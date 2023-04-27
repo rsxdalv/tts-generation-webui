@@ -2,7 +2,7 @@
 
 This code provides a Gradio interface for generating audio from text input using the Bark TTS model. The interface takes a text prompt as input and generates audio as output.
 
-![Screenshot](screenshot.jpg)
+![Screenshot](screenshot.png)
 
 ## Dependencies
 
