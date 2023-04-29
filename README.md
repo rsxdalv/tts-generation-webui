@@ -7,7 +7,7 @@ This code provides a Gradio interface for generating audio from text input using
 
 ![Screenshot_generation_tab](./screenshots/generation_tab.png)
 ![Screenshot_history_tab](./screenshots/history_tab.png)
-![Screenshot_models_tab](./screenshots/models_tab.png)
+![Screenshot_settings_tab](./screenshots/settings_tab.png)
 
 ## Dependencies
 

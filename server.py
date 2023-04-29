@@ -1,3 +1,6 @@
+import dotenv_init
+import matplotlib
+import matplotlib.pyplot as plt
 import gradio as gr
 from models.bark.bark.generation import SUPPORTED_LANGS, preload_models
 from scipy.io.wavfile import write as write_wav
@@ -6,10 +9,9 @@ import json
 import os
 import glob
 import datetime
-from dotenv import load_dotenv
-load_dotenv()
 
-
+dotenv_init.init()
+matplotlib.use('agg')
 config = None
 
 
@@ -35,8 +37,16 @@ def setup_or_recover():
     if not os.path.exists('.env'):
         print("Env file not found. Creating default env.")
         with open('.env', 'w') as outfile:
-            outfile.write(
-                "SUNO_USE_SMALL_MODELS=False\nSUNO_ENABLE_MPS=False\nSUNO_OFFLOAD_CPU=False\n")
+            outfile.write(f"""
+# Due to implementation, only empty string is False,
+#  everything else is True
+# Duplicates small models checkboxes
+SUNO_USE_SMALL_MODELS=
+# Use MPS when CUDA is unavailable
+SUNO_ENABLE_MPS=
+# Offload GPU models to CPU
+SUNO_OFFLOAD_CPU=
+""")
 
 
 setup_or_recover()
@@ -75,7 +85,12 @@ def save_config(text_use_gpu,
     return "Saved: " + str(config)
 
 
+are_models_loaded = False
+
+
 def reload_models():
+    global are_models_loaded
+    are_models_loaded = True
     preload_models(
         text_use_gpu=config["model"]["text_use_gpu"],
         text_use_small=config["model"]["text_use_small"],
@@ -118,23 +133,61 @@ def open_outputs_folder():
     os.startfile("outputs")
 
 
-def generate(prompt, useHistory, language=None, speaker_id=0):
-    # generate audio from text
-    history_prompt = None if not useHistory else f"{SUPPORTED_LANGS[language][1]}_speaker_{speaker_id}"
+def generate(prompt, useHistory, language=None, speaker_id=0, text_temp=0.7, waveform_temp=0.7):
+    if not are_models_loaded:
+        reload_models()
 
-    print("Generating:", prompt, "history_prompt:", history_prompt)
-    audio_array = generate_audio(prompt, history_prompt=history_prompt)
+    # generate audio from text
+    history_prompt = f"{SUPPORTED_LANGS[language][1]}_speaker_{speaker_id}" if useHistory else None
+
+    print("Generating:", prompt, "history_prompt:", history_prompt, "text_temp:", text_temp, "waveform_temp:", waveform_temp)
+    audio_array = generate_audio(prompt, history_prompt=history_prompt, text_temp=text_temp, waveform_temp=waveform_temp)
 
     # get current date for file
     now = datetime.datetime.now()
     date = now.strftime("%Y-%m-%d_%H-%M-%S")
 
+    base_filename = f"outputs/audio__{history_prompt}__{date}"
     # To save audio_array as a WAV file:
-    filename = f"outputs/audio_{history_prompt}_{date}.wav"
+    filename = f"{base_filename}.wav"
     # See if metadata can be added to the file
     write_wav(filename, SAMPLE_RATE, audio_array)
-    return filename
+    # Plot the waveform using matplotlib
+    plt.figure(figsize=(10, 3))
+    plt.plot(audio_array)
+    plt.axis("off")
+    # Return the plot as an image
+    filename_png = f"{base_filename}.png"
+    plt.savefig(filename_png)
 
+    # Generate metadata for the audio file
+    metadata = {
+        "prompt": prompt,
+        "language": SUPPORTED_LANGS[language][0] if useHistory else None,
+        "speaker_id": speaker_id if useHistory else None,
+        "history_prompt": history_prompt,
+        "text_temp": text_temp,
+        "waveform_temp": waveform_temp,
+        "date": date,
+        "filename": filename,
+        "filename_png": filename_png,
+    }
+    # Write metadata to txt file
+    with open(f"{base_filename}.json", "w") as outfile:
+        json.dump(metadata, outfile, indent=2)
+
+    return [filename, filename_png]
+
+
+def generate_multi(count=1):
+    def gen(prompt, useHistory, language=None, speaker_id=0, text_temp=0.7, waveform_temp=0.7):
+        filenames = []
+        for i in range(count):
+            filename, filename_png = generate(prompt, useHistory, language, speaker_id, text_temp=text_temp, waveform_temp=waveform_temp)
+            filenames.append(filename)
+            filenames.append(filename_png)
+        return filenames
+    return gen
 
 def test():
     text_prompt = """
@@ -174,6 +227,10 @@ with gr.Blocks() as block:
         useHistory.change(fn=toggleHistory, inputs=[useHistory], outputs=[
             languageRadio, speakerIdRadio])
 
+        with gr.Row():
+            text_temp = gr.Slider(label="Text temperature", value=0.7, minimum=0.0, maximum=1.0, step=0.1)
+            waveform_temp = gr.Slider(label="Waveform temperature", value=0.7, minimum=0.0, maximum=1.0, step=0.1)
+
         prompt = gr.Textbox(label="Prompt", lines=3,
                             placeholder="Enter text here...")
 
@@ -181,9 +238,25 @@ with gr.Blocks() as block:
             prompt,
             useHistory,
             languageRadio,
-            speakerIdRadio
+            speakerIdRadio,
+            text_temp,
+            waveform_temp
         ]
-        outputs = gr.Audio(type="filepath", label="Generated audio")
+        with gr.Row():
+            audio_1 = gr.Audio(type="filepath", label="Generated audio")
+            audio_2 = gr.Audio(
+                type="filepath", label="Generated audio", visible=False)
+            audio_3 = gr.Audio(
+                type="filepath", label="Generated audio", visible=False)
+
+        with gr.Row():
+            image_1 = gr.Image(label="Waveform")
+            image_2 = gr.Image(label="Waveform", visible=False)
+            image_3 = gr.Image(label="Waveform", visible=False)
+
+        outputs = [audio_1, image_1]
+        outputs2 = [audio_2, image_2]
+        outputs3 = [audio_3, image_3]
         examples = [
             ["The quick brown fox jumps over the lazy dog."],
             ["To be or not to be, that is the question."],
@@ -192,10 +265,33 @@ with gr.Blocks() as block:
                 True, "English", "0"],
         ]
 
-        generate_button = gr.Button("Generate", variant="primary")
+        with gr.Row():
+            generate3_button = gr.Button("Generate 3")
+            generate2_button = gr.Button("Generate 2")
+            generate1_button = gr.Button("Generate", variant="primary")
 
         prompt.submit(fn=generate, inputs=inputs, outputs=outputs)
-        generate_button.click(fn=generate, inputs=inputs, outputs=outputs)
+        generate1_button.click(fn=generate, inputs=inputs, outputs=outputs)
+        generate2_button.click(fn=generate_multi(2), inputs=inputs,
+                               outputs=outputs + outputs2)
+        generate3_button.click(fn=generate_multi(3), inputs=inputs,
+                               outputs=outputs + outputs2 + outputs3)
+
+        def show_closure(count):
+            def show():
+                return [
+                    gr.Audio.update(visible=True),
+                    gr.Image.update(visible=True),
+                    gr.Audio.update(visible=count > 1),
+                    gr.Image.update(visible=count > 1),
+                    gr.Audio.update(visible=count > 2),
+                    gr.Image.update(visible=count > 2),
+                ]
+            return show
+
+        generate1_button.click(fn=show_closure(1), outputs=outputs + outputs2 + outputs3)
+        generate2_button.click(fn=show_closure(2), outputs=outputs + outputs2 + outputs3)
+        generate3_button.click(fn=show_closure(3), outputs=outputs + outputs2 + outputs3)
 
     with gr.Tab("History") as history_tab:
 
@@ -216,15 +312,21 @@ with gr.Blocks() as block:
                                   samples=get_wav_files(), label="History", samples_per_page=20)
         history_audio = gr.Audio(
             visible=True, type="filepath", label="History")
+        history_image = gr.Image()
+        history_json = gr.JSON()
 
         def select_audio(selection):
-            print("selection", selection)
-            print("wav_file_list", wav_file_list)
             filename = wav_file_list[selection]
-            return gr.Audio.update(value=filename, label=filename)
+            with open(filename.replace(".wav", ".json")) as f:
+                json_text = json.load(f)
+            return [
+                gr.Audio.update(value=filename, label=filename),
+                gr.Image.update(value=filename.replace(".wav", ".png")),
+                gr.JSON.update(value=json_text),
+            ]
 
         history_list.select(fn=select_audio, inputs=[history_list], outputs=[
-                            history_audio], preprocess=False)
+                            history_audio, history_image, history_json], preprocess=False)
 
         def update_history_tab():
             return gr.Dataset.update(samples=get_wav_files())
@@ -256,9 +358,12 @@ with gr.Blocks() as block:
                     ## Environment variables
                     (Requires restart)
                 """)
-                ENV_SMALL_MODELS = os.environ.get("SUNO_USE_SMALL_MODELS", "").lower() in ("true", "1")
-                ENV_ENABLE_MPS = os.environ.get("SUNO_ENABLE_MPS", "").lower() in ("true", "1")
-                ENV_OFFLOAD_CPU = os.environ.get("SUNO_OFFLOAD_CPU", "").lower() in ("true", "1")
+                ENV_SMALL_MODELS = os.environ.get(
+                    "SUNO_USE_SMALL_MODELS", "").lower() in ("true", "1")
+                ENV_ENABLE_MPS = os.environ.get(
+                    "SUNO_ENABLE_MPS", "").lower() in ("true", "1")
+                ENV_OFFLOAD_CPU = os.environ.get(
+                    "SUNO_OFFLOAD_CPU", "").lower() in ("true", "1")
                 environment_suno_use_small_models = gr.Checkbox(
                     label="Use small models", value=ENV_SMALL_MODELS)
 
@@ -284,9 +389,14 @@ with gr.Blocks() as block:
                         environment_suno_offload_cpu)
                     with open('.env', 'w') as outfile:
                         outfile.write(f"""
-                            SUNO_USE_SMALL_MODELS={environment_suno_use_small_models}  # Duplicates small models checkboxes
-                            SUNO_ENABLE_MPS={environment_suno_enable_mps}  # Use MPS when CUDA is unavailable
-                            SUNO_OFFLOAD_CPU={environment_suno_offload_cpu}  # Offload GPU models to CPU
+# Due to implementation, only empty string is False,
+#  everything else is True
+# Duplicates small models checkboxes
+SUNO_USE_SMALL_MODELS={"" if not environment_suno_use_small_models else environment_suno_use_small_models}
+# Use MPS when CUDA is unavailable
+SUNO_ENABLE_MPS={"" if not environment_suno_enable_mps else environment_suno_enable_mps}
+# Offload GPU models to CPU
+SUNO_OFFLOAD_CPU={"" if not environment_suno_offload_cpu else environment_suno_offload_cpu}
                         """)
                     os._exit(0)
 
@@ -336,8 +446,6 @@ with gr.Blocks() as block:
                 def set_to_reload():
                     return gr.Button.update(value="Loading...", interactive=False)
 
-
-
             with gr.Column():
                 gr.Markdown(
                     """
@@ -347,7 +455,7 @@ with gr.Blocks() as block:
                     For VRAM < 4GB, use CPU offloading (requires restart).
                 """
                 )
-                
+
                 load_button = gr.Button(
                     value="Reload models" if config["load_models_on_startup"] else "Load models")
 

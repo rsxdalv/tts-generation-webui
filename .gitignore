@@ -1,4 +1,5 @@
 __pycache__
 outputs/
+favorites/
 config.json
 .env
