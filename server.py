@@ -227,8 +227,91 @@ def toggleHistory(choice):
 with gr.Blocks() as block:
     gr.Markdown("# TTS Generation WebUI (Bark)")
 
-    with gr.Tab("Generation"):
+    with gr.Tab("Generation (Bark)"):
         useHistory = gr.Checkbox(
+            label="Use a voice (History Prompt):", value=False)
+
+        languages = [lang[0] for lang in SUPPORTED_LANGS]
+        languageRadio = gr.Radio(languages, type="index", show_label=False,
+                                 value="English", visible=False)
+
+        speaker_ids = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
+        speakerIdRadio = gr.Radio(speaker_ids, type="value",
+                                  label="Speaker ID", value="0", visible=False)
+
+        # Show the language and speakerId radios only when useHistory is checked
+        useHistory.change(fn=toggleHistory, inputs=[useHistory], outputs=[
+            languageRadio, speakerIdRadio])
+
+        with gr.Row():
+            text_temp = gr.Slider(label="Text temperature", value=0.7, minimum=0.0, maximum=1.0, step=0.1)
+            waveform_temp = gr.Slider(label="Waveform temperature", value=0.7, minimum=0.0, maximum=1.0, step=0.1)
+
+        prompt = gr.Textbox(label="Prompt", lines=3,
+                            placeholder="Enter text here...")
+
+        inputs = [
+            prompt,
+            useHistory,
+            languageRadio,
+            speakerIdRadio,
+            text_temp,
+            waveform_temp
+        ]
+
+        with gr.Row():
+            audio_1 = gr.Audio(type="filepath", label="Generated audio")
+            audio_2 = gr.Audio(
+                type="filepath", label="Generated audio", visible=False)
+            audio_3 = gr.Audio(
+                type="filepath", label="Generated audio", visible=False)
+
+        with gr.Row():
+            image_1 = gr.Image(label="Waveform")
+            image_2 = gr.Image(label="Waveform", visible=False)
+            image_3 = gr.Image(label="Waveform", visible=False)
+
+        outputs = [audio_1, image_1]
+        outputs2 = [audio_2, image_2]
+        outputs3 = [audio_3, image_3]
+        examples = [
+            ["The quick brown fox jumps over the lazy dog."],
+            ["To be or not to be, that is the question."],
+            ["In a hole in the ground there lived a hobbit."],
+            ["This text uses a history prompt, resulting in a more predictable voice.",
+                True, "English", "0"],
+        ]
+
+        with gr.Row():
+            generate3_button = gr.Button("Generate 3")
+            generate2_button = gr.Button("Generate 2")
+            generate1_button = gr.Button("Generate", variant="primary")
+
+        prompt.submit(fn=generate, inputs=inputs, outputs=outputs)
+        generate1_button.click(fn=generate, inputs=inputs, outputs=outputs)
+        generate2_button.click(fn=generate_multi(2), inputs=inputs,
+                               outputs=outputs + outputs2)
+        generate3_button.click(fn=generate_multi(3), inputs=inputs,
+                               outputs=outputs + outputs2 + outputs3)
+
+        def show_closure(count):
+            def show():
+                return [
+                    gr.Audio.update(visible=True),
+                    gr.Image.update(visible=True),
+                    gr.Audio.update(visible=count > 1),
+                    gr.Image.update(visible=count > 1),
+                    gr.Audio.update(visible=count > 2),
+                    gr.Image.update(visible=count > 2),
+                ]
+            return show
+
+        generate1_button.click(fn=show_closure(1), outputs=outputs + outputs2 + outputs3)
+        generate2_button.click(fn=show_closure(2), outputs=outputs + outputs2 + outputs3)
+        generate3_button.click(fn=show_closure(3), outputs=outputs + outputs2 + outputs3)
+
+    with gr.Tab("Generation (Tortoise))"):
+        useHistory = gr.Checkbox(2,
             label="Use a voice (History Prompt):", value=False)
 
         languages = [lang[0] for lang in SUPPORTED_LANGS]
