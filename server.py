@@ -35,6 +35,8 @@ def setup_or_recover():
             }, outfile, indent=2)
     if not os.path.exists('outputs'):
         os.makedirs('outputs')
+    if not os.path.exists('favorites'):
+        os.makedirs('favorites')
     if not os.path.exists('.env'):
         print("Env file not found. Creating default env.")
         with open('.env', 'w') as outfile:
