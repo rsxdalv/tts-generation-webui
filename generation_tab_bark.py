@@ -1,3 +1,4 @@
+import os
 from create_base_filename import create_base_filename
 from gen_tortoise import generate_tortoise_
 from get_date import get_date
@@ -8,14 +9,18 @@ from models.bark.bark.generation import SUPPORTED_LANGS
 import gradio as gr
 from save_waveform_plot import save_waveform_plot
 from model_manager import model_manager
-from config import config 
+from config import config
 
-def generate(prompt, useHistory, language=None, speaker_id=0, text_temp=0.7, waveform_temp=0.7):
+
+def generate(prompt, useHistory, language=None, speaker_id=0, useV2=False, text_temp=0.7, waveform_temp=0.7):
     if not model_manager.models_loaded:
         model_manager.reload_models(config)
 
-    # generate audio from text
     history_prompt = f"{SUPPORTED_LANGS[language][1]}_speaker_{speaker_id}" if useHistory else None
+    if useV2:
+        history_prompt = os.path.join("v2", history_prompt)
+    # "v2" + {os.path.sep} + history_prompt
+    # history_prompt = f"v2{os.path.sep}{history_prompt}"
 
     print("Generating:", prompt, "history_prompt:", history_prompt,
           "text_temp:", text_temp, "waveform_temp:", waveform_temp)
@@ -52,27 +57,22 @@ def generate(prompt, useHistory, language=None, speaker_id=0, text_temp=0.7, wav
 
 
 def generate_multi(count=1):
-    def gen(prompt, useHistory, language=None, speaker_id=0, text_temp=0.7, waveform_temp=0.7):
+    def gen(prompt, useHistory, language=None, speaker_id=0, useV2=False, text_temp=0.7, waveform_temp=0.7):
         filenames = []
         for i in range(count):
             filename, filename_png = generate(
-                prompt, useHistory, language, speaker_id, text_temp=text_temp, waveform_temp=waveform_temp)
+                prompt, useHistory, language, speaker_id, useV2, text_temp=text_temp, waveform_temp=waveform_temp)
             filenames.extend((filename, filename_png))
         return filenames
     return gen
-
-
-def toggleHistory(choice):
-    if choice == True:
-        return [gr.Radio.update(visible=True), gr.Radio.update(visible=True)]
-    else:
-        return [gr.Radio.update(visible=False), gr.Radio.update(visible=False)]
-
 
 def generation_tab_bark():
     with gr.Tab("Generation (Bark)"):
         useHistory = gr.Checkbox(
             label="Use a voice (History Prompt):", value=False)
+
+        useV2 = gr.Checkbox(
+            label="Use V2", value=False, visible=False)
 
         languages = [lang[0] for lang in SUPPORTED_LANGS]
         languageRadio = gr.Radio(languages, type="index", show_label=False,
@@ -83,8 +83,11 @@ def generation_tab_bark():
                                   label="Speaker ID", value="0", visible=False)
 
         # Show the language and speakerId radios only when useHistory is checked
-        useHistory.change(fn=toggleHistory, inputs=[useHistory], outputs=[
-            languageRadio, speakerIdRadio])
+        useHistory.change(
+            fn=lambda choice: [gr.Radio.update(visible=choice), gr.Radio.update(
+                visible=choice), gr.Checkbox.update(visible=choice)],
+            inputs=[useHistory],
+            outputs=[languageRadio, speakerIdRadio, useV2])
 
         with gr.Row():
             text_temp = gr.Slider(label="Text temperature",
@@ -100,6 +103,7 @@ def generation_tab_bark():
             useHistory,
             languageRadio,
             speakerIdRadio,
+            useV2,
             text_temp,
             waveform_temp
         ]
@@ -133,7 +137,7 @@ def generation_tab_bark():
             generate1_button = gr.Button("Generate", variant="primary")
 
         prompt.submit(fn=generate, inputs=inputs, outputs=outputs)
-        generate1_button.click(fn=generate, inputs=inputs, outputs=outputs)
+        generate1_button.click(fn=generate_multi(1), inputs=inputs, outputs=outputs)
         generate2_button.click(fn=generate_multi(2), inputs=inputs,
                                outputs=outputs + outputs2)
         generate3_button.click(fn=generate_multi(3), inputs=inputs,
@@ -224,4 +228,3 @@ def generation_tab_tortoise():
             2), outputs=outputs + outputs2 + outputs3)
         generate3_button.click(fn=show_closure(
             3), outputs=outputs + outputs2 + outputs3)
-
