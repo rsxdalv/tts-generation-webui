@@ -2,6 +2,7 @@ import os
 from create_base_filename import create_base_filename
 from gen_tortoise import generate_tortoise_
 from get_date import get_date
+from get_speaker_gender import get_speaker_gender
 from models.bark.bark import SAMPLE_RATE, generate_audio
 from scipy.io.wavfile import write as write_wav
 import json
@@ -18,6 +19,25 @@ history_settings = [value_empty_history, value_use_last_gen, value_use_voice]
 
 last_generation = None
 
+
+def create_voice_string(language, speaker_id, useV2):
+    history_prompt = f"{SUPPORTED_LANGS[language][1]}_speaker_{speaker_id}"
+    if useV2:
+        history_prompt = os.path.join("v2", history_prompt)
+    return history_prompt
+
+
+def generate_choice_string(useV2, language, speaker_id):
+    history_prompt = create_voice_string(language, speaker_id, useV2)
+    gender = get_speaker_gender(history_prompt)
+    return gr.Markdown.update(
+        value=f"Chosen voice: {history_prompt}, Gender: {gender}"
+    )
+
+
+def get_history_prompt_verbal(history_prompt, use_last_generation):
+    return "last_generation" if use_last_generation else (history_prompt or "None")
+
 def generate(prompt, history_setting, language=None, speaker_id=0, useV2=False, text_temp=0.7, waveform_temp=0.7):
     if not model_manager.models_loaded:
         model_manager.reload_models(config)
@@ -29,15 +49,10 @@ def generate(prompt, history_setting, language=None, speaker_id=0, useV2=False, 
     if use_last_generation and last_generation is not None:
         history_prompt = last_generation
     else:
-        history_prompt = f"{SUPPORTED_LANGS[language][1]}_speaker_{speaker_id}" if use_voice else None
+        history_prompt = create_voice_string(
+            language, speaker_id, useV2) if use_voice else None
 
-    if useV2 and use_voice:
-        history_prompt = os.path.join("v2", history_prompt)
-
-    history_prompt_verbal = history_prompt if history_prompt is not None else "None"
-    if use_last_generation:
-        history_prompt_verbal = "last_generation"
-    
+    history_prompt_verbal = get_history_prompt_verbal(history_prompt, use_last_generation)
 
     print("Generating:", prompt, "history_prompt:", history_prompt_verbal,
           "text_temp:", text_temp, "waveform_temp:", waveform_temp,
@@ -96,8 +111,10 @@ def generation_tab_bark():
             label="History Prompt (voice) setting:"
         )
 
-        useV2 = gr.Checkbox(
-            label="Use V2", value=False, visible=False)
+        with gr.Row():
+            useV2 = gr.Checkbox(
+                label="Use V2", value=False, visible=False)
+            choice_string = gr.Markdown("Chosen voice: en_speaker_0, Gender: Unknown", visible=False)
 
         languages = [lang[0] for lang in SUPPORTED_LANGS]
         languageRadio = gr.Radio(languages, type="index", show_label=False,
@@ -112,10 +129,11 @@ def generation_tab_bark():
             fn=lambda choice: [
                 gr.Radio.update(visible=(choice == value_use_voice)),
                 gr.Radio.update(visible=(choice == value_use_voice)),
-                gr.Checkbox.update(visible=(choice == value_use_voice))
+                gr.Checkbox.update(visible=(choice == value_use_voice)),
+                gr.Markdown.update(visible=(choice == value_use_voice)),
             ],
             inputs=[history_setting],
-            outputs=[languageRadio, speakerIdRadio, useV2])
+            outputs=[languageRadio, speakerIdRadio, useV2, choice_string])
 
         with gr.Row():
             text_temp = gr.Slider(label="Text temperature",
@@ -135,6 +153,18 @@ def generation_tab_bark():
             text_temp,
             waveform_temp
         ]
+
+        voice_inputs = [
+            useV2,
+            languageRadio,
+            speakerIdRadio
+        ]
+
+        for i in voice_inputs:
+            i.change(
+                fn=generate_choice_string,
+                inputs=voice_inputs,
+                outputs=[choice_string])
 
         with gr.Row():
             audio_1 = gr.Audio(type="filepath", label="Generated audio")
