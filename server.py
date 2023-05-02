@@ -1,5 +1,4 @@
-from config import config
-
+import setup_or_recover
 import dotenv_init
 import matplotlib
 import matplotlib.pyplot as plt
@@ -9,12 +8,11 @@ import json
 from history_tab import favorites_tab, history_tab
 from model_manager import model_manager
 from settings_tab import settings_tab
+from config import config
 
-from setup_or_recover import setup_or_recover
-
+setup_or_recover.dummy()
 dotenv_init.init()
 matplotlib.use('agg')
-setup_or_recover()
 
 def save_config(text_use_gpu,
                 text_use_small,

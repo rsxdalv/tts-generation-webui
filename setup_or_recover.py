@@ -1,6 +1,8 @@
 import json
 import os
 
+def dummy():
+    pass
 
 def setup_or_recover():
     if not os.path.exists('config.json'):
@@ -38,3 +40,5 @@ SUNO_ENABLE_MPS=
 SUNO_OFFLOAD_CPU=
 """
             )
+
+setup_or_recover()
