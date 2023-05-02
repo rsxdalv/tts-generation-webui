@@ -17,7 +17,7 @@ def generate(prompt, useHistory, language=None, speaker_id=0, useV2=False, text_
         model_manager.reload_models(config)
 
     history_prompt = f"{SUPPORTED_LANGS[language][1]}_speaker_{speaker_id}" if useHistory else None
-    if useV2:
+    if useV2 and history_prompt is not None:
         history_prompt = os.path.join("v2", history_prompt)
     # "v2" + {os.path.sep} + history_prompt
     # history_prompt = f"v2{os.path.sep}{history_prompt}"
