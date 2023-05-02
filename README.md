@@ -5,9 +5,11 @@ https://github.com/rsxdalv/one-click-installers-tts
 
 This code provides a Gradio interface for generating audio from text input using the Bark TTS and Tortoise TTS models. The interface takes a text prompt as input and generates audio as output.
 
-![Screenshot_generation_tab](./screenshots/generation_tab.png)
-![Screenshot_history_tab](./screenshots/history_tab.png)
-![Screenshot_settings_tab](./screenshots/settings_tab.png)
+![Screenshot 1](./screenshots/screenshot%20(1).png)
+![Screenshot 2](./screenshots/screenshot%20(2).png)
+![Screenshot 3](./screenshots/screenshot%20(3).png)
+![Screenshot 4](./screenshots/screenshot%20(4).png)
+![Screenshot 5](./screenshots/screenshot%20(5).png)
 
 ## Dependencies
 
@@ -17,6 +19,16 @@ This code requires the following dependencies:
 - `scipy`
 - `gradio`
 
+
+## Changelog
+May 2 Update 2:
+* Added support for history recylcing to continue longer prompts manually
+
+May 2 Update 1:
+* Added support for v2 prompts
+
+Before:
+* Added support for Tortoise TTS
 
 ## To customize the installation, you may clone one of bark model forks within models/bark
 
