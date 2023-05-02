@@ -11,26 +11,46 @@ from save_waveform_plot import save_waveform_plot
 from model_manager import model_manager
 from config import config
 
+value_empty_history = "Empty history"
+value_use_last_gen = "or Use last generation as history"
+value_use_voice = "or Use a voice:"
+history_settings = [value_empty_history, value_use_last_gen, value_use_voice]
 
-def generate(prompt, useHistory, language=None, speaker_id=0, useV2=False, text_temp=0.7, waveform_temp=0.7):
+last_generation = None
+
+def generate(prompt, history_setting, language=None, speaker_id=0, useV2=False, text_temp=0.7, waveform_temp=0.7):
     if not model_manager.models_loaded:
         model_manager.reload_models(config)
 
-    history_prompt = f"{SUPPORTED_LANGS[language][1]}_speaker_{speaker_id}" if useHistory else None
-    if useV2 and history_prompt is not None:
-        history_prompt = os.path.join("v2", history_prompt)
-    # "v2" + {os.path.sep} + history_prompt
-    # history_prompt = f"v2{os.path.sep}{history_prompt}"
+    use_voice = history_setting == value_use_voice
+    use_last_generation = history_setting == value_use_last_gen
 
-    print("Generating:", prompt, "history_prompt:", history_prompt,
-          "text_temp:", text_temp, "waveform_temp:", waveform_temp)
-    audio_array = generate_audio(
-        prompt, history_prompt=history_prompt, text_temp=text_temp, waveform_temp=waveform_temp)
+    global last_generation
+    if use_last_generation and last_generation is not None:
+        history_prompt = last_generation
+    else:
+        history_prompt = f"{SUPPORTED_LANGS[language][1]}_speaker_{speaker_id}" if use_voice else None
+
+    if useV2 and use_voice:
+        history_prompt = os.path.join("v2", history_prompt)
+
+    history_prompt_verbal = history_prompt if history_prompt is not None else "None"
+    if use_last_generation:
+        history_prompt_verbal = "last_generation"
+    
+
+    print("Generating:", prompt, "history_prompt:", history_prompt_verbal,
+          "text_temp:", text_temp, "waveform_temp:", waveform_temp,
+          "useV2:", useV2, "use_voice:", use_voice, "use_last_generation", use_last_generation)
+    full_generation, audio_array = generate_audio(
+        prompt, history_prompt=history_prompt, text_temp=text_temp, waveform_temp=waveform_temp, output_full=True)
+
+    last_generation = full_generation
 
     model = "bark"
     date = get_date()
     base_filename = create_base_filename(
-        history_prompt, "outputs", model, date)
+        history_prompt_verbal, "outputs", model, date)
     filename = f"{base_filename}.wav"
     write_wav(filename, SAMPLE_RATE, audio_array)
     filename_png = f"{base_filename}.png"
@@ -40,9 +60,9 @@ def generate(prompt, useHistory, language=None, speaker_id=0, useV2=False, text_
     # Generate metadata for the audio file
     metadata = {
         "prompt": prompt,
-        "language": SUPPORTED_LANGS[language][0] if useHistory else None,
-        "speaker_id": speaker_id if useHistory else None,
-        "history_prompt": history_prompt,
+        "language": SUPPORTED_LANGS[language][0] if use_voice else None,
+        "speaker_id": speaker_id if use_voice else None,
+        "history_prompt": history_prompt_verbal,
         "text_temp": text_temp,
         "waveform_temp": waveform_temp,
         "date": date,
@@ -57,19 +77,24 @@ def generate(prompt, useHistory, language=None, speaker_id=0, useV2=False, text_
 
 
 def generate_multi(count=1):
-    def gen(prompt, useHistory, language=None, speaker_id=0, useV2=False, text_temp=0.7, waveform_temp=0.7):
+    def gen(prompt, history_setting, language=None, speaker_id=0, useV2=False, text_temp=0.7, waveform_temp=0.7):
         filenames = []
         for i in range(count):
             filename, filename_png = generate(
-                prompt, useHistory, language, speaker_id, useV2, text_temp=text_temp, waveform_temp=waveform_temp)
+                prompt, history_setting, language, speaker_id, useV2, text_temp=text_temp, waveform_temp=waveform_temp)
             filenames.extend((filename, filename_png))
         return filenames
     return gen
 
+
 def generation_tab_bark():
     with gr.Tab("Generation (Bark)"):
-        useHistory = gr.Checkbox(
-            label="Use a voice (History Prompt):", value=False)
+        history_setting = gr.Radio(
+            history_settings,
+            value="Empty history",
+            type="value",
+            label="History Prompt (voice) setting:"
+        )
 
         useV2 = gr.Checkbox(
             label="Use V2", value=False, visible=False)
@@ -83,10 +108,13 @@ def generation_tab_bark():
                                   label="Speaker ID", value="0", visible=False)
 
         # Show the language and speakerId radios only when useHistory is checked
-        useHistory.change(
-            fn=lambda choice: [gr.Radio.update(visible=choice), gr.Radio.update(
-                visible=choice), gr.Checkbox.update(visible=choice)],
-            inputs=[useHistory],
+        history_setting.change(
+            fn=lambda choice: [
+                gr.Radio.update(visible=(choice == value_use_voice)),
+                gr.Radio.update(visible=(choice == value_use_voice)),
+                gr.Checkbox.update(visible=(choice == value_use_voice))
+            ],
+            inputs=[history_setting],
             outputs=[languageRadio, speakerIdRadio, useV2])
 
         with gr.Row():
@@ -100,7 +128,7 @@ def generation_tab_bark():
 
         inputs = [
             prompt,
-            useHistory,
+            history_setting,
             languageRadio,
             speakerIdRadio,
             useV2,
@@ -136,8 +164,9 @@ def generation_tab_bark():
             generate2_button = gr.Button("Generate 2")
             generate1_button = gr.Button("Generate", variant="primary")
 
-        prompt.submit(fn=generate, inputs=inputs, outputs=outputs)
-        generate1_button.click(fn=generate_multi(1), inputs=inputs, outputs=outputs)
+        prompt.submit(fn=generate_multi(1), inputs=inputs, outputs=outputs)
+        generate1_button.click(fn=generate_multi(1), inputs=inputs,
+                               outputs=outputs)
         generate2_button.click(fn=generate_multi(2), inputs=inputs,
                                outputs=outputs + outputs2)
         generate3_button.click(fn=generate_multi(3), inputs=inputs,
