@@ -2,7 +2,7 @@ import setup_or_recover
 import dotenv_init
 import matplotlib
 import matplotlib.pyplot as plt
-from generation_tab_bark import generation_tab_tortoise, generation_tab_bark
+from generation_tab_bark import generation_tab_tortoise, generation_tab_bark, css_tortoise
 import gradio as gr
 import json
 from history_tab import favorites_tab, history_tab
@@ -59,9 +59,9 @@ def load_models(
     model_manager.reload_models(config)
     return gr.Button.update(value="Reload models", interactive=True)
 
+full_css = css_tortoise
 
-
-with gr.Blocks() as block:
+with gr.Blocks(css=full_css) as block:
     gr.Markdown("# TTS Generation WebUI (Bark & Tortoise)")
     generation_tab_bark()
     generation_tab_tortoise()

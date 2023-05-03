@@ -21,6 +21,9 @@ This code requires the following dependencies:
 
 
 ## Changelog
+May 3:
+* Improved Tortoise UI: Voice, Preset and CVVP settings as well as ability to generate 3 results (https://github.com/rsxdalv/tts-generation-webui/pull/6)
+
 May 2 Update 2:
 * Added support for history recylcing to continue longer prompts manually
 

@@ -1,6 +1,6 @@
 import os
 from create_base_filename import create_base_filename
-from gen_tortoise import generate_tortoise_
+from gen_tortoise import generate_tortoise_n
 from get_date import get_date
 from get_speaker_gender import get_speaker_gender
 from models.bark.bark import SAMPLE_RATE, generate_audio
@@ -8,6 +8,7 @@ from scipy.io.wavfile import write as write_wav
 import json
 from models.bark.bark.generation import SUPPORTED_LANGS
 import gradio as gr
+from models.tortoise.tortoise.utils.audio import get_voices
 from save_waveform_plot import save_waveform_plot
 from model_manager import model_manager
 from config import config
@@ -38,6 +39,7 @@ def generate_choice_string(useV2, language, speaker_id):
 def get_history_prompt_verbal(history_prompt, use_last_generation):
     return "last_generation" if use_last_generation else (history_prompt or "None")
 
+
 def generate(prompt, history_setting, language=None, speaker_id=0, useV2=False, text_temp=0.7, waveform_temp=0.7):
     if not model_manager.models_loaded:
         model_manager.reload_models(config)
@@ -52,7 +54,8 @@ def generate(prompt, history_setting, language=None, speaker_id=0, useV2=False, 
         history_prompt = create_voice_string(
             language, speaker_id, useV2) if use_voice else None
 
-    history_prompt_verbal = get_history_prompt_verbal(history_prompt, use_last_generation)
+    history_prompt_verbal = get_history_prompt_verbal(
+        history_prompt, use_last_generation)
 
     print("Generating:", prompt, "history_prompt:", history_prompt_verbal,
           "text_temp:", text_temp, "waveform_temp:", waveform_temp,
@@ -114,7 +117,8 @@ def generation_tab_bark():
         with gr.Row():
             useV2 = gr.Checkbox(
                 label="Use V2", value=False, visible=False)
-            choice_string = gr.Markdown("Chosen voice: en_speaker_0, Gender: Unknown", visible=False)
+            choice_string = gr.Markdown(
+                "Chosen voice: en_speaker_0, Gender: Unknown", visible=False)
 
         languages = [lang[0] for lang in SUPPORTED_LANGS]
         languageRadio = gr.Radio(languages, type="index", show_label=False,
@@ -229,14 +233,60 @@ def test():
     generate(text_prompt, True, history_prompt)
     generate(text_prompt, False, history_prompt)
 
+css_tortoise = """
+.btn-sm {
+    min-width: 3em !important;
+    flex-grow: 0 !important;
+}
+"""
 
 def generation_tab_tortoise():
     with gr.Tab("Generation (Tortoise)"):
-        prompt_tortoise = gr.Textbox(label="Prompt", lines=3,
-                                     placeholder="Enter text here...")
+        prompt = gr.Textbox(label="Prompt", lines=3,
+                            placeholder="Enter text here...")
+
+        with gr.Row():
+            # with gr.Box():
+                # gr.Markdown("### Voice")
+            with gr.Row():
+                voice = gr.Dropdown(
+                    choices=["random"] + list(get_voices()),
+                    value="random",
+                    # show_label=False,
+                    label="Voice"
+                )
+                    # voice.style(container=False)
+                    # reload_voices = gr.Button("🔁", elem_classes="btn-sm")
+                    # reload_voices.style(size="sm")
+                    # def reload_voices_fn():
+                    #     choices = 
+                    #     print(choices)
+                    #     return [
+                    #         gr.Dropdown.update(choices=choices),
+                    #     ]
+                    # reload_voices.click(fn=reload_voices_fn, outputs=[voice])
+            preset = gr.Dropdown(label="Preset", choices=[
+                'ultra_fast',
+                'fast',
+                'standard',
+                'high_quality',
+            ], value="ultra_fast")
+        # Args:
+        # seed (int): The desired seed. Value must be within the inclusive range
+        #     `[-0x8000_0000_0000_0000, 0xffff_ffff_ffff_ffff]`. Otherwise, a RuntimeError
+        #     is raised. Negative inputs are remapped to positive values with the formula
+        #     `0xffff_ffff_ffff_ffff + seed`.
+        seed = gr.Textbox(label="Seed", lines=1,
+                          placeholder="Enter seed here...", value="None", visible=False)
+        cvvp_amount = gr.Slider(label="CVVP Amount",
+                                value=0.0, minimum=0.0, maximum=1.0, step=0.1)
 
         inputs = [
-            prompt_tortoise
+            prompt,
+            voice,
+            preset,
+            seed,
+            cvvp_amount
         ]
 
         with gr.Row():
@@ -256,17 +306,17 @@ def generation_tab_tortoise():
         outputs3 = [audio_3, image_3]
 
         with gr.Row():
-            generate3_button = gr.Button("Generate 3", visible=False)
-            generate2_button = gr.Button("Generate 2", visible=False)
+            generate3_button = gr.Button("Generate 3")
+            generate2_button = gr.Button("Generate 2")
             generate1_button = gr.Button("Generate", variant="primary")
 
-        prompt_tortoise.submit(fn=generate_tortoise_,
+        prompt.submit(fn=generate_tortoise_n(1),
+                      inputs=inputs, outputs=outputs)
+        generate1_button.click(fn=generate_tortoise_n(1),
                                inputs=inputs, outputs=outputs)
-        generate1_button.click(fn=generate_tortoise_,
-                               inputs=inputs, outputs=outputs)
-        generate2_button.click(fn=generate_tortoise_, inputs=inputs,
+        generate2_button.click(fn=generate_tortoise_n(2), inputs=inputs,
                                outputs=outputs + outputs2)
-        generate3_button.click(fn=generate_tortoise_, inputs=inputs,
+        generate3_button.click(fn=generate_tortoise_n(3), inputs=inputs,
                                outputs=outputs + outputs2 + outputs3)
 
         def show_closure(count):
