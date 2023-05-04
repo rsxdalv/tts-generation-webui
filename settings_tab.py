@@ -1,6 +1,8 @@
 import os
 import gradio as gr
 
+from setup_or_recover import generate_env
+
 
 def settings_tab(config, save_config, load_models):
     with gr.Tab("Settings (Bark)") as settings_tab:
@@ -61,16 +63,9 @@ def settings_tab(config, save_config, load_models):
                         environment_suno_offload_cpu)
                     with open('.env', 'w') as outfile:
                         outfile.write(
-                            f"""
-# Due to implementation, only empty string is False,
-#  everything else is True
-# Duplicates small models checkboxes
-SUNO_USE_SMALL_MODELS={environment_suno_use_small_models if environment_suno_use_small_models else ""}
-# Use MPS when CUDA is unavailable
-SUNO_ENABLE_MPS={environment_suno_enable_mps if environment_suno_enable_mps else ""}
-# Offload GPU models to CPU
-SUNO_OFFLOAD_CPU={environment_suno_offload_cpu if environment_suno_offload_cpu else ""}
-                        """
+                            generate_env(environment_suno_use_small_models,
+                                         environment_suno_enable_mps,
+                                         environment_suno_offload_cpu)
                         )
                     os._exit(0)
 
