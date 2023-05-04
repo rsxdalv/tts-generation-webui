@@ -11,7 +11,7 @@ This code provides a Gradio interface for generating audio from text input using
 ![Screenshot 4](./screenshots/screenshot%20(4).png)
 ![Screenshot 5](./screenshots/screenshot%20(5).png)
 
-![Audio 1](./samples/audio__bark__continued_generation__2023-05-04_16-07-49_long.wav)
+![Audio 1](./samples/audio__bark__continued_generation__2023-05-04_16-07-49_long.webm)
 ![Audio 2](./samples/audio__bark__continued_generation__2023-05-04_16-09-21_long.wav)
 ![Audio 3](./samples/audio__bark__continued_generation__2023-05-04_16-10-55_long.wav)
 
