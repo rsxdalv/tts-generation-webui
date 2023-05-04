@@ -26,7 +26,7 @@ This code requires the following dependencies:
 
 ## Changelog
 May 4:
-* Long form generation
+* Long form generation (credits to https://github.com/suno-ai/bark/blob/main/notebooks/long_form_generation.ipynb and https://github.com/suno-ai/bark/issues/161)
 * Adapt to fixed env var bug
 
 May 3:
