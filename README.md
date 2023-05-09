@@ -17,6 +17,9 @@ This code provides a Gradio interface for generating audio from text input using
 
 [audio__bark__continued_generation__2023-05-04_16-10-55_long.webm](https://user-images.githubusercontent.com/6757283/236219243-dad96404-0879-4274-828e-7f3afc6bac65.webm)
 
+## Extra Voices
+https://rsxdalv.github.io/bark-speaker-directory/ (https://github.com/rsxdalv/bark-speaker-directory)
+
 ## Dependencies
 
 This code requires the following dependencies:
