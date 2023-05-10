@@ -7,3 +7,4 @@ def save_waveform_plot(audio_array, filename_png):
     plt.plot(audio_array, color='orange')
     plt.axis("off")
     plt.savefig(filename_png)
+    plt.close()
