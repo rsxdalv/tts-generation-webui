@@ -31,6 +31,9 @@ This code requires the following dependencies:
 
 
 ## Changelog
+May 10:
+* Enable the possibility of reusing history prompts from older generations. Save generations as npz files. Add a convenient method of reusing any of the last 3 generations for the next prompts. Add a button for saving and collecting history prompts under /voices. https://github.com/rsxdalv/tts-generation-webui/pull/10
+
 May 4:
 * Long form generation (credits to https://github.com/suno-ai/bark/blob/main/notebooks/long_form_generation.ipynb and https://github.com/suno-ai/bark/issues/161)
 * Adapt to fixed env var bug
