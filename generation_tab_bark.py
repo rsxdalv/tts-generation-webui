@@ -1,9 +1,9 @@
 import glob
 import os
+import shutil
 
 import numpy as np
 from create_base_filename import create_base_filename
-from gen_tortoise import generate_tortoise_n
 from get_date import get_date
 from get_speaker_gender import get_speaker_gender
 from models.bark.bark import SAMPLE_RATE, generate_audio
@@ -11,7 +11,6 @@ from scipy.io.wavfile import write as write_wav
 import json
 from models.bark.bark.generation import SUPPORTED_LANGS
 import gradio as gr
-from models.tortoise.tortoise.utils.audio import get_voices
 from save_waveform_plot import save_waveform_plot
 from model_manager import model_manager
 from config import config
@@ -123,6 +122,7 @@ def generate(prompt, history_setting, language=None, speaker_id=0, useV2=False, 
         "filename": filename,
         "filename_png": filename_png,
         "filename_json": filename_json,
+        "filename_npz": filename_npz,
     }
     with open(filename_json, "w") as outfile:
         json.dump(metadata, outfile, indent=2)
@@ -224,7 +224,7 @@ def split_by_length_simple(prompt):
         prompt[i:i+200] for i in range(0, len(prompt), 200)]
 
 def get_npz_files():
-    return glob.glob("outputs/*.npz")
+    return glob.glob("voices/*.npz") + glob.glob("outputs/*.npz")
 
 def reload_voices_fn():
     choices = get_npz_files()
@@ -276,7 +276,14 @@ def generation_tab_bark():
                 visible=False
             )
             old_generation_dropdown.style(container=False)
-            reload_old_generation_dropdown = gr.Button("🔁", visible=False, elem_classes="btn-sm")
+            copy_old_generation_button = gr.Button("save", visible=False, elem_classes="btn-sm material-symbols-outlined")
+            copy_old_generation_button.style(size="sm")
+            copy_old_generation_button.click(fn=lambda x: [
+                # Move x from outputs to voices
+                shutil.copy(x, os.path.join("voices", os.path.basename(x))),
+            ], inputs=[old_generation_dropdown])
+
+            reload_old_generation_dropdown = gr.Button("refresh", visible=False, elem_classes="btn-sm material-symbols-outlined")
             reload_old_generation_dropdown.style(size="sm")
 
             reload_old_generation_dropdown.click(fn=reload_voices_fn,
@@ -287,9 +294,10 @@ def generation_tab_bark():
             fn=lambda choice: [
                 gr.Dropdown.update(visible=(choice == value_use_old_generation)),
                 gr.Button.update(visible=(choice == value_use_old_generation)),
+                gr.Button.update(visible=(choice == value_use_old_generation)),
             ],
             inputs=[history_setting],
-            outputs=[old_generation_dropdown, reload_old_generation_dropdown])
+            outputs=[old_generation_dropdown, copy_old_generation_button, reload_old_generation_dropdown])
 
         with gr.Row():
             with gr.Column():
@@ -299,9 +307,9 @@ def generation_tab_bark():
                     long_prompt_history_choices, type="value", label="For each subsequent generation:", value=value_reuse_history)
             with gr.Column():
                 text_temp = gr.Slider(label="Text temperature",
-                                      value=0.7, minimum=0.0, maximum=1.0, step=0.1)
+                                      value=0.7, minimum=0.0, maximum=3.0, step=0.05)
                 waveform_temp = gr.Slider(
-                    label="Waveform temperature", value=0.7, minimum=0.0, maximum=1.0, step=0.1)
+                    label="Waveform temperature", value=0.7, minimum=0.0, maximum=3.0, step=0.05)
 
         prompt = gr.Textbox(label="Prompt", lines=3,
                             placeholder="Enter text here...")
@@ -412,110 +420,3 @@ def test():
     history_prompt = "en_speaker_0"
     generate(text_prompt, True, history_prompt)
     generate(text_prompt, False, history_prompt)
-
-
-css_tortoise = """
-.btn-sm {
-    min-width: 3em !important;
-    flex-grow: 0 !important;
-}
-"""
-
-
-def generation_tab_tortoise():
-    with gr.Tab("Generation (Tortoise)"):
-        prompt = gr.Textbox(label="Prompt", lines=3,
-                            placeholder="Enter text here...")
-
-        with gr.Row():
-            # with gr.Box():
-            # gr.Markdown("### Voice")
-            with gr.Row():
-                voice = gr.Dropdown(
-                    choices=["random"] + list(get_voices()),
-                    value="random",
-                    # show_label=False,
-                    label="Voice"
-                )
-                # voice.style(container=False)
-                # reload_voices = gr.Button("🔁", elem_classes="btn-sm")
-                # reload_voices.style(size="sm")
-                # def reload_voices_fn():
-                #     choices =
-                #     print(choices)
-                #     return [
-                #         gr.Dropdown.update(choices=choices),
-                #     ]
-                # reload_voices.click(fn=reload_voices_fn, outputs=[voice])
-            preset = gr.Dropdown(label="Preset", choices=[
-                'ultra_fast',
-                'fast',
-                'standard',
-                'high_quality',
-            ], value="ultra_fast")
-        # Args:
-        # seed (int): The desired seed. Value must be within the inclusive range
-        #     `[-0x8000_0000_0000_0000, 0xffff_ffff_ffff_ffff]`. Otherwise, a RuntimeError
-        #     is raised. Negative inputs are remapped to positive values with the formula
-        #     `0xffff_ffff_ffff_ffff + seed`.
-        seed = gr.Textbox(label="Seed", lines=1,
-                          placeholder="Enter seed here...", value="None", visible=False)
-        cvvp_amount = gr.Slider(label="CVVP Amount",
-                                value=0.0, minimum=0.0, maximum=1.0, step=0.1)
-
-        inputs = [
-            prompt,
-            voice,
-            preset,
-            seed,
-            cvvp_amount
-        ]
-
-        with gr.Row():
-            audio_1 = gr.Audio(type="filepath", label="Generated audio")
-            audio_2 = gr.Audio(
-                type="filepath", label="Generated audio", visible=False)
-            audio_3 = gr.Audio(
-                type="filepath", label="Generated audio", visible=False)
-
-        with gr.Row():
-            image_1 = gr.Image(label="Waveform")
-            image_2 = gr.Image(label="Waveform", visible=False)
-            image_3 = gr.Image(label="Waveform", visible=False)
-
-        outputs = [audio_1, image_1]
-        outputs2 = [audio_2, image_2]
-        outputs3 = [audio_3, image_3]
-
-        with gr.Row():
-            generate3_button = gr.Button("Generate 3")
-            generate2_button = gr.Button("Generate 2")
-            generate1_button = gr.Button("Generate", variant="primary")
-
-        prompt.submit(fn=generate_tortoise_n(1),
-                      inputs=inputs, outputs=outputs)
-        generate1_button.click(fn=generate_tortoise_n(1),
-                               inputs=inputs, outputs=outputs)
-        generate2_button.click(fn=generate_tortoise_n(2), inputs=inputs,
-                               outputs=outputs + outputs2)
-        generate3_button.click(fn=generate_tortoise_n(3), inputs=inputs,
-                               outputs=outputs + outputs2 + outputs3)
-
-        def show_closure(count):
-            def show():
-                return [
-                    gr.Audio.update(visible=True),
-                    gr.Image.update(visible=True),
-                    gr.Audio.update(visible=count > 1),
-                    gr.Image.update(visible=count > 1),
-                    gr.Audio.update(visible=count > 2),
-                    gr.Image.update(visible=count > 2),
-                ]
-            return show
-
-        generate1_button.click(fn=show_closure(
-            1), outputs=outputs + outputs2 + outputs3)
-        generate2_button.click(fn=show_closure(
-            2), outputs=outputs + outputs2 + outputs3)
-        generate3_button.click(fn=show_closure(
-            3), outputs=outputs + outputs2 + outputs3)

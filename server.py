@@ -1,8 +1,9 @@
+from generation_tab_tortoise import css_tortoise, generation_tab_tortoise
 import setup_or_recover
 import dotenv_init
 import matplotlib
 import matplotlib.pyplot as plt
-from generation_tab_bark import generation_tab_tortoise, generation_tab_bark, css_tortoise
+from generation_tab_bark import generation_tab_bark
 import gradio as gr
 import json
 from history_tab import favorites_tab, history_tab
@@ -59,9 +60,31 @@ def load_models(
     model_manager.reload_models(config)
     return gr.Button.update(value="Reload models", interactive=True)
 
-full_css = css_tortoise
+material_symbols_css = """
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200');
 
-with gr.Blocks(css=full_css) as block:
+.material-symbols-outlined {
+    font-family: 'Material Symbols Outlined' !important;
+    font-weight: normal !important;
+    font-style: normal !important;
+    font-size: 24px !important;
+    line-height: 1 !important;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    -webkit-font-feature-settings: 'liga';
+    -webkit-font-smoothing: antialiased;
+}
+"""
+
+full_css = ""
+full_css += material_symbols_css
+full_css += css_tortoise
+
+with gr.Blocks(css=full_css) as demo:
     gr.Markdown("# TTS Generation WebUI (Bark & Tortoise)")
     generation_tab_bark()
     generation_tab_tortoise()
@@ -71,10 +94,5 @@ with gr.Blocks(css=full_css) as block:
 
     settings_tab(config, save_config, load_models)
 
-    block.launch(server_name='0.0.0.0')
-
-
-
-
-
-
+if __name__ == "__main__":
+    demo.launch(server_name='0.0.0.0')
