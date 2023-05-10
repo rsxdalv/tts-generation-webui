@@ -356,13 +356,17 @@ def generation_tab_bark():
             continue_button_2 = gr.Button("Use as history", visible=False)
             continue_button_3 = gr.Button("Use as history", visible=False)
 
-        continue_button_1.click(fn=insert_npz_file, inputs=[continue_button_1], outputs=[old_generation_dropdown, history_setting])
-        continue_button_2.click(fn=insert_npz_file, inputs=[continue_button_2], outputs=[old_generation_dropdown, history_setting])
-        continue_button_3.click(fn=insert_npz_file, inputs=[continue_button_3], outputs=[old_generation_dropdown, history_setting])
+        continue_button_1_data = gr.State()
+        continue_button_2_data = gr.State()
+        continue_button_3_data = gr.State()
 
-        outputs = [audio_1, image_1, continue_button_1]
-        outputs2 = [audio_2, image_2, continue_button_2]
-        outputs3 = [audio_3, image_3, continue_button_3]
+        continue_button_1.click(fn=insert_npz_file, inputs=[continue_button_1_data], outputs=[old_generation_dropdown, history_setting])
+        continue_button_2.click(fn=insert_npz_file, inputs=[continue_button_2_data], outputs=[old_generation_dropdown, history_setting])
+        continue_button_3.click(fn=insert_npz_file, inputs=[continue_button_3_data], outputs=[old_generation_dropdown, history_setting])
+
+        outputs = [audio_1, image_1, continue_button_1_data]
+        outputs2 = [audio_2, image_2, continue_button_2_data]
+        outputs3 = [audio_3, image_3, continue_button_3_data]
         # examples = [
         #     ["The quick brown fox jumps over the lazy dog."],
         #     ["To be or not to be, that is the question."],
@@ -396,12 +400,14 @@ def generation_tab_bark():
             gr.Button.update(visible=count > 2),
         ]
 
-        generate1_button.click(fn=lambda: show(
-            1), outputs=outputs + outputs2 + outputs3)
-        generate2_button.click(fn=lambda: show(
-            2), outputs=outputs + outputs2 + outputs3)
-        generate3_button.click(fn=lambda: show(
-            3), outputs=outputs + outputs2 + outputs3)
+        view_outputs = [audio_1, image_1, continue_button_1]
+        view_outputs2 = [audio_2, image_2, continue_button_2]
+        view_outputs3 = [audio_3, image_3, continue_button_3]
+        all_viw_outputs = view_outputs + view_outputs2 + view_outputs3
+
+        generate1_button.click(fn=lambda: show(1), outputs=all_viw_outputs)
+        generate2_button.click(fn=lambda: show(2), outputs=all_viw_outputs)
+        generate3_button.click(fn=lambda: show(3), outputs=all_viw_outputs)
 
 def insert_npz_file(npz_filename):
     print("gen", "old_generation_filename", npz_filename)
