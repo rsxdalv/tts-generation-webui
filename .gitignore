@@ -3,3 +3,5 @@ outputs/
 favorites/
 config.json
 .env
+
+voices/
