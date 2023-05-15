@@ -26,6 +26,9 @@ This code provides a Gradio interface for generating audio from text input using
 
 [audio__bark__continued_generation__2023-05-04_16-10-55_long.webm](https://user-images.githubusercontent.com/6757283/236219243-dad96404-0879-4274-828e-7f3afc6bac65.webm)
 
+## Full Gradio settings
+![Screenshot 8](./screenshots/screenshot%20(8).png)
+
 ## Extra Voices
 https://rsxdalv.github.io/bark-speaker-directory/ (https://github.com/rsxdalv/bark-speaker-directory)
 
@@ -39,6 +42,9 @@ This code requires the following dependencies:
 
 
 ## Changelog
+May 16:
+* Add gradio settings tab, fix gradio errors in console, improve logging.
+
 May 13:
 * Enable deterministic generation and enhance generated logs. Credits to https://github.com/suno-ai/bark/pull/175.
 
