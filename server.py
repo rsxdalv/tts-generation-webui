@@ -1,4 +1,8 @@
+import os
+import time
 from generation_tab_tortoise import css_tortoise, generation_tab_tortoise
+from load_config import load_config
+from settings_tab_gradio import settings_tab_gradio
 import setup_or_recover
 import dotenv_init
 import matplotlib
@@ -8,7 +12,7 @@ import gradio as gr
 import json
 from history_tab import favorites_tab, history_tab
 from model_manager import model_manager
-from settings_tab import settings_tab
+from settings_tab_bark import settings_tab_bark
 from config import config
 
 setup_or_recover.dummy()
@@ -38,6 +42,22 @@ def save_config(text_use_gpu,
 
     return f"Saved: {str(config)}"
 
+def save_config_gradio(keys, inputs):
+    # Recreate the UI dictionary
+    gradio_interface_options_ui = {
+        keys[i]: value for i, value in enumerate(inputs)
+    }
+    # convert '' to None
+    for key, value in gradio_interface_options_ui.items():
+        if value == '':
+            gradio_interface_options_ui[key] = None
+    # Save the config
+    global config
+    config["gradio_interface_options"] = gradio_interface_options_ui
+    with open('config.json', 'w') as outfile:
+        json.dump(config, outfile, indent=2)
+
+    return f"Saved {gradio_interface_options_ui}"
 
 def load_models(
     text_use_gpu,
@@ -84,6 +104,17 @@ full_css = ""
 full_css += material_symbols_css
 full_css += css_tortoise
 
+def reload_config_and_restart_ui():
+    os._exit(0)
+    # print("Reloading config and restarting UI...")
+    # config = load_config()
+    # gradio_interface_options = config["gradio_interface_options"] if "gradio_interface_options" in config else {}
+    # demo.close()
+    # time.sleep(1)
+    # demo.launch(**gradio_interface_options)
+
+gradio_interface_options = config["gradio_interface_options"] if "gradio_interface_options" in config else {}
+
 with gr.Blocks(css=full_css) as demo:
     gr.Markdown("# TTS Generation WebUI (Bark & Tortoise)")
     generation_tab_bark()
@@ -92,7 +123,17 @@ with gr.Blocks(css=full_css) as demo:
     history_tab()
     favorites_tab()
 
-    settings_tab(config, save_config, load_models)
+    settings_tab_bark(config, save_config, load_models)
+    settings_tab_gradio(save_config_gradio, reload_config_and_restart_ui, gradio_interface_options)
 
-if __name__ == "__main__":
-    demo.launch(server_name='0.0.0.0')
+def print_pretty_options(options):
+    print("Gradio interface options:")
+    max_key_length = max(len(key) for key in options.keys())
+    for key, value in options.items():
+        print(f"  {key}:{' '*(max_key_length - len(key))} {value}")
+
+print("Starting Gradio server...")
+print_pretty_options(gradio_interface_options)
+
+if __name__ == "__main__":   
+    demo.launch(**gradio_interface_options)
