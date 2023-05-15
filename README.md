@@ -1,7 +1,12 @@
 # TTS Generation WebUI (Bark v2, Tortoise)
 
 ## One click installers
-https://github.com/rsxdalv/one-click-installers-tts
+
+[Download](https://github.com/rsxdalv/one-click-installers-tts/archive/refs/tags/v1.0.zip) ||
+[Release Page](https://github.com/rsxdalv/one-click-installers-tts/releases/tag/v1.0) ||
+[Installer Repo](https://github.com/rsxdalv/one-click-installers-tts)
+
+## Screenshots
 
 This code provides a Gradio interface for generating audio from text input using the Bark TTS and Tortoise TTS models. The interface takes a text prompt as input and generates audio as output.
 
