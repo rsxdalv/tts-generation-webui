@@ -135,7 +135,7 @@ def generate_multi(count=1):
             for i in range(count):
                 filename, filename_png, _, _, filename_npz, seed = generate(
                     prompt, history_setting, language, speaker_id, useV2, text_temp=text_temp, waveform_temp=waveform_temp, history_prompt=history_prompt, seed=seed, index=i)
-                filenames.extend((filename, filename_png, filename_npz, seed))
+                filenames.extend((filename, filename_png, gr.Button.update(visible=True), filename_npz, seed))
                 # yield filenames
             return filenames
 
@@ -165,7 +165,7 @@ def generate_multi(count=1):
             filename, filename_png = save_long_generation(
                 prompt, history_setting, language, speaker_id, text_temp, waveform_temp, seed, filename, pieces)
 
-            filenames.extend((filename, filename_png, filename_npz, seed))
+            filenames.extend((filename, filename_png, gr.Button.update(visible=True), filename_npz, seed))
         return filenames
     return gen
 
@@ -241,10 +241,6 @@ def generation_tab_bark(tabs):
                 with gr.Column():
                     gr.Markdown("Seed")
                     with gr.Row():
-                        seed_1 = gr.State()
-                        seed_2 = gr.State()
-                        seed_3 = gr.State()
-
                         seed_input = gr.Textbox(value="-1", show_label=False)
                         seed_input.style(container=False)
                         set_random_seed_button = gr.Button(
@@ -258,9 +254,6 @@ def generation_tab_bark(tabs):
                             "repeat", elem_classes="btn-sm material-symbols-outlined")
 
                         set_old_seed_button.style(size="sm")
-                        set_old_seed_button.click(fn=lambda x: gr.Textbox.update(value=str(x)),
-                                                  inputs=[seed_1],
-                                                  outputs=[seed_input])
 
         prompt = gr.Textbox(label="Prompt", lines=3,
                             placeholder="Enter text here...")
@@ -291,51 +284,41 @@ def generation_tab_bark(tabs):
                 inputs=voice_inputs,
                 outputs=[choice_string])
 
-        def create_components():
-            with gr.Column():
-                audio = gr.Audio(type="filepath", label="Generated audio")
-                image = gr.Image(label="Waveform")
-                continue_button = gr.Button("Use as history", visible=False)
-                npz = gr.State()
-                seed = gr.State()
-                
-                # Add the button and its associated click function
-                continue_button.click(fn=insert_npz_file, inputs=[npz], outputs=[old_generation_dropdown, history_setting])
-
-                return audio, image, continue_button, npz, seed
-
         with gr.Row():
-            audio_1, image_1, continue_button_1, npz_1, seed_1 = create_components()
-            audio_2, image_2, continue_button_2, npz_2, seed_2 = create_components()
-            audio_3, image_3, continue_button_3, npz_3, seed_3 = create_components()
+            outputs1 = create_components(old_generation_dropdown, history_setting)
+            outputs2 = create_components(old_generation_dropdown, history_setting)
+            outputs3 = create_components(old_generation_dropdown, history_setting)
 
-        def register_use_as_history_button(button, source):
-            button.click(fn=lambda value: {
-                old_generation_dropdown: value,
-                history_setting: value_use_old_generation,
-                tabs: gr.Tabs.update(selected="generation_bark"),
-            }, inputs=[source],
-                outputs=[old_generation_dropdown, history_setting, tabs])
-
-        outputs = [audio_1, image_1, npz_1, seed_1]
-        outputs2 = [audio_2, image_2, npz_2, seed_2]
-        outputs3 = [audio_3, image_3, npz_3, seed_3]
+        audio_1, image_1, continue_button_1, _, seed_1 = outputs1
+        audio_2, image_2, continue_button_2, _, seed_2 = outputs2
+        audio_3, image_3, continue_button_3, _, seed_3 = outputs3
 
         with gr.Row():
             generate3_button = gr.Button("Generate 3")
             generate2_button = gr.Button("Generate 2")
             generate1_button = gr.Button("Generate", variant="primary")
 
-        prompt.submit(fn=generate_multi(1), inputs=inputs, outputs=outputs)
+        prompt.submit(fn=generate_multi(1), inputs=inputs, outputs=outputs1)
         generate1_button.click(fn=generate_multi(1), inputs=inputs,
-                               outputs=outputs)
+                               outputs=outputs1)
         generate2_button.click(fn=generate_multi(2), inputs=inputs,
-                               outputs=outputs + outputs2)
+                               outputs=outputs1 + outputs2)
         generate3_button.click(fn=generate_multi(3), inputs=inputs,
-                               outputs=outputs + outputs2 + outputs3)
+                               outputs=outputs1 + outputs2 + outputs3)
 
+        set_old_seed_button.click(fn=lambda x: gr.Textbox.update(value=str(x)),
+                                    inputs=[seed_1],
+                                    outputs=[seed_input])
 
         setup_show_hide_outputs(audio_1, audio_2, audio_3, image_1, image_2, image_3, continue_button_1, continue_button_2, continue_button_3, generate3_button, generate2_button, generate1_button)
+
+    def register_use_as_history_button(button, source):
+        button.click(fn=lambda value: {
+            old_generation_dropdown: value,
+            history_setting: value_use_old_generation,
+            tabs: gr.Tabs.update(selected="generation_bark"),
+        }, inputs=[source],
+            outputs=[old_generation_dropdown, history_setting, tabs])
 
     return register_use_as_history_button
 
@@ -385,3 +368,16 @@ def insert_npz_file(npz_filename):
         gr.Radio.update(value=value_use_old_generation),
     ]
 
+
+def create_components(old_generation_dropdown, history_setting):
+    with gr.Column():
+        audio = gr.Audio(type="filepath", label="Generated audio")
+        image = gr.Image(label="Waveform")
+        continue_button = gr.Button("Use as history", visible=False)
+        npz = gr.State()
+        seed = gr.State()
+        
+        # Add the button and its associated click function
+        continue_button.click(fn=insert_npz_file, inputs=[npz], outputs=[old_generation_dropdown, history_setting])
+
+        return [audio, image, continue_button, npz, seed]
