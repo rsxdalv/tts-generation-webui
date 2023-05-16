@@ -241,9 +241,9 @@ def generation_tab_bark(tabs):
                 with gr.Column():
                     gr.Markdown("Seed")
                     with gr.Row():
-                        last_seed_1 = gr.State()
-                        last_seed_2 = gr.State()
-                        last_seed_3 = gr.State()
+                        seed_1 = gr.State()
+                        seed_2 = gr.State()
+                        seed_3 = gr.State()
 
                         seed_input = gr.Textbox(value="-1", show_label=False)
                         seed_input.style(container=False)
@@ -259,7 +259,7 @@ def generation_tab_bark(tabs):
 
                         set_old_seed_button.style(size="sm")
                         set_old_seed_button.click(fn=lambda x: gr.Textbox.update(value=str(x)),
-                                                  inputs=[last_seed_1],
+                                                  inputs=[seed_1],
                                                   outputs=[seed_input])
 
         prompt = gr.Textbox(label="Prompt", lines=3,
@@ -291,33 +291,23 @@ def generation_tab_bark(tabs):
                 inputs=voice_inputs,
                 outputs=[choice_string])
 
-        with gr.Row():
-            audio_1 = gr.Audio(type="filepath", label="Generated audio")
-            audio_2 = gr.Audio(
-                type="filepath", label="Generated audio", visible=False)
-            audio_3 = gr.Audio(
-                type="filepath", label="Generated audio", visible=False)
+        def create_components():
+            with gr.Column():
+                audio = gr.Audio(type="filepath", label="Generated audio")
+                image = gr.Image(label="Waveform")
+                continue_button = gr.Button("Use as history", visible=False)
+                npz = gr.State()
+                seed = gr.State()
+                
+                # Add the button and its associated click function
+                continue_button.click(fn=insert_npz_file, inputs=[npz], outputs=[old_generation_dropdown, history_setting])
+
+                return audio, image, continue_button, npz, seed
 
         with gr.Row():
-            image_1 = gr.Image(label="Waveform")
-            image_2 = gr.Image(label="Waveform", visible=False)
-            image_3 = gr.Image(label="Waveform", visible=False)
-
-        with gr.Row():
-            continue_button_1 = gr.Button("Use as history", visible=False)
-            continue_button_2 = gr.Button("Use as history", visible=False)
-            continue_button_3 = gr.Button("Use as history", visible=False)
-
-        continue_button_1_data = gr.State()
-        continue_button_2_data = gr.State()
-        continue_button_3_data = gr.State()
-
-        continue_button_1.click(fn=insert_npz_file, inputs=[
-                                continue_button_1_data], outputs=[old_generation_dropdown, history_setting])
-        continue_button_2.click(fn=insert_npz_file, inputs=[
-                                continue_button_2_data], outputs=[old_generation_dropdown, history_setting])
-        continue_button_3.click(fn=insert_npz_file, inputs=[
-                                continue_button_3_data], outputs=[old_generation_dropdown, history_setting])
+            audio_1, image_1, continue_button_1, npz_1, seed_1 = create_components()
+            audio_2, image_2, continue_button_2, npz_2, seed_2 = create_components()
+            audio_3, image_3, continue_button_3, npz_3, seed_3 = create_components()
 
         def register_use_as_history_button(button, source):
             button.click(fn=lambda value: {
@@ -327,9 +317,9 @@ def generation_tab_bark(tabs):
             }, inputs=[source],
                 outputs=[old_generation_dropdown, history_setting, tabs])
 
-        outputs = [audio_1, image_1, continue_button_1_data, last_seed_1]
-        outputs2 = [audio_2, image_2, continue_button_2_data, last_seed_2]
-        outputs3 = [audio_3, image_3, continue_button_3_data, last_seed_3]
+        outputs = [audio_1, image_1, npz_1, seed_1]
+        outputs2 = [audio_2, image_2, npz_2, seed_2]
+        outputs3 = [audio_3, image_3, npz_3, seed_3]
 
         with gr.Row():
             generate3_button = gr.Button("Generate 3")
