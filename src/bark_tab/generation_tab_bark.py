@@ -3,6 +3,7 @@ import shutil
 
 import numpy as np
 from create_base_filename import create_base_filename
+from ..history_tab.save_to_favorites import save_to_favorites
 from src.bark_tab.create_voice_string import create_voice_string
 from src.bark_tab.generate_and_save_metadata import generate_and_save_metadata
 from src.bark_tab.generate_choice_string import generate_choice_string
@@ -62,10 +63,10 @@ def generate(prompt, history_setting, language=None, speaker_id=0, useV2=False, 
         prompt, history_prompt=history_prompt, text_temp=text_temp, waveform_temp=waveform_temp, output_full=True)
     set_seed(-1)
 
-    filename, filename_png, filename_npz = save_generation(
+    filename, filename_png, filename_npz, metadata = save_generation(
         prompt, language, speaker_id, text_temp, waveform_temp, history_prompt, seed, use_voice, history_prompt_verbal, full_generation, audio_array)
 
-    return [filename, filename_png, audio_array, full_generation, filename_npz, seed]
+    return [filename, filename_png, audio_array, full_generation, filename_npz, seed, metadata]
 
 
 def save_generation(prompt, language, speaker_id, text_temp, waveform_temp, history_prompt, seed, use_voice, history_prompt_verbal, full_generation, audio_array):
@@ -86,10 +87,10 @@ def save_generation(prompt, language, speaker_id, text_temp, waveform_temp, hist
     speaker_id = speaker_id if use_voice else None
     history_prompt = history_prompt_verbal
 
-    generate_and_save_metadata(prompt, language, speaker_id, text_temp, waveform_temp, seed, filename,
+    metadata = generate_and_save_metadata(prompt, language, speaker_id, text_temp, waveform_temp, seed, filename,
                                date, filename_png, filename_json, history_prompt_npz, filename_npz, history_prompt)
 
-    return filename, filename_png, filename_npz
+    return filename, filename_png, filename_npz, metadata
 
 def save_long_generation(prompt, history_setting, language, speaker_id, text_temp, waveform_temp, seed, filename, pieces):
     base_filename = filename.replace(".wav", "_long")
@@ -106,10 +107,10 @@ def save_long_generation(prompt, history_setting, language, speaker_id, text_tem
     filename_npz = None
     history_prompt = history_setting
 
-    generate_and_save_metadata(prompt, language, speaker_id, text_temp, waveform_temp, seed, filename,
+    metadata = generate_and_save_metadata(prompt, language, speaker_id, text_temp, waveform_temp, seed, filename,
                                date, filename_png, filename_json, history_prompt_npz, filename_npz, history_prompt)
 
-    return filename, filename_png
+    return filename, filename_png, metadata
 
 
 def generate_multi(count=1):
@@ -131,17 +132,17 @@ def generate_multi(count=1):
             history_prompt = load_npz(old_generation_filename)
 
         if long_prompt_radio == value_short_prompt:
-            filenames = []
+            outputs = []
             for i in range(count):
-                filename, filename_png, _, _, filename_npz, seed = generate(
+                filename, filename_png, _, _, filename_npz, seed, metadata = generate(
                     prompt, history_setting, language, speaker_id, useV2, text_temp=text_temp, waveform_temp=waveform_temp, history_prompt=history_prompt, seed=seed, index=i)
-                filenames.extend((filename, filename_png, gr.Button.update(visible=True), filename_npz, seed))
+                outputs.extend((filename, filename_png, gr.Button.update(value="Save to favorites", visible=True), gr.Button.update(visible=True), filename_npz, seed, metadata))
                 # yield filenames
-            return filenames
+            return outputs
 
         prompts = split_by_lines(
             prompt) if long_prompt_radio == value_split_lines else split_by_length_simple(prompt)
-        filenames = []
+        outputs = []
 
         for i in range(count):
             pieces = []
@@ -162,11 +163,11 @@ def generate_multi(count=1):
                     prompt_piece, history_setting, language, speaker_id, useV2, text_temp=text_temp, waveform_temp=waveform_temp, history_prompt=history_prompt, seed=seed, index=i)
                 pieces += [audio_array]
 
-            filename, filename_png = save_long_generation(
+            filename, filename_png, metadata = save_long_generation(
                 prompt, history_setting, language, speaker_id, text_temp, waveform_temp, seed, filename, pieces)
 
-            filenames.extend((filename, filename_png, gr.Button.update(visible=True), filename_npz, seed))
-        return filenames
+            outputs.extend((filename, filename_png, gr.Button.update(value="Save to favorites", visible=True), gr.Button.update(visible=True), filename_npz, seed, metadata))
+        return outputs
     return gen
 
 
@@ -239,21 +240,7 @@ def generation_tab_bark(tabs):
                 waveform_temp = gr.Slider(
                     label="Waveform temperature", value=0.7, minimum=0.0, maximum=1.2, step=0.05)
                 with gr.Column():
-                    gr.Markdown("Seed")
-                    with gr.Row():
-                        seed_input = gr.Textbox(value="-1", show_label=False)
-                        seed_input.style(container=False)
-                        set_random_seed_button = gr.Button(
-                            "backspace", elem_classes="btn-sm material-symbols-outlined")
-
-                        set_random_seed_button.style(size="sm")
-                        set_random_seed_button.click(
-                            fn=lambda: gr.Textbox.update(value="-1"), outputs=[seed_input])
-
-                        set_old_seed_button = gr.Button(
-                            "repeat", elem_classes="btn-sm material-symbols-outlined")
-
-                        set_old_seed_button.style(size="sm")
+                    seed_input, set_old_seed_button = setup_seed_ui()
 
         prompt = gr.Textbox(label="Prompt", lines=3,
                             placeholder="Enter text here...")
@@ -285,32 +272,38 @@ def generation_tab_bark(tabs):
                 outputs=[choice_string])
 
         with gr.Row():
-            outputs1 = create_components(old_generation_dropdown, history_setting)
-            outputs2 = create_components(old_generation_dropdown, history_setting)
-            outputs3 = create_components(old_generation_dropdown, history_setting)
-
-        audio_1, image_1, continue_button_1, _, seed_1 = outputs1
-        audio_2, image_2, continue_button_2, _, seed_2 = outputs2
-        audio_3, image_3, continue_button_3, _, seed_3 = outputs3
+            outputs1, col1, seed_1 = create_components(old_generation_dropdown, history_setting)
+            outputs2, col2, _ = create_components(old_generation_dropdown, history_setting)
+            outputs3, col3, _ = create_components(old_generation_dropdown, history_setting)
 
         with gr.Row():
             generate3_button = gr.Button("Generate 3")
+            generate3_button.click(fn=generate_multi(3), inputs=inputs,
+                                outputs=outputs1 + outputs2 + outputs3)
             generate2_button = gr.Button("Generate 2")
+            generate2_button.click(fn=generate_multi(2), inputs=inputs,
+                                outputs=outputs1 + outputs2)
             generate1_button = gr.Button("Generate", variant="primary")
+            generate1_button.click(fn=generate_multi(1), inputs=inputs,
+                                outputs=outputs1)
 
         prompt.submit(fn=generate_multi(1), inputs=inputs, outputs=outputs1)
-        generate1_button.click(fn=generate_multi(1), inputs=inputs,
-                               outputs=outputs1)
-        generate2_button.click(fn=generate_multi(2), inputs=inputs,
-                               outputs=outputs1 + outputs2)
-        generate3_button.click(fn=generate_multi(3), inputs=inputs,
-                               outputs=outputs1 + outputs2 + outputs3)
 
         set_old_seed_button.click(fn=lambda x: gr.Textbox.update(value=str(x)),
                                     inputs=[seed_1],
                                     outputs=[seed_input])
 
-        setup_show_hide_outputs(audio_1, audio_2, audio_3, image_1, image_2, image_3, continue_button_1, continue_button_2, continue_button_3, generate3_button, generate2_button, generate1_button)
+        def show(count): return [
+            gr.Column.update(visible=True),
+            gr.Column.update(visible=count > 1),
+            gr.Column.update(visible=count > 2),
+        ]
+
+        all_viw_outputs = [col1, col2, col3]
+
+        generate1_button.click(fn=lambda: show(1), outputs=all_viw_outputs)
+        generate2_button.click(fn=lambda: show(2), outputs=all_viw_outputs)
+        generate3_button.click(fn=lambda: show(3), outputs=all_viw_outputs)
 
     def register_use_as_history_button(button, source):
         button.click(fn=lambda value: {
@@ -321,6 +314,24 @@ def generation_tab_bark(tabs):
             outputs=[old_generation_dropdown, history_setting, tabs])
 
     return register_use_as_history_button
+
+def setup_seed_ui():
+    gr.Markdown("Seed")
+    with gr.Row():
+        seed_input = gr.Textbox(value="-1", show_label=False)
+        seed_input.style(container=False)
+        set_random_seed_button = gr.Button(
+                            "backspace", elem_classes="btn-sm material-symbols-outlined")
+
+        set_random_seed_button.style(size="sm")
+        set_random_seed_button.click(
+                            fn=lambda: gr.Textbox.update(value="-1"), outputs=[seed_input])
+
+        set_old_seed_button = gr.Button(
+                            "repeat", elem_classes="btn-sm material-symbols-outlined")
+
+        set_old_seed_button.style(size="sm")
+    return seed_input, set_old_seed_button
 
 def setup_bark_voice_prompt_ui():
     with gr.Row():
@@ -339,29 +350,6 @@ def setup_bark_voice_prompt_ui():
                               
     return useV2,choice_string,languageRadio,speakerIdRadio
 
-def setup_show_hide_outputs(audio_1, audio_2, audio_3, image_1, image_2, image_3, continue_button_1, continue_button_2, continue_button_3, generate3_button, generate2_button, generate1_button):
-    def show(count): return [
-        gr.Audio.update(visible=True),
-        gr.Image.update(visible=True),
-        gr.Button.update(visible=True),
-        gr.Audio.update(visible=count > 1),
-        gr.Image.update(visible=count > 1),
-        gr.Button.update(visible=count > 1),
-        gr.Audio.update(visible=count > 2),
-        gr.Image.update(visible=count > 2),
-        gr.Button.update(visible=count > 2),
-    ]
-
-    view_outputs = [audio_1, image_1, continue_button_1]
-    view_outputs2 = [audio_2, image_2, continue_button_2]
-    view_outputs3 = [audio_3, image_3, continue_button_3]
-    all_viw_outputs = view_outputs + view_outputs2 + view_outputs3
-
-    generate1_button.click(fn=lambda: show(1), outputs=all_viw_outputs)
-    generate2_button.click(fn=lambda: show(2), outputs=all_viw_outputs)
-    generate3_button.click(fn=lambda: show(3), outputs=all_viw_outputs)
-
-
 def insert_npz_file(npz_filename):
     return [
         gr.Dropdown.update(value=npz_filename),
@@ -370,14 +358,17 @@ def insert_npz_file(npz_filename):
 
 
 def create_components(old_generation_dropdown, history_setting):
-    with gr.Column():
+    with gr.Column() as col:
         audio = gr.Audio(type="filepath", label="Generated audio")
         image = gr.Image(label="Waveform")
-        continue_button = gr.Button("Use as history", visible=False)
+        with gr.Row():
+            save_button = gr.Button("Save to favorites", visible=False)
+            continue_button = gr.Button("Use as history", visible=False)
         npz = gr.State()
         seed = gr.State()
+        json_text = gr.State()
         
-        # Add the button and its associated click function
         continue_button.click(fn=insert_npz_file, inputs=[npz], outputs=[old_generation_dropdown, history_setting])
+        save_button.click(fn=save_to_favorites, inputs=[json_text], outputs=[save_button])
 
-        return [audio, image, continue_button, npz, seed]
+        return [audio, image, save_button, continue_button, npz, seed, json_text], col, seed
