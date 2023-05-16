@@ -44,6 +44,10 @@ This code requires the following dependencies:
 ## Changelog
 May 16:
 * Add gradio settings tab, fix gradio errors in console, improve logging.
+* Update History and Favorites with "use as voice" and "save voice" buttons
+* Add voices tab
+* Bark tab: Remove "or Use last generation as history"
+* Improve code organization
 
 May 13:
 * Enable deterministic generation and enhance generated logs. Credits to https://github.com/suno-ai/bark/pull/175.

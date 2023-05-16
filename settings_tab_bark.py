@@ -1,7 +1,7 @@
 import os
 import gradio as gr
 
-from setup_or_recover import generate_env
+from src.setup_or_recover import generate_env
 
 
 def settings_tab_bark(config, save_config, load_models):
