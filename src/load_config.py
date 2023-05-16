@@ -17,7 +17,7 @@ default_config = {
         'inbrowser': True,
         'share': False, 
         'debug': False, 
-        'enable_queue': False, 
+        'enable_queue': True,
         'max_threads': 40, 
         'auth': None,
         'auth_message': None,

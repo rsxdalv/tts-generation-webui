@@ -1,16 +1,17 @@
 import os
 import time
 from generation_tab_tortoise import css_tortoise, generation_tab_tortoise
-from load_config import load_config
+from src.history_tab.history_css import history_css
+from src.load_config import load_config
 from settings_tab_gradio import settings_tab_gradio
-import setup_or_recover
-import dotenv_init
+import src.setup_or_recover as setup_or_recover
+import src.dotenv_init as dotenv_init
 import matplotlib
 import matplotlib.pyplot as plt
-from generation_tab_bark import generation_tab_bark
+from src.bark_tab.generation_tab_bark import generation_tab_bark
 import gradio as gr
 import json
-from history_tab import favorites_tab, history_tab
+from src.history_tab.main import favorites_tab, history_tab, voices_tab
 from model_manager import model_manager
 from settings_tab_bark import settings_tab_bark
 from config import config
@@ -103,6 +104,7 @@ material_symbols_css = """
 full_css = ""
 full_css += material_symbols_css
 full_css += css_tortoise
+full_css += history_css
 
 def reload_config_and_restart_ui():
     os._exit(0)
@@ -117,14 +119,17 @@ gradio_interface_options = config["gradio_interface_options"] if "gradio_interfa
 
 with gr.Blocks(css=full_css) as demo:
     gr.Markdown("# TTS Generation WebUI (Bark & Tortoise)")
-    generation_tab_bark()
-    generation_tab_tortoise()
+    with gr.Tabs() as tabs:
+        register_use_as_history_button = generation_tab_bark(tabs)
+        generation_tab_tortoise()
 
-    history_tab()
-    favorites_tab()
+        history_tab(register_use_as_history_button)
+        favorites_tab(register_use_as_history_button)
+        voices_tab(register_use_as_history_button)
 
-    settings_tab_bark(config, save_config, load_models)
-    settings_tab_gradio(save_config_gradio, reload_config_and_restart_ui, gradio_interface_options)
+        settings_tab_bark(config, save_config, load_models)
+        settings_tab_gradio(save_config_gradio, reload_config_and_restart_ui, gradio_interface_options)
+
 
 def print_pretty_options(options):
     print("Gradio interface options:")
