@@ -1,11 +1,16 @@
-import glob
 import os
 import shutil
 
 import numpy as np
 from create_base_filename import create_base_filename
+from src.bark_tab.create_voice_string import create_voice_string
+from src.bark_tab.generate_choice_string import generate_choice_string
+from src.bark_tab.get_history_prompt import get_history_prompt
+from src.bark_tab.log_generation import log_generation
+from src.bark_tab.npz_tools import get_npz_files, load_npz, save_npz
+from src.bark_tab.parse_or_set_seed import parse_or_set_seed
+from src.bark_tab.split_text_functions import split_by_length_simple, split_by_lines
 from src.get_date import get_date
-from src.get_speaker_gender import get_speaker_gender
 from models.bark.bark import SAMPLE_RATE, generate_audio
 from scipy.io.wavfile import write as write_wav
 import json
@@ -15,6 +20,8 @@ from src.save_waveform_plot import save_waveform_plot
 from model_manager import model_manager
 from config import config
 from src.set_seed import set_seed
+from src.bark_tab.generate_random_seed import generate_random_seed
+
 
 value_empty_history = "Empty history"
 value_use_voice = "or Use a voice:"
@@ -37,74 +44,23 @@ long_prompt_history_choices = [
     value_reuse_history, value_use_voice_history, value_empty_history
 ]
 
-def create_voice_string(language, speaker_id, useV2):
-    history_prompt = f"{SUPPORTED_LANGS[language][1]}_speaker_{speaker_id}"
-    if useV2:
-        history_prompt = os.path.join("v2", history_prompt)
-    return history_prompt
-
-
-def generate_choice_string(useV2, language, speaker_id):
-    history_prompt = create_voice_string(language, speaker_id, useV2)
-    gender = get_speaker_gender(history_prompt)
-    return gr.Markdown.update(
-        value=f"Chosen voice: {history_prompt}, Gender: {gender}"
-    )
-
-
-def get_history_prompt_verbal(history_prompt):
-    return history_prompt or "None"
-
-
-def save_npz(filename, full_generation):
-    np.savez(filename, **full_generation)
-
-
-def load_npz(filename):
-    with np.load(filename, allow_pickle=True) as data:
-        return {key: data[key] for key in data}
-
-
-def generate_random_seed():
-    return np.random.default_rng().integers(1, 2**32 - 1)
-
-
-last_seed = -1
-
-
 def generate(prompt, history_setting, language=None, speaker_id=0, useV2=False, text_temp=0.7, waveform_temp=0.7, history_prompt=None, seed=None, index=0):
     if not model_manager.models_loaded:
         model_manager.reload_models(config)
 
     use_voice = history_setting == value_use_voice
-    if history_prompt is None:
-        history_prompt = create_voice_string(
-            language, speaker_id, useV2) if use_voice else None
-        history_prompt_verbal = get_history_prompt_verbal(history_prompt)
-    else:
-        history_prompt_verbal = history_prompt if isinstance(
-            history_prompt, str) else "continued_generation"
+    history_prompt, history_prompt_verbal = get_history_prompt(language, speaker_id, useV2, history_prompt, use_voice)
 
-    print("Generating: '''", prompt, "'''")
-    print("Parameters: history_prompt:", history_prompt_verbal,
-          "text_temp:", text_temp, "waveform_temp:", waveform_temp,
-          "useV2:", useV2, "use_voice:", use_voice)
+    log_generation(prompt, useV2, text_temp, waveform_temp, use_voice, history_prompt_verbal)
 
-    if seed is not None:
-        seed = int(seed)
-        if seed == -1:
-            seed = generate_random_seed()
-            global last_seed
-            last_seed = seed
-        set_seed(seed + index)
+    seed = parse_or_set_seed(seed, index)
     full_generation, audio_array = generate_audio(
         prompt, history_prompt=history_prompt, text_temp=text_temp, waveform_temp=waveform_temp, output_full=True)
     set_seed(-1)
 
-    model = "bark"
     date = get_date()
     base_filename = create_base_filename(
-        history_prompt_verbal, "outputs", model, date)
+        history_prompt_verbal, "outputs", model="bark", date=date)
     filename = f"{base_filename}.wav"
     write_wav(filename, SAMPLE_RATE, audio_array)
     filename_png = f"{base_filename}.png"
@@ -134,8 +90,7 @@ def generate(prompt, history_setting, language=None, speaker_id=0, useV2=False, 
     with open(filename_json, "w") as outfile:
         json.dump(metadata, outfile, indent=2)
 
-    return [filename, filename_png, audio_array, full_generation, filename_npz]
-
+    return [filename, filename_png, audio_array, full_generation, filename_npz, seed]
 
 def generate_multi(count=1):
     def gen(prompt,
@@ -158,10 +113,10 @@ def generate_multi(count=1):
         if long_prompt_radio == value_short_prompt:
             filenames = []
             for i in range(count):
-                filename, filename_png, _, _, filename_npz = generate(
+                filename, filename_png, _, _, filename_npz, seed = generate(
                     prompt, history_setting, language, speaker_id, useV2, text_temp=text_temp, waveform_temp=waveform_temp, history_prompt=history_prompt, seed=seed, index=i)
-                filenames.extend((filename, filename_png, filename_npz))
-                yield filenames
+                filenames.extend((filename, filename_png, filename_npz, seed))
+                # yield filenames
             return filenames
 
         prompts = split_by_lines(
@@ -183,7 +138,7 @@ def generate_multi(count=1):
                 elif long_prompt_history_radio == value_empty_history:
                     history_prompt = None
 
-                filename, filename_png, audio_array, last_piece_history, filename_npz = generate(
+                filename, filename_png, audio_array, last_piece_history, filename_npz, seed = generate(
                     prompt_piece, history_setting, language, speaker_id, useV2, text_temp=text_temp, waveform_temp=waveform_temp, history_prompt=history_prompt, seed=seed, index=i)
                 pieces += [audio_array]
 
@@ -212,31 +167,9 @@ def generate_multi(count=1):
             with open(filename_json, "w") as outfile:
                 json.dump(metadata, outfile, indent=2)
 
-            filenames.extend((filename, filename_png, filename_npz))
+            filenames.extend((filename, filename_png, filename_npz, seed))
         return filenames
-
-    def split_by_lines(prompt):
-        prompts = prompt.split("\n")
-        prompts = [p.strip() for p in prompts]
-        prompts = [p for p in prompts if len(p) > 0]
-        return prompts
-
     return gen
-
-
-def split_by_length_simple(prompt):
-    return [
-        prompt[i:i+200] for i in range(0, len(prompt), 200)]
-
-
-def get_npz_files():
-    return glob.glob("voices/*.npz") + glob.glob("outputs/*.npz")
-
-
-def reload_voices_fn():
-    choices = get_npz_files()
-    return gr.Dropdown.update(choices=choices)
-
 
 def generation_tab_bark(tabs):
     with gr.Tab(label="Generation (Bark)", id="generation_bark") as tab_bark:
@@ -295,7 +228,7 @@ def generation_tab_bark(tabs):
                 "refresh", visible=False, elem_classes="btn-sm material-symbols-outlined")
             reload_old_generation_dropdown.style(size="sm")
 
-            reload_old_generation_dropdown.click(fn=reload_voices_fn,
+            reload_old_generation_dropdown.click(fn=lambda: gr.Dropdown.update(choices=get_npz_files()),
                                                  outputs=old_generation_dropdown)
 
         # Show the language and speakerId radios only when useHistory is checked
@@ -323,6 +256,10 @@ def generation_tab_bark(tabs):
                 with gr.Column():
                     gr.Markdown("Seed")
                     with gr.Row():
+                        last_seed_1 = gr.State()
+                        last_seed_2 = gr.State()
+                        last_seed_3 = gr.State()
+
                         seed_input = gr.Textbox(value="-1", show_label=False)
                         seed_input.style(container=False)
                         set_random_seed_button = gr.Button(
@@ -335,7 +272,9 @@ def generation_tab_bark(tabs):
                             "repeat", elem_classes="btn-sm material-symbols-outlined")
 
                         set_old_seed_button.style(size="sm")
-                        set_old_seed_button.click(fn=lambda: gr.Textbox.update(value=str(last_seed)), outputs=[seed_input])
+                        set_old_seed_button.click(fn=lambda x: gr.Textbox.update(value=str(x)),
+                                                  inputs=[last_seed_1],
+                                                   outputs=[seed_input])
 
         prompt = gr.Textbox(label="Prompt", lines=3,
                             placeholder="Enter text here...")
@@ -402,9 +341,9 @@ def generation_tab_bark(tabs):
             }, inputs=[source],
                          outputs=[old_generation_dropdown, history_setting, tabs])
 
-        outputs = [audio_1, image_1, continue_button_1_data]
-        outputs2 = [audio_2, image_2, continue_button_2_data]
-        outputs3 = [audio_3, image_3, continue_button_3_data]
+        outputs = [audio_1, image_1, continue_button_1_data, last_seed_1]
+        outputs2 = [audio_2, image_2, continue_button_2_data, last_seed_2]
+        outputs3 = [audio_3, image_3, continue_button_3_data, last_seed_3]
         # examples = [
         #     ["The quick brown fox jumps over the lazy dog."],
         #     ["To be or not to be, that is the question."],
@@ -455,14 +394,3 @@ def insert_npz_file(npz_filename):
         gr.Dropdown.update(value=npz_filename),
         gr.Radio.update(value=value_use_old_generation),
     ]
-
-
-def test():
-    text_prompt = """
-        Hello, my name is Suno. And, uh — and I like pizza. [laughs] 
-        But I also have other interests such as playing tic tac toe.
-    """
-
-    history_prompt = "en_speaker_0"
-    generate(text_prompt, True, history_prompt)
-    generate(text_prompt, False, history_prompt)
