@@ -8,7 +8,7 @@ import src.setup_or_recover as setup_or_recover
 import src.dotenv_init as dotenv_init
 import matplotlib
 import matplotlib.pyplot as plt
-from src.bark_tab.generation_tab_bark import generation_tab_bark
+from src.bark_tab.generation_tab_bark import generation_tab_bark, bark_css
 import gradio as gr
 import json
 from src.history_tab.main import favorites_tab, history_tab, voices_tab
@@ -105,6 +105,7 @@ full_css = ""
 full_css += material_symbols_css
 full_css += css_tortoise
 full_css += history_css
+full_css += bark_css
 
 def reload_config_and_restart_ui():
     os._exit(0)
@@ -138,6 +139,9 @@ def print_pretty_options(options):
         print(f"  {key}:{' '*(max_key_length - len(key))} {value}")
 
 print("Starting Gradio server...")
+if not gradio_interface_options["enable_queue"]:
+    print("Warning: Gradio server queue is disabled. Automatically enabling")
+    gradio_interface_options["enable_queue"] = True
 print_pretty_options(gradio_interface_options)
 
 if __name__ == "__main__":   
