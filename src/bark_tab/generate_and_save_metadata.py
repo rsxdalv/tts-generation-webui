@@ -19,3 +19,5 @@ def generate_and_save_metadata(prompt, language, speaker_id, text_temp, waveform
     }
     with open(filename_json, "w") as outfile:
         json.dump(metadata, outfile, indent=2)
+
+    return metadata

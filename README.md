@@ -10,24 +10,16 @@
 
 This code provides a Gradio interface for generating audio from text input using the Bark TTS and Tortoise TTS models. The interface takes a text prompt as input and generates audio as output.
 
+![generation](./screenshots/v2/generation.jpg)
+![history](./screenshots/v2/history.jpg)
 ![Screenshot 1](./screenshots/screenshot%20(1).png)
-![Screenshot 6](./screenshots/screenshot%20(6).png)
-![Screenshot 2](./screenshots/screenshot%20(2).png)
-![Screenshot 3](./screenshots/screenshot%20(3).png)
-![Screenshot 4](./screenshots/screenshot%20(4).png)
 ![Screenshot 5](./screenshots/screenshot%20(5).png)
-
-## Deterministic Generation
-![Screenshot 7](./screenshots/screenshot%20(7).png)
 
 [audio__bark__continued_generation__2023-05-04_16-07-49_long.webm](https://user-images.githubusercontent.com/6757283/236218842-b9dc253e-05de-49e5-ada9-e714e1e2cbd4.webm)
 
 [audio__bark__continued_generation__2023-05-04_16-09-21_long.webm](https://user-images.githubusercontent.com/6757283/236219228-518d2b70-51a3-4175-af44-b24c01d14932.webm)
 
 [audio__bark__continued_generation__2023-05-04_16-10-55_long.webm](https://user-images.githubusercontent.com/6757283/236219243-dad96404-0879-4274-828e-7f3afc6bac65.webm)
-
-## Full Gradio settings
-![Screenshot 8](./screenshots/screenshot%20(8).png)
 
 ## Extra Voices
 https://rsxdalv.github.io/bark-speaker-directory/ (https://github.com/rsxdalv/bark-speaker-directory)
@@ -42,6 +34,9 @@ This code requires the following dependencies:
 
 
 ## Changelog
+May 17:
+* Update to v2 - generate results as they appear, preview long prompt generations piece by piece, enable up to 9 outputs, UI tweaks
+
 May 16:
 * Add gradio settings tab, fix gradio errors in console, improve logging.
 * Update History and Favorites with "use as voice" and "save voice" buttons
