@@ -12,7 +12,7 @@ default_config = {
         "codec_use_gpu": True,
         "load_models_on_startup": True
     },
-    "gradio_interface_options_ui": {
+    "gradio_interface_options": {
         'inline': False,
         'inbrowser': True,
         'share': False, 
