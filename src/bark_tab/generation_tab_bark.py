@@ -39,9 +39,9 @@ long_prompt_choices = [value_short_prompt,
                        #   value_split_length
                        ]
 
-value_reuse_history = "Reuse history"
-value_use_voice_history = "Use voice history"
-value_empty_history = "Empty history (not recommended)"
+value_reuse_history = "Use old generation as history"
+value_use_voice_history = "or Use history prompt setting"
+value_empty_history = "or Clear history"
 long_prompt_history_choices = [
     value_reuse_history, value_use_voice_history, value_empty_history
 ]
@@ -190,8 +190,8 @@ def generate_multi(count=1, outputs_ref=None):
                 if long_prompt_history_radio == value_reuse_history:
                     history_prompt = last_piece_history
                 elif long_prompt_history_radio == value_use_voice_history:
-                    history_prompt = create_voice_string(
-                        language, speaker_id, useV2)
+                    history_prompt, _ = get_history_prompt(
+                        language, speaker_id, useV2, history_prompt, use_voice=history_setting == value_use_voice)
                 elif long_prompt_history_radio == value_empty_history:
                     history_prompt = None
 
