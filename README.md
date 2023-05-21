@@ -2,8 +2,8 @@
 
 ## One click installers
 
-[Download](https://github.com/rsxdalv/one-click-installers-tts/archive/refs/tags/v1.0.zip) ||
-[Release Page](https://github.com/rsxdalv/one-click-installers-tts/releases/tag/v1.0) ||
+[Download](https://github.com/rsxdalv/one-click-installers-tts/archive/refs/tags/v2.0.zip) ||
+[Release Page](https://github.com/rsxdalv/one-click-installers-tts/releases/tag/v2.0) ||
 [Installer Repo](https://github.com/rsxdalv/one-click-installers-tts)
 
 ## Screenshots
@@ -14,6 +14,7 @@ This code provides a Gradio interface for generating audio from text input using
 ![history](./screenshots/v2/history.jpg)
 ![Screenshot 1](./screenshots/screenshot%20(1).png)
 ![Screenshot 5](./screenshots/screenshot%20(5).png)
+![cloning](./screenshots/v2/cloning.png)
 
 [audio__bark__continued_generation__2023-05-04_16-07-49_long.webm](https://user-images.githubusercontent.com/6757283/236218842-b9dc253e-05de-49e5-ada9-e714e1e2cbd4.webm)
 

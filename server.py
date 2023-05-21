@@ -9,6 +9,7 @@ import src.setup_or_recover as setup_or_recover
 import matplotlib
 import matplotlib.pyplot as plt
 from src.bark_tab.generation_tab_bark import generation_tab_bark, bark_css
+from src.clone_tab.tab_voice_clone_demo import tab_voice_clone_demo
 import gradio as gr
 import json
 from src.history_tab.main import favorites_tab, history_tab, voices_tab
@@ -122,6 +123,7 @@ with gr.Blocks(css=full_css) as demo:
     gr.Markdown("# TTS Generation WebUI (Bark & Tortoise)")
     with gr.Tabs() as tabs:
         register_use_as_history_button = generation_tab_bark(tabs)
+        tab_voice_clone_demo()
         generation_tab_tortoise()
 
         history_tab(register_use_as_history_button)

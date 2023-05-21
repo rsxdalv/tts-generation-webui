@@ -5,3 +5,4 @@ config.json
 .env
 
 voices/
+data/
