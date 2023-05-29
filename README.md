@@ -2,8 +2,8 @@
 
 ## One click installers
 
-[Download](https://github.com/rsxdalv/one-click-installers-tts/archive/refs/tags/v2.0.zip) ||
-[Release Page](https://github.com/rsxdalv/one-click-installers-tts/releases/tag/v2.0) ||
+[Download](https://github.com/rsxdalv/one-click-installers-tts/archive/refs/tags/v3.1.zip) ||
+[Release Page](https://github.com/rsxdalv/one-click-installers-tts/releases/tag/v3.1) ||
 [Installer Repo](https://github.com/rsxdalv/one-click-installers-tts)
 
 ## Screenshots
