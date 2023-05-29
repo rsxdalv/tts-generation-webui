@@ -44,7 +44,7 @@ def _load_tokenizer():
     tokenizer_path = HuBERTManager.make_sure_tokenizer_installed()
     global tokenizer
     if tokenizer is None:
-        tokenizer = CustomTokenizer()
+        tokenizer = CustomTokenizer.load_from_checkpoint('data/models/hubert/tokenizer.pth')
         tokenizer.load_state_dict(torch.load(tokenizer_path))
     return tokenizer
 
