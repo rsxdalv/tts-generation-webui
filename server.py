@@ -6,8 +6,6 @@ from src.history_tab.history_css import history_css
 from src.load_config import default_config
 from settings_tab_gradio import settings_tab_gradio
 import src.setup_or_recover as setup_or_recover
-import matplotlib
-import matplotlib.pyplot as plt
 from src.bark_tab.generation_tab_bark import generation_tab_bark, bark_css
 from src.clone_tab.tab_voice_clone_demo import tab_voice_clone_demo
 import gradio as gr
@@ -19,7 +17,6 @@ from config import config
 
 setup_or_recover.dummy()
 dotenv_init.init()
-matplotlib.use('agg')
 
 def save_config(text_use_gpu,
                 text_use_small,
