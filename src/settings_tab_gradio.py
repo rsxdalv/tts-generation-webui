@@ -71,7 +71,8 @@ def settings_tab_gradio(save_config: Callable[[], None], reload_config_and_resta
                         label="favicon_path: Path to a file (.png, .gif, or .ico) to use as the favicon",
                         value=gradio_interface_options["favicon_path"]),
                     "ssl_keyfile": gr.Textbox(
-                        label="ssl_keyfile: Path to a file to use as the private key file to create a local server running on https",
+                        label="ssl_keyfile: Path to a file to use as the private key file to create a local server "
+                              "running on https",
                         value=gradio_interface_options["ssl_keyfile"]),
                     "ssl_certfile": gr.Textbox(
                         label="ssl_certfile: Path to a file to use as the signed certificate for https",
@@ -98,8 +99,8 @@ def settings_tab_gradio(save_config: Callable[[], None], reload_config_and_resta
                 save_beacon = gr.Markdown("")
 
                 # Map over the UI elements
-                for input in inputs:
-                    input.change(
+                for i in inputs:
+                    i.change(
                         fn=lambda *input_values: save_config(keys, input_values),
                         inputs=inputs,
                         outputs=[save_beacon],

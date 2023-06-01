@@ -1,5 +1,4 @@
 import os
-import time
 import src.setup_or_recover as setup_or_recover
 import src.dotenv_init as dotenv_init
 
