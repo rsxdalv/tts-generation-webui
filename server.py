@@ -76,6 +76,7 @@ def load_models(
                 fine_use_small,
                 codec_use_gpu)
     # download and load all models
+    # TODO: try catch for memmory errors
     model_manager.reload_models(config)
     return gr.Button.update(value="Reload models", interactive=True)
 

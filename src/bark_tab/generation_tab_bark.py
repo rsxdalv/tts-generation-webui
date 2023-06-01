@@ -3,7 +3,7 @@ import shutil
 
 import numpy as np
 from create_base_filename import create_base_filename
-from ..history_tab.save_to_favorites import save_to_favorites
+from src.history_tab.save_to_favorites import save_to_favorites
 from src.bark_tab.create_voice_string import create_voice_string
 from src.bark_tab.generate_and_save_metadata import generate_and_save_metadata
 from src.bark_tab.generate_choice_string import generate_choice_string
@@ -108,7 +108,7 @@ def save_generation(prompt, language, speaker_id, text_temp, waveform_temp, hist
     return filename, filename_png, filename_npz, metadata
 
 
-def save_long_generation(prompt, history_setting, language, speaker_id, text_temp, waveform_temp, seed, filename, pieces, full_generation=None):
+def save_long_generation(prompt, history_setting, language, speaker_id, text_temp, waveform_temp, seed, filename, pieces, full_generation=None, history_prompt=None):
     base_filename = filename.replace(".wav", "_long")
     audio_array = np.concatenate(pieces)
 
@@ -147,6 +147,8 @@ def generate_multi(count=1, outputs_ref=None):
         if history_setting == value_use_old_generation:
             history_prompt = load_npz(old_generation_filename)
 
+        _original_history_prompt = history_prompt
+
         for i in range(count):
             yield {
                 outputs_ref[i][0]: None,
@@ -158,11 +160,12 @@ def generate_multi(count=1, outputs_ref=None):
                 outputs_ref[i][6]: None
             }
 
+        _original_seed = seed
         if long_prompt_radio == value_short_prompt:
             outputs = []
             for i in range(count):
                 filename, filename_png, _, _, filename_npz, seed, metadata = generate(
-                    prompt, history_setting, language, speaker_id, useV2, text_temp=text_temp, waveform_temp=waveform_temp, history_prompt=history_prompt, seed=seed, index=i)
+                    prompt, history_setting, language, speaker_id, useV2, text_temp=text_temp, waveform_temp=waveform_temp, history_prompt=history_prompt, seed=_original_seed, index=i)
                 outputs.extend((filename, filename_png, gr.Button.update(
                     value="Save to favorites", visible=True), gr.Button.update(visible=True), filename_npz, seed, metadata))
                 yield {
@@ -209,7 +212,7 @@ def generate_multi(count=1, outputs_ref=None):
                 }
 
             filename, filename_png, filename_npz, metadata = save_long_generation(
-                prompt, history_setting, language, speaker_id, text_temp, waveform_temp, seed, filename, pieces, full_generation=last_piece_history)
+                prompt, history_setting, language, speaker_id, text_temp, waveform_temp, seed, filename, pieces, full_generation=last_piece_history, history_prompt=_original_history_prompt)
 
             outputs.extend((filename, filename_png, gr.Button.update(
                 value="Save to favorites", visible=True), gr.Button.update(visible=True), filename_npz, seed, metadata))
