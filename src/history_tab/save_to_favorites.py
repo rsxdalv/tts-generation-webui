@@ -9,6 +9,8 @@ def save_to_favorites(json_text):
     shutil.copy(json_text["filename"], "favorites/")
     shutil.copy(json_text["filename_png"], "favorites/")
     shutil.copy(json_text["filename_npz"], "favorites/")
+    # temp
+    shutil.copy(json_text["filename"].replace(".wav", ".ogg"), "favorites/")
     # write new json file with new filename
     json_text["filename"] = json_text["filename"].replace(
         "outputs\\", "favorites\\").replace("outputs/", "favorites/")
