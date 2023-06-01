@@ -9,11 +9,11 @@ from src.tortoise.generation_tab_tortoise import generation_tab_tortoise
 from src.config.load_config import default_config
 from src.settings_tab_gradio import settings_tab_gradio
 from src.bark.generation_tab_bark import generation_tab_bark
-from src.clone_tab.tab_voice_clone_demo import tab_voice_clone_demo
+from src.bark.clone.tab_voice_clone_demo import tab_voice_clone_demo
 import gradio as gr
 from src.history_tab.main import favorites_tab, history_tab, voices_tab
 from src.model_manager import model_manager
-from src.settings_tab_bark import settings_tab_bark
+from src.bark.settings_tab_bark import settings_tab_bark
 from src.config.config import config
 
 setup_or_recover.dummy()

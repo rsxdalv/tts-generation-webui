@@ -4,10 +4,6 @@ import numpy as np
 from src.bark.FullGeneration import FullGeneration
 
 
-def npz_tools():
-    return None
-
-
 def compress_history(full_generation):
     full_generation["semantic_prompt"] = full_generation["semantic_prompt"].astype(np.int16)
     full_generation["coarse_prompt"] = full_generation["coarse_prompt"].astype(np.int16)
