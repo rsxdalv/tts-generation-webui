@@ -61,7 +61,7 @@ def settings_tab_bark(config: dict, save_config: Callable, load_models: Callable
                         environment_suno_enable_mps)
                     os.environ["SUNO_OFFLOAD_CPU"] = str(
                         environment_suno_offload_cpu)
-                    with open('.env', 'w') as outfile:
+                    with open('../.env', 'w') as outfile:
                         outfile.write(
                             generate_env(environment_suno_use_small_models,
                                          environment_suno_enable_mps,
