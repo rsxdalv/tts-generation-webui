@@ -2,6 +2,8 @@ import os
 import shutil
 
 import numpy as np
+
+from src.bark_tab.history_to_hash import history_to_hash
 from create_base_filename import create_base_filename
 from src.history_tab.save_to_favorites import save_to_favorites
 from src.bark_tab.create_voice_string import create_voice_string
@@ -74,15 +76,16 @@ def generate(prompt, history_setting, language=None, speaker_id=0, useV2=False, 
     log_generation(prompt, useV2, text_temp, waveform_temp,
                    use_voice, history_prompt_verbal)
 
-    seed = parse_or_set_seed(seed, index)
+    # seed = parse_or_set_seed(seed, index)
+    indexed_seed = parse_or_set_seed(seed, index)
     full_generation, audio_array = generate_audio(
         prompt, history_prompt=history_prompt, text_temp=text_temp, waveform_temp=waveform_temp, output_full=True)
     set_seed(-1)
 
     filename, filename_png, filename_npz, metadata = save_generation(
-        prompt, language, speaker_id, text_temp, waveform_temp, history_prompt, seed, use_voice, history_prompt_verbal, full_generation, audio_array)
+        prompt, language, speaker_id, text_temp, waveform_temp, history_prompt, indexed_seed, use_voice, history_prompt_verbal, full_generation, audio_array)
 
-    return [filename, filename_png, audio_array, full_generation, filename_npz, seed, metadata]
+    return [filename, filename_png, audio_array, full_generation, filename_npz, indexed_seed, metadata]
 
 
 def save_generation(prompt, language, speaker_id, text_temp, waveform_temp, history_prompt, seed, use_voice, history_prompt_verbal, full_generation, audio_array):
@@ -97,13 +100,14 @@ def save_generation(prompt, language, speaker_id, text_temp, waveform_temp, hist
 
     # Generate metadata for the audio file
     language = SUPPORTED_LANGS[language][0] if use_voice else None
+    history_hash = history_to_hash(history_prompt)
     history_prompt_npz = history_prompt if isinstance(
         history_prompt, str) else None
     speaker_id = speaker_id if use_voice else None
     history_prompt = history_prompt_verbal
 
     metadata = generate_and_save_metadata(prompt, language, speaker_id, text_temp, waveform_temp, seed, filename,
-                                          date, filename_png, filename_json, history_prompt_npz, filename_npz, history_prompt)
+                                          date, filename_png, filename_json, history_prompt_npz, filename_npz, history_prompt, history_hash)
 
     return filename, filename_png, filename_npz, metadata
 
@@ -120,11 +124,13 @@ def save_long_generation(prompt, history_setting, language, speaker_id, text_tem
 
     # Generate metadata for the audio file
     language = SUPPORTED_LANGS[language][0]
+    history_hash = history_to_hash(history_prompt)
     history_prompt_npz = None
     history_prompt = history_setting
 
     metadata = generate_and_save_metadata(prompt, language, speaker_id, text_temp, waveform_temp, seed, filename,
-                                          date, filename_png, filename_json, history_prompt_npz, filename_npz, history_prompt)
+                                          date, filename_png, filename_json, history_prompt_npz, filename_npz, history_prompt, history_hash)
+
 
     return filename, filename_png, filename_npz, metadata
 
@@ -293,6 +299,7 @@ def generation_tab_bark(tabs):
                 long_prompt_history_radio = gr.Radio(
                     long_prompt_history_choices, type="value", label="For each subsequent generation:", value=value_reuse_history)
             with gr.Column():
+                # TODO: Add gradient temperature options (requires model changes)
                 text_temp = gr.Slider(label="Text temperature",
                                       value=0.7, minimum=0.0, maximum=1.2, step=0.05)
                 waveform_temp = gr.Slider(
