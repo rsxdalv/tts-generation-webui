@@ -6,5 +6,6 @@ def parse_or_set_seed(seed, index):
         seed = int(seed)
         if seed == -1:
             seed = generate_random_seed()
-    set_seed(seed + index)
-    return seed
+    indexed_seed = seed + index
+    set_seed(indexed_seed)
+    return indexed_seed
