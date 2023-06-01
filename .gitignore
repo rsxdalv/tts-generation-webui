@@ -18,3 +18,7 @@ temp/
 
 # Ignore node modules
 node_modules/
+
+# Editors
+.vscode/
+.idea/
