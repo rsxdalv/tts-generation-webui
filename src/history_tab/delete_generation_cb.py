@@ -1,8 +1,8 @@
 import os
 
 
-def delete_generation_cb(refresh):
-    def delete_generation(json):
+def delete_generation_cb(refresh: callable):
+    def delete_generation(json: dict):
         os.remove(json["filename"])
         os.remove(json["filename_png"])
         os.remove(json["filename_json"])

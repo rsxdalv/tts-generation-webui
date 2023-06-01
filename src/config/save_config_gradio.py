@@ -3,7 +3,7 @@ from src.config.config import config
 from typing import List, Any
 
 
-def _convert_empty_strings_to_none(dictionary):
+def _convert_empty_strings_to_none(dictionary: dict):
     for key, value in dictionary.items():
         if value == '':
             dictionary[key] = None

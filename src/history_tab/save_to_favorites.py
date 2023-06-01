@@ -4,7 +4,7 @@ import json
 import shutil
 
 
-def save_to_favorites(json_text):
+def save_to_favorites(json_text: dict):
     shutil.copy(json_text["filename"], "favorites/")
     shutil.copy(json_text["filename_png"], "favorites/")
     shutil.copy(json_text["filename_npz"], "favorites/")

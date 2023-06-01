@@ -5,7 +5,8 @@ def dummy():
     pass
 
 
-def generate_env(environment_suno_use_small_models, environment_suno_enable_mps, environment_suno_offload_cpu):
+def generate_env(environment_suno_use_small_models: bool, environment_suno_enable_mps: bool,
+                 environment_suno_offload_cpu: bool):
     return f"""
 # Duplicates small models checkboxes
 SUNO_USE_SMALL_MODELS={environment_suno_use_small_models}
