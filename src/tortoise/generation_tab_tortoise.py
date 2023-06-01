@@ -1,4 +1,4 @@
-from gen_tortoise import generate_tortoise_n
+from src.tortoise.gen_tortoise import generate_tortoise_n
 from models.tortoise.tortoise.utils.audio import get_voices
 
 

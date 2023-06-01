@@ -6,7 +6,7 @@ import src.dotenv_init as dotenv_init
 from src.config.save_config_bark import save_config_bark
 from material_symbols_css import material_symbols_css
 from src.config.save_config_gradio import save_config_gradio
-from generation_tab_tortoise import css_tortoise, generation_tab_tortoise
+from src.tortoise.generation_tab_tortoise import css_tortoise, generation_tab_tortoise
 from src.history_tab.history_css import history_css
 from src.load_config import default_config
 from settings_tab_gradio import settings_tab_gradio
