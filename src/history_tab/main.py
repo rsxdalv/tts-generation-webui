@@ -20,13 +20,19 @@ def open_favorites_folder(): open_folder("favorites")
 
 def get_wav_files(directory):
     wav_files = glob.glob(f"{directory}/*.wav")
-    return [[file, parse_time(extract_time(file))] for file in wav_files]
+    # file_date_list = [[file, parse_time(extract_time(file))] for file in wav_files]
+    # swap headers
+    file_date_list = [[parse_time(extract_time(file)), file] for file in wav_files]
+    # order by date
+    file_date_list.sort(key=lambda x: x[0], reverse=True)
+    return file_date_list
 
 
 def get_wav_files_history(): return get_wav_files("outputs")
 def get_wav_files_favorites(): return get_wav_files("favorites")
 
 
+# TODO: add hash column and date column
 def get_npz_files_voices():
     npz_files = glob.glob("voices/*.npz")
     return [[file] for file in npz_files]
@@ -34,7 +40,9 @@ def get_npz_files_voices():
 
 def select_audio(table, evt):
     index = evt.index
-    filename = table['data'][index[0]][0]
+    # filename = table['data'][index[0]][0]
+    # swap headers
+    filename = table['data'][index[0]][1]
     with open(filename.replace(".wav", ".json")) as f:
         json_text = json.load(f)
     return filename, json_text
@@ -64,8 +72,12 @@ def history_tab(register_use_as_history_button):
                                         interactive=False,
                                         col_count=2,
                                         max_cols=2,
-                                        datatype=["str", "date"],
-                                        headers=["History", "Date and time"])
+                                        # datatype=["str", "date"],
+                                        # headers=["History", "Date and time"]
+                                        # swap headers
+                                        datatype=["date", "str"],
+                                        headers=["Date and time", "History"]
+                                        )
 
         with gr.Column():
             history_audio = gr.Audio(
@@ -141,8 +153,12 @@ def favorites_tab(register_use_as_history_button):
                                           interactive=False,
                                           col_count=2,
                                           max_cols=2,
-                                          datatype=["str", "date"],
-                                          headers=["Favorites", "Date and time"])
+                                        #   datatype=["str", "date"],
+                                        #   headers=["Favorites", "Date and time"]
+                                            # swap headers
+                                            datatype=["date", "str"],
+                                            headers=["Date and time", "Favorites"]
+                                          )
 
         with gr.Column():
             favorites_audio = gr.Audio(
