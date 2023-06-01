@@ -105,6 +105,7 @@ def tab_voice_clone_demo():
         This demo is based on https://github.com/gitmylo/bark-voice-cloning-HuBERT-quantizer repository.
         """)
 
+        # TODO: try with ffmpeg (except mp3)
         # file_input = gr.Audio(label="Input Audio", type="numpy", source="upload", interactive=True)
         file_input = gr.File(label="Input Audio", file_types=[
                              ".wav"], interactive=True)
