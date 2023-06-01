@@ -4,6 +4,7 @@ import shutil
 import numpy as np
 
 from src.bark_tab.history_to_hash import history_to_hash
+from src.extensions_loader.ext_callback_save_generation import ext_callback_save_generation
 from create_base_filename import create_base_filename
 from src.history_tab.save_to_favorites import save_to_favorites
 from src.bark_tab.create_voice_string import create_voice_string
@@ -25,7 +26,7 @@ from model_manager import model_manager
 from config import config
 from src.set_seed import set_seed
 from src.bark_tab.generate_random_seed import generate_random_seed
-
+import soundfile as sf
 
 value_empty_history = "Empty history"
 value_use_voice = "or Use a voice:"
@@ -95,8 +96,9 @@ def save_generation(prompt, language, speaker_id, text_temp, waveform_temp, hist
 
     filename, filename_png, filename_json, filename_npz = get_filenames(base_filename)
     save_npz(filename_npz, full_generation)
-    write_wav(filename, SAMPLE_RATE, audio_array)
-    save_waveform_plot(audio_array, filename_png)
+    save_wav(audio_array, filename)
+    plot = save_waveform_plot(audio_array, filename_png)
+    filename_ogg = filename.replace(".wav", ".ogg")
 
     # Generate metadata for the audio file
     language = SUPPORTED_LANGS[language][0] if use_voice else None
@@ -109,8 +111,18 @@ def save_generation(prompt, language, speaker_id, text_temp, waveform_temp, hist
     metadata = generate_and_save_metadata(prompt, language, speaker_id, text_temp, waveform_temp, seed, filename,
                                           date, filename_png, filename_json, history_prompt_npz, filename_npz, history_prompt, history_hash)
 
-    return filename, filename_png, filename_npz, metadata
 
+    ext_callback_save_generation(
+        full_generation,
+        audio_array,
+        { "wav": filename, "png": filename_png, "npz": filename_npz, "ogg": filename_ogg },
+        metadata
+    )
+
+    return filename, plot, filename_npz, metadata
+
+def save_wav(audio_array, filename):
+    write_wav(filename, SAMPLE_RATE, audio_array)
 
 def save_long_generation(prompt, history_setting, language, speaker_id, text_temp, waveform_temp, seed, filename, pieces, full_generation=None, history_prompt=None):
     base_filename = filename.replace(".wav", "_long")
@@ -120,7 +132,8 @@ def save_long_generation(prompt, history_setting, language, speaker_id, text_tem
     filename, filename_png, filename_json, filename_npz = get_filenames(base_filename)
     save_npz(filename_npz, full_generation)
     write_wav(filename, SAMPLE_RATE, audio_array)
-    save_waveform_plot(audio_array, filename_png)
+    plot = save_waveform_plot(audio_array, filename_png)
+    filename_ogg = filename.replace(".wav", ".ogg")
 
     # Generate metadata for the audio file
     language = SUPPORTED_LANGS[language][0]
@@ -132,7 +145,14 @@ def save_long_generation(prompt, history_setting, language, speaker_id, text_tem
                                           date, filename_png, filename_json, history_prompt_npz, filename_npz, history_prompt, history_hash)
 
 
-    return filename, filename_png, filename_npz, metadata
+    ext_callback_save_generation(
+        full_generation,
+        audio_array,
+        { "wav": filename, "png": filename_png, "npz": filename_npz, "ogg": filename_ogg },
+        metadata
+    )
+
+    return filename, plot, filename_npz, metadata
 
 
 def generate_multi(count=1, outputs_ref=None):
