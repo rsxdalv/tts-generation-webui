@@ -3,18 +3,18 @@ import shutil
 
 import numpy as np
 
-from src.bark_tab.history_to_hash import history_to_hash
+from src.bark.history_to_hash import history_to_hash
 from src.extensions_loader.ext_callback_save_generation import ext_callback_save_generation
 from src.utils.create_base_filename import create_base_filename
 from src.history_tab.save_to_favorites import save_to_favorites
-from src.bark_tab.generate_and_save_metadata import generate_and_save_metadata
-from src.bark_tab.generate_choice_string import generate_choice_string
-from src.bark_tab.get_filenames import get_filenames
-from src.bark_tab.get_history_prompt import get_history_prompt
-from src.bark_tab.log_generation import log_generation
-from src.bark_tab.npz_tools import get_npz_files, load_npz, save_npz
-from src.bark_tab.parse_or_set_seed import parse_or_set_seed
-from src.bark_tab.split_text_functions import split_by_length_simple, split_by_lines
+from src.bark.generate_and_save_metadata import generate_and_save_metadata
+from src.bark.generate_choice_string import generate_choice_string
+from src.bark.get_filenames import get_filenames
+from src.bark.get_history_prompt import get_history_prompt
+from src.bark.log_generation import log_generation
+from src.bark.npz_tools import get_npz_files, load_npz, save_npz
+from src.bark.parse_or_set_seed import parse_or_set_seed
+from src.bark.split_text_functions import split_by_length_simple, split_by_lines
 from src.utils.date import get_date_string
 from models.bark.bark import SAMPLE_RATE, generate_audio
 from scipy.io.wavfile import write as write_wav

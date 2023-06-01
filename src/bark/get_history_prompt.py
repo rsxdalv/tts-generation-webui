@@ -1,4 +1,4 @@
-from src.bark_tab.create_voice_string import create_voice_string
+from src.bark.create_voice_string import create_voice_string
 
 
 def get_history_prompt(language, speaker_id, useV2, history_prompt, use_voice):

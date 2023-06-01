@@ -1,4 +1,4 @@
-from ..bark_tab.FullGeneration import FullGeneration
+from ..bark.FullGeneration import FullGeneration
 
 import numpy as np
 

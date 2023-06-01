@@ -1,4 +1,4 @@
-from src.bark_tab.generation_tab_bark import generate
+from src.bark.generation_tab_bark import generate
 
 
 def test():

@@ -1,6 +1,6 @@
 import hashlib
 
-from src.bark_tab.FullGeneration import FullGeneration
+from src.bark.FullGeneration import FullGeneration
 
 
 def history_to_hash(npz: FullGeneration):
