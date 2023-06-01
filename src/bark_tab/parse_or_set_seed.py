@@ -1,5 +1,5 @@
 from src.bark_tab.generate_random_seed import generate_random_seed
-from src.set_seed import set_seed
+from src.utils.set_seed import set_seed
 
 
 def parse_or_set_seed(seed, index):

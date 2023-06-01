@@ -57,7 +57,11 @@ if __name__ == "__main__":
 
     # Test the extensions
     ext_callback_save_generation(
-        full_generation={},
+        full_generation={
+            "semantic_prompt": np.array([1, 2, 3]),
+            "coarse_prompt": np.array([1, 2, 3]),
+            "fine_prompt": np.array([1, 2, 3]),
+        },
         audio_array=np.array([1, 2, 3]),
         files={"ogg": "sample.ogg"},
         metadata={"extension": "test"}

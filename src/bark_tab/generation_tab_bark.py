@@ -5,9 +5,8 @@ import numpy as np
 
 from src.bark_tab.history_to_hash import history_to_hash
 from src.extensions_loader.ext_callback_save_generation import ext_callback_save_generation
-from src.create_base_filename import create_base_filename
+from src.utils.create_base_filename import create_base_filename
 from src.history_tab.save_to_favorites import save_to_favorites
-from src.bark_tab.create_voice_string import create_voice_string
 from src.bark_tab.generate_and_save_metadata import generate_and_save_metadata
 from src.bark_tab.generate_choice_string import generate_choice_string
 from src.bark_tab.get_filenames import get_filenames
@@ -16,17 +15,15 @@ from src.bark_tab.log_generation import log_generation
 from src.bark_tab.npz_tools import get_npz_files, load_npz, save_npz
 from src.bark_tab.parse_or_set_seed import parse_or_set_seed
 from src.bark_tab.split_text_functions import split_by_length_simple, split_by_lines
-from src.get_date import get_date
+from src.utils.date import get_date_string
 from models.bark.bark import SAMPLE_RATE, generate_audio
 from scipy.io.wavfile import write as write_wav
 from models.bark.bark.generation import SUPPORTED_LANGS
 import gradio as gr
-from src.save_waveform_plot import save_waveform_plot
+from src.utils.save_waveform_plot import save_waveform_plot
 from src.model_manager import model_manager
 from src.config.config import config
-from src.set_seed import set_seed
-from src.bark_tab.generate_random_seed import generate_random_seed
-import soundfile as sf
+from src.utils.set_seed import set_seed
 
 value_empty_history = "Empty history"
 value_use_voice = "or Use a voice:"
@@ -93,7 +90,7 @@ def generate(prompt, history_setting, language=None, speaker_id=0, useV2=False, 
 
 def save_generation(prompt, language, speaker_id, text_temp, waveform_temp, history_prompt, seed, use_voice,
                     history_prompt_verbal, full_generation, audio_array):
-    date = get_date()
+    date = get_date_string()
     base_filename = create_base_filename(
         history_prompt_verbal, "outputs", model="bark", date=date)
 
@@ -134,7 +131,7 @@ def save_long_generation(prompt, history_setting, language, speaker_id, text_tem
     base_filename = filename.replace(".wav", "_long")
     audio_array = np.concatenate(pieces)
 
-    date = get_date()
+    date = get_date_string()
     filename, filename_png, filename_json, filename_npz = get_filenames(base_filename)
     save_npz(filename_npz, full_generation)
     write_wav(filename, SAMPLE_RATE, audio_array)
@@ -268,7 +265,7 @@ def generate_multi(count=1, outputs_ref=None):
 
 
 def generation_tab_bark(tabs):
-    with gr.Tab(label="Generation (Bark)", id="generation_bark") as tab_bark:
+    with gr.Tab(label="Generation (Bark)", id="generation_bark"):
         history_setting = gr.Radio(
             history_settings,
             value="Empty history",

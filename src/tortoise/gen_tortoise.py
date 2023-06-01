@@ -1,9 +1,9 @@
 import datetime
 import os
-from src.create_base_filename import create_base_filename
+from src.utils.create_base_filename import create_base_filename
 
-from src.get_date import get_date
-from src.save_waveform_plot import save_waveform_plot
+from src.utils.date import get_date_string
+from src.utils.save_waveform_plot import save_waveform_plot
 
 import torchaudio
 
@@ -53,7 +53,7 @@ def process_gen(text, voice, preset, candidates, seed, cvvp_amount, filenames, g
     audio_tensor = gen.squeeze(0).cpu()
 
     model = "tortoise"
-    date = get_date()
+    date = get_date_string()
 
     base_filename = f"{create_base_filename(voice, OUTPUT_PATH, model, date)}__n{j}"
     filename = f'{base_filename}.wav'

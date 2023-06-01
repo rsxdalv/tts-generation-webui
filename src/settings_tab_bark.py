@@ -2,7 +2,7 @@ import os
 import gradio as gr
 from typing import Callable
 
-from src.setup_or_recover import generate_env
+from src.utils.setup_or_recover import generate_env
 
 
 def settings_tab_bark(config: dict, save_config: Callable, load_models: Callable) -> None:
@@ -88,8 +88,8 @@ def settings_tab_bark(config: dict, save_config: Callable, load_models: Callable
                     load_models_on_startup
                 ]
 
-                for input in inputs:
-                    input.change(fn=save_config, inputs=inputs,
+                for i in inputs:
+                    i.change(fn=save_config, inputs=inputs,
                                  outputs=[save_beacon])
 
                 def sync_ui():

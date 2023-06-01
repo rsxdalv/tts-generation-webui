@@ -1,7 +1,7 @@
 import glob
 import numpy as np
 
-from .FullGeneration import FullGeneration
+from src.bark_tab.FullGeneration import FullGeneration
 
 
 def npz_tools():

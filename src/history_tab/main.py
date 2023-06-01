@@ -7,10 +7,10 @@ import json
 import shutil
 
 import numpy as np
-from .delete_generation_cb import delete_generation_cb
-from .parse_time import extract_time, parse_time
-from .save_to_favorites import save_to_favorites
-from .open_folder import open_folder
+from src.history_tab.delete_generation_cb import delete_generation_cb
+from src.history_tab.parse_time import extract_time, parse_time
+from src.history_tab.save_to_favorites import save_to_favorites
+from src.history_tab.open_folder import open_folder
 
 
 def open_outputs_folder(): open_folder("outputs")

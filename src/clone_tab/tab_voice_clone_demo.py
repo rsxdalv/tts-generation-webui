@@ -1,5 +1,4 @@
 import tempfile
-from typing import List
 from models.bark_voice_cloning_hubert_quantizer.hubert.hubert_manager import HuBERTManager
 from models.bark_voice_cloning_hubert_quantizer.hubert.pre_kmeans_hubert import CustomHubert
 from models.bark_voice_cloning_hubert_quantizer.hubert.customtokenizer import CustomTokenizer
@@ -101,7 +100,7 @@ def save_cloned_voice(
 
 def tab_voice_clone_demo():
     with gr.Tab("Bark Voice Clone Demo"):
-        disclaimer = gr.Markdown("""
+        gr.Markdown("""
         Unethical use of this technology is prohibited.
         This demo is based on https://github.com/gitmylo/bark-voice-cloning-HuBERT-quantizer repository.
         """)
@@ -117,7 +116,7 @@ def tab_voice_clone_demo():
             value="Generate Voice", variant="primary")
 
         def generate_voice(wav_file_obj: tempfile._TemporaryFileWrapper, use_gpu: bool):
-            if (wav_file_obj is None):
+            if wav_file_obj is None:
                 print("No file selected")
                 return
             wav_file = wav_file_obj.name

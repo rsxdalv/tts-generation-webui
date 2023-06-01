@@ -1,15 +1,14 @@
 import os
-import src.setup_or_recover as setup_or_recover
-import src.dotenv_init as dotenv_init
+from src.css.css import full_css
+import src.utils.setup_or_recover as setup_or_recover
+import src.utils.dotenv_init as dotenv_init
 
 from src.config.save_config_bark import save_config_bark
-from src.material_symbols_css import material_symbols_css
 from src.config.save_config_gradio import save_config_gradio
-from src.tortoise.generation_tab_tortoise import css_tortoise, generation_tab_tortoise
-from src.history_tab.history_css import history_css
-from src.load_config import default_config
+from src.tortoise.generation_tab_tortoise import generation_tab_tortoise
+from src.config.load_config import default_config
 from src.settings_tab_gradio import settings_tab_gradio
-from src.bark_tab.generation_tab_bark import generation_tab_bark, bark_css
+from src.bark_tab.generation_tab_bark import generation_tab_bark
 from src.clone_tab.tab_voice_clone_demo import tab_voice_clone_demo
 import gradio as gr
 from src.history_tab.main import favorites_tab, history_tab, voices_tab
@@ -42,12 +41,6 @@ def load_models(
     model_manager.reload_models(config)
     return gr.Button.update(value="Reload models", interactive=True)
 
-
-full_css = ""
-full_css += material_symbols_css
-full_css += css_tortoise
-full_css += history_css
-full_css += bark_css
 
 
 def reload_config_and_restart_ui():
