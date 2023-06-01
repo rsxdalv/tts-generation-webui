@@ -1,7 +1,6 @@
 from src.bark_tab.create_voice_string import create_voice_string
 from src.get_speaker_gender import get_speaker_gender
 
-
 import gradio as gr
 
 

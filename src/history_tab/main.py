@@ -2,7 +2,6 @@ import os
 import time
 import gradio as gr
 
-
 import glob
 import json
 import shutil
@@ -15,6 +14,8 @@ from .open_folder import open_folder
 
 
 def open_outputs_folder(): open_folder("outputs")
+
+
 def open_favorites_folder(): open_folder("favorites")
 
 
@@ -29,6 +30,8 @@ def get_wav_files(directory):
 
 
 def get_wav_files_history(): return get_wav_files("outputs")
+
+
 def get_wav_files_favorites(): return get_wav_files("favorites")
 
 
@@ -55,9 +58,11 @@ def clear_audio(): return [
     gr.Button.update(visible=False),
 ]
 
+
 def save_to_voices_cb(json_text):
     shutil.copy(json_text["filename_npz"], "voices/")
     return gr.Button.update(value="Saved")
+
 
 def history_tab(register_use_as_history_button):
     with gr.Tab("History") as history_tab, gr.Row():
@@ -121,21 +126,21 @@ def history_tab(register_use_as_history_button):
             }
 
         history_list.select(fn=select_audio_history, inputs=[history_list], outputs=[
-                            history_audio,
-                            history_image,
-                            history_json,
-                            history_npz,
-                            delete_from_history,
-                            save_to_favorites_history,
-                            use_as_voice,
-                            save_to_voices
-                            ], preprocess=False)
+            history_audio,
+            history_image,
+            history_json,
+            history_npz,
+            delete_from_history,
+            save_to_favorites_history,
+            use_as_voice,
+            save_to_voices
+        ], preprocess=False)
 
         def update_history_tab():
             return gr.Dataframe.update(value=get_wav_files_history())
 
         delete_from_history.click(fn=clear_audio, outputs=[
-                                  history_audio, history_image, history_json, delete_from_history])
+            history_audio, history_image, history_json, delete_from_history])
         delete_from_history.click(fn=delete_generation_cb(
             update_history_tab), inputs=history_json, outputs=[history_list])
         history_tab.select(fn=update_history_tab, outputs=[history_list])
@@ -153,11 +158,11 @@ def favorites_tab(register_use_as_history_button):
                                           interactive=False,
                                           col_count=2,
                                           max_cols=2,
-                                        #   datatype=["str", "date"],
-                                        #   headers=["Favorites", "Date and time"]
-                                            # swap headers
-                                            datatype=["date", "str"],
-                                            headers=["Date and time", "Favorites"]
+                                          #   datatype=["str", "date"],
+                                          #   headers=["Favorites", "Date and time"]
+                                          # swap headers
+                                          datatype=["date", "str"],
+                                          headers=["Date and time", "Favorites"]
                                           )
 
         with gr.Column():
@@ -174,7 +179,7 @@ def favorites_tab(register_use_as_history_button):
                     value="Use as voice", variant="primary", visible=False)
                 save_to_voices = gr.Button(
                     value="Save to voices", variant="secondary", visible=False)
-                
+
                 register_use_as_history_button(
                     use_as_voice,
                     favorites_npz,
@@ -209,7 +214,7 @@ def favorites_tab(register_use_as_history_button):
             return gr.Dataframe.update(value=get_wav_files_favorites())
 
         delete_from_favorites.click(fn=clear_audio, outputs=[
-                                    favorites_audio, favorites_image, favorites_json, delete_from_favorites])
+            favorites_audio, favorites_image, favorites_json, delete_from_favorites])
         delete_from_favorites.click(fn=delete_generation_cb(
             update_favorites_tab), inputs=favorites_json, outputs=[favorites_list])
         favorites_tab.select(fn=update_favorites_tab, outputs=[favorites_list])
@@ -221,19 +226,18 @@ def open_voices_folder():
 
 def voices_tab(register_use_as_history_button):
     with gr.Tab("Voices") as voices_tab, gr.Row():
-            
         with gr.Column():
             with gr.Row():
                 button_output = gr.Button(value="Open voices folder")
             button_output.click(open_voices_folder)
 
             voices_list = gr.List(value=get_npz_files_voices(),
-                                    max_cols=1,
-                                    interactive=False,
-                                    datatype=["str"],   
-                                    headers=["Voices"],
-                                    #  elem_classes="file-list"
-                                    )
+                                  max_cols=1,
+                                  interactive=False,
+                                  datatype=["str"],
+                                  headers=["Voices"],
+                                  #  elem_classes="file-list"
+                                  )
         with gr.Column():
             voice_file_name = gr.Textbox(label="Voice file name", value="")
             new_voice_file_name = gr.Textbox(label="New voice file name", value="")
@@ -257,12 +261,14 @@ def voices_tab(register_use_as_history_button):
                     voices_list: update_voices_tab(),
                 }
 
-            rename_voice_button.click(fn=rename_voice, inputs=[voice_file_name, new_voice_file_name], outputs=[rename_voice_button, voices_list])
+            rename_voice_button.click(fn=rename_voice, inputs=[voice_file_name, new_voice_file_name],
+                                      outputs=[rename_voice_button, voices_list])
             register_use_as_history_button(
                 use_voice_button,
                 voice_file_name,
             )
-            delete_voice_button.click(fn=delete_voice, inputs=[voice_file_name], outputs=[delete_voice_button, voices_list])
+            delete_voice_button.click(fn=delete_voice, inputs=[voice_file_name],
+                                      outputs=[delete_voice_button, voices_list])
 
             def select(list_data, evt: gr.SelectData):
                 filename = evt.value
@@ -272,9 +278,9 @@ def voices_tab(register_use_as_history_button):
                 }
 
             voices_list.select(fn=select, inputs=[voices_list], outputs=[
-                                voice_file_name,
-                                new_voice_file_name,
-                                ])
+                voice_file_name,
+                new_voice_file_name,
+            ])
 
             def update_voices_tab():
                 return gr.List.update(value=get_npz_files_voices())

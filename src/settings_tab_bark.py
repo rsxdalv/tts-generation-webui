@@ -4,6 +4,7 @@ from typing import Callable
 
 from src.setup_or_recover import generate_env
 
+
 def settings_tab_bark(config: dict, save_config: Callable, load_models: Callable) -> None:
     with gr.Tab("Settings (Bark)") as settings_tab:
         with gr.Row():
@@ -51,9 +52,9 @@ def settings_tab_bark(config: dict, save_config: Callable, load_models: Callable
                     value="Save Environment Variables and Exit")
 
                 def save_environment_variables(
-                    environment_suno_use_small_models,
-                    environment_suno_enable_mps,
-                    environment_suno_offload_cpu
+                        environment_suno_use_small_models,
+                        environment_suno_enable_mps,
+                        environment_suno_offload_cpu
                 ):
                     os.environ["SUNO_USE_SMALL_MODELS"] = str(
                         environment_suno_use_small_models)
@@ -95,6 +96,7 @@ def settings_tab_bark(config: dict, save_config: Callable, load_models: Callable
                     def checkbox_update_helper(key: str):
                         return gr.Checkbox.update(
                             value=config["model"][key])
+
                     return [
                         checkbox_update_helper("text_use_gpu"),
                         checkbox_update_helper("text_use_small"),

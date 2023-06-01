@@ -18,6 +18,7 @@ def parse_time(text):
         print(text)
         return None
 
+
 # audio__bark__None__2023-05-16_11-45-00_long.wav
 # audio__tortoise__random__2023-05-31_14-19-13__n0.wav
 # Matches the time string in the filename and returns it

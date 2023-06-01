@@ -15,6 +15,7 @@ SUNO_ENABLE_MPS={environment_suno_enable_mps}
 SUNO_OFFLOAD_CPU={environment_suno_offload_cpu}
 """
 
+
 def setup_or_recover():
     if not os.path.exists('outputs'):
         os.makedirs('outputs')

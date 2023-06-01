@@ -10,11 +10,13 @@ import numpy as np
 
 import base64
 
+
 def ndarray_to_base64(arr):
     # Convert ndarray to bytes
     arr_bytes = arr.tobytes()
     # Encode bytes to base64
     return base64.b64encode(arr_bytes).decode('utf-8')
+
 
 def decode_base64_to_ndarray(base64_string):
     # Decode base64 string to bytes
@@ -22,12 +24,13 @@ def decode_base64_to_ndarray(base64_string):
     # Convert bytes to NumPy ndarray
     return np.frombuffer(decoded_bytes, dtype=np.int16)
 
+
 def callback_save_generation(
-    # full_generation: FullGeneration,
-    full_generation: Any,
-    audio_array: np.ndarray,
-    files: Dict[str, str],
-    metadata: Dict[str, Any]
+        # full_generation: FullGeneration,
+        full_generation: Any,
+        audio_array: np.ndarray,
+        files: Dict[str, str],
+        metadata: Dict[str, Any]
 ) -> None:
     print("Saving generation to", files.get("ogg"))
 

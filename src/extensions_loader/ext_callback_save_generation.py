@@ -34,16 +34,16 @@ for file_name in extension_files:
         except AttributeError:
             print(
                 f"Module {module_name} does not contain the function 'callback_save_generation'")
-            
+
 print(f"Loaded {len(callbacks_save_generation)} extensions.")
 
 
 def ext_callback_save_generation(
-    full_generation: FullGeneration,
-    # full_generation: Dict[str, Any],
-    audio_array: np.ndarray,
-    files: Dict[str, str],
-    metadata: Dict[str, Any]
+        full_generation: FullGeneration,
+        # full_generation: Dict[str, Any],
+        audio_array: np.ndarray,
+        files: Dict[str, str],
+        metadata: Dict[str, Any]
 ) -> None:
     for callback in callbacks_save_generation:
         callback(full_generation, audio_array, files, metadata)

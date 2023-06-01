@@ -1,7 +1,6 @@
 from src.tortoise.gen_tortoise import generate_tortoise_n
 from models.tortoise.tortoise.utils.audio import get_voices
 
-
 import gradio as gr
 
 
@@ -94,6 +93,7 @@ def generation_tab_tortoise():
                     gr.Audio.update(visible=count > 2),
                     gr.Image.update(visible=count > 2),
                 ]
+
             return show
 
         generate1_button.click(fn=show_closure(

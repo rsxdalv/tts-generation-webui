@@ -68,6 +68,7 @@ def get_prompts(path_to_wav, use_gpu):
     fine_prompt, coarse_prompt = get_encodec_prompts(path_to_wav, use_gpu)
     return semantic_prompt, coarse_prompt, fine_prompt
 
+
 def get_encodec_prompts(path_to_wav, use_gpu=True):
     device = 'cuda' if use_gpu else 'cpu'
     model = load_codec_model(use_gpu=use_gpu)
@@ -87,9 +88,9 @@ def get_encodec_prompts(path_to_wav, use_gpu=True):
 
 
 def save_cloned_voice(
-    semantic_prompt,
-    coarse_prompt,
-    fine_prompt,
+        semantic_prompt,
+        coarse_prompt,
+        fine_prompt,
 ):
     voice_name = f'test_clone_voice{str(np.random.randint(100000))}'
     filename = f'voices/{voice_name}.npz'
@@ -108,7 +109,7 @@ def tab_voice_clone_demo():
         # TODO: try with ffmpeg (except mp3)
         # file_input = gr.Audio(label="Input Audio", type="numpy", source="upload", interactive=True)
         file_input = gr.File(label="Input Audio", file_types=[
-                             ".wav"], interactive=True)
+            ".wav"], interactive=True)
 
         use_gpu_checkbox = gr.Checkbox(label="Use GPU", value=True)
 
@@ -133,4 +134,4 @@ def tab_voice_clone_demo():
             "Output will appear here after input", type="auto")
 
         generate_voice_button.click(fn=generate_voice, inputs=[
-                                    file_input, use_gpu_checkbox], outputs=output, preprocess=True)
+            file_input, use_gpu_checkbox], outputs=output, preprocess=True)

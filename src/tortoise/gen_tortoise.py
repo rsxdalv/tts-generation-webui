@@ -11,16 +11,17 @@ from models.tortoise.tortoise.api import TextToSpeech, MODELS_DIR
 from models.tortoise.tortoise.utils.audio import load_voices
 
 SAMPLE_RATE = 24_000
-OUTPUT_PATH='outputs/'
+OUTPUT_PATH = 'outputs/'
 
-def generate_tortoise(text="The expressiveness of autoregressive transformers is literally nuts! I absolutely adore them.",
-                      voice='random',
-                      preset='fast',
-                      model_dir=MODELS_DIR,
-                      candidates=3,
-                      seed=None,
-                      cvvp_amount=.0):
 
+def generate_tortoise(
+        text="The expressiveness of autoregressive transformers is literally nuts! I absolutely adore them.",
+        voice='random',
+        preset='fast',
+        model_dir=MODELS_DIR,
+        candidates=3,
+        seed=None,
+        cvvp_amount=.0):
     os.makedirs(OUTPUT_PATH, exist_ok=True)
 
     tts = TextToSpeech(models_dir=model_dir)
@@ -47,7 +48,8 @@ def generate_tortoise(text="The expressiveness of autoregressive transformers is
         process_gen(text, voice, preset, candidates, seed, cvvp_amount, filenames, gen)
     return filenames
 
-def process_gen(text, voice, preset, candidates, seed, cvvp_amount, filenames, gen, j = 0):
+
+def process_gen(text, voice, preset, candidates, seed, cvvp_amount, filenames, gen, j=0):
     audio_tensor = gen.squeeze(0).cpu()
 
     model = "tortoise"
@@ -63,29 +65,31 @@ def process_gen(text, voice, preset, candidates, seed, cvvp_amount, filenames, g
     filename_json = f'{base_filename}.json'
 
     metadata = {
-            "text": text,
-            "voice": voice,
-            "preset": preset,
-            "candidates": candidates,
-            "seed": seed,
-            "cvvp_amount": cvvp_amount,
-            "filename": filename,
-            "filename_png": filename_png,
-            "filename_json": filename_json,
-        }
+        "text": text,
+        "voice": voice,
+        "preset": preset,
+        "candidates": candidates,
+        "seed": seed,
+        "cvvp_amount": cvvp_amount,
+        "filename": filename,
+        "filename_png": filename_png,
+        "filename_json": filename_json,
+    }
     import json
     with open(filename_json, 'w') as f:
         json.dump(metadata, f)
 
     filenames.extend((filename, filename_png))
 
+
 def generate_tortoise_n(n):
     def gen(prompt, voice="random", preset="ultra_fast", seed=None, cvvp_amount=.0):
         return generate_tortoise(text=prompt,
-                        voice=voice,
-                        preset=preset,
-                        candidates=n,
-                        seed=seed if seed != "None" else None,
-                        cvvp_amount=cvvp_amount,
-                        )
+                                 voice=voice,
+                                 preset=preset,
+                                 candidates=n,
+                                 seed=seed if seed != "None" else None,
+                                 cvvp_amount=cvvp_amount,
+                                 )
+
     return gen

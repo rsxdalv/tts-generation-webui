@@ -66,7 +66,8 @@ bark_css = """
 """
 
 
-def generate(prompt, history_setting, language=None, speaker_id=0, useV2=False, text_temp=0.7, waveform_temp=0.7, history_prompt=None, seed=None, index=0):
+def generate(prompt, history_setting, language=None, speaker_id=0, useV2=False, text_temp=0.7, waveform_temp=0.7,
+             history_prompt=None, seed=None, index=0):
     if not model_manager.models_loaded:
         model_manager.reload_models(config)
 
@@ -84,12 +85,14 @@ def generate(prompt, history_setting, language=None, speaker_id=0, useV2=False, 
     set_seed(-1)
 
     filename, filename_png, filename_npz, metadata = save_generation(
-        prompt, language, speaker_id, text_temp, waveform_temp, history_prompt, indexed_seed, use_voice, history_prompt_verbal, full_generation, audio_array)
+        prompt, language, speaker_id, text_temp, waveform_temp, history_prompt, indexed_seed, use_voice,
+        history_prompt_verbal, full_generation, audio_array)
 
     return [filename, filename_png, audio_array, full_generation, filename_npz, indexed_seed, metadata]
 
 
-def save_generation(prompt, language, speaker_id, text_temp, waveform_temp, history_prompt, seed, use_voice, history_prompt_verbal, full_generation, audio_array):
+def save_generation(prompt, language, speaker_id, text_temp, waveform_temp, history_prompt, seed, use_voice,
+                    history_prompt_verbal, full_generation, audio_array):
     date = get_date()
     base_filename = create_base_filename(
         history_prompt_verbal, "outputs", model="bark", date=date)
@@ -109,22 +112,25 @@ def save_generation(prompt, language, speaker_id, text_temp, waveform_temp, hist
     history_prompt = history_prompt_verbal
 
     metadata = generate_and_save_metadata(prompt, language, speaker_id, text_temp, waveform_temp, seed, filename,
-                                          date, filename_png, filename_json, history_prompt_npz, filename_npz, history_prompt, history_hash)
-
+                                          date, filename_png, filename_json, history_prompt_npz, filename_npz,
+                                          history_prompt, history_hash)
 
     ext_callback_save_generation(
         full_generation,
         audio_array,
-        { "wav": filename, "png": filename_png, "npz": filename_npz, "ogg": filename_ogg },
+        {"wav": filename, "png": filename_png, "npz": filename_npz, "ogg": filename_ogg},
         metadata
     )
 
     return filename, plot, filename_npz, metadata
 
+
 def save_wav(audio_array, filename):
     write_wav(filename, SAMPLE_RATE, audio_array)
 
-def save_long_generation(prompt, history_setting, language, speaker_id, text_temp, waveform_temp, seed, filename, pieces, full_generation=None, history_prompt=None):
+
+def save_long_generation(prompt, history_setting, language, speaker_id, text_temp, waveform_temp, seed, filename,
+                         pieces, full_generation=None, history_prompt=None):
     base_filename = filename.replace(".wav", "_long")
     audio_array = np.concatenate(pieces)
 
@@ -142,13 +148,13 @@ def save_long_generation(prompt, history_setting, language, speaker_id, text_tem
     history_prompt = history_setting
 
     metadata = generate_and_save_metadata(prompt, language, speaker_id, text_temp, waveform_temp, seed, filename,
-                                          date, filename_png, filename_json, history_prompt_npz, filename_npz, history_prompt, history_hash)
-
+                                          date, filename_png, filename_json, history_prompt_npz, filename_npz,
+                                          history_prompt, history_hash)
 
     ext_callback_save_generation(
         full_generation,
         audio_array,
-        { "wav": filename, "png": filename_png, "npz": filename_npz, "ogg": filename_ogg },
+        {"wav": filename, "png": filename_png, "npz": filename_npz, "ogg": filename_ogg},
         metadata
     )
 
@@ -191,9 +197,11 @@ def generate_multi(count=1, outputs_ref=None):
             outputs = []
             for i in range(count):
                 filename, filename_png, _, _, filename_npz, seed, metadata = generate(
-                    prompt, history_setting, language, speaker_id, useV2, text_temp=text_temp, waveform_temp=waveform_temp, history_prompt=history_prompt, seed=_original_seed, index=i)
+                    prompt, history_setting, language, speaker_id, useV2, text_temp=text_temp,
+                    waveform_temp=waveform_temp, history_prompt=history_prompt, seed=_original_seed, index=i)
                 outputs.extend((filename, filename_png, gr.Button.update(
-                    value="Save to favorites", visible=True), gr.Button.update(visible=True), filename_npz, seed, metadata))
+                    value="Save to favorites", visible=True), gr.Button.update(visible=True), filename_npz, seed,
+                                metadata))
                 yield {
                     outputs_ref[i][0]: filename,
                     outputs_ref[i][1]: filename_png,
@@ -225,10 +233,12 @@ def generate_multi(count=1, outputs_ref=None):
                     history_prompt = None
 
                 filename, filename_png, audio_array, last_piece_history, filename_npz, seed, _metadata = generate(
-                    prompt_piece, history_setting, language, speaker_id, useV2, text_temp=text_temp, waveform_temp=waveform_temp, history_prompt=history_prompt, seed=seed, index=i)
+                    prompt_piece, history_setting, language, speaker_id, useV2, text_temp=text_temp,
+                    waveform_temp=waveform_temp, history_prompt=history_prompt, seed=seed, index=i)
                 pieces += [audio_array]
                 yield {
-                    outputs_ref[i][0]: gr.Audio.update(value=filename, label=f"Generated audio fragment... `{prompt_piece}`"),
+                    outputs_ref[i][0]: gr.Audio.update(value=filename,
+                                                       label=f"Generated audio fragment... `{prompt_piece}`"),
                     outputs_ref[i][1]: filename_png,
                     outputs_ref[i][2]: gr.Button.update(value="Save to favorites", visible=True),
                     outputs_ref[i][3]: gr.Button.update(visible=True),
@@ -238,7 +248,8 @@ def generate_multi(count=1, outputs_ref=None):
                 }
 
             filename, filename_png, filename_npz, metadata = save_long_generation(
-                prompt, history_setting, language, speaker_id, text_temp, waveform_temp, seed, filename, pieces, full_generation=last_piece_history, history_prompt=_original_history_prompt)
+                prompt, history_setting, language, speaker_id, text_temp, waveform_temp, seed, filename, pieces,
+                full_generation=last_piece_history, history_prompt=_original_history_prompt)
 
             outputs.extend((filename, filename_png, gr.Button.update(
                 value="Save to favorites", visible=True), gr.Button.update(visible=True), filename_npz, seed, metadata))
@@ -252,6 +263,7 @@ def generate_multi(count=1, outputs_ref=None):
                 outputs_ref[i][6]: metadata
             }
         return {}
+
     return gen
 
 
@@ -317,7 +329,8 @@ def generation_tab_bark(tabs):
                 long_prompt_radio = gr.Radio(
                     long_prompt_choices, type="value", label="Prompt type", value=value_short_prompt, show_label=False)
                 long_prompt_history_radio = gr.Radio(
-                    long_prompt_history_choices, type="value", label="For each subsequent generation:", value=value_reuse_history)
+                    long_prompt_history_choices, type="value", label="For each subsequent generation:",
+                    value=value_reuse_history)
             with gr.Column():
                 # TODO: Add gradient temperature options (requires model changes)
                 text_temp = gr.Slider(label="Text temperature",
@@ -401,7 +414,7 @@ def generation_tab_bark(tabs):
             history_setting: value_use_old_generation,
             tabs: gr.Tabs.update(selected="generation_bark"),
         }, inputs=[source],
-            outputs=[old_generation_dropdown, history_setting, tabs])
+                     outputs=[old_generation_dropdown, history_setting, tabs])
 
     return register_use_as_history_button
 
@@ -462,8 +475,8 @@ def create_components(old_generation_dropdown, history_setting, index):
         json_text = gr.State()
 
         continue_button.click(fn=insert_npz_file, inputs=[npz], outputs=[
-                              old_generation_dropdown, history_setting])
+            old_generation_dropdown, history_setting])
         save_button.click(fn=save_to_favorites, inputs=[
-                          json_text], outputs=[save_button])
+            json_text], outputs=[save_button])
 
         return [audio, image, save_button, continue_button, npz, seed, json_text], col, seed

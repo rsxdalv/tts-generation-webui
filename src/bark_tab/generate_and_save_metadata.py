@@ -2,7 +2,9 @@ import json
 from models.bark.bark.generation import models
 
 
-def generate_and_save_metadata(prompt, language, speaker_id, text_temp, waveform_temp, seed, filename, date, filename_png, filename_json, history_prompt_npz, filename_npz, history_prompt, history_hash):
+def generate_and_save_metadata(prompt, language, speaker_id, text_temp, waveform_temp, seed, filename, date,
+                               filename_png, filename_json, history_prompt_npz, filename_npz, history_prompt,
+                               history_hash):
     is_big_semantic_model = models["text"]["model"].config.n_embd > 768
     is_big_coarse_model = models["coarse"].config.n_embd > 768
     is_big_fine_model = models["fine"].config.n_embd > 768

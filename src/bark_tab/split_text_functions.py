@@ -7,4 +7,4 @@ def split_by_lines(prompt):
 
 def split_by_length_simple(prompt):
     return [
-        prompt[i:i+200] for i in range(0, len(prompt), 200)]
+        prompt[i:i + 200] for i in range(0, len(prompt), 200)]
