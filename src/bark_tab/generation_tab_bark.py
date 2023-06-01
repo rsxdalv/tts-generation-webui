@@ -5,7 +5,7 @@ import numpy as np
 
 from src.bark_tab.history_to_hash import history_to_hash
 from src.extensions_loader.ext_callback_save_generation import ext_callback_save_generation
-from create_base_filename import create_base_filename
+from src.create_base_filename import create_base_filename
 from src.history_tab.save_to_favorites import save_to_favorites
 from src.bark_tab.create_voice_string import create_voice_string
 from src.bark_tab.generate_and_save_metadata import generate_and_save_metadata
@@ -22,7 +22,7 @@ from scipy.io.wavfile import write as write_wav
 from models.bark.bark.generation import SUPPORTED_LANGS
 import gradio as gr
 from src.save_waveform_plot import save_waveform_plot
-from model_manager import model_manager
+from src.model_manager import model_manager
 from src.config.config import config
 from src.set_seed import set_seed
 from src.bark_tab.generate_random_seed import generate_random_seed

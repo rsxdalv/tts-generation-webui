@@ -1,4 +1,4 @@
-from BarkModelManager import BarkModelManager
+from src.BarkModelManager import BarkModelManager
 from src.config.config import config
 
 

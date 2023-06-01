@@ -4,7 +4,7 @@ import src.setup_or_recover as setup_or_recover
 import src.dotenv_init as dotenv_init
 
 from src.config.save_config_bark import save_config_bark
-from material_symbols_css import material_symbols_css
+from src.material_symbols_css import material_symbols_css
 from src.config.save_config_gradio import save_config_gradio
 from src.tortoise.generation_tab_tortoise import css_tortoise, generation_tab_tortoise
 from src.history_tab.history_css import history_css
@@ -14,7 +14,7 @@ from src.bark_tab.generation_tab_bark import generation_tab_bark, bark_css
 from src.clone_tab.tab_voice_clone_demo import tab_voice_clone_demo
 import gradio as gr
 from src.history_tab.main import favorites_tab, history_tab, voices_tab
-from model_manager import model_manager
+from src.model_manager import model_manager
 from settings_tab_bark import settings_tab_bark
 from src.config.config import config
 from typing import Optional, Callable
