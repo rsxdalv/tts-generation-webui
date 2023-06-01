@@ -1,4 +1,6 @@
 import tempfile
+from src.bark.npz_tools import save_npz
+from src.bark.FullGeneration import FullGeneration
 from models.bark_voice_cloning_hubert_quantizer.hubert.hubert_manager import HuBERTManager
 from models.bark_voice_cloning_hubert_quantizer.hubert.pre_kmeans_hubert import CustomHubert
 from models.bark_voice_cloning_hubert_quantizer.hubert.customtokenizer import CustomTokenizer
@@ -6,6 +8,7 @@ import torchaudio
 import torch
 from encodec.utils import convert_audio
 from bark.generation import load_codec_model
+from encodec import EncodecModel
 
 import gradio as gr
 import numpy as np
@@ -21,12 +24,12 @@ def _load_hubert_model():
     return hubert_model
 
 
-def get_semantic_vectors(path_to_wav):
+def get_semantic_vectors(path_to_wav: str):
     hubert_model = _load_hubert_model()
     return _get_semantic_vectors(hubert_model, path_to_wav)
 
 
-def _get_semantic_vectors(hubert_model, path_to_wav):
+def _get_semantic_vectors(hubert_model: CustomHubert, path_to_wav: str):
     # This is where you load your wav, with soundfile or torchaudio for example
     wav, sr = torchaudio.load(path_to_wav)
 
@@ -48,29 +51,33 @@ def _load_tokenizer():
     return tokenizer
 
 
-def _get_semantic_tokens(semantic_vectors, tokenizer):
+def _get_semantic_tokens(semantic_vectors: torch.Tensor, tokenizer: CustomTokenizer):
     return tokenizer.get_token(semantic_vectors)
 
 
-def get_semantic_tokens(semantic_vectors):
+def get_semantic_tokens(semantic_vectors: torch.Tensor):
     tokenizer = _load_tokenizer()
     return _get_semantic_tokens(semantic_vectors, tokenizer)
 
 
-def get_semantic_prompt(path_to_wav):
+def get_semantic_prompt(path_to_wav: str):
     semantic_vectors = get_semantic_vectors(path_to_wav)
-    return get_semantic_tokens(semantic_vectors)
+    return get_semantic_tokens(semantic_vectors).cpu().numpy()
 
 
-def get_prompts(path_to_wav, use_gpu):
+def get_prompts(path_to_wav: str, use_gpu: bool):
     semantic_prompt = get_semantic_prompt(path_to_wav)
     fine_prompt, coarse_prompt = get_encodec_prompts(path_to_wav, use_gpu)
-    return semantic_prompt, coarse_prompt, fine_prompt
+    return FullGeneration(
+        semantic_prompt=semantic_prompt,
+        coarse_prompt=coarse_prompt,
+        fine_prompt=fine_prompt,
+    )
 
 
-def get_encodec_prompts(path_to_wav, use_gpu=True):
+def get_encodec_prompts(path_to_wav: str, use_gpu=True):
     device = 'cuda' if use_gpu else 'cpu'
-    model = load_codec_model(use_gpu=use_gpu)
+    model: EncodecModel = load_codec_model(use_gpu=use_gpu)
     wav, sr = torchaudio.load(path_to_wav)
     wav = convert_audio(wav, sr, model.sample_rate, model.channels)
     wav = wav.unsqueeze(0).to(device)
@@ -80,21 +87,18 @@ def get_encodec_prompts(path_to_wav, use_gpu=True):
     with torch.no_grad():
         encoded_frames = model.encode(wav)
 
-    fine_prompt = torch.cat(
+    fine_prompt: np.ndarray = torch.cat(
         [encoded[0] for encoded in encoded_frames], dim=-1).squeeze().cpu().numpy()
     coarse_prompt = fine_prompt[:2, :]
     return fine_prompt, coarse_prompt
 
 
 def save_cloned_voice(
-        semantic_prompt,
-        coarse_prompt,
-        fine_prompt,
+    full_generation: FullGeneration,
 ):
     voice_name = f'test_clone_voice{str(np.random.randint(100000))}'
     filename = f'voices/{voice_name}.npz'
-    np.savez(filename, fine_prompt=fine_prompt,
-             coarse_prompt=coarse_prompt, semantic_prompt=semantic_prompt)
+    save_npz(filename, full_generation)
     return filename
 
 
@@ -120,13 +124,8 @@ def tab_voice_clone_demo():
                 print("No file selected")
                 return
             wav_file = wav_file_obj.name
-            semantic_prompt, coarse_prompt, fine_prompt = get_prompts(
-                wav_file, use_gpu)
-            filename = save_cloned_voice(
-                semantic_prompt,
-                coarse_prompt,
-                fine_prompt,
-            )
+            full_generation = get_prompts(wav_file, use_gpu)
+            filename = save_cloned_voice(full_generation)
             return f"Saved: {filename}"
 
         output = gr.Label(

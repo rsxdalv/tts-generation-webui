@@ -134,5 +134,5 @@ voice_to_gender_dict = {
 }
 
 
-def get_speaker_gender(history_prompt):
+def get_speaker_gender(history_prompt: str):
     return voice_to_gender_dict.get(history_prompt.replace(os.path.sep, "/"), "Unknown")

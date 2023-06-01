@@ -4,19 +4,19 @@ import numpy as np
 from src.bark.FullGeneration import FullGeneration
 
 
-def compress_history(full_generation):
-    full_generation["semantic_prompt"] = full_generation["semantic_prompt"].astype(np.int16)
-    full_generation["coarse_prompt"] = full_generation["coarse_prompt"].astype(np.int16)
-    full_generation["fine_prompt"] = full_generation["fine_prompt"].astype(np.int16)
-    return full_generation
+def compress_history(full_generation: FullGeneration):
+    return {
+        "semantic_prompt": full_generation["semantic_prompt"].astype(np.int16),
+        "coarse_prompt": full_generation["coarse_prompt"].astype(np.int16),
+        "fine_prompt": full_generation["fine_prompt"].astype(np.int16),
+    }
 
 
-def save_npz(filename, full_generation: FullGeneration):
-    full_generation = compress_history(full_generation)
-    np.savez(filename, **full_generation)
+def save_npz(filename: str, full_generation: FullGeneration):
+    np.savez(filename, **compress_history(full_generation))
 
 
-def load_npz(filename):
+def load_npz(filename: str) -> FullGeneration:
     with np.load(filename, allow_pickle=True) as data:
         return {key: data[key] for key in data}
 
