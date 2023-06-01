@@ -1,62 +1,26 @@
 import os
 import time
+import src.setup_or_recover as setup_or_recover
 import src.dotenv_init as dotenv_init
+
+from src.config.save_config_bark import save_config_bark
+from material_symbols_css import material_symbols_css
+from src.config.save_config_gradio import save_config_gradio
 from generation_tab_tortoise import css_tortoise, generation_tab_tortoise
 from src.history_tab.history_css import history_css
 from src.load_config import default_config
 from settings_tab_gradio import settings_tab_gradio
-import src.setup_or_recover as setup_or_recover
 from src.bark_tab.generation_tab_bark import generation_tab_bark, bark_css
 from src.clone_tab.tab_voice_clone_demo import tab_voice_clone_demo
 import gradio as gr
-import json
 from src.history_tab.main import favorites_tab, history_tab, voices_tab
 from model_manager import model_manager
 from settings_tab_bark import settings_tab_bark
-from config import config
+from src.config.config import config
+from typing import Optional, Callable
 
 setup_or_recover.dummy()
 dotenv_init.init()
-
-def save_config(text_use_gpu,
-                text_use_small,
-                coarse_use_gpu,
-                coarse_use_small,
-                fine_use_gpu,
-                fine_use_small,
-                codec_use_gpu,
-                load_models_on_startup=False
-                ):
-    global config
-    config["model"]["text_use_gpu"] = text_use_gpu
-    config["model"]["text_use_small"] = text_use_small
-    config["model"]["coarse_use_gpu"] = coarse_use_gpu
-    config["model"]["coarse_use_small"] = coarse_use_small
-    config["model"]["fine_use_gpu"] = fine_use_gpu
-    config["model"]["fine_use_small"] = fine_use_small
-    config["model"]["codec_use_gpu"] = codec_use_gpu
-    config["load_models_on_startup"] = load_models_on_startup
-    with open('config.json', 'w') as outfile:
-        json.dump(config, outfile, indent=2)
-
-    return f"Saved: {str(config)}"
-
-def save_config_gradio(keys, inputs):
-    # Recreate the UI dictionary
-    gradio_interface_options_ui = {
-        keys[i]: value for i, value in enumerate(inputs)
-    }
-    # convert '' to None
-    for key, value in gradio_interface_options_ui.items():
-        if value == '':
-            gradio_interface_options_ui[key] = None
-    # Save the config
-    global config
-    config["gradio_interface_options"] = gradio_interface_options_ui
-    with open('config.json', 'w') as outfile:
-        json.dump(config, outfile, indent=2)
-
-    return f"Saved {gradio_interface_options_ui}"
 
 def load_models(
     text_use_gpu,
@@ -68,7 +32,7 @@ def load_models(
     codec_use_gpu
 ):
 
-    save_config(text_use_gpu,
+    save_config_bark(text_use_gpu,
                 text_use_small,
                 coarse_use_gpu,
                 coarse_use_small,
@@ -79,26 +43,6 @@ def load_models(
     # TODO: try catch for memmory errors
     model_manager.reload_models(config)
     return gr.Button.update(value="Reload models", interactive=True)
-
-material_symbols_css = """
-@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200');
-
-.material-symbols-outlined {
-    font-family: 'Material Symbols Outlined' !important;
-    font-weight: normal !important;
-    font-style: normal !important;
-    font-size: 24px !important;
-    line-height: 1 !important;
-    letter-spacing: normal;
-    text-transform: none;
-    display: inline-block;
-    white-space: nowrap;
-    word-wrap: normal;
-    direction: ltr;
-    -webkit-font-feature-settings: 'liga';
-    -webkit-font-smoothing: antialiased;
-}
-"""
 
 full_css = ""
 full_css += material_symbols_css
@@ -128,7 +72,7 @@ with gr.Blocks(css=full_css) as demo:
         favorites_tab(register_use_as_history_button)
         voices_tab(register_use_as_history_button)
 
-        settings_tab_bark(config, save_config, load_models)
+        settings_tab_bark(config, save_config_bark, load_models)
         settings_tab_gradio(save_config_gradio, reload_config_and_restart_ui, gradio_interface_options)
 
 

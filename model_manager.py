@@ -1,5 +1,5 @@
 from BarkModelManager import BarkModelManager
-from config import config
+from src.config.config import config
 
 
 model_manager = BarkModelManager(config)

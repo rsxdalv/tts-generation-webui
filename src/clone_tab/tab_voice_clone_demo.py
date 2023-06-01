@@ -130,7 +130,7 @@ def tab_voice_clone_demo():
             return f"Saved: {filename}"
 
         output = gr.Label(
-            "Output will appear here after input", type="auto", lines=3)
+            "Output will appear here after input", type="auto")
 
         generate_voice_button.click(fn=generate_voice, inputs=[
                                     file_input, use_gpu_checkbox], outputs=output, preprocess=True)

@@ -1,10 +1,10 @@
 import os
 import gradio as gr
+from typing import Callable
 
 from src.setup_or_recover import generate_env
 
-
-def settings_tab_bark(config, save_config, load_models):
+def settings_tab_bark(config: dict, save_config: Callable, load_models: Callable) -> None:
     with gr.Tab("Settings (Bark)") as settings_tab:
         with gr.Row():
             with gr.Column():
@@ -92,21 +92,17 @@ def settings_tab_bark(config, save_config, load_models):
                                  outputs=[save_beacon])
 
                 def sync_ui():
+                    def checkbox_update_helper(key: str):
+                        return gr.Checkbox.update(
+                            value=config["model"][key])
                     return [
-                        gr.Checkbox.update(
-                            value=config["model"]["text_use_gpu"]),
-                        gr.Checkbox.update(
-                            value=config["model"]["text_use_small"]),
-                        gr.Checkbox.update(
-                            value=config["model"]["coarse_use_gpu"]),
-                        gr.Checkbox.update(
-                            value=config["model"]["coarse_use_small"]),
-                        gr.Checkbox.update(
-                            value=config["model"]["fine_use_gpu"]),
-                        gr.Checkbox.update(
-                            value=config["model"]["fine_use_small"]),
-                        gr.Checkbox.update(
-                            value=config["model"]["codec_use_gpu"]),
+                        checkbox_update_helper("text_use_gpu"),
+                        checkbox_update_helper("text_use_small"),
+                        checkbox_update_helper("coarse_use_gpu"),
+                        checkbox_update_helper("coarse_use_small"),
+                        checkbox_update_helper("fine_use_gpu"),
+                        checkbox_update_helper("fine_use_small"),
+                        checkbox_update_helper("codec_use_gpu"),
                         gr.Checkbox.update(
                             value=config["load_models_on_startup"]),
                     ]

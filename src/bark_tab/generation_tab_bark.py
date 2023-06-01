@@ -23,7 +23,7 @@ from models.bark.bark.generation import SUPPORTED_LANGS
 import gradio as gr
 from src.save_waveform_plot import save_waveform_plot
 from model_manager import model_manager
-from config import config
+from src.config.config import config
 from src.set_seed import set_seed
 from src.bark_tab.generate_random_seed import generate_random_seed
 import soundfile as sf

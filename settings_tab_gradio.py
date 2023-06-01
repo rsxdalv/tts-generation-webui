@@ -1,7 +1,8 @@
+from typing import Any, Callable, Dict
 import gradio as gr
 
 
-def settings_tab_gradio(save_config, reload_config_and_restart_ui, gradio_interface_options):
+def settings_tab_gradio(save_config: Callable[[], None], reload_config_and_restart_ui: Callable[[], None], gradio_interface_options: Dict[str, Any]):
     with gr.Tab("Settings (Gradio)"):
         with gr.Row():
             with gr.Column():
@@ -30,7 +31,7 @@ def settings_tab_gradio(save_config, reload_config_and_restart_ui, gradio_interf
                 # show_api: If True, shows the api docs in the footer of the app. Default True. If the queue is enabled, then api_open parameter of .queue() will determine if the api docs are shown, independent of the value of show_api.
                 # file_directories: List of directories that gradio is allowed to serve files from (in addition to the directory containing the gradio python file). Must be absolute paths. Warning: any files in these directories or its children are potentially accessible to all users of your app.
 
-                gradio_interface_options_ui = {
+                gradio_interface_options_ui: Dict[str, gr.Checkbox | gr.Slider | gr.Textbox] = {
                     "inline": gr.Checkbox(label="inline: Display inline in an iframe", value=gradio_interface_options["inline"]),
                     "inbrowser": gr.Checkbox(label="inbrowser: Automatically launch in a new tab", value=gradio_interface_options["inbrowser"]),
                     "share": gr.Checkbox(label="share: Create a publicly shareable link", value=gradio_interface_options["share"]),
@@ -58,16 +59,18 @@ def settings_tab_gradio(save_config, reload_config_and_restart_ui, gradio_interf
                 }
 
                 # Create an input list of all UI elements
-                inputs = [value for key,
-                          value in gradio_interface_options_ui.items()]
+                inputs = list(gradio_interface_options_ui.values())
                 keys = list(gradio_interface_options_ui)
 
-                save_beacon_2 = gr.Markdown("")
+                save_beacon = gr.Markdown("")
 
                 # Map over the UI elements
-                for key, _ in gradio_interface_options_ui.items():
-                    gradio_interface_options_ui[key].change(
-                        fn=lambda *inputs2: save_config(keys, inputs2), inputs=inputs, outputs=[save_beacon_2])
+                for input in inputs:
+                    input.change(
+                        fn=lambda *input_values: save_config(keys, input_values),
+                        inputs=inputs,
+                        outputs=[save_beacon],
+                    )
 
                 reload_config_and_restart_ui_button = gr.Button(
                     # value="Reload config and restart UI",
