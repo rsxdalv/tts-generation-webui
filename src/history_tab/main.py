@@ -7,6 +7,7 @@ from src.history_tab.get_wav_files import get_npz_files_voices, get_wav_files, g
 from src.history_tab.delete_generation_cb import delete_generation_cb
 from src.history_tab.save_to_favorites import save_to_favorites
 from src.history_tab.open_folder import open_folder
+from src.bark.get_audio_from_npz import get_audio_from_npz
 
 
 def _get_row_index(evt: gr.SelectData):
@@ -173,6 +174,7 @@ def voices_tab(register_use_as_history_button, directory="voices"):
                                        #  elem_classes="file-list"
                                        )
         with gr.Column():
+            audio = gr.Audio(visible=True, type="numpy", label="Fine prompt audio")
             voice_file_name = gr.Textbox(label="Voice file name", value="")
             new_voice_file_name = gr.Textbox(
                 label="New voice file name", value="")
@@ -184,49 +186,51 @@ def voices_tab(register_use_as_history_button, directory="voices"):
                     value="Use voice", variant="primary")
                 rename_voice_button = gr.Button(value="Rename voice")
 
-            def delete_voice(voice_file_name):
-                os.remove(voice_file_name)
-                return {
-                    delete_voice_button: gr.Button.update(value="Deleted"),
-                    voices_list: update_voices_tab(),
-                }
+    def delete_voice(voice_file_name):
+        os.remove(voice_file_name)
+        return {
+            delete_voice_button: gr.Button.update(value="Deleted"),
+            voices_list: update_voices_tab(),
+        }
 
-            def rename_voice(voice_file_name, new_voice_file_name):
-                shutil.move(voice_file_name, new_voice_file_name)
-                return {
-                    rename_voice_button: gr.Button.update(value="Renamed"),
-                    voices_list: update_voices_tab(),
-                }
+    def rename_voice(voice_file_name, new_voice_file_name):
+        shutil.move(voice_file_name, new_voice_file_name)
+        return {
+            rename_voice_button: gr.Button.update(value="Renamed"),
+            voices_list: update_voices_tab(),
+        }
 
-            rename_voice_button.click(fn=rename_voice, inputs=[voice_file_name, new_voice_file_name],
-                                      outputs=[rename_voice_button, voices_list])
-            register_use_as_history_button(
-                use_voice_button,
-                voice_file_name,
-            )
-            delete_voice_button.click(fn=delete_voice, inputs=[voice_file_name],
-                                      outputs=[delete_voice_button, voices_list])
+    rename_voice_button.click(fn=rename_voice, inputs=[voice_file_name, new_voice_file_name],
+                                outputs=[rename_voice_button, voices_list])
+    register_use_as_history_button(
+        use_voice_button,
+        voice_file_name,
+    )
+    delete_voice_button.click(fn=delete_voice, inputs=[voice_file_name],
+                                outputs=[delete_voice_button, voices_list])
 
-            def select(_list_data, evt: gr.SelectData):
-                filename = _get_filename(_list_data, _get_row_index(evt))
-                return {
-                    voice_file_name: gr.Textbox.update(value=filename),
-                    new_voice_file_name: gr.Textbox.update(value=filename),
-                    delete_voice_button: gr.Button.update(value="Delete"),
-                    rename_voice_button: gr.Button.update(value="Rename"),
-                }
+    def select(_list_data, evt: gr.SelectData):
+        filename_npz = _get_filename(_list_data, _get_row_index(evt))
+        return {
+            voice_file_name: gr.Textbox.update(value=filename_npz),
+            new_voice_file_name: gr.Textbox.update(value=filename_npz),
+            delete_voice_button: gr.Button.update(value="Delete"),
+            rename_voice_button: gr.Button.update(value="Rename"),
+            audio: gr.Audio.update(value=get_audio_from_npz(filename_npz)),
+        }
 
-            outputs = [
-                voice_file_name,
-                new_voice_file_name,
-                delete_voice_button,
-                rename_voice_button,
-            ]
+    outputs = [
+        voice_file_name,
+        new_voice_file_name,
+        delete_voice_button,
+        rename_voice_button,
+        audio,
+    ]
 
-            voices_list.select(fn=select, inputs=[
-                               voices_list], outputs=outputs, preprocess=False)
+    voices_list.select(fn=select, inputs=[
+                        voices_list], outputs=outputs, preprocess=False)
 
-            def update_voices_tab():
-                return gr.List.update(value=get_npz_files_voices())
+    def update_voices_tab():
+        return gr.List.update(value=get_npz_files_voices())
 
-            voices_tab.select(fn=update_voices_tab, outputs=[voices_list])
+    voices_tab.select(fn=update_voices_tab, outputs=[voices_list])
