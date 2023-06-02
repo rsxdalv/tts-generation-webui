@@ -1,29 +1,24 @@
 import os
 import gradio as gr
 
-import glob
 import json
 import shutil
-from src.history_tab.get_wav_files import get_wav_files, get_wav_files_img
+from src.history_tab.get_wav_files import get_npz_files_voices, get_wav_files, get_wav_files_img
 from src.history_tab.delete_generation_cb import delete_generation_cb
 from src.history_tab.save_to_favorites import save_to_favorites
 from src.history_tab.open_folder import open_folder
 
 
-# TODO: add hash column and date column
-def get_npz_files_voices():
-    npz_files = glob.glob("voices/*.npz")
-    return [[file] for file in npz_files]
+def _get_row_index(evt: gr.SelectData):
+    return evt.index[0]
 
 
-def select_audio(table, evt):
-    index = evt.index
-    index = index[0]
-    return _select_audio(table, index)
+def _get_filename(table, index):
+    return table['data'][index][-1]
 
 
 def _select_audio(table, index):
-    filename = table['data'][index][-1]
+    filename = _get_filename(table, index)
     with open(filename.replace(".wav", ".json")) as f:
         json_text = json.load(f)
     return filename, json_text
@@ -56,6 +51,8 @@ def history_tab(register_use_as_history_button, directory="outputs"):
                 button_output.click(lambda: open_folder(directory))
 
                 datatypes = ["date", "str", "str", "str"]
+                headers = ["Date and Time", directory.capitalize(),
+                           "When", "Filename"]
 
                 history_list = gr.Dataframe(value=get_wav_files(directory),
                                             elem_classes="file-list",
@@ -64,8 +61,7 @@ def history_tab(register_use_as_history_button, directory="outputs"):
                                             col_count=len(datatypes),
                                             max_cols=len(datatypes),
                                             datatype=datatypes,
-                                            headers=[
-                                                "Date and Time", directory.capitalize(), "When", "Filename"]
+                                            headers=headers,
                                             )
 
             with gr.Column():
@@ -118,7 +114,10 @@ def history_tab(register_use_as_history_button, directory="outputs"):
             }
 
         def select_audio_history(table, evt: gr.SelectData):
-            return _select_audio_history(*select_audio(table, evt))
+            return _select_audio_history(*_select_audio(table, _get_row_index(evt)))
+
+        def select_audio_history2(_list, evt: gr.SelectData, table):
+            return _select_audio_history(*_select_audio(table, evt.index))
 
         outputs = [
             history_bundle_name,
@@ -137,6 +136,9 @@ def history_tab(register_use_as_history_button, directory="outputs"):
         history_list.select(fn=select_audio_history, inputs=[
                             history_list], outputs=outputs, preprocess=False)
 
+        history_list_as_gallery.select(fn=select_audio_history2, inputs=[
+                                       history_list_as_gallery, history_list], outputs=outputs, preprocess=False)
+
         def update_history_tab():
             return [
                 gr.Dataframe.update(value=get_wav_files(directory)),
@@ -150,28 +152,26 @@ def history_tab(register_use_as_history_button, directory="outputs"):
         history_tab.select(fn=update_history_tab, outputs=[
                            history_list, history_list_as_gallery])
 
-        def select_audio_history2(_list, evt: gr.SelectData, table):
-            return _select_audio_history(*_select_audio(table, evt.index))
-
-        history_list_as_gallery.select(fn=select_audio_history2, inputs=[
-                                       history_list_as_gallery, history_list], outputs=outputs, preprocess=False)
-
-
 
 def voices_tab(register_use_as_history_button, directory="voices"):
-    with gr.Tab(directory.capitalize()) as voices_tab:
+    with gr.Tab(directory.capitalize()) as voices_tab, gr.Row():
         with gr.Column():
             with gr.Row():
                 button_output = gr.Button(value=f"Open {directory} folder")
             button_output.click(lambda: open_folder(directory))
 
-            voices_list = gr.List(value=get_npz_files_voices(),
-                                  max_cols=1,
-                                  interactive=False,
-                                  datatype=["str"],
-                                  headers=[directory.capitalize()]
-                                  #  elem_classes="file-list"
-                                  )
+            datatypes = ["date", "str", "str", "str", "str"]
+            headers = ["Date and Time", directory.capitalize(),
+                       "When", "Hash", "Filename"]
+
+            voices_list = gr.Dataframe(value=get_npz_files_voices(),
+                                       interactive=False,
+                                       datatype=datatypes,
+                                       col_count=len(datatypes),
+                                       max_cols=len(datatypes),
+                                       headers=headers,
+                                       #  elem_classes="file-list"
+                                       )
         with gr.Column():
             voice_file_name = gr.Textbox(label="Voice file name", value="")
             new_voice_file_name = gr.Textbox(
@@ -208,7 +208,7 @@ def voices_tab(register_use_as_history_button, directory="voices"):
                                       outputs=[delete_voice_button, voices_list])
 
             def select(_list_data, evt: gr.SelectData):
-                filename = evt.value
+                filename = _get_filename(_list_data, _get_row_index(evt))
                 return {
                     voice_file_name: gr.Textbox.update(value=filename),
                     new_voice_file_name: gr.Textbox.update(value=filename),
@@ -216,17 +216,17 @@ def voices_tab(register_use_as_history_button, directory="voices"):
                     rename_voice_button: gr.Button.update(value="Rename"),
                 }
 
-            voices_list.select(fn=select, inputs=[voices_list], outputs=[
+            outputs = [
                 voice_file_name,
                 new_voice_file_name,
                 delete_voice_button,
                 rename_voice_button,
-            ])
+            ]
+
+            voices_list.select(fn=select, inputs=[
+                               voices_list], outputs=outputs, preprocess=False)
 
             def update_voices_tab():
                 return gr.List.update(value=get_npz_files_voices())
 
             voices_tab.select(fn=update_voices_tab, outputs=[voices_list])
-
-
-
