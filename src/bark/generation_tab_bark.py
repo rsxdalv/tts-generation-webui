@@ -178,6 +178,9 @@ def generate_multi(count=1, outputs_ref=None):
 
         _original_history_prompt = history_prompt
 
+
+        # TODO: extract all outputs_ref[i]
+        # TODO 2: extract yield to a function
         for i in range(count):
             yield {
                 outputs_ref[i][0]: None,

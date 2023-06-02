@@ -28,3 +28,6 @@ def extract_time(filename: str):
     matches = re.finditer(regex, filename, re.MULTILINE)
     for matchNum, match in enumerate(matches, start=1):
         return match.group(1)
+
+def extract_and_parse_time(filename: str):
+    return parse_time(extract_time(filename))
