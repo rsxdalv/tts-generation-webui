@@ -158,6 +158,22 @@ def save_long_generation(prompt, history_setting, language, speaker_id, text_tem
     return filename, plot, filename_npz, metadata
 
 
+def yield_generation(outputs_ref, i):
+    output_for_yield = outputs_ref[i]
+    def return_for_yield(audio, image, save_button, continue_button, npz, seed, json_text):
+        return {
+            output_for_yield[0]: audio,
+            output_for_yield[1]: image,
+            output_for_yield[2]: save_button,
+            output_for_yield[3]: continue_button,
+            output_for_yield[4]: npz,
+            output_for_yield[5]: seed,
+            output_for_yield[6]: json_text
+        }
+    
+    return return_for_yield
+
+
 def generate_multi(count=1, outputs_ref=None):
     def gen(prompt,
             history_setting,
@@ -179,18 +195,16 @@ def generate_multi(count=1, outputs_ref=None):
         _original_history_prompt = history_prompt
 
 
-        # TODO: extract all outputs_ref[i]
-        # TODO 2: extract yield to a function
         for i in range(count):
-            yield {
-                outputs_ref[i][0]: None,
-                outputs_ref[i][1]: None,
-                outputs_ref[i][2]: gr.Button.update(value="Save to favorites", visible=False),
-                outputs_ref[i][3]: gr.Button.update(visible=False),
-                outputs_ref[i][4]: None,
-                outputs_ref[i][5]: None,
-                outputs_ref[i][6]: None
-            }
+            yield yield_generation(outputs_ref, i)(
+                audio=None,
+                image=None,
+                save_button=gr.Button.update(value="Save to favorites", visible=False),
+                continue_button=gr.Button.update(visible=False),
+                npz=None,
+                seed=None,
+                json_text=None
+            )
 
         _original_seed = seed
         if long_prompt_radio == value_short_prompt:
@@ -202,15 +216,17 @@ def generate_multi(count=1, outputs_ref=None):
                 outputs.extend((filename, filename_png, gr.Button.update(
                     value="Save to favorites", visible=True), gr.Button.update(visible=True), filename_npz, seed,
                                 metadata))
-                yield {
-                    outputs_ref[i][0]: filename,
-                    outputs_ref[i][1]: filename_png,
-                    outputs_ref[i][2]: gr.Button.update(value="Save to favorites", visible=True),
-                    outputs_ref[i][3]: gr.Button.update(visible=True),
-                    outputs_ref[i][4]: filename_npz,
-                    outputs_ref[i][5]: seed,
-                    outputs_ref[i][6]: metadata
-                }
+                
+                
+                yield yield_generation(outputs_ref, i)(
+                    audio=filename,
+                    image=filename_png,
+                    save_button=gr.Button.update(value="Save to favorites", visible=True),
+                    continue_button=gr.Button.update(visible=True),
+                    npz=filename_npz,
+                    seed=seed,
+                    json_text=metadata
+                )
             return {}
 
         prompts = split_by_lines(
@@ -236,16 +252,16 @@ def generate_multi(count=1, outputs_ref=None):
                     prompt_piece, history_setting, language, speaker_id, useV2, text_temp=text_temp,
                     waveform_temp=waveform_temp, history_prompt=history_prompt, seed=seed, index=i)
                 pieces += [audio_array]
-                yield {
-                    outputs_ref[i][0]: gr.Audio.update(value=filename,
-                                                       label=f"Generated audio fragment... `{prompt_piece}`"),
-                    outputs_ref[i][1]: filename_png,
-                    outputs_ref[i][2]: gr.Button.update(value="Save to favorites", visible=True),
-                    outputs_ref[i][3]: gr.Button.update(visible=True),
-                    outputs_ref[i][4]: filename_npz,
-                    outputs_ref[i][5]: seed,
-                    outputs_ref[i][6]: _metadata
-                }
+                yield yield_generation(outputs_ref, i)(
+                    audio=gr.Audio.update(value=filename,
+                                             label=f"Generated audio fragment... `{prompt_piece}`"),
+                    image=filename_png,
+                    save_button=gr.Button.update(value="Save to favorites", visible=True),
+                    continue_button=gr.Button.update(visible=True),
+                    npz=filename_npz,
+                    seed=seed,
+                    json_text=_metadata
+                )
 
             filename, filename_png, filename_npz, metadata = save_long_generation(
                 prompt, history_setting, language, speaker_id, text_temp, waveform_temp, seed, filename, pieces,
@@ -253,15 +269,15 @@ def generate_multi(count=1, outputs_ref=None):
 
             outputs.extend((filename, filename_png, gr.Button.update(
                 value="Save to favorites", visible=True), gr.Button.update(visible=True), filename_npz, seed, metadata))
-            yield {
-                outputs_ref[i][0]: gr.Audio.update(value=filename, label="Generated audio"),
-                outputs_ref[i][1]: filename_png,
-                outputs_ref[i][2]: gr.Button.update(value="Save to favorites", visible=True),
-                outputs_ref[i][3]: gr.Button.update(visible=True),
-                outputs_ref[i][4]: filename_npz,
-                outputs_ref[i][5]: seed,
-                outputs_ref[i][6]: metadata
-            }
+            yield yield_generation(outputs_ref, i)(
+                audio=gr.Audio.update(value=filename, label="Generated audio"),
+                image=filename_png,
+                save_button=gr.Button.update(value="Save to favorites", visible=True),
+                continue_button=gr.Button.update(visible=True),
+                npz=filename_npz,
+                seed=seed,
+                json_text=metadata
+            )
         return {}
 
     return gen
