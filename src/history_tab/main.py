@@ -4,33 +4,10 @@ import gradio as gr
 import glob
 import json
 import shutil
-
+from src.history_tab.get_wav_files import get_wav_files, get_wav_files_img
 from src.history_tab.delete_generation_cb import delete_generation_cb
-from src.history_tab.parse_time import extract_and_parse_time
 from src.history_tab.save_to_favorites import save_to_favorites
 from src.history_tab.open_folder import open_folder
-
-
-def get_wav_files(directory: str):
-    list_of_directories = glob.glob(f"{directory}/*")
-    file_date_list = [
-        [
-            extract_and_parse_time(directory),
-            get_wav_in_dir(directory),
-        ]
-        for directory in list_of_directories
-    ]
-    # order by date
-    file_date_list.sort(key=lambda x: x[0], reverse=True)
-    return file_date_list
-
-
-def get_wav_in_dir(directory: str):
-    return os.path.join(directory, f"{os.path.basename(directory)}.wav")
-
-
-def get_wav_files_img(directory):
-    return [file[1].replace(".wav", ".png") for file in get_wav_files(directory)]
 
 
 # TODO: add hash column and date column
@@ -46,7 +23,7 @@ def select_audio(table, evt):
 
 
 def _select_audio(table, index):
-    filename = table['data'][index][1]
+    filename = table['data'][index][-1]
     with open(filename.replace(".wav", ".json")) as f:
         json_text = json.load(f)
     return filename, json_text
@@ -78,15 +55,17 @@ def history_tab(register_use_as_history_button, directory="outputs"):
                     button_output = gr.Button(value=f"Open {directory} folder")
                 button_output.click(lambda: open_folder(directory))
 
+                datatypes = ["date", "str", "str", "str"]
+
                 history_list = gr.Dataframe(value=get_wav_files(directory),
                                             elem_classes="file-list",
                                             type="array",
                                             interactive=False,
-                                            col_count=2,
-                                            max_cols=2,
-                                            datatype=["date", "str"],
+                                            col_count=len(datatypes),
+                                            max_cols=len(datatypes),
+                                            datatype=datatypes,
                                             headers=[
-                                                "Date and Time", directory.capitalize()]
+                                                "Date and Time", directory.capitalize(), "When", "Filename"]
                                             )
 
             with gr.Column():
@@ -248,3 +227,6 @@ def voices_tab(register_use_as_history_button, directory="voices"):
                 return gr.List.update(value=get_npz_files_voices())
 
             voices_tab.select(fn=update_voices_tab, outputs=[voices_list])
+
+
+
