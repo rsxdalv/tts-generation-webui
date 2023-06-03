@@ -41,9 +41,9 @@ long_prompt_choices = [value_short_prompt,
 
 value_reuse_history = "Use old generation as history"
 value_use_voice_history = "or Use history prompt setting"
-value_empty_history = "or Clear history"
+value_empty_history_2 = "or Clear history"
 long_prompt_history_choices = [
-    value_reuse_history, value_use_voice_history, value_empty_history
+    value_reuse_history, value_use_voice_history, value_empty_history_2
 ]
 
 bark_css = """
@@ -245,7 +245,7 @@ def generate_multi(count=1, outputs_ref=None):
                 elif long_prompt_history_radio == value_use_voice_history:
                     history_prompt, _ = get_history_prompt(
                         language, speaker_id, useV2, history_prompt, use_voice=history_setting == value_use_voice)
-                elif long_prompt_history_radio == value_empty_history:
+                elif long_prompt_history_radio == value_empty_history_2:
                     history_prompt = None
 
                 filename, filename_png, audio_array, last_piece_history, filename_npz, seed, _metadata = generate(
