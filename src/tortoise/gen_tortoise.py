@@ -73,9 +73,6 @@ def process_gen(text, voice, preset, candidates, seed, cvvp_amount, filenames, g
         "candidates": candidates,
         "seed": seed,
         "cvvp_amount": cvvp_amount,
-        "filename": filename,
-        "filename_png": filename_png,
-        "filename_json": filename_json,
     }
     import json
     with open(filename_json, 'w') as f:

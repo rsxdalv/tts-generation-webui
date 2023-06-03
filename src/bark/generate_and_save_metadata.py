@@ -26,10 +26,6 @@ def generate_and_save_metadata(prompt: str, language: str, speaker_id: int, text
         "waveform_temp": waveform_temp,
         "date": date,
         "seed": str(seed),
-        "filename": filename,
-        "filename_png": filename_png,
-        "filename_json": filename_json,
-        "filename_npz": filename_npz,
         # "files": {
         #     "wav": filename,
         #     "png": filename_png,
