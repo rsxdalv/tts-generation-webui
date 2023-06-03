@@ -1,12 +1,9 @@
-import os
+import shutil
 
 
-def delete_generation_cb(refresh):
-    def delete_generation(json):
-        os.remove(json["filename"])
-        os.remove(json["filename_png"])
-        os.remove(json["filename_json"])
-        os.remove(json["filename_npz"])
+def delete_generation_cb(refresh: callable):
+    def delete_generation(directory: str):
+        shutil.rmtree(directory)
 
         return refresh()
 

@@ -2,8 +2,8 @@
 
 ## One click installers
 
-[Download](https://github.com/rsxdalv/one-click-installers-tts/archive/refs/tags/v3.1.zip) ||
-[Release Page](https://github.com/rsxdalv/one-click-installers-tts/releases/tag/v3.1) ||
+[Download](https://github.com/rsxdalv/one-click-installers-tts/archive/refs/tags/v4.0.zip) ||
+[Release Page](https://github.com/rsxdalv/one-click-installers-tts/releases/tag/v4.0) ||
 [Installer Repo](https://github.com/rsxdalv/one-click-installers-tts)
 
 ## Screenshots
@@ -70,3 +70,24 @@ Before:
 ## To customize the installation, you may clone one of bark model forks within models/bark
 
 git clone https://github.com/rsxdalv/bark.git
+
+## Open Source Libraries
+
+This project utilizes the following open source libraries:
+
+- **suno-ai/bark** - [MIT License](https://github.com/suno-ai/bark/blob/main/LICENSE)
+  - Description: A powerful library for XYZ.
+  - Repository: [suno/bark](https://github.com/suno-ai/bark)
+
+- **tortoise-tts** - [Apache-2.0 License](https://github.com/neonbjb/tortoise-tts/blob/master/LICENSE)
+  - Description: A flexible text-to-speech synthesis library for various platforms.
+  - Repository: [neonbjb/tortoise-tts](https://github.com/neonbjb/tortoise-tts)
+
+- **ffmpeg** - [LGPL License](https://github.com/FFmpeg/FFmpeg/blob/master/LICENSE.md)
+  - Description: A complete and cross-platform solution for video and audio processing.
+  - Repository: [FFmpeg](https://github.com/FFmpeg/FFmpeg)
+  - Use: Encoding Vorbis Ogg files
+
+- **ffmpeg-python** - [Apache 2.0 License](https://github.com/kkroening/ffmpeg-python/blob/master/LICENSE)
+  - Description: Python bindings for FFmpeg library for handling multimedia files.
+  - Repository: [kkroening/ffmpeg-python](https://github.com/kkroening/ffmpeg-python)
