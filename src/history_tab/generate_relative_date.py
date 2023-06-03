@@ -1,7 +1,7 @@
 from datetime import datetime
 
 
-def generate_relative_date(date: datetime):
+def _generate_relative_date(date: datetime):
     now = datetime.now()
     diff = now - date
     if diff.days > 0:
@@ -12,3 +12,11 @@ def generate_relative_date(date: datetime):
         return f"{diff.seconds // 60} minutes ago"
     else:
         return f"{diff.seconds} seconds ago"
+    
+
+def generate_relative_date(date: datetime):
+    try:
+        return _generate_relative_date(date)
+    except Exception as e:
+        print(e)
+        return "Unknown"

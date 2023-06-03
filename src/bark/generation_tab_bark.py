@@ -75,7 +75,6 @@ def generate(prompt, history_setting, language=None, speaker_id=0, useV2=False, 
     log_generation(prompt, useV2, text_temp, waveform_temp,
                    use_voice, history_prompt_verbal)
 
-    # seed = parse_or_set_seed(seed, index)
     indexed_seed = parse_or_set_seed(seed, index)
     full_generation, audio_array = generate_audio(
         prompt, history_prompt=history_prompt, text_temp=text_temp, waveform_temp=waveform_temp, output_full=True)
@@ -128,7 +127,8 @@ def save_wav(audio_array, filename):
 
 def save_long_generation(prompt, history_setting, language, speaker_id, text_temp, waveform_temp, seed, filename,
                          pieces, full_generation=None, history_prompt=None):
-    base_filename = filename.replace(".wav", "_long")
+    base_filename = create_base_filename(
+        "long", "outputs", model="bark", date=get_date_string())
     audio_array = np.concatenate(pieces)
 
     date = get_date_string()

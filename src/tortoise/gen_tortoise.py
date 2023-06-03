@@ -55,7 +55,9 @@ def process_gen(text, voice, preset, candidates, seed, cvvp_amount, filenames, g
     model = "tortoise"
     date = get_date_string()
 
-    base_filename = f"{create_base_filename(voice, OUTPUT_PATH, model, date)}__n{j}"
+    base_filename = (
+        f"{create_base_filename(f'{voice}__n{j}', OUTPUT_PATH, model, date)}"
+    )
     filename = f'{base_filename}.wav'
     torchaudio.save(filename, audio_tensor, SAMPLE_RATE)
     audio_array = audio_tensor.t().numpy()
