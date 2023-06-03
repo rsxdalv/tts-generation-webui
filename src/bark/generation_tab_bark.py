@@ -24,42 +24,7 @@ from src.utils.save_waveform_plot import save_waveform_plot
 from src.model_manager import model_manager
 from src.config.config import config
 from src.utils.set_seed import set_seed
-
-
-class HistorySettings:
-    EMPTY = "Empty history"
-    VOICE = "or Use a voice:"
-    NPZ_FILE = "or Use old generation as history:"
-
-    choices = [
-        EMPTY,
-        VOICE,
-        NPZ_FILE,
-    ]
-
-
-class PromptSplitSettings:
-    NONE = "Short prompt (<15s)"
-    LINES = "Split prompt by lines"
-    LENGTH = "Split prompt by length"
-
-    choices = [
-        NONE,
-        LINES,
-        # LENGTH,
-    ]
-
-
-class LongPromptHistorySettings:
-    CONTINUE = "Use old generation as history"
-    CONSTANT = "or Use history prompt setting"
-    EMPTY = "or Clear history"
-
-    choices = [
-        CONTINUE,
-        CONSTANT,
-        EMPTY,
-    ]
+from src.bark.generation_settings import HistorySettings, PromptSplitSettings, LongPromptHistorySettings
 
 
 def generate(prompt, history_setting, language=None, speaker_id=0, useV2=False, text_temp=0.7, waveform_temp=0.7,
