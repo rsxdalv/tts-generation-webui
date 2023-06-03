@@ -46,23 +46,6 @@ long_prompt_history_choices = [
     VALUE_REUSE_HISTORY, VALUE_USE_VOICE_HISTORY, VALUE_EMPTY_HISTORY_2
 ]
 
-bark_css = """
-.generating {
-    pointer-events: none;
-}
-.tts-audio > .empty.small.unpadded_box {
-    padding: var(--size-2);
-    width: var(--size-full);
-    height: var(--size-14);
-    min-height: var(--size-14);
-}
-.tts-image > .empty.large.unpadded_box {
-    height: 150px;
-    min-height: 150px;
-}
-"""
-
-
 def generate(prompt, history_setting, language=None, speaker_id=0, useV2=False, text_temp=0.7, waveform_temp=0.7,
              history_prompt=None, seed=None, index=0):
     if not model_manager.models_loaded:
