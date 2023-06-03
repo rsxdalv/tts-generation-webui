@@ -29,16 +29,16 @@ from src.utils.set_seed import set_seed
 class HistorySettings:
     EMPTY = "Empty history"
     VOICE = "or Use a voice:"
-    OLD_GENERATION = "or Use old generation as history:"
+    NPZ_FILE = "or Use old generation as history:"
 
     choices = [
         EMPTY,
         VOICE,
-        OLD_GENERATION,
+        NPZ_FILE,
     ]
 
 
-class LongPromptChoices:
+class PromptSplitSettings:
     NONE = "Short prompt (<15s)"
     LINES = "Split prompt by lines"
     LENGTH = "Split prompt by length"
@@ -50,7 +50,7 @@ class LongPromptChoices:
     ]
 
 
-class LongPromptHistoryChoices:
+class LongPromptHistorySettings:
     CONTINUE = "Use old generation as history"
     CONSTANT = "or Use history prompt setting"
     EMPTY = "or Clear history"
@@ -186,14 +186,14 @@ def generate_multi(count=1, outputs_ref=None):
             useV2=False,
             text_temp=0.7,
             waveform_temp=0.7,
-            long_prompt_radio=LongPromptChoices.NONE,
-            long_prompt_history_radio=LongPromptHistoryChoices.CONTINUE,
+            long_prompt_radio=PromptSplitSettings.NONE,
+            long_prompt_history_radio=LongPromptHistorySettings.CONTINUE,
             old_generation_filename=None,
             seed=None,
             ):
         history_prompt = None
         print("gen", "old_generation_filename", old_generation_filename)
-        if history_setting == HistorySettings.OLD_GENERATION:
+        if history_setting == HistorySettings.NPZ_FILE:
             history_prompt = load_npz(old_generation_filename)
 
         _original_history_prompt = history_prompt
@@ -211,7 +211,7 @@ def generate_multi(count=1, outputs_ref=None):
             )
 
         _original_seed = seed
-        if long_prompt_radio == LongPromptChoices.NONE:
+        if long_prompt_radio == PromptSplitSettings.NONE:
             outputs = []
             for i in range(count):
                 filename, filename_png, _, _, filename_npz, seed, metadata = generate(
@@ -234,14 +234,14 @@ def generate_multi(count=1, outputs_ref=None):
             return {}
 
         prompts = split_by_lines(
-            prompt) if long_prompt_radio == LongPromptChoices.LINES else split_by_length_simple(prompt)
+            prompt) if long_prompt_radio == PromptSplitSettings.LINES else split_by_length_simple(prompt)
         outputs = []
 
         for i in range(count):
             pieces = []
             last_piece_history = None
-            # This will work when HistorySettings.OLD_GENERATION is selected
-            if history_setting == HistorySettings.OLD_GENERATION:
+            # This will work when HistorySettings.NPZ_FILE is selected
+            if history_setting == HistorySettings.NPZ_FILE:
                 last_piece_history = history_prompt
             for prompt_piece in prompts:
                 history_prompt = get_long_gen_history_prompt(
@@ -282,12 +282,12 @@ def generate_multi(count=1, outputs_ref=None):
         return {}
 
     def get_long_gen_history_prompt(history_setting, language, speaker_id, useV2, long_prompt_history_radio, last_piece_history):
-        if long_prompt_history_radio == LongPromptHistoryChoices.CONTINUE:
+        if long_prompt_history_radio == LongPromptHistorySettings.CONTINUE:
             history_prompt = last_piece_history
-        elif long_prompt_history_radio == LongPromptHistoryChoices.CONSTANT:
+        elif long_prompt_history_radio == LongPromptHistorySettings.CONSTANT:
             history_prompt, _ = get_history_prompt(
                 language, speaker_id, useV2, history_prompt, use_voice=history_setting == HistorySettings.VOICE)
-        elif long_prompt_history_radio == LongPromptHistoryChoices.EMPTY:
+        elif long_prompt_history_radio == LongPromptHistorySettings.EMPTY:
             history_prompt = None
         return history_prompt
 
@@ -344,11 +344,11 @@ def generation_tab_bark(tabs):
         history_setting.change(
             fn=lambda choice: [
                 gr.Dropdown.update(
-                    visible=(choice == HistorySettings.OLD_GENERATION)),
+                    visible=(choice == HistorySettings.NPZ_FILE)),
                 gr.Button.update(
-                    visible=(choice == HistorySettings.OLD_GENERATION)),
+                    visible=(choice == HistorySettings.NPZ_FILE)),
                 gr.Button.update(
-                    visible=(choice == HistorySettings.OLD_GENERATION)),
+                    visible=(choice == HistorySettings.NPZ_FILE)),
             ],
             inputs=[history_setting],
             outputs=[old_generation_dropdown, copy_old_generation_button, reload_old_generation_dropdown])
@@ -356,10 +356,10 @@ def generation_tab_bark(tabs):
         with gr.Row():
             with gr.Column():
                 long_prompt_radio = gr.Radio(
-                    LongPromptChoices.choices, type="value", label="Prompt type", value=LongPromptChoices.NONE, show_label=False)
+                    PromptSplitSettings.choices, type="value", label="Prompt type", value=PromptSplitSettings.NONE, show_label=False)
                 long_prompt_history_radio = gr.Radio(
-                    LongPromptHistoryChoices.choices, type="value", label="For each subsequent generation:",
-                    value=LongPromptHistoryChoices.CONTINUE)
+                    LongPromptHistorySettings.choices, type="value", label="For each subsequent generation:",
+                    value=LongPromptHistorySettings.CONTINUE)
             with gr.Column():
                 # TODO: Add gradient temperature options (requires model changes)
                 text_temp = gr.Slider(label="Text temperature",
@@ -440,7 +440,7 @@ def generation_tab_bark(tabs):
     def register_use_as_history_button(button, source):
         button.click(fn=lambda value: {
             old_generation_dropdown: value,
-            history_setting: HistorySettings.OLD_GENERATION,
+            history_setting: HistorySettings.NPZ_FILE,
             tabs: gr.Tabs.update(selected="generation_bark"),
         }, inputs=[source],
             outputs=[old_generation_dropdown, history_setting, tabs])
@@ -488,7 +488,7 @@ def setup_bark_voice_prompt_ui():
 def insert_npz_file(npz_filename):
     return [
         gr.Dropdown.update(value=npz_filename),
-        gr.Radio.update(value=HistorySettings.OLD_GENERATION),
+        gr.Radio.update(value=HistorySettings.NPZ_FILE),
     ]
 
 
