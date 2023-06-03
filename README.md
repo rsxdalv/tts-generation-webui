@@ -35,6 +35,9 @@ This code requires the following dependencies:
 
 
 ## Changelog
+June 3:
+* Update to v3 - new output structure, improved history view, codebase reorganization, improved metadata, output extensions support
+
 May 17:
 * Update to v2 - generate results as they appear, preview long prompt generations piece by piece, enable up to 9 outputs, UI tweaks
 
