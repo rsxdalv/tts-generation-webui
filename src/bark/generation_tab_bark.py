@@ -2,7 +2,8 @@ import os
 import shutil
 
 import numpy as np
-
+import gradio as gr
+from src.bark.FinalGenParams import FinalGenParams
 from src.bark.history_to_hash import history_to_hash
 from src.extensions_loader.ext_callback_save_generation import ext_callback_save_generation
 from src.utils.create_base_filename import create_base_filename
@@ -19,7 +20,6 @@ from src.utils.date import get_date_string
 from models.bark.bark import SAMPLE_RATE, generate_audio
 from scipy.io.wavfile import write as write_wav
 from models.bark.bark.generation import SUPPORTED_LANGS
-import gradio as gr
 from src.utils.save_waveform_plot import save_waveform_plot
 from src.model_manager import model_manager
 from src.config.config import config
@@ -36,23 +36,47 @@ def generate(prompt, history_setting, language=None, speaker_id=0, useV2=False, 
     history_prompt, history_prompt_verbal = get_history_prompt(
         language, speaker_id, useV2, history_prompt, use_voice)
 
-    log_generation(prompt, useV2, text_temp, waveform_temp,
-                   use_voice, history_prompt_verbal)
+    final_gen_params: FinalGenParams = {
+        "text": prompt,
+        "history_prompt": history_prompt,
+        "text_temp": text_temp,
+        "waveform_temp": waveform_temp, 
+        "output_full": True
+    }
+
+    log_generation(
+        prompt=prompt,
+        useV2=useV2,
+        text_temp=text_temp,
+        waveform_temp=waveform_temp,
+        use_voice=use_voice,
+        history_prompt_verbal=history_prompt_verbal
+    )
 
     indexed_seed = parse_or_set_seed(seed, index)
-    full_generation, audio_array = generate_audio(
-        prompt, history_prompt=history_prompt, text_temp=text_temp, waveform_temp=waveform_temp, output_full=True)
+    full_generation, audio_array = generate_audio(**final_gen_params)
     set_seed(-1)
 
     filename, filename_png, filename_npz, metadata = save_generation(
-        prompt, language, speaker_id, text_temp, waveform_temp, history_prompt, indexed_seed, use_voice,
-        history_prompt_verbal, full_generation, audio_array)
+        prompt=prompt,
+        language=language,
+        speaker_id=speaker_id,
+        text_temp=text_temp,
+        waveform_temp=waveform_temp,
+        history_prompt=history_prompt,
+        indexed_seed=indexed_seed,
+        use_voice=use_voice,
+        history_prompt_verbal=history_prompt_verbal,
+        full_generation=full_generation,
+        audio_array=audio_array,
+        final_gen_params=final_gen_params
+    )
 
     return [filename, filename_png, audio_array, full_generation, filename_npz, indexed_seed, metadata]
 
 
 def save_generation(prompt, language, speaker_id, text_temp, waveform_temp, history_prompt, seed, use_voice,
-                    history_prompt_verbal, full_generation, audio_array):
+                    history_prompt_verbal, full_generation, audio_array, final_gen_params):
     date = get_date_string()
     base_filename = create_base_filename(
         history_prompt_verbal, "outputs", model="bark", date=date)
@@ -476,3 +500,4 @@ def create_components(old_generation_dropdown, history_setting, index):
             json_text], outputs=[save_button])
 
         return [audio, image, save_button, continue_button, npz, seed, json_text], col, seed
+
