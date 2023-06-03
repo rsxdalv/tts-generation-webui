@@ -25,33 +25,49 @@ from src.model_manager import model_manager
 from src.config.config import config
 from src.utils.set_seed import set_seed
 
-VALUE_EMPTY_HISTORY = "Empty history"
-VALUE_USE_VOICE = "or Use a voice:"
-VALUE_USE_OLD_GENERATION = "or Use old generation as history:"
-history_settings = [VALUE_EMPTY_HISTORY,
-                    VALUE_USE_VOICE, VALUE_USE_OLD_GENERATION]
 
-VALUE_SHORT_PROMPT = "Short prompt (<15s)"
-VALUE_SPLIT_LINES = "Split prompt by lines"
-VALUE_SPLIT_LENGTH = "Split prompt by length"
-long_prompt_choices = [VALUE_SHORT_PROMPT,
-                       VALUE_SPLIT_LINES,
-                       #   VALUE_SPLIT_LENGTH
-                       ]
+class HistorySettings:
+    EMPTY = "Empty history"
+    VOICE = "or Use a voice:"
+    OLD_GENERATION = "or Use old generation as history:"
 
-VALUE_REUSE_HISTORY = "Use old generation as history"
-VALUE_USE_VOICE_HISTORY = "or Use history prompt setting"
-VALUE_EMPTY_HISTORY_2 = "or Clear history"
-long_prompt_history_choices = [
-    VALUE_REUSE_HISTORY, VALUE_USE_VOICE_HISTORY, VALUE_EMPTY_HISTORY_2
-]
+    choices = [
+        EMPTY,
+        VOICE,
+        OLD_GENERATION,
+    ]
+
+
+class LongPromptChoices:
+    NONE = "Short prompt (<15s)"
+    LINES = "Split prompt by lines"
+    LENGTH = "Split prompt by length"
+
+    choices = [
+        NONE,
+        LINES,
+        # LENGTH,
+    ]
+
+
+class LongPromptHistoryChoices:
+    CONTINUE = "Use old generation as history"
+    CONSTANT = "or Use history prompt setting"
+    EMPTY = "or Clear history"
+
+    choices = [
+        CONTINUE,
+        CONSTANT,
+        EMPTY,
+    ]
+
 
 def generate(prompt, history_setting, language=None, speaker_id=0, useV2=False, text_temp=0.7, waveform_temp=0.7,
              history_prompt=None, seed=None, index=0):
     if not model_manager.models_loaded:
         model_manager.reload_models(config)
 
-    use_voice = history_setting == VALUE_USE_VOICE
+    use_voice = history_setting == HistorySettings.VOICE
     history_prompt, history_prompt_verbal = get_history_prompt(
         language, speaker_id, useV2, history_prompt, use_voice)
 
@@ -76,7 +92,8 @@ def save_generation(prompt, language, speaker_id, text_temp, waveform_temp, hist
     base_filename = create_base_filename(
         history_prompt_verbal, "outputs", model="bark", date=date)
 
-    filename, filename_png, filename_json, filename_npz = get_filenames(base_filename)
+    filename, filename_png, filename_json, filename_npz = get_filenames(
+        base_filename)
     save_npz(filename_npz, full_generation)
     save_wav(audio_array, filename)
     plot = save_waveform_plot(audio_array, filename_png)
@@ -97,7 +114,8 @@ def save_generation(prompt, language, speaker_id, text_temp, waveform_temp, hist
     ext_callback_save_generation(
         full_generation,
         audio_array,
-        {"wav": filename, "png": filename_png, "npz": filename_npz, "ogg": filename_ogg},
+        {"wav": filename, "png": filename_png,
+            "npz": filename_npz, "ogg": filename_ogg},
         metadata
     )
 
@@ -115,7 +133,8 @@ def save_long_generation(prompt, history_setting, language, speaker_id, text_tem
     audio_array = np.concatenate(pieces)
 
     date = get_date_string()
-    filename, filename_png, filename_json, filename_npz = get_filenames(base_filename)
+    filename, filename_png, filename_json, filename_npz = get_filenames(
+        base_filename)
     save_npz(filename_npz, full_generation)
     write_wav(filename, SAMPLE_RATE, audio_array)
     plot = save_waveform_plot(audio_array, filename_png)
@@ -134,7 +153,8 @@ def save_long_generation(prompt, history_setting, language, speaker_id, text_tem
     ext_callback_save_generation(
         full_generation,
         audio_array,
-        {"wav": filename, "png": filename_png, "npz": filename_npz, "ogg": filename_ogg},
+        {"wav": filename, "png": filename_png,
+            "npz": filename_npz, "ogg": filename_ogg},
         metadata
     )
 
@@ -143,6 +163,7 @@ def save_long_generation(prompt, history_setting, language, speaker_id, text_tem
 
 def yield_generation(outputs_ref, i):
     output_for_yield = outputs_ref[i]
+
     def return_for_yield(audio, image, save_button, continue_button, npz, seed, json_text):
         return {
             output_for_yield[0]: audio,
@@ -153,7 +174,7 @@ def yield_generation(outputs_ref, i):
             output_for_yield[5]: seed,
             output_for_yield[6]: json_text
         }
-    
+
     return return_for_yield
 
 
@@ -165,24 +186,24 @@ def generate_multi(count=1, outputs_ref=None):
             useV2=False,
             text_temp=0.7,
             waveform_temp=0.7,
-            long_prompt_radio=VALUE_SHORT_PROMPT,
-            long_prompt_history_radio=VALUE_REUSE_HISTORY,
+            long_prompt_radio=LongPromptChoices.NONE,
+            long_prompt_history_radio=LongPromptHistoryChoices.CONTINUE,
             old_generation_filename=None,
             seed=None,
             ):
         history_prompt = None
         print("gen", "old_generation_filename", old_generation_filename)
-        if history_setting == VALUE_USE_OLD_GENERATION:
+        if history_setting == HistorySettings.OLD_GENERATION:
             history_prompt = load_npz(old_generation_filename)
 
         _original_history_prompt = history_prompt
-
 
         for i in range(count):
             yield yield_generation(outputs_ref, i)(
                 audio=None,
                 image=None,
-                save_button=gr.Button.update(value="Save to favorites", visible=False),
+                save_button=gr.Button.update(
+                    value="Save to favorites", visible=False),
                 continue_button=gr.Button.update(visible=False),
                 npz=None,
                 seed=None,
@@ -190,7 +211,7 @@ def generate_multi(count=1, outputs_ref=None):
             )
 
         _original_seed = seed
-        if long_prompt_radio == VALUE_SHORT_PROMPT:
+        if long_prompt_radio == LongPromptChoices.NONE:
             outputs = []
             for i in range(count):
                 filename, filename_png, _, _, filename_npz, seed, metadata = generate(
@@ -198,13 +219,13 @@ def generate_multi(count=1, outputs_ref=None):
                     waveform_temp=waveform_temp, history_prompt=history_prompt, seed=_original_seed, index=i)
                 outputs.extend((filename, filename_png, gr.Button.update(
                     value="Save to favorites", visible=True), gr.Button.update(visible=True), filename_npz, seed,
-                                metadata))
-                
-                
+                    metadata))
+
                 yield yield_generation(outputs_ref, i)(
                     audio=filename,
                     image=filename_png,
-                    save_button=gr.Button.update(value="Save to favorites", visible=True),
+                    save_button=gr.Button.update(
+                        value="Save to favorites", visible=True),
                     continue_button=gr.Button.update(visible=True),
                     npz=filename_npz,
                     seed=seed,
@@ -213,23 +234,18 @@ def generate_multi(count=1, outputs_ref=None):
             return {}
 
         prompts = split_by_lines(
-            prompt) if long_prompt_radio == VALUE_SPLIT_LINES else split_by_length_simple(prompt)
+            prompt) if long_prompt_radio == LongPromptChoices.LINES else split_by_length_simple(prompt)
         outputs = []
 
         for i in range(count):
             pieces = []
             last_piece_history = None
-            # This will work when VALUE_REUSE_HISTORY is selected
-            if history_setting == VALUE_USE_OLD_GENERATION:
+            # This will work when HistorySettings.OLD_GENERATION is selected
+            if history_setting == HistorySettings.OLD_GENERATION:
                 last_piece_history = history_prompt
             for prompt_piece in prompts:
-                if long_prompt_history_radio == VALUE_REUSE_HISTORY:
-                    history_prompt = last_piece_history
-                elif long_prompt_history_radio == VALUE_USE_VOICE_HISTORY:
-                    history_prompt, _ = get_history_prompt(
-                        language, speaker_id, useV2, history_prompt, use_voice=history_setting == VALUE_USE_VOICE)
-                elif long_prompt_history_radio == VALUE_EMPTY_HISTORY_2:
-                    history_prompt = None
+                history_prompt = get_long_gen_history_prompt(
+                    history_setting, language, speaker_id, useV2, long_prompt_history_radio, last_piece_history)
 
                 filename, filename_png, audio_array, last_piece_history, filename_npz, seed, _metadata = generate(
                     prompt_piece, history_setting, language, speaker_id, useV2, text_temp=text_temp,
@@ -237,9 +253,10 @@ def generate_multi(count=1, outputs_ref=None):
                 pieces += [audio_array]
                 yield yield_generation(outputs_ref, i)(
                     audio=gr.Audio.update(value=filename,
-                                             label=f"Generated audio fragment... `{prompt_piece}`"),
+                                          label=f"Generated audio fragment... `{prompt_piece}`"),
                     image=filename_png,
-                    save_button=gr.Button.update(value="Save to favorites", visible=True),
+                    save_button=gr.Button.update(
+                        value="Save to favorites", visible=True),
                     continue_button=gr.Button.update(visible=True),
                     npz=filename_npz,
                     seed=seed,
@@ -255,7 +272,8 @@ def generate_multi(count=1, outputs_ref=None):
             yield yield_generation(outputs_ref, i)(
                 audio=gr.Audio.update(value=filename, label="Generated audio"),
                 image=filename_png,
-                save_button=gr.Button.update(value="Save to favorites", visible=True),
+                save_button=gr.Button.update(
+                    value="Save to favorites", visible=True),
                 continue_button=gr.Button.update(visible=True),
                 npz=filename_npz,
                 seed=seed,
@@ -263,13 +281,23 @@ def generate_multi(count=1, outputs_ref=None):
             )
         return {}
 
+    def get_long_gen_history_prompt(history_setting, language, speaker_id, useV2, long_prompt_history_radio, last_piece_history):
+        if long_prompt_history_radio == LongPromptHistoryChoices.CONTINUE:
+            history_prompt = last_piece_history
+        elif long_prompt_history_radio == LongPromptHistoryChoices.CONSTANT:
+            history_prompt, _ = get_history_prompt(
+                language, speaker_id, useV2, history_prompt, use_voice=history_setting == HistorySettings.VOICE)
+        elif long_prompt_history_radio == LongPromptHistoryChoices.EMPTY:
+            history_prompt = None
+        return history_prompt
+
     return gen
 
 
 def generation_tab_bark(tabs):
     with gr.Tab(label="Generation (Bark)", id="generation_bark"):
         history_setting = gr.Radio(
-            history_settings,
+            HistorySettings.choices,
             value="Empty history",
             type="value",
             label="History Prompt (voice) setting:"
@@ -280,10 +308,10 @@ def generation_tab_bark(tabs):
         # Show the language and speakerId radios only when useHistory is checked
         history_setting.change(
             fn=lambda choice: [
-                gr.Radio.update(visible=(choice == VALUE_USE_VOICE)),
-                gr.Radio.update(visible=(choice == VALUE_USE_VOICE)),
-                gr.Checkbox.update(visible=(choice == VALUE_USE_VOICE)),
-                gr.Markdown.update(visible=(choice == VALUE_USE_VOICE)),
+                gr.Radio.update(visible=(choice == HistorySettings.VOICE)),
+                gr.Radio.update(visible=(choice == HistorySettings.VOICE)),
+                gr.Checkbox.update(visible=(choice == HistorySettings.VOICE)),
+                gr.Markdown.update(visible=(choice == HistorySettings.VOICE)),
             ],
             inputs=[history_setting],
             outputs=[languageRadio, speakerIdRadio, useV2, choice_string])
@@ -316,9 +344,11 @@ def generation_tab_bark(tabs):
         history_setting.change(
             fn=lambda choice: [
                 gr.Dropdown.update(
-                    visible=(choice == VALUE_USE_OLD_GENERATION)),
-                gr.Button.update(visible=(choice == VALUE_USE_OLD_GENERATION)),
-                gr.Button.update(visible=(choice == VALUE_USE_OLD_GENERATION)),
+                    visible=(choice == HistorySettings.OLD_GENERATION)),
+                gr.Button.update(
+                    visible=(choice == HistorySettings.OLD_GENERATION)),
+                gr.Button.update(
+                    visible=(choice == HistorySettings.OLD_GENERATION)),
             ],
             inputs=[history_setting],
             outputs=[old_generation_dropdown, copy_old_generation_button, reload_old_generation_dropdown])
@@ -326,10 +356,10 @@ def generation_tab_bark(tabs):
         with gr.Row():
             with gr.Column():
                 long_prompt_radio = gr.Radio(
-                    long_prompt_choices, type="value", label="Prompt type", value=VALUE_SHORT_PROMPT, show_label=False)
+                    LongPromptChoices.choices, type="value", label="Prompt type", value=LongPromptChoices.NONE, show_label=False)
                 long_prompt_history_radio = gr.Radio(
-                    long_prompt_history_choices, type="value", label="For each subsequent generation:",
-                    value=VALUE_REUSE_HISTORY)
+                    LongPromptHistoryChoices.choices, type="value", label="For each subsequent generation:",
+                    value=LongPromptHistoryChoices.CONTINUE)
             with gr.Column():
                 # TODO: Add gradient temperature options (requires model changes)
                 text_temp = gr.Slider(label="Text temperature",
@@ -410,10 +440,10 @@ def generation_tab_bark(tabs):
     def register_use_as_history_button(button, source):
         button.click(fn=lambda value: {
             old_generation_dropdown: value,
-            history_setting: VALUE_USE_OLD_GENERATION,
+            history_setting: HistorySettings.OLD_GENERATION,
             tabs: gr.Tabs.update(selected="generation_bark"),
         }, inputs=[source],
-                     outputs=[old_generation_dropdown, history_setting, tabs])
+            outputs=[old_generation_dropdown, history_setting, tabs])
 
     return register_use_as_history_button
 
@@ -458,14 +488,16 @@ def setup_bark_voice_prompt_ui():
 def insert_npz_file(npz_filename):
     return [
         gr.Dropdown.update(value=npz_filename),
-        gr.Radio.update(value=VALUE_USE_OLD_GENERATION),
+        gr.Radio.update(value=HistorySettings.OLD_GENERATION),
     ]
 
 
 def create_components(old_generation_dropdown, history_setting, index):
     with gr.Column(visible=index == 0) as col:
-        audio = gr.Audio(type="filepath", label="Generated audio", elem_classes="tts-audio")
-        image = gr.Image(label="Waveform", shape=(None, 100), elem_classes="tts-image")
+        audio = gr.Audio(type="filepath", label="Generated audio",
+                         elem_classes="tts-audio")
+        image = gr.Image(label="Waveform", shape=(
+            None, 100), elem_classes="tts-image")
         with gr.Row():
             save_button = gr.Button("Save to favorites", visible=False)
             continue_button = gr.Button("Use as history", visible=False)
