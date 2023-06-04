@@ -1,4 +1,4 @@
-from ..bark.FullGeneration import FullGeneration
+from src.bark.FullGeneration import FullGeneration
 from .CallbackSaveGeneration import CallbackSaveGeneration
 import sys
 import numpy as np
@@ -9,22 +9,23 @@ import importlib
 # callbacks_save_generation: List[CallbackSaveGeneration] = [
 # ]
 callbacks_save_generation = []
-extensions_folder = os.path.join(os.path.dirname(__file__), 'extensions')
+extensions_folder = os.path.join(os.path.dirname(__file__), "extensions")
 
 # Get the list of files in the extensions folder
 print("Loading extensions:")
 extension_files = os.listdir(extensions_folder)
 for file_name in extension_files:
-    if file_name.endswith('.py'):
+    if file_name.endswith(".py"):
         module_name = file_name[:-3]
         try:
-            spec = importlib.util.spec_from_file_location(module_name, os.path.join(extensions_folder, file_name))
+            spec = importlib.util.spec_from_file_location(
+                module_name, os.path.join(extensions_folder, file_name)
+            )
             module = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(module)
 
             # Retrieve the function from the module
-            callback_save_generation = getattr(
-                module, 'callback_save_generation')
+            callback_save_generation = getattr(module, "callback_save_generation")
 
             callbacks_save_generation.append(callback_save_generation)
             print("Loaded extension:", module_name)
@@ -33,17 +34,18 @@ for file_name in extension_files:
             print("Error:", sys.exc_info()[0], sys.exc_info()[1])
         except AttributeError:
             print(
-                f"Module {module_name} does not contain the function 'callback_save_generation'")
+                f"Module {module_name} does not contain the function 'callback_save_generation'"
+            )
 
 print(f"Loaded {len(callbacks_save_generation)} extensions.")
 
 
 def ext_callback_save_generation(
-        full_generation: FullGeneration,
-        # full_generation: Dict[str, Any],
-        audio_array: np.ndarray,
-        files: Dict[str, str],
-        metadata: Dict[str, Any]
+    full_generation: FullGeneration,
+    # full_generation: Dict[str, Any],
+    audio_array: np.ndarray,
+    files: Dict[str, str],
+    metadata: Dict[str, Any],
 ) -> None:
     for callback in callbacks_save_generation:
         callback(full_generation, audio_array, files, metadata)
@@ -64,5 +66,5 @@ if __name__ == "__main__":
         },
         audio_array=np.array([1, 2, 3]),
         files={"ogg": "sample.ogg"},
-        metadata={"extension": "test"}
+        metadata={"extension": "test"},
     )

@@ -1,2 +1,6 @@
 # pip install nodejs-bin==16.15.1a4
 ffmpeg-python # Apache 2.0
+gradio==3.33.1
+python-dotenv==1.0.0
+soundfile==0.12.1 # torchaudio platform windows
+# run_cmd("pip install sox") # torchaudio platform linux

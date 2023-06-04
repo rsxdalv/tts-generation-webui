@@ -22,3 +22,4 @@ node_modules/
 # Editors
 .vscode/
 .idea/
+.sourcery.yaml

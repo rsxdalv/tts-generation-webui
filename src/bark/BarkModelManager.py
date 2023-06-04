@@ -20,10 +20,11 @@ class BarkModelManager:
         codec_use_gpu = model_config["codec_use_gpu"]
 
         print(
-            f'''\t- Text Generation:\t\t GPU: {"Yes" if text_use_gpu else "No"}, Small Model: {"Yes" if text_use_small else "No"}
+            f"""\t- Text Generation:\t\t GPU: {"Yes" if text_use_gpu else "No"}, Small Model: {"Yes" if text_use_small else "No"}
 \t- Coarse-to-Fine Inference:\t GPU: {"Yes" if coarse_use_gpu else "No"}, Small Model: {"Yes" if coarse_use_small else "No"}
 \t- Fine-tuning:\t\t\t GPU: {"Yes" if fine_use_gpu else "No"}, Small Model: {"Yes" if fine_use_small else "No"}
-\t- Codec:\t\t\t GPU: {"Yes" if codec_use_gpu else "No"}''')
+\t- Codec:\t\t\t GPU: {"Yes" if codec_use_gpu else "No"}"""
+        )
 
         preload_models(
             text_use_gpu=text_use_gpu,

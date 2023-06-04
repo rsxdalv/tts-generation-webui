@@ -1,7 +1,7 @@
 import shutil
 
 
-def delete_generation_cb(refresh: callable):
+def delete_generation_cb(refresh):
     def delete_generation(directory: str):
         shutil.rmtree(directory)
 

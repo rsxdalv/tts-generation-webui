@@ -12,7 +12,7 @@ def _generate_relative_date(date: datetime):
         return f"{diff.seconds // 60} minutes ago"
     else:
         return f"{diff.seconds} seconds ago"
-    
+
 
 def generate_relative_date(date: datetime):
     try:

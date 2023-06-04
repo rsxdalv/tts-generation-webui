@@ -12,12 +12,13 @@ import datetime
 def get_wav_files(directory: str):
     def get_wav_in_dir(directory: str):
         return os.path.join(directory, f"{os.path.basename(directory)}.wav")
+
     list_of_directories = glob.glob(f"{directory}/*")
     file_date_list = [
         [
             extract_and_parse_time(directory),
             generate_pretty_name(directory),
-            generate_relative_date(extract_and_parse_time(directory)),
+            generate_relative_date(extract_and_parse_time(directory)),  # type: ignore
             get_wav_in_dir(directory),
         ]
         for directory in list_of_directories
@@ -51,10 +52,12 @@ def get_npz_file_data(file: os.DirEntry):
         file.path,
     ]
 
+
 # TODO: add hash column
 def get_npz_files_voices(directory: str = "voices"):
     file_list = list(os.scandir(directory))
-    data_list = [get_npz_file_data(file) for file in file_list if file.name.endswith(".npz")]
+    data_list = [
+        get_npz_file_data(file) for file in file_list if file.name.endswith(".npz")
+    ]
     data_list.sort(key=lambda x: x[0], reverse=True)
     return data_list
-
