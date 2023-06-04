@@ -11,7 +11,7 @@ def get_history_prompt(
 ):
     if history_prompt is None:
         history_prompt = (
-            create_voice_string(language, speaker_id, useV2) if use_voice else None # type: ignore
+            create_voice_string(language, speaker_id, useV2) if use_voice else None  # type: ignore
         )
         history_prompt_verbal = history_prompt or "None"
     else:

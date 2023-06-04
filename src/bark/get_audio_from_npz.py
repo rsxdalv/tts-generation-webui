@@ -1,5 +1,10 @@
 from typing import Tuple
-from models.bark.bark.generation import SAMPLE_RATE, codec_decode, models, load_codec_model
+from models.bark.bark.generation import (
+    SAMPLE_RATE,
+    codec_decode,
+    models,
+    load_codec_model,
+)
 from src.bark.npz_tools import load_npz
 from src.config.config import config
 import numpy as np

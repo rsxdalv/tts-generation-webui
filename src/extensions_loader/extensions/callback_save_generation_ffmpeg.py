@@ -39,14 +39,14 @@ def callback_save_generation(
     attach_generation_meta(
         full_generation, "coarse_prompt", metadata
     )
-    metadata = json.dumps(metadata)
     filename = files.get("ogg")
     input_data = audio_array.tobytes()
+    metadata_str = json.dumps(metadata)
 
     args = (
         ffmpeg.input('pipe:', format='f32le', ar=str(SAMPLE_RATE))
         .output(
-            filename, format='ogg', metadata=f"comment={metadata}"
+            filename, format='ogg', metadata=f"comment={metadata_str}"
         )
         .overwrite_output()
         .get_args()

@@ -12,7 +12,9 @@ def parse_time(text: str):
         # extract hour, minute, second
         hour, minute, second = time.split("-")
         # create a native date
-        return datetime.datetime(int(year), int(month), int(day), int(hour), int(minute), int(second))
+        return datetime.datetime(
+            int(year), int(month), int(day), int(hour), int(minute), int(second)
+        )
     except Exception:
         print("Error parsing time")
         print(text)
@@ -28,6 +30,7 @@ def extract_time(filename: str):
     matches = re.finditer(regex, filename, re.MULTILINE)
     for matchNum, match in enumerate(matches, start=1):
         return match.group(1)
+
 
 def extract_and_parse_time(filename: str):
     return parse_time(extract_time(filename))

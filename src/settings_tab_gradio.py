@@ -1,9 +1,12 @@
-from typing import Any, Callable, Dict
+from typing import Any, Callable, Dict, List
 import gradio as gr
 
 
-def settings_tab_gradio(save_config: Callable[[], None], reload_config_and_restart_ui: Callable[[], None],
-                        gradio_interface_options: Dict[str, Any]):
+def settings_tab_gradio(
+    save_config: Callable[[List[str], List[Any]], str],
+    reload_config_and_restart_ui: Callable[[], None],
+    gradio_interface_options: Dict[str, Any],
+):
     with gr.Tab("Settings (Gradio)"):
         with gr.Row():
             with gr.Column():
@@ -32,64 +35,115 @@ def settings_tab_gradio(save_config: Callable[[], None], reload_config_and_resta
                 # show_api: If True, shows the api docs in the footer of the app. Default True. If the queue is enabled, then api_open parameter of .queue() will determine if the api docs are shown, independent of the value of show_api.
                 # file_directories: List of directories that gradio is allowed to serve files from (in addition to the directory containing the gradio python file). Must be absolute paths. Warning: any files in these directories or its children are potentially accessible to all users of your app.
 
-                gradio_interface_options_ui: Dict[str, gr.Checkbox | gr.Slider | gr.Textbox] = {
-                    "inline": gr.Checkbox(label="inline: Display inline in an iframe",
-                                          value=gradio_interface_options["inline"]),
-                    "inbrowser": gr.Checkbox(label="inbrowser: Automatically launch in a new tab",
-                                             value=gradio_interface_options["inbrowser"]),
-                    "share": gr.Checkbox(label="share: Create a publicly shareable link",
-                                         value=gradio_interface_options["share"]),
-                    "debug": gr.Checkbox(label="debug: Block the main thread from running",
-                                         value=gradio_interface_options["debug"]),
-                    "enable_queue": gr.Checkbox(label="enable_queue: Serve inference requests through a queue",
-                                                value=gradio_interface_options["enable_queue"]),
-                    "max_threads": gr.Slider(minimum=1, maximum=100, step=1,
-                                             label="max_threads: Maximum number of total threads",
-                                             value=gradio_interface_options["max_threads"]),
-                    "auth": gr.Textbox(label="auth: Username and password required to access interface",
-                                       value=gradio_interface_options["auth"]),
-                    "auth_message": gr.Textbox(label="auth_message: HTML message provided on login page",
-                                               value=gradio_interface_options["auth_message"]),
+                gradio_interface_options_ui: Dict[
+                    str, gr.Checkbox | gr.Slider | gr.Textbox
+                ] = {
+                    "inline": gr.Checkbox(
+                        label="inline: Display inline in an iframe",
+                        value=gradio_interface_options["inline"],
+                    ),
+                    "inbrowser": gr.Checkbox(
+                        label="inbrowser: Automatically launch in a new tab",
+                        value=gradio_interface_options["inbrowser"],
+                    ),
+                    "share": gr.Checkbox(
+                        label="share: Create a publicly shareable link",
+                        value=gradio_interface_options["share"],
+                    ),
+                    "debug": gr.Checkbox(
+                        label="debug: Block the main thread from running",
+                        value=gradio_interface_options["debug"],
+                    ),
+                    "enable_queue": gr.Checkbox(
+                        label="enable_queue: Serve inference requests through a queue",
+                        value=gradio_interface_options["enable_queue"],
+                    ),
+                    "max_threads": gr.Slider(
+                        minimum=1,
+                        maximum=100,
+                        step=1,
+                        label="max_threads: Maximum number of total threads",
+                        value=gradio_interface_options["max_threads"],
+                    ),
+                    "auth": gr.Textbox(
+                        label="auth: Username and password required to access interface",
+                        value=gradio_interface_options["auth"],
+                    ),
+                    "auth_message": gr.Textbox(
+                        label="auth_message: HTML message provided on login page",
+                        value=gradio_interface_options["auth_message"],
+                    ),
                     "prevent_thread_lock": gr.Checkbox(
                         label="prevent_thread_lock: Block the main thread while the server is running",
-                        value=gradio_interface_options["prevent_thread_lock"]),
-                    "show_error": gr.Checkbox(label="show_error: Display errors in an alert modal",
-                                              value=gradio_interface_options["show_error"]),
-                    "server_name": gr.Textbox(label="server_name: Make app accessible on local network",
-                                              value=gradio_interface_options["server_name"]),
-                    "server_port": gr.Textbox(label="server_port: Start gradio app on this port",
-                                              value=gradio_interface_options["server_port"]),
-                    "show_tips": gr.Checkbox(label="show_tips: Show tips about new Gradio features",
-                                             value=gradio_interface_options["show_tips"]),
-                    "height": gr.Slider(minimum=100, maximum=1000, step=10,
-                                        label="height: Height in pixels of the iframe element",
-                                        value=gradio_interface_options["height"]),
-                    "width": gr.Slider(minimum=100, maximum=1000, step=10,
-                                       label="width: Width in pixels of the iframe element",
-                                       value=gradio_interface_options["width"]),
+                        value=gradio_interface_options["prevent_thread_lock"],
+                    ),
+                    "show_error": gr.Checkbox(
+                        label="show_error: Display errors in an alert modal",
+                        value=gradio_interface_options["show_error"],
+                    ),
+                    "server_name": gr.Textbox(
+                        label="server_name: Make app accessible on local network",
+                        value=gradio_interface_options["server_name"],
+                    ),
+                    "server_port": gr.Textbox(
+                        label="server_port: Start gradio app on this port",
+                        value=gradio_interface_options["server_port"],
+                    ),
+                    "show_tips": gr.Checkbox(
+                        label="show_tips: Show tips about new Gradio features",
+                        value=gradio_interface_options["show_tips"],
+                    ),
+                    "height": gr.Slider(
+                        minimum=100,
+                        maximum=1000,
+                        step=10,
+                        label="height: Height in pixels of the iframe element",
+                        value=gradio_interface_options["height"],
+                    ),
+                    "width": gr.Slider(
+                        minimum=100,
+                        maximum=1000,
+                        step=10,
+                        label="width: Width in pixels of the iframe element",
+                        value=gradio_interface_options["width"],
+                    ),
                     "favicon_path": gr.Textbox(
                         label="favicon_path: Path to a file (.png, .gif, or .ico) to use as the favicon",
-                        value=gradio_interface_options["favicon_path"]),
+                        value=gradio_interface_options["favicon_path"],
+                    ),
                     "ssl_keyfile": gr.Textbox(
                         label="ssl_keyfile: Path to a file to use as the private key file to create a local server "
-                              "running on https",
-                        value=gradio_interface_options["ssl_keyfile"]),
+                        "running on https",
+                        value=gradio_interface_options["ssl_keyfile"],
+                    ),
                     "ssl_certfile": gr.Textbox(
                         label="ssl_certfile: Path to a file to use as the signed certificate for https",
-                        value=gradio_interface_options["ssl_certfile"]),
+                        value=gradio_interface_options["ssl_certfile"],
+                    ),
                     "ssl_keyfile_password": gr.Textbox(
                         label="ssl_keyfile_password: Password to use with the ssl certificate for https",
-                        value=gradio_interface_options["ssl_keyfile_password"]),
-                    "ssl_verify": gr.Checkbox(label="ssl_verify: Skip certificate validation",
-                                              value=gradio_interface_options["ssl_verify"]),
-                    "quiet": gr.Checkbox(label="quiet: Suppress most print statements",
-                                         value=gradio_interface_options["quiet"]),
-                    "show_api": gr.Checkbox(label="show_api: Show the api docs in the footer of the app",
-                                            value=gradio_interface_options["show_api"]),
+                        value=gradio_interface_options["ssl_keyfile_password"],
+                    ),
+                    "ssl_verify": gr.Checkbox(
+                        label="ssl_verify: Skip certificate validation",
+                        value=gradio_interface_options["ssl_verify"],
+                    ),
+                    "quiet": gr.Checkbox(
+                        label="quiet: Suppress most print statements",
+                        value=gradio_interface_options["quiet"],
+                    ),
+                    "show_api": gr.Checkbox(
+                        label="show_api: Show the api docs in the footer of the app",
+                        value=gradio_interface_options["show_api"],
+                    ),
                     "file_directories": gr.Textbox(
                         label="file_directories: List of directories that gradio is allowed to serve files from",
-                        value=gradio_interface_options["file_directories"]),
-                    "_frontend": gr.Checkbox(label="_frontend: Frontend", value=gradio_interface_options["_frontend"]),
+                        value=gradio_interface_options["file_directories"],
+                    ),
+                    "_frontend": gr.Checkbox(
+                        label="_frontend: Frontend",
+                        value=gradio_interface_options["_frontend"],
+                    ),
                 }
 
                 # Create an input list of all UI elements
@@ -112,6 +166,5 @@ def settings_tab_gradio(save_config: Callable[[], None], reload_config_and_resta
                 )
 
                 reload_config_and_restart_ui_button.click(
-                    fn=reload_config_and_restart_ui,
-                    _js="window.location.reload();"
+                    fn=reload_config_and_restart_ui, _js="window.location.reload();"
                 )

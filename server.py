@@ -21,26 +21,27 @@ dotenv_init.init()
 
 
 def load_models(
+    text_use_gpu,
+    text_use_small,
+    coarse_use_gpu,
+    coarse_use_small,
+    fine_use_gpu,
+    fine_use_small,
+    codec_use_gpu,
+):
+    save_config_bark(
         text_use_gpu,
         text_use_small,
         coarse_use_gpu,
         coarse_use_small,
         fine_use_gpu,
         fine_use_small,
-        codec_use_gpu
-):
-    save_config_bark(text_use_gpu,
-                     text_use_small,
-                     coarse_use_gpu,
-                     coarse_use_small,
-                     fine_use_gpu,
-                     fine_use_small,
-                     codec_use_gpu)
+        codec_use_gpu,
+    )
     # download and load all models
     # TODO: try catch for memory errors
     model_manager.reload_models(config)
     return gr.Button.update(value="Reload models", interactive=True)
-
 
 
 def reload_config_and_restart_ui():
@@ -53,8 +54,11 @@ def reload_config_and_restart_ui():
     # demo.launch(**gradio_interface_options)
 
 
-gradio_interface_options = config[
-    "gradio_interface_options"] if "gradio_interface_options" in config else default_config
+gradio_interface_options = (
+    config["gradio_interface_options"]
+    if "gradio_interface_options" in config
+    else default_config
+)
 
 with gr.Blocks(css=full_css) as demo:
     gr.Markdown("# TTS Generation WebUI (Bark & Tortoise)")
@@ -68,7 +72,9 @@ with gr.Blocks(css=full_css) as demo:
         voices_tab(register_use_as_history_button)
 
         settings_tab_bark(config, save_config_bark, load_models)
-        settings_tab_gradio(save_config_gradio, reload_config_and_restart_ui, gradio_interface_options)
+        settings_tab_gradio(
+            save_config_gradio, reload_config_and_restart_ui, gradio_interface_options
+        )
 
 
 def print_pretty_options(options):

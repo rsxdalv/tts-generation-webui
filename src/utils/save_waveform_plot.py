@@ -4,13 +4,13 @@ import matplotlib.figure as mpl_fig
 from matplotlib import pyplot as plt
 import numpy as np
 
-matplotlib.use('agg')
+matplotlib.use("agg")
 
 
 def save_waveform_plot(audio_array: np.ndarray, filename_png: str):
     fig = plt.figure(figsize=(10, 3))
-    plt.style.use('dark_background')
-    plt.plot(audio_array, color='orange')
+    plt.style.use("dark_background")
+    plt.plot(audio_array, color="orange")
     plt.axis("off")
     plt.savefig(filename_png)
     plt.close()
@@ -19,7 +19,7 @@ def save_waveform_plot(audio_array: np.ndarray, filename_png: str):
 
 def figure_to_image(fig: mpl_fig.Figure):
     with io.BytesIO() as buff:
-        fig.savefig(buff, format='raw')
+        fig.savefig(buff, format="raw")
         buff.seek(0)
         data = np.frombuffer(buff.getvalue(), dtype=np.uint8)
     w, h = fig.canvas.get_width_height()

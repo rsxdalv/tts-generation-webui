@@ -8,6 +8,6 @@ def parse_or_set_seed(seed: Union[str, int, None], index: int) -> int:
         seed = int(seed)
         if seed == -1:
             seed = generate_random_seed()
-    indexed_seed = seed + index # type: ignore
+    indexed_seed = seed + index  # type: ignore
     set_seed(indexed_seed)
     return indexed_seed

@@ -5,14 +5,12 @@ from typing import List, Any
 
 def _convert_empty_strings_to_none(dictionary: dict):
     for key, value in dictionary.items():
-        if value == '':
+        if value == "":
             dictionary[key] = None
 
 
 def _recreate_ui_dict(keys: List[str], inputs: List[Any]):
-    return {
-        keys[i]: value for i, value in enumerate(inputs)
-    }
+    return {keys[i]: value for i, value in enumerate(inputs)}
 
 
 def _save_config_gradio(keys: List[str], inputs: List[Any]):

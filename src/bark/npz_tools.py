@@ -18,8 +18,13 @@ def save_npz(filename: str, full_generation: FullGeneration):
 
 def load_npz(filename: str) -> FullGeneration:
     with np.load(filename, allow_pickle=True) as data:
-        return {key: data[key] for key in data}
+        return {key: data[key] for key in data} # type: ignore
+        # return FullGeneration(**data)
 
 
 def get_npz_files():
-    return glob.glob("voices/*.npz") + glob.glob("favorites/*.npz") + glob.glob("outputs/*.npz")
+    return (
+        glob.glob("voices/*.npz")
+        + glob.glob("favorites/*.npz")
+        + glob.glob("outputs/*.npz")
+    )

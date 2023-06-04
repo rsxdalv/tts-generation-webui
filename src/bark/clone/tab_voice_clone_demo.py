@@ -1,9 +1,15 @@
 import tempfile
 from src.bark.npz_tools import save_npz
 from src.bark.FullGeneration import FullGeneration
-from models.bark_voice_cloning_hubert_quantizer.hubert.hubert_manager import HuBERTManager
-from models.bark_voice_cloning_hubert_quantizer.hubert.pre_kmeans_hubert import CustomHubert
-from models.bark_voice_cloning_hubert_quantizer.hubert.customtokenizer import CustomTokenizer
+from models.bark_voice_cloning_hubert_quantizer.hubert.hubert_manager import (
+    HuBERTManager,
+)
+from models.bark_voice_cloning_hubert_quantizer.hubert.pre_kmeans_hubert import (
+    CustomHubert,
+)
+from models.bark_voice_cloning_hubert_quantizer.hubert.customtokenizer import (
+    CustomTokenizer,
+)
 import torchaudio
 import torch
 from encodec.utils import convert_audio
@@ -46,7 +52,9 @@ def _load_tokenizer():
     tokenizer_path = HuBERTManager.make_sure_tokenizer_installed()
     global tokenizer
     if tokenizer is None:
-        tokenizer = CustomTokenizer.load_from_checkpoint('data/models/hubert/tokenizer.pth')
+        tokenizer = CustomTokenizer.load_from_checkpoint(
+            "data/models/hubert/tokenizer.pth"
+        )
         tokenizer.load_state_dict(torch.load(tokenizer_path))
     return tokenizer
 
@@ -76,7 +84,7 @@ def get_prompts(path_to_wav: str, use_gpu: bool):
 
 
 def get_encodec_prompts(path_to_wav: str, use_gpu=True):
-    device = 'cuda' if use_gpu else 'cpu'
+    device = "cuda" if use_gpu else "cpu"
     model: EncodecModel = load_codec_model(use_gpu=use_gpu)
     wav, sr = torchaudio.load(path_to_wav)
     wav = convert_audio(wav, sr, model.sample_rate, model.channels)
@@ -87,8 +95,12 @@ def get_encodec_prompts(path_to_wav: str, use_gpu=True):
     with torch.no_grad():
         encoded_frames = model.encode(wav)
 
-    fine_prompt: np.ndarray = torch.cat(
-        [encoded[0] for encoded in encoded_frames], dim=-1).squeeze().cpu().numpy()
+    fine_prompt: np.ndarray = (
+        torch.cat([encoded[0] for encoded in encoded_frames], dim=-1)
+        .squeeze()
+        .cpu()
+        .numpy()
+    )
     coarse_prompt = fine_prompt[:2, :]
     return fine_prompt, coarse_prompt
 
@@ -96,28 +108,28 @@ def get_encodec_prompts(path_to_wav: str, use_gpu=True):
 def save_cloned_voice(
     full_generation: FullGeneration,
 ):
-    voice_name = f'test_clone_voice{str(np.random.randint(100000))}'
-    filename = f'voices/{voice_name}.npz'
+    voice_name = f"test_clone_voice{str(np.random.randint(100000))}"
+    filename = f"voices/{voice_name}.npz"
     save_npz(filename, full_generation)
     return filename
 
 
 def tab_voice_clone_demo():
     with gr.Tab("Bark Voice Clone Demo"):
-        gr.Markdown("""
+        gr.Markdown(
+            """
         Unethical use of this technology is prohibited.
         This demo is based on https://github.com/gitmylo/bark-voice-cloning-HuBERT-quantizer repository.
-        """)
+        """
+        )
 
         # TODO: try with ffmpeg (except mp3)
         # file_input = gr.Audio(label="Input Audio", type="numpy", source="upload", interactive=True)
-        file_input = gr.File(label="Input Audio", file_types=[
-            ".wav"], interactive=True)
+        file_input = gr.File(label="Input Audio", file_types=[".wav"], interactive=True)
 
         use_gpu_checkbox = gr.Checkbox(label="Use GPU", value=True)
 
-        generate_voice_button = gr.Button(
-            value="Generate Voice", variant="primary")
+        generate_voice_button = gr.Button(value="Generate Voice", variant="primary")
 
         def generate_voice(wav_file_obj: tempfile._TemporaryFileWrapper, use_gpu: bool):
             if wav_file_obj is None:
@@ -128,8 +140,11 @@ def tab_voice_clone_demo():
             filename = save_cloned_voice(full_generation)
             return f"Saved: {filename}"
 
-        output = gr.Label(
-            "Output will appear here after input", type="auto")
+        output = gr.Label("Output will appear here after input", type="auto")
 
-        generate_voice_button.click(fn=generate_voice, inputs=[
-            file_input, use_gpu_checkbox], outputs=output, preprocess=True)
+        generate_voice_button.click(
+            fn=generate_voice,
+            inputs=[file_input, use_gpu_checkbox],
+            outputs=output,
+            preprocess=True,
+        )
