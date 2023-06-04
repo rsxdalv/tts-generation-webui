@@ -44,13 +44,13 @@ def generate(prompt, history_setting, language=None, speaker_id=0, useV2=False, 
         "output_full": True
     }
 
+    # log_generation(
+    #     history_prompt_verbal=history_prompt_verbal,
+    #     final_gen_params=final_gen_params,
+    # )
     log_generation(
-        prompt=prompt,
-        useV2=useV2,
-        text_temp=text_temp,
-        waveform_temp=waveform_temp,
-        use_voice=use_voice,
-        history_prompt_verbal=history_prompt_verbal
+        **final_gen_params,
+        history_prompt_verbal=history_prompt_verbal,
     )
 
     indexed_seed = parse_or_set_seed(seed, index)
@@ -64,7 +64,7 @@ def generate(prompt, history_setting, language=None, speaker_id=0, useV2=False, 
         text_temp=text_temp,
         waveform_temp=waveform_temp,
         history_prompt=history_prompt,
-        indexed_seed=indexed_seed,
+        seed=indexed_seed,
         use_voice=use_voice,
         history_prompt_verbal=history_prompt_verbal,
         full_generation=full_generation,
@@ -116,7 +116,7 @@ def save_wav(audio_array, filename):
 
 
 def save_long_generation(prompt, history_setting, language, speaker_id, text_temp, waveform_temp, seed, filename,
-                         pieces, full_generation=None, history_prompt=None):
+                         pieces, full_generation, history_prompt=None):
     base_filename = create_base_filename(
         "long", "outputs", model="bark", date=get_date_string())
     audio_array = np.concatenate(pieces)
@@ -252,14 +252,14 @@ def generate_multi(count=1, outputs_ref=None):
                     json_text=_metadata
                 )
 
-            filename, filename_png, filename_npz, metadata = save_long_generation(
+            filename_long, filename_png, filename_npz, metadata = save_long_generation(
                 prompt, history_setting, language, speaker_id, text_temp, waveform_temp, seed, filename, pieces,
                 full_generation=last_piece_history, history_prompt=_original_history_prompt)
 
-            outputs.extend((filename, filename_png, gr.Button.update(
+            outputs.extend((filename_long, filename_png, gr.Button.update(
                 value="Save to favorites", visible=True), gr.Button.update(visible=True), filename_npz, seed, metadata))
             yield yield_generation(outputs_ref, i)(
-                audio=gr.Audio.update(value=filename, label="Generated audio"),
+                audio=gr.Audio.update(value=filename_long, label="Generated audio"),
                 image=filename_png,
                 save_button=gr.Button.update(
                     value="Save to favorites", visible=True),
