@@ -24,6 +24,7 @@ def generate_and_save_metadata(
     is_big_fine_model = models["fine"].config.n_embd > 768
     metadata = {
         "_version": "0.0.1",
+        "_hash_version": "0.0.2",
         # "id": generation_hash, # generation_hash is the same as history_hash but for current generation
         # "model_semantic_hash": model_semantic_hash,
         "is_big_semantic_model": is_big_semantic_model,
