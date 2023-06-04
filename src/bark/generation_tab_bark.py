@@ -181,8 +181,13 @@ def generate_multi(count=1, outputs_ref=None):
             seed=None,
             ):
         history_prompt = None
+        if prompt is None or prompt == "":
+            raise Exception("Prompt is empty")
+
         print("gen", "old_generation_filename", old_generation_filename)
         if history_setting == HistorySettings.NPZ_FILE:
+            if old_generation_filename is None:
+                raise Exception("old_generation_filename is None")
             history_prompt = load_npz(old_generation_filename)
 
         _original_history_prompt = history_prompt
@@ -253,7 +258,7 @@ def generate_multi(count=1, outputs_ref=None):
                 )
 
             filename_long, filename_png, filename_npz, metadata = save_long_generation(
-                prompt, history_setting, language, speaker_id, text_temp, waveform_temp, seed, filename, pieces,
+                prompt, history_setting, language, speaker_id, text_temp, waveform_temp, seed, filename, pieces, # type: ignore
                 full_generation=last_piece_history, history_prompt=_original_history_prompt)
 
             outputs.extend((filename_long, filename_png, gr.Button.update(
@@ -403,7 +408,7 @@ def generation_tab_bark(tabs):
         def show(count):
             return [gr.Column.update(visible=count > i) for i in range(total_columns)]
 
-        def generate_button(text, count, variant=None):
+        def generate_button(text, count, variant):
             button = gr.Button(text, variant=variant)
             button.click(fn=lambda: show(count), outputs=output_cols)
             button.click(fn=generate_multi(count, output_components),
@@ -415,7 +420,7 @@ def generation_tab_bark(tabs):
                 num_columns = total_columns - i
                 generate_button(f"Generate {num_columns if num_columns > 1 else ''}",
                                 num_columns,
-                                variant="primary" if num_columns == 1 else None)
+                                variant="primary" if num_columns == 1 else "secondary")
 
         prompt.submit(fn=lambda: show(1), outputs=output_cols)
         prompt.submit(fn=generate_multi(1, output_components),
@@ -484,14 +489,13 @@ def create_components(old_generation_dropdown, history_setting, index):
     with gr.Column(visible=index == 0) as col:
         audio = gr.Audio(type="filepath", label="Generated audio",
                          elem_classes="tts-audio")
-        image = gr.Image(label="Waveform", shape=(
-            None, 100), elem_classes="tts-image")
+        image = gr.Image(label="Waveform", shape=(None, 100), elem_classes="tts-image") # type: ignore
         with gr.Row():
             save_button = gr.Button("Save to favorites", visible=False)
             continue_button = gr.Button("Use as history", visible=False)
-        npz = gr.State()
-        seed = gr.State()
-        json_text = gr.State()
+        npz = gr.State() # type: ignore
+        seed = gr.State() # type: ignore
+        json_text = gr.State() # type: ignore
 
         continue_button.click(fn=insert_npz_file, inputs=[npz], outputs=[
             old_generation_dropdown, history_setting])
