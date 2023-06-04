@@ -234,7 +234,7 @@ def generate_multi(count=1, outputs_ref=None):
                 last_piece_history = history_prompt
             for prompt_piece in prompts:
                 history_prompt = get_long_gen_history_prompt(
-                    history_setting, language, speaker_id, useV2, long_prompt_history_radio, last_piece_history)
+                    history_setting, language, speaker_id, useV2, long_prompt_history_radio, last_piece_history, history_prompt)
 
                 filename, filename_png, audio_array, last_piece_history, filename_npz, seed, _metadata = generate(
                     prompt_piece, history_setting, language, speaker_id, useV2, text_temp=text_temp,
@@ -269,19 +269,18 @@ def generate_multi(count=1, outputs_ref=None):
                 json_text=metadata
             )
         return {}
-
-    def get_long_gen_history_prompt(history_setting, language, speaker_id, useV2, long_prompt_history_radio, last_piece_history):
-        if long_prompt_history_radio == LongPromptHistorySettings.CONTINUE:
-            history_prompt = last_piece_history
-        elif long_prompt_history_radio == LongPromptHistorySettings.CONSTANT:
-            history_prompt, _ = get_history_prompt(
-                language, speaker_id, useV2, history_prompt, use_voice=history_setting == HistorySettings.VOICE)
-        elif long_prompt_history_radio == LongPromptHistorySettings.EMPTY:
-            history_prompt = None
-        return history_prompt
-
     return gen
 
+def get_long_gen_history_prompt(history_setting, language, speaker_id, useV2, long_prompt_history_radio, last_piece_history, history_prompt):
+    if long_prompt_history_radio == LongPromptHistorySettings.CONTINUE:
+        return last_piece_history
+    elif long_prompt_history_radio == LongPromptHistorySettings.CONSTANT:
+        x, _ = get_history_prompt(
+            language, speaker_id, useV2, history_prompt, use_voice=history_setting == HistorySettings.VOICE)
+        return x
+    elif long_prompt_history_radio == LongPromptHistorySettings.EMPTY:
+        return None
+    return None
 
 def generation_tab_bark(tabs):
     with gr.Tab(label="Generation (Bark)", id="generation_bark"):
