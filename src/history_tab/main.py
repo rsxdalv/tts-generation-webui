@@ -15,14 +15,16 @@ from src.bark.get_audio_from_npz import get_audio_from_npz
 
 
 def _get_row_index(evt: gr.SelectData):
-    return evt.index[0]
+    index: int | tuple[int, int] = evt.index
+    return index[0] if isinstance(index, (list, tuple)) else index
 
 
 def _get_filename(table, index):
     return table["data"][index][-1]
 
 
-def _select_audio(table, index):
+def _select_audio(table, evt: gr.SelectData):
+    index = _get_row_index(evt)
     filename = _get_filename(table, index)
     with open(filename.replace(".wav", ".json")) as f:
         json_text = json.load(f)
@@ -133,10 +135,10 @@ def history_content(register_use_as_history_button, directory, history_tab):
         }
 
     def select_audio_history(table, evt: gr.SelectData):
-        return _select_audio_history(*_select_audio(table, _get_row_index(evt)))
+        return _select_audio_history(*_select_audio(table, evt))
 
     def select_audio_history2(_list, evt: gr.SelectData, table):
-        return _select_audio_history(*_select_audio(table, evt.index))
+        return _select_audio_history(*_select_audio(table, evt))
 
     outputs = [
         history_bundle_name,
