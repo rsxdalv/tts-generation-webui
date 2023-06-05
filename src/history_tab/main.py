@@ -3,13 +3,17 @@ import gradio as gr
 
 import json
 import shutil
+from src.history_tab.collections_directories_atom import (
+    collections_directories_atom,
+    get_collections,
+)
 from src.history_tab.get_wav_files import (
     get_npz_files_voices,
     get_wav_files,
     get_wav_files_img,
 )
 from src.history_tab.delete_generation_cb import delete_generation_cb
-from src.history_tab.save_to_favorites import save_to_favorites
+from src.history_tab.save_to_favorites import save_to_collection, save_to_favorites
 from src.history_tab.open_folder import open_folder
 from src.bark.get_audio_from_npz import get_audio_from_npz
 
@@ -45,23 +49,50 @@ def save_to_voices_cb(npz_filename: str):
     return gr.Button.update(value="Saved")
 
 
-def history_tab(register_use_as_history_button, directory="outputs"):
-    with gr.Tab(directory.capitalize()) as history_tab:
-        return history_content(register_use_as_history_button, directory, history_tab)
+def history_tab(
+    register_use_as_history_button, directory="outputs", show_collections=False
+):
+    with gr.Tab(
+        show_collections and "Collections" or directory.capitalize()
+    ) as history_tab:
+        return history_content(
+            register_use_as_history_button, directory, history_tab, show_collections
+        )
 
 
-def history_content(register_use_as_history_button, directory, history_tab):
+def history_content(
+    register_use_as_history_button, directory, history_tab, show_collections
+):
+    directories = get_collections()
+    directory_dropdown = gr.Dropdown(
+        value=directory,
+        choices=directories,
+        label="Select directory of the collection",
+        visible=show_collections,
+    )
+    collections_directories_atom.change(
+        fn=lambda x: gr.Dropdown.update(choices=x),
+        inputs=[collections_directories_atom],
+        outputs=[directory_dropdown],
+    )
+
+    if show_collections:
+        create_collection_ui(collections_directories_atom)
+
     with gr.Accordion("Gallery Selector (Click to Open)", open=False):
         history_list_as_gallery = gr.Gallery(value=get_wav_files_img(directory))
         history_list_as_gallery.style(columns=8, object_fit="contain", height="auto")
     with gr.Row():
         with gr.Column():
             with gr.Row():
-                button_output = gr.Button(value=f"Open {directory} folder")
-            button_output.click(lambda: open_folder(directory))
+                button_output = gr.Button(
+                    value=f"Open {show_collections and 'collection' or directory} folder"
+                )
+            button_output.click(lambda x: open_folder(x), inputs=[directory_dropdown])
 
             datatypes = ["date", "str", "str", "str"]
-            headers = ["Date and Time", directory.capitalize(), "When", "Filename"]
+            # headers = ["Date and Time", directory.capitalize(), "When", "Filename"]
+            headers = ["Date and Time", "Name", "When", "Filename"]
 
             history_list = gr.Dataframe(
                 value=get_wav_files(directory),
@@ -117,6 +148,13 @@ def history_content(register_use_as_history_button, directory, history_tab):
                     fn=save_to_voices_cb, inputs=history_npz, outputs=save_to_voices
                 )
 
+            save_to_collection_ui(
+                directory,
+                directories,
+                history_bundle_name_data,
+                collections_directories_atom,
+            )
+
     def _select_audio_history(filename, json_text):
         return {
             history_bundle_name: gr.Textbox.update(value=os.path.dirname(filename)),
@@ -168,7 +206,7 @@ def history_content(register_use_as_history_button, directory, history_tab):
         preprocess=False,
     )
 
-    def update_history_tab():
+    def update_history_tab(directory):
         return [
             gr.Dataframe.update(value=get_wav_files(directory)),
             gr.Gallery.update(value=get_wav_files_img(directory)),
@@ -180,11 +218,68 @@ def history_content(register_use_as_history_button, directory, history_tab):
     )
     delete_from_history.click(
         fn=delete_generation_cb(update_history_tab),
-        inputs=history_bundle_name_data,
+        inputs=[history_bundle_name_data, directory_dropdown],
         outputs=[history_list, history_list_as_gallery],
     )
     history_tab.select(
-        fn=update_history_tab, outputs=[history_list, history_list_as_gallery]
+        fn=update_history_tab,
+        inputs=[directory_dropdown],
+        outputs=[history_list, history_list_as_gallery],
+    )
+
+    directory_dropdown.change(
+        fn=update_history_tab,
+        inputs=[directory_dropdown],
+        outputs=[history_list, history_list_as_gallery],
+    )
+
+
+def save_to_collection_ui(
+    directory: str,
+    directories: list[str],
+    history_bundle_name_data: gr.State,
+    directories_state: gr.JSON,
+):
+    with gr.Row():
+        move_to_collection = gr.Dropdown(
+            label="Save to collection",
+            choices=directories,
+            value=directory,
+        )
+
+    move_to_collection.select(
+        fn=save_to_collection,
+        inputs=[history_bundle_name_data, move_to_collection],
+        outputs=[move_to_collection],
+    )
+
+    directories_state.change(
+        fn=lambda x: gr.Dropdown.update(choices=x),
+        inputs=[directories_state],
+        outputs=[move_to_collection],
+    )
+
+
+def create_collection_ui(directories_state):
+    new_collection_name = gr.Textbox(label="New collection name", value="")
+
+    def create_collection(new_collection_name):
+        os.makedirs(os.path.join("collections", new_collection_name))
+        return [
+            get_collections(),
+            gr.Button.update(value="Created"),
+        ]
+
+    create_collection_button = gr.Button(value="Create collection")
+
+    new_collection_name.change(
+        fn=lambda: gr.Button.update(value="Create collection"),
+        outputs=[create_collection_button],
+    )
+    create_collection_button.click(
+        fn=create_collection,
+        inputs=[new_collection_name],
+        outputs=[directories_state, create_collection_button],
     )
 
 
