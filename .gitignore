@@ -9,6 +9,7 @@ config.json
 outputs/
 favorites/
 voices/
+collections/
 
 # Ignore model checkpoints
 data/

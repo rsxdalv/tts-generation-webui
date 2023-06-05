@@ -3,6 +3,7 @@ from src.css.css import full_css
 import src.utils.setup_or_recover as setup_or_recover
 import src.utils.dotenv_init as dotenv_init
 
+from src.history_tab.collections_directories_atom import collections_directories_atom
 from src.config.save_config_bark import save_config_bark
 from src.config.save_config_gradio import save_config_gradio
 from src.tortoise.generation_tab_tortoise import generation_tab_tortoise
@@ -67,8 +68,10 @@ with gr.Blocks(css=full_css) as demo:
         tab_voice_clone_demo()
         generation_tab_tortoise()
 
+        collections_directories_atom.render()
         history_tab(register_use_as_history_button)
         history_tab(register_use_as_history_button, directory="favorites")
+        history_tab(register_use_as_history_button, directory="outputs", show_collections=True)
         voices_tab(register_use_as_history_button)
 
         settings_tab_bark(config, save_config_bark, load_models)

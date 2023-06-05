@@ -37,6 +37,7 @@ This code requires the following dependencies:
 ## Changelog
 June 5:
 * Fix "Save to Favorites" button on bark generation page, clean up console (v4.1.1)
+* Add "Collections" tab for managing several different data sets and easier curration.
 
 June 4:
 * Update to v4.1 - improved hash function, code improvements
