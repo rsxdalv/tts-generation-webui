@@ -14,7 +14,7 @@ def ndarray_to_base64(arr):
     # Convert ndarray to bytes
     arr_bytes = arr.tobytes()
     # Encode bytes to base64
-    return base64.b64encode(arr_bytes).decode('utf-8')
+    return base64.b64encode(arr_bytes).decode("utf-8")
 
 
 def decode_base64_to_ndarray(base64_string):
@@ -25,40 +25,43 @@ def decode_base64_to_ndarray(base64_string):
 
 
 def callback_save_generation(
-        # full_generation: FullGeneration,
-        full_generation: Any,
-        audio_array: np.ndarray,
-        files: Dict[str, str],
-        metadata: Dict[str, Any]
+    # full_generation: FullGeneration,
+    full_generation: Any,
+    audio_array: np.ndarray,
+    files: Dict[str, str],
+    metadata: Dict[str, Any],
 ) -> None:
     print("Saving generation to", files.get("ogg"))
 
-    attach_generation_meta(
-        full_generation, "semantic_prompt", metadata
-    )
-    attach_generation_meta(
-        full_generation, "coarse_prompt", metadata
-    )
+    attach_generation_meta(full_generation, "semantic_prompt", metadata)
+    attach_generation_meta(full_generation, "coarse_prompt", metadata)
     filename = files.get("ogg")
     input_data = audio_array.tobytes()
     metadata_str = json.dumps(metadata)
 
     args = (
-        ffmpeg.input('pipe:', format='f32le', ar=str(SAMPLE_RATE))
+        ffmpeg.input("pipe:", format="f32le", ar=str(SAMPLE_RATE))
         .output(
-            filename, format='ogg', metadata=f"comment={metadata_str}"
+            filename,
+            format="ogg",
+            metadata=f"comment={metadata_str}",
+            loglevel="error",
         )
         .overwrite_output()
         .get_args()
     )
-    p = subprocess.Popen(['ffmpeg'] + args, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+    p = subprocess.Popen(["ffmpeg"] + args, stdin=subprocess.PIPE)
     output_data = p.communicate(input=input_data)[0]
-    print(output_data)
     # wait for the subprocess to exit
     p.wait()
-    print(p.returncode)
-
-    print("Saved generation to", files.get("ogg"))
+    # print(p.returncode)
+    # Show if success
+    if p.returncode == 0:
+        print("Saved generation to", files.get("ogg"))
+    else:
+        print("Failed to save generation to", files.get("ogg"))
+        print("ffmpeg args:", args)
+        print(output_data)
 
 
 def attach_generation_meta(full_generation, arg1, metadata):

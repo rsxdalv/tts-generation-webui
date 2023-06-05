@@ -233,18 +233,36 @@ def save_long_generation(
 
 def yield_generation(outputs_ref, i):
     output_for_yield = outputs_ref[i]
+    (
+        audio_,
+        image_,
+        save_button_,
+        continue_button_,
+        npz_,
+        seed_,
+        json_text_,
+        history_bundle_name_data_,
+    ) = output_for_yield
 
     def return_for_yield(
-        audio, image, save_button, continue_button, npz, seed, json_text
+        audio,
+        image,
+        save_button,
+        continue_button,
+        npz,
+        seed,
+        json_text,
+        history_bundle_name_data,
     ):
         return {
-            output_for_yield[0]: audio,
-            output_for_yield[1]: image,
-            output_for_yield[2]: save_button,
-            output_for_yield[3]: continue_button,
-            output_for_yield[4]: npz,
-            output_for_yield[5]: seed,
-            output_for_yield[6]: json_text,
+            audio_: audio,
+            image_: image,
+            save_button_: save_button,
+            continue_button_: continue_button,
+            npz_: npz,
+            seed_: seed,
+            json_text_: json_text,
+            history_bundle_name_data_: history_bundle_name_data,
         }
 
     return return_for_yield
@@ -285,6 +303,7 @@ def generate_multi(count=1, outputs_ref=None):
                 npz=None,
                 seed=None,
                 json_text=None,
+                history_bundle_name_data=None,
             )
 
         _original_seed = seed
@@ -325,6 +344,7 @@ def generate_multi(count=1, outputs_ref=None):
                     npz=filename_npz,
                     seed=seed,
                     json_text=metadata,
+                    history_bundle_name_data=os.path.dirname(filename),
                 )
             return {}
 
@@ -386,6 +406,7 @@ def generate_multi(count=1, outputs_ref=None):
                     npz=filename_npz,
                     seed=seed,
                     json_text=_metadata,
+                    history_bundle_name_data=os.path.dirname(filename),
                 )
 
             filename_long, filename_png, filename_npz, metadata = save_long_generation(
@@ -396,8 +417,8 @@ def generate_multi(count=1, outputs_ref=None):
                 text_temp,
                 waveform_temp,
                 seed,
-                filename,
-                pieces,  # type: ignore
+                filename,  # type: ignore
+                pieces,
                 full_generation=last_piece_history,
                 history_prompt=_original_history_prompt,
             )
@@ -421,6 +442,7 @@ def generate_multi(count=1, outputs_ref=None):
                 npz=filename_npz,
                 seed=seed,
                 json_text=metadata,
+                history_bundle_name_data=os.path.dirname(filename_long),
             )
         return {}
 
@@ -716,6 +738,7 @@ def create_components(old_generation_dropdown, history_setting, index):
         npz = gr.State()  # type: ignore
         seed = gr.State()  # type: ignore
         json_text = gr.State()  # type: ignore
+        history_bundle_name_data = gr.State()  # type: ignore
 
         continue_button.click(
             fn=insert_npz_file,
@@ -723,11 +746,22 @@ def create_components(old_generation_dropdown, history_setting, index):
             outputs=[old_generation_dropdown, history_setting],
         )
         save_button.click(
-            fn=save_to_favorites, inputs=[json_text], outputs=[save_button]
+            fn=save_to_favorites,
+            inputs=[history_bundle_name_data],
+            outputs=[save_button],
         )
 
         return (
-            [audio, image, save_button, continue_button, npz, seed, json_text],
+            [
+                audio,
+                image,
+                save_button,
+                continue_button,
+                npz,
+                seed,
+                json_text,
+                history_bundle_name_data,
+            ],
             col,
             seed,
         )
