@@ -1,0 +1,341 @@
+import hashlib
+import json
+from typing import Union
+from src.bark.npz_tools import load_npz
+from src.bark.FullGeneration import FullGeneration
+import os
+
+
+def history_to_hash(npz: Union[None, str, FullGeneration]):
+    if npz is None:
+        return get_md5_hex(b"None")
+    if isinstance(npz, str):
+        return get_md5_hex(npz.encode("utf-8"))
+    npz_str = json.dumps(
+        {
+            "semantic_prompt": npz["semantic_prompt"].tolist(),
+            "coarse_prompt": npz["coarse_prompt"].tolist(),
+            "fine_prompt": npz["fine_prompt"].tolist(),
+        }
+    )
+    npz_as_str = npz_str.encode("utf-8")
+    return get_md5_hex(npz_as_str)
+
+
+def get_md5_hex(npz_as_str: bytes):
+    return hashlib.md5(npz_as_str).hexdigest()
+
+
+def get_all_npz_files():
+    return [
+        file
+        for file in os.listdir("./models/bark/bark/assets/prompts/")
+        if file.endswith(".npz")
+    ] + [
+        os.path.join("v2", file)
+        for file in os.listdir("./models/bark/bark/assets/prompts/v2")
+        if file.endswith(".npz")
+    ]
+
+
+def get_all_npz_hashes():
+    npz_hashes = {}
+    for file in get_all_npz_files():
+        file_agnostic = file.replace("\\", "/")
+        npz_hashes[file_agnostic] = history_to_hash(
+            load_npz(os.path.join("./models/bark/bark/assets/prompts/", file))
+        )
+
+    return npz_hashes
+
+
+cached_hashes = {
+    "announcer.npz": "7f8d7a494683049b8eab735fdea5d558",
+    "de_speaker_0.npz": "6213f01e28cd15fc3383b430fad11d67",
+    "de_speaker_1.npz": "66d00f0909a7817ed7b23f000c2fec2c",
+    "de_speaker_2.npz": "72531bb0ebd970902f62b7d79679355d",
+    "de_speaker_3.npz": "ece7eb7c432fda01b5605afaf8401323",
+    "de_speaker_4.npz": "93137c55fdfe1ebf72dfc7bf69e8493d",
+    "de_speaker_5.npz": "6142984e5ec5d864a562e757207f558a",
+    "de_speaker_6.npz": "78e421d51d9f3736f7b0669197fe406b",
+    "de_speaker_7.npz": "78d6a078993a4fefb7d547a42a74414b",
+    "de_speaker_8.npz": "751da074b18148c2ef2dd3cb33e3367b",
+    "de_speaker_9.npz": "5ca368670df2d349bad4aecffa6ec6f3",
+    "en_speaker_0.npz": "72dddbb211d7fbe509f25c86b810b1c8",
+    "en_speaker_1.npz": "be33662a1bc80c84bcbfafe7db8f6524",
+    "en_speaker_2.npz": "a39942c6012771ad97b26e037c399ab9",
+    "en_speaker_3.npz": "b35d81622b310ff3155d461b2d4c6153",
+    "en_speaker_4.npz": "f4d394da7217a8386e9725feeab30441",
+    "en_speaker_5.npz": "7ea7aec5fb7252f2ce628809373e0922",
+    "en_speaker_6.npz": "402146931126de385f86f71860c8302b",
+    "en_speaker_7.npz": "57a10b41fcb317dfc403643ccec849bc",
+    "en_speaker_8.npz": "f777b3fedd45b27047d7d7a583637dba",
+    "en_speaker_9.npz": "5231c57f0524b18a5b0baa1f9e47a5da",
+    "es_speaker_0.npz": "adf047fa3b44b8275f55d60355664e2b",
+    "es_speaker_1.npz": "71c4672848bc4bd412a946ad496baf90",
+    "es_speaker_2.npz": "e8cf27237b248c6469797bfdb8e85847",
+    "es_speaker_3.npz": "e753134dacdfd403a57f427bb23893b4",
+    "es_speaker_4.npz": "802a2bf0ab3c765a84d335ceec07cffb",
+    "es_speaker_5.npz": "72a1c7a267e183a77627d8d6523ce155",
+    "es_speaker_6.npz": "6c9b6ff87bdadd73ad873ebff08adf9f",
+    "es_speaker_7.npz": "9fc08d5fe9171af74b63ab6b366ae2a1",
+    "es_speaker_8.npz": "a68d9afc0063011452cb9c001535ebda",
+    "es_speaker_9.npz": "0c291208237438923e667285bac621a9",
+    "fr_speaker_0.npz": "412883c295e37c564a1bf727b08a173c",
+    "fr_speaker_1.npz": "7091ca66009d6fd85ad626f691fdb5f0",
+    "fr_speaker_2.npz": "14f0615903c54511e1b0cf0214a1522f",
+    "fr_speaker_3.npz": "fd16e194af5dec26a11674fac21ce0c1",
+    "fr_speaker_4.npz": "c42290c4319dd960864f201e03a86f3c",
+    "fr_speaker_5.npz": "4dfb12e679bb3ba96f7d6e23364a9fa3",
+    "fr_speaker_6.npz": "1dea8042c30dce76aaa825c2ae414b8e",
+    "fr_speaker_7.npz": "16b94b66360beee27b24097b53352539",
+    "fr_speaker_8.npz": "4ab0645ee6cd123e307ea5b95daf47b1",
+    "fr_speaker_9.npz": "c5e142af9b61ffd0c206df17e7624ed4",
+    "hi_speaker_0.npz": "0cf312c9764d918dd1742a0ef04d3b45",
+    "hi_speaker_1.npz": "1330e73df0744a489b1cd809c89f9694",
+    "hi_speaker_2.npz": "5dbcc8ba724ad8288458f98c85e6a8bf",
+    "hi_speaker_3.npz": "2b35f7e1a637e0cbf6b2e32152216215",
+    "hi_speaker_4.npz": "ddf1ebf3aa866802e59f556068e78aec",
+    "hi_speaker_5.npz": "a4dbca81fe07244f6368d93e0c47a2d4",
+    "hi_speaker_6.npz": "323122a2e16af00e7cc48705e87a1a6f",
+    "hi_speaker_7.npz": "5d47447faf1b5e368a711f4485ae1a18",
+    "hi_speaker_8.npz": "6d0fef364b0cc7029e01ac4885d53da5",
+    "hi_speaker_9.npz": "bb201c2a65794895699e6b803597605e",
+    "it_speaker_0.npz": "4c8a353ca491a37fa6fa2c8a5973ea9c",
+    "it_speaker_1.npz": "ea9174347f7741a43d82fb8b3f609e20",
+    "it_speaker_2.npz": "b52b2b40d0c613d898edd937c99c81e4",
+    "it_speaker_3.npz": "bc3d12ac792a37793cc6e9fdee48b087",
+    "it_speaker_4.npz": "5b9522b9405df47723aa7a0325461e6d",
+    "it_speaker_5.npz": "7277204d7e0a609d1c3f46398be8c334",
+    "it_speaker_6.npz": "d1f2bed59f3974124a4540f863da97a2",
+    "it_speaker_7.npz": "1fb82a64652ebb54f585f85fcf65441d",
+    "it_speaker_8.npz": "c888670f00eb2d21fd6ffea9b029bf81",
+    "it_speaker_9.npz": "5e0acbd276ac203579abcf61764d44e5",
+    "ja_speaker_0.npz": "0c5e6f1bb5014020641881269e503be6",
+    "ja_speaker_1.npz": "5e3f6b978b733bc969ebe14b51d95254",
+    "ja_speaker_2.npz": "66ee8387d8df6689db442e7f5c37b553",
+    "ja_speaker_3.npz": "5ce0aa459183f08578dd10caec3e585f",
+    "ja_speaker_4.npz": "34a93f72700190804f5709d92d6cda43",
+    "ja_speaker_5.npz": "df4cbe5bde28ac6f326acbda4cdec606",
+    "ja_speaker_6.npz": "e6c011a9c6f922b6e4b3f9d040df8787",
+    "ja_speaker_7.npz": "492a4d864d273a5458ebd4ffa768d7a1",
+    "ja_speaker_8.npz": "dd5a16f47a603bbb9684d1aa7d61c7a1",
+    "ja_speaker_9.npz": "31ae25aa461d28619f8a35894b83001a",
+    "ko_speaker_0.npz": "621e0ee3c86222fea9fddf9d6fe60e5b",
+    "ko_speaker_1.npz": "1232e7fe1700f0dc413db916d8380470",
+    "ko_speaker_2.npz": "aa243ab97dd6629b89ad3340c726558a",
+    "ko_speaker_3.npz": "8d4a3be7190b6466487a4fbaeee5948a",
+    "ko_speaker_4.npz": "a3226afe560260790870282787d57b88",
+    "ko_speaker_5.npz": "e89e99e14721f4731c2641d3ab4c532d",
+    "ko_speaker_6.npz": "4c897888089cdf73368f37be76a36874",
+    "ko_speaker_7.npz": "d175acedd12a7edf24e59305e23e1378",
+    "ko_speaker_8.npz": "89a16e1d090b4b298eda56e14f297a6e",
+    "ko_speaker_9.npz": "97e00b5f7766d073d60a7a0c283f7e38",
+    "pl_speaker_0.npz": "a5dcc94819038aa44d41ce3c35913192",
+    "pl_speaker_1.npz": "056633e08bd428e4966b4741b9bbd6c4",
+    "pl_speaker_2.npz": "dccc38407418fc63298d1a7f2eb0236a",
+    "pl_speaker_3.npz": "b4a9798bf47a36fc07e707a6d28c8f56",
+    "pl_speaker_4.npz": "cee791e2c1afea5fe643d03111385634",
+    "pl_speaker_5.npz": "a458a113dd520160d093d8afd2b84fea",
+    "pl_speaker_6.npz": "ba585e9fdb5ecdc47c226c1e6a5139a2",
+    "pl_speaker_7.npz": "36c879b7c830030abdc0fd596199d9e8",
+    "pl_speaker_8.npz": "d4ee53e732733a9b631a94ad8285acae",
+    "pl_speaker_9.npz": "b5882bfd995562a1de8f5802fe3e36f8",
+    "pt_speaker_0.npz": "068f4b1754179993e3b461caccd40a96",
+    "pt_speaker_1.npz": "427574432e64a030cbfa18c6982205e0",
+    "pt_speaker_2.npz": "dfcc1ae843dd61e20250478d36b659e9",
+    "pt_speaker_3.npz": "37f1ab9c3fcd3cd8db15efe2f2222188",
+    "pt_speaker_4.npz": "7f3546a21dd5a3bb474312826faa334c",
+    "pt_speaker_5.npz": "6f855cd75f24c7b2658840a72c7b6eb4",
+    "pt_speaker_6.npz": "b75936a508a6310fc7ac39041f8373f9",
+    "pt_speaker_7.npz": "85dc661d572cb15443632cc4448636fa",
+    "pt_speaker_8.npz": "23212043b394be1d24d113bf6f9ed236",
+    "pt_speaker_9.npz": "ffb844d309e78831cb612490a4b9373c",
+    "ru_speaker_0.npz": "f1ac63229c015c44700ed607ff53494c",
+    "ru_speaker_1.npz": "35e32a05d19eb7988063381c2cc5ed07",
+    "ru_speaker_2.npz": "810bb94d86b18246ba2884ef023f187c",
+    "ru_speaker_3.npz": "ba070b9db125ce2944d3a797ee825de0",
+    "ru_speaker_4.npz": "ebf2688aaa640ec9b6a0498c92bf857c",
+    "ru_speaker_5.npz": "c6bb4818670ee9a59f0193afd7f26964",
+    "ru_speaker_6.npz": "2a4722c492651a8e7953803fec129cae",
+    "ru_speaker_7.npz": "1dca2cd001821365dced346ee6fa7e9c",
+    "ru_speaker_8.npz": "d11607536edf511608f9386497599789",
+    "ru_speaker_9.npz": "0ecd837154c9b104e3ddc7983681ffe7",
+    "speaker_0.npz": "d3ca6c82247d718081ca5457573d97bf",
+    "speaker_1.npz": "0c6a86c9cdd818dd03c40f649a6a9829",
+    "speaker_2.npz": "73fe4375ed53b15dffa55dcf7b1910c1",
+    "speaker_3.npz": "79942272ef5760211ca004239e0cf2c6",
+    "speaker_4.npz": "9c886af59ff6c46b968bab5c894c6032",
+    "speaker_5.npz": "db2b891b3abc2844ba5f19f57f6bb7df",
+    "speaker_6.npz": "efd6ff2a93de963fa276231d5a5563e9",
+    "speaker_7.npz": "6247eb2d2b4f3c6090844232dbb93ebb",
+    "speaker_8.npz": "fe9d9aa834438ad49f38c9dd5657c31c",
+    "speaker_9.npz": "156105048184b791e531213c056ff8a4",
+    "tr_speaker_0.npz": "2804d28e41b5e71914bfb926b0e755f2",
+    "tr_speaker_1.npz": "08865f2a1819b61408612f72a7ce11fe",
+    "tr_speaker_2.npz": "0c675cdca8b3a93757b3af52f6607edf",
+    "tr_speaker_3.npz": "fc326998c263ea6b6bfdbd0b6281d7be",
+    "tr_speaker_4.npz": "f7adc4aad74eba8aa22ed3bd5ceb48a6",
+    "tr_speaker_5.npz": "21175468ba93e8dc8f9a9662a3f661a1",
+    "tr_speaker_6.npz": "399b1b852dec824c6aa65eb758039591",
+    "tr_speaker_7.npz": "a2b7e0d91441e24eb74a877a16dc9062",
+    "tr_speaker_8.npz": "35490149603a1b71bf5752b0678f52f9",
+    "tr_speaker_9.npz": "b174dd311bb9a8f6ae2371393c53f3a9",
+    "zh_speaker_0.npz": "d3ca6c82247d718081ca5457573d97bf",
+    "zh_speaker_1.npz": "0c6a86c9cdd818dd03c40f649a6a9829",
+    "zh_speaker_2.npz": "73fe4375ed53b15dffa55dcf7b1910c1",
+    "zh_speaker_3.npz": "79942272ef5760211ca004239e0cf2c6",
+    "zh_speaker_4.npz": "9c886af59ff6c46b968bab5c894c6032",
+    "zh_speaker_5.npz": "db2b891b3abc2844ba5f19f57f6bb7df",
+    "zh_speaker_6.npz": "efd6ff2a93de963fa276231d5a5563e9",
+    "zh_speaker_7.npz": "6247eb2d2b4f3c6090844232dbb93ebb",
+    "zh_speaker_8.npz": "fe9d9aa834438ad49f38c9dd5657c31c",
+    "zh_speaker_9.npz": "156105048184b791e531213c056ff8a4",
+    "v2/de_speaker_0.npz": "63af51caa8a179e32cb0ad49b6a1df89",
+    "v2/de_speaker_1.npz": "156002ffa93f162c7633967f8ef6b4a5",
+    "v2/de_speaker_2.npz": "b79083387745aa1cfcf133ec022c614b",
+    "v2/de_speaker_3.npz": "af355fbe21bd4b50cc62f3adc0e6f0ff",
+    "v2/de_speaker_4.npz": "0dd6fec6f304ad84d15883a112ae256a",
+    "v2/de_speaker_5.npz": "0d0f944b905f39bdf6e5185bf254a457",
+    "v2/de_speaker_6.npz": "7f469d61a5452b27716c529076e23515",
+    "v2/de_speaker_7.npz": "24b39aef2f3f013e9a3eac7cd3ebf51b",
+    "v2/de_speaker_8.npz": "cd3208f2d21342864317bf5dd970e645",
+    "v2/de_speaker_9.npz": "f50b4c0bcd240dbd4d9dbb0bf3d73b2a",
+    "v2/en_speaker_0.npz": "842eb3aa6ce6a1fa0cfc0503ed578a71",
+    "v2/en_speaker_1.npz": "bd48cd2c0cb78ee043909996c5b6b525",
+    "v2/en_speaker_2.npz": "081c077a0f95285ddf270ea80095e9be",
+    "v2/en_speaker_3.npz": "a1fbde072256fbcaf5194fca6028a9eb",
+    "v2/en_speaker_4.npz": "eec060e1210edd70407f26e76611528b",
+    "v2/en_speaker_5.npz": "41e7157094386a4797a39925929b00ec",
+    "v2/en_speaker_6.npz": "8d135608a3989f0dda0f211d564421cd",
+    "v2/en_speaker_7.npz": "b11b64b2897128990602c8920e5f62b2",
+    "v2/en_speaker_8.npz": "2069bb747d145e5d37bee7c23295400c",
+    "v2/en_speaker_9.npz": "7c7d26a38a58cf40689a84b992444a6d",
+    "v2/es_speaker_0.npz": "0cb24a974b1ab5764a73e839673f9941",
+    "v2/es_speaker_1.npz": "e2b572634010c47f2f6fca33d126fe2a",
+    "v2/es_speaker_2.npz": "3e8f68ea09c4d754200819f354f64925",
+    "v2/es_speaker_3.npz": "e5a9574eb10b4433828f8f166f1db710",
+    "v2/es_speaker_4.npz": "960ee188ef4528c5c7e81f84e6196607",
+    "v2/es_speaker_5.npz": "e3141a5835c96a35d6bb030b8fa8c32c",
+    "v2/es_speaker_6.npz": "3eb52ff9b5664b938575d74cf32e74c1",
+    "v2/es_speaker_7.npz": "60de78264e52dc660c8983eeef16c557",
+    "v2/es_speaker_8.npz": "56c7e6c0e4cf6d32371f162447bf0573",
+    "v2/es_speaker_9.npz": "61f55c8fdca8f3ef5fe2d3abed48a40d",
+    "v2/fr_speaker_0.npz": "379042518ae070392a698c9d995439b9",
+    "v2/fr_speaker_1.npz": "878776da9c7d35607a813bdc32332326",
+    "v2/fr_speaker_2.npz": "d36706f4e1bfd54c882db04c86d32f50",
+    "v2/fr_speaker_3.npz": "274b3be806435eeb400eceb87053968b",
+    "v2/fr_speaker_4.npz": "12ef406df7488712f134a81f385fdce1",
+    "v2/fr_speaker_5.npz": "ac5123787279c51362af1b12f5686f14",
+    "v2/fr_speaker_6.npz": "86ace71d5c381ecfefa8e4271f06cb7a",
+    "v2/fr_speaker_7.npz": "0301ddc9a4b77dcb7809047323019208",
+    "v2/fr_speaker_8.npz": "cfb822b1dc11e65b4b6b9fced08b33f7",
+    "v2/fr_speaker_9.npz": "d07c5656e41f0abac5ddfb0316232c4e",
+    "v2/hi_speaker_0.npz": "4444959d30688539ec3e03b1b994e81e",
+    "v2/hi_speaker_1.npz": "a68cd20946e0f7580ad174016ad8c721",
+    "v2/hi_speaker_2.npz": "72543c76b0bab39a6d4719bd279381c6",
+    "v2/hi_speaker_3.npz": "4b522a937e5835cbaf301a2fe6b02575",
+    "v2/hi_speaker_4.npz": "501b5ab00186495e36f17c4bb3fde5f2",
+    "v2/hi_speaker_5.npz": "57e9a67ad085bf80fa0ec38dfc1982f7",
+    "v2/hi_speaker_6.npz": "a2669235d3cd668e29097ca30adc35f7",
+    "v2/hi_speaker_7.npz": "6e35298ee4efb8cf7c7cceb2347fb645",
+    "v2/hi_speaker_8.npz": "3b094157f281c02802b0a4bebbe1a20a",
+    "v2/hi_speaker_9.npz": "5893ea14b975879bc27ba5c3f8023196",
+    "v2/it_speaker_0.npz": "ac199d5011ea5ebb18fffa6ff8a96d83",
+    "v2/it_speaker_1.npz": "e2f871a2d58643105d780eda1c5d15e5",
+    "v2/it_speaker_2.npz": "9282a8b7dfc3380705cfe8c335ff2f42",
+    "v2/it_speaker_3.npz": "77ee7e7a6465a1a6adb7f727edbeb18d",
+    "v2/it_speaker_4.npz": "60a8d752d5fbc4be37bb0be2193bbdb7",
+    "v2/it_speaker_5.npz": "46dd0742bcf99e6508742a1d7dd6e922",
+    "v2/it_speaker_6.npz": "76fa620475b8db4ef52f2132a4a2e246",
+    "v2/it_speaker_7.npz": "aa6eccbc43a6d9d0f5de942c104b490d",
+    "v2/it_speaker_8.npz": "298b8a3c8262665876422a2bc4e0be31",
+    "v2/it_speaker_9.npz": "884a7037fddd5f5b3136e398e6b9e4ea",
+    "v2/ja_speaker_0.npz": "4c5c47ee5af4c0f10659631595c4bcfa",
+    "v2/ja_speaker_1.npz": "eb0f0375fb06f925d1993fe543bb0dba",
+    "v2/ja_speaker_2.npz": "d32a7b827cbf970ce530b7fe8f95648f",
+    "v2/ja_speaker_3.npz": "7086c1e6fa5dfbb97c7c2ec4fcc1ec0b",
+    "v2/ja_speaker_4.npz": "9fb420f3851c6041cc94c9ab03a50fb5",
+    "v2/ja_speaker_5.npz": "122cf0717b29754ff7db7629d69dc348",
+    "v2/ja_speaker_6.npz": "1e9197a2e17f30e65c0d124b1bb2e2f3",
+    "v2/ja_speaker_7.npz": "a17e4ceef0fa3abbed31975ce2c2eeb8",
+    "v2/ja_speaker_8.npz": "203f058201474c82b339a750bcdf1fe0",
+    "v2/ja_speaker_9.npz": "fdd76bfbdbe1ea073c8f306d9b4fe168",
+    "v2/ko_speaker_0.npz": "3c0ea0dd59c1a9e68f8313d49e81c232",
+    "v2/ko_speaker_1.npz": "df683a1615963ec776633c7d8f0a4ebe",
+    "v2/ko_speaker_2.npz": "a7f538922f5d8ed5becc570916c3a082",
+    "v2/ko_speaker_3.npz": "a28ed4c2616560e1648a9de6a8c0c04e",
+    "v2/ko_speaker_4.npz": "22ff5423af9effb682ff6365cb9bf9dd",
+    "v2/ko_speaker_5.npz": "9111ee3be2cbcf3ce3c19c8db8af1804",
+    "v2/ko_speaker_6.npz": "e3af1256e8edfa8db2417c009cc75945",
+    "v2/ko_speaker_7.npz": "1cae984f4a1c0c6fb56f2ae63da8cca1",
+    "v2/ko_speaker_8.npz": "1401d47313ce422da4593af0a01a46b3",
+    "v2/ko_speaker_9.npz": "cf32eabaf94030f8354b887135e89f63",
+    "v2/pl_speaker_0.npz": "a20424419784f9e469114832900eb8fa",
+    "v2/pl_speaker_1.npz": "84bb28d4eae1e89f752c570db7adb61c",
+    "v2/pl_speaker_2.npz": "7240cb3ef07d1aa772dc09559f9e0f11",
+    "v2/pl_speaker_3.npz": "4ebd20a59af21728c4bff8b328b3e0da",
+    "v2/pl_speaker_4.npz": "ffcd190853a727d1a282c048051c2ed9",
+    "v2/pl_speaker_5.npz": "e82a51a680652b1ff9bf716698bd80aa",
+    "v2/pl_speaker_6.npz": "c5e258ae8b232dbfdb062c05d600ba33",
+    "v2/pl_speaker_7.npz": "ce5c75384958daef0aad1d5caf6532e6",
+    "v2/pl_speaker_8.npz": "290e890dac4150d21b25e177e52647c8",
+    "v2/pl_speaker_9.npz": "53ca0347d9875c470c22182f52b78c3a",
+    "v2/pt_speaker_0.npz": "5ce194a79f7d2e211b6514023780888d",
+    "v2/pt_speaker_1.npz": "d6c8f6bd052cd1702b9791d07a839560",
+    "v2/pt_speaker_2.npz": "c9e4db0dcb8d350516ac592ebf544304",
+    "v2/pt_speaker_3.npz": "f23d873625e6980520afbbea61035ade",
+    "v2/pt_speaker_4.npz": "77ba7695e425ed49b04fb2723378db21",
+    "v2/pt_speaker_5.npz": "7692bb35417a1b677746bd02b23e9d2a",
+    "v2/pt_speaker_6.npz": "60feb073282de8b2373a506f2cfc51d8",
+    "v2/pt_speaker_7.npz": "2ce3c3260ed8f77a6ebcb57c6ccd0921",
+    "v2/pt_speaker_8.npz": "b1759f2cdf571d0267f6cc852a889f84",
+    "v2/pt_speaker_9.npz": "5fae32750cd452301eda0644470dcbd9",
+    "v2/ru_speaker_0.npz": "acdcd0b3ceaa9b39f378e7860051cc41",
+    "v2/ru_speaker_1.npz": "31b2475889795cd1e65a87839eddd2bd",
+    "v2/ru_speaker_2.npz": "6e1a2f2102ad40dee02570abad188b98",
+    "v2/ru_speaker_3.npz": "6e15a965bd546b1c5a1e546475882c90",
+    "v2/ru_speaker_4.npz": "ad230e37adb31a115fcee99a79046f3d",
+    "v2/ru_speaker_5.npz": "c3017de522fd818dd9ce2faaa3ad0a70",
+    "v2/ru_speaker_6.npz": "91bd94f881a197251d10a5b603dba351",
+    "v2/ru_speaker_7.npz": "82ef65c57e705c5cfbd5a16b4cd5a7c0",
+    "v2/ru_speaker_8.npz": "7a3a7a39af3dae452d50934637b05f87",
+    "v2/ru_speaker_9.npz": "ae152687ae481544bed68660f4d3f1cc",
+    "v2/tr_speaker_0.npz": "cac49dfc1e9a104640aa09c1d80f8f98",
+    "v2/tr_speaker_1.npz": "07ccb66813bc7dbfa31233b00ac5165a",
+    "v2/tr_speaker_2.npz": "895e8568bc82734d81bfa9273e2c2c43",
+    "v2/tr_speaker_3.npz": "5c3a187989d0f7a79f5473b16c0eb06e",
+    "v2/tr_speaker_4.npz": "514e074be7fec4d9a854b51496064f1b",
+    "v2/tr_speaker_5.npz": "eb9d38aa488ca2ce0c3421007530a9bc",
+    "v2/tr_speaker_6.npz": "88f007be1f56322f4f521350e6b62735",
+    "v2/tr_speaker_7.npz": "30c6148bfde2400b3081c75fe4c09890",
+    "v2/tr_speaker_8.npz": "a289a791effeeb07a0a5ee430e72964f",
+    "v2/tr_speaker_9.npz": "67ff6cb8f49e0e63f4656329cfa26c1a",
+    "v2/zh_speaker_0.npz": "0f9fbb6829333893b278d202c84880ec",
+    "v2/zh_speaker_1.npz": "81651726adeeaf39a6ccfde595dcba60",
+    "v2/zh_speaker_2.npz": "56e81dccc9411809c6bbd8e1447eeaa5",
+    "v2/zh_speaker_3.npz": "9487af2b7b34077df6d89fa37d104e2f",
+    "v2/zh_speaker_4.npz": "d1cfe0dbdfc8d38c64304c8f33fa9145",
+    "v2/zh_speaker_5.npz": "8121f06f64cac3940cd77018482d2df4",
+    "v2/zh_speaker_6.npz": "a695abc00ec46ca8f319d784147a06c2",
+    "v2/zh_speaker_7.npz": "a4a53017e9dc389a9e749a8f50f2bc85",
+    "v2/zh_speaker_8.npz": "fdef458bf3a4512f6b6750243dc5b8f8",
+    "v2/zh_speaker_9.npz": "31df4c91298dc61359d610c174961ae3",
+}
+
+cached_hashes = get_all_npz_hashes()
+
+
+def get_hash_from_voice_name(voice_name):
+    return cached_hashes[voice_name.replace("\\", "/") + ".npz"]
+
+
+if __name__ == "__main__":
+    assert (
+        get_hash_from_voice_name("v2/zh_speaker_9")
+        == "31df4c91298dc61359d610c174961ae3"
+    )
+    assert (
+        get_hash_from_voice_name("v2\\zh_speaker_9")
+        == "31df4c91298dc61359d610c174961ae3"
+    )
