@@ -1,4 +1,4 @@
-# TTS Generation WebUI (Bark v2, Tortoise)
+# TTS Generation WebUI (Bark v2, MusicGen, Tortoise)
 
 ## One click installers
 
@@ -10,6 +10,7 @@
 
 This code provides a Gradio interface for generating audio from text input using the Bark TTS and Tortoise TTS models. The interface takes a text prompt as input and generates audio as output.
 
+![musicgen](./screenshots/v2/musicgen.png)
 ![generation](./screenshots/v2/generation.jpg)
 ![history](./screenshots/v2/history.jpg)
 ![Screenshot 1](./screenshots/screenshot%20(1).png)
@@ -104,3 +105,7 @@ This project utilizes the following open source libraries:
 - **ffmpeg-python** - [Apache 2.0 License](https://github.com/kkroening/ffmpeg-python/blob/master/LICENSE)
   - Description: Python bindings for FFmpeg library for handling multimedia files.
   - Repository: [kkroening/ffmpeg-python](https://github.com/kkroening/ffmpeg-python)
+
+- **audiocraft** - [MIT License](https://github.com/facebookresearch/audiocraft/blob/main/LICENSE)
+  - Description: A library for audio generation and MusicGen.
+  - Repository: [facebookresearch/audiocraft](https://github.com/facebookresearch/audiocraft)
