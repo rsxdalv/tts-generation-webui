@@ -140,7 +140,7 @@ def tab_voice_clone_demo():
             filename = save_cloned_voice(full_generation)
             return f"Saved: {filename}"
 
-        output = gr.Label("Output will appear here after input", type="auto")
+        output = gr.Label("Output will appear here after input")
 
         generate_voice_button.click(
             fn=generate_voice,
