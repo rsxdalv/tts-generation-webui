@@ -1,4 +1,6 @@
 import json
+from src.bark.history_to_hash import history_to_hash
+from src.bark.FullGeneration import FullGeneration
 from models.bark.bark.generation import models
 from typing import Optional
 
@@ -10,14 +12,12 @@ def generate_and_save_metadata(
     text_temp: float,
     waveform_temp: float,
     seed: int,
-    filename: str,
     date: str,
-    filename_png: str,
     filename_json: str,
     history_prompt_npz: Optional[str],
-    filename_npz: str,
     history_prompt: str,
     history_hash: str,
+    full_generation: FullGeneration,
 ):
     is_big_semantic_model = models["text"]["model"].config.n_embd > 768
     is_big_coarse_model = models["coarse"].config.n_embd > 768
@@ -25,6 +25,7 @@ def generate_and_save_metadata(
     metadata = {
         "_version": "0.0.1",
         "_hash_version": "0.0.2",
+        "_type": "bark",
         # "id": generation_hash, # generation_hash is the same as history_hash but for current generation
         # "model_semantic_hash": model_semantic_hash,
         "is_big_semantic_model": is_big_semantic_model,
@@ -35,6 +36,7 @@ def generate_and_save_metadata(
         "prompt": prompt,
         "language": language,
         "speaker_id": speaker_id,
+        "hash": history_to_hash(full_generation),
         "history_prompt": history_prompt,
         "history_prompt_npz": history_prompt_npz,
         "history_hash": history_hash,

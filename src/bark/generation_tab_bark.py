@@ -120,7 +120,6 @@ def save_generation(
     )
 
     filename, filename_png, filename_json, filename_npz = get_filenames(base_filename)
-    save_npz(filename_npz, full_generation)
     save_wav(audio_array, filename)
     plot = save_waveform_plot(audio_array, filename_png)
     filename_ogg = filename.replace(".wav", ".ogg")
@@ -133,21 +132,20 @@ def save_generation(
     history_prompt = history_prompt_verbal
 
     metadata = generate_and_save_metadata(
-        prompt,
-        language,
-        speaker_id,
-        text_temp,
-        waveform_temp,
-        seed,
-        filename,
-        date,
-        filename_png,
-        filename_json,
-        history_prompt_npz,
-        filename_npz,
-        history_prompt,
-        history_hash,
+        prompt=prompt,
+        language=language,
+        speaker_id=speaker_id,
+        text_temp=text_temp,
+        waveform_temp=waveform_temp,
+        seed=seed,
+        date=date,
+        filename_json=filename_json,
+        history_prompt_npz=history_prompt_npz,
+        history_prompt=history_prompt,
+        history_hash=history_hash,
+        full_generation=full_generation,
     )
+    save_npz(filename_npz, full_generation, metadata)
 
     ext_callback_save_generation(
         full_generation,
@@ -188,7 +186,6 @@ def save_long_generation(
 
     date = get_date_string()
     filename, filename_png, filename_json, filename_npz = get_filenames(base_filename)
-    save_npz(filename_npz, full_generation)
     write_wav(filename, SAMPLE_RATE, audio_array)
     plot = save_waveform_plot(audio_array, filename_png)
     filename_ogg = filename.replace(".wav", ".ogg")
@@ -200,21 +197,20 @@ def save_long_generation(
     history_prompt = history_setting
 
     metadata = generate_and_save_metadata(
-        prompt,
-        language,
-        speaker_id,
-        text_temp,
-        waveform_temp,
-        seed,
-        filename,
-        date,
-        filename_png,
-        filename_json,
-        history_prompt_npz,
-        filename_npz,
-        history_prompt,
-        history_hash,
+        prompt=prompt, # indicate how prompt is split, maybe as an array
+        language=language,
+        speaker_id=speaker_id,
+        text_temp=text_temp,
+        waveform_temp=waveform_temp,
+        seed=seed,
+        date=date,
+        filename_json=filename_json,
+        history_prompt_npz=history_prompt_npz,
+        history_prompt=history_prompt,
+        history_hash=history_hash,
+        full_generation=full_generation,
     )
+    save_npz(filename_npz, full_generation, metadata)
 
     ext_callback_save_generation(
         full_generation,
