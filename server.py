@@ -12,10 +12,11 @@ from src.settings_tab_gradio import settings_tab_gradio
 from src.bark.generation_tab_bark import generation_tab_bark
 from src.bark.clone.tab_voice_clone_demo import tab_voice_clone_demo
 import gradio as gr
-from src.history_tab.main import history_tab, voices_tab
+from src.history_tab.main import history_tab
 from src.model_manager import model_manager
 from src.bark.settings_tab_bark import settings_tab_bark
 from src.config.config import config
+from src.history_tab.voices_tab import voices_tab
 
 setup_or_recover.dummy()
 dotenv_init.init()
