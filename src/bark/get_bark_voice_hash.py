@@ -1,29 +1,10 @@
 import hashlib
 import json
 from typing import Union
+# from src.bark.history_to_hash import history_to_hash
 from src.bark.npz_tools import load_npz
 from src.bark.FullGeneration import FullGeneration
 import os
-
-
-def history_to_hash(npz: Union[None, str, FullGeneration]):
-    if npz is None:
-        return get_md5_hex(b"None")
-    if isinstance(npz, str):
-        return get_md5_hex(npz.encode("utf-8"))
-    npz_str = json.dumps(
-        {
-            "semantic_prompt": npz["semantic_prompt"].tolist(),
-            "coarse_prompt": npz["coarse_prompt"].tolist(),
-            "fine_prompt": npz["fine_prompt"].tolist(),
-        }
-    )
-    npz_as_str = npz_str.encode("utf-8")
-    return get_md5_hex(npz_as_str)
-
-
-def get_md5_hex(npz_as_str: bytes):
-    return hashlib.md5(npz_as_str).hexdigest()
 
 
 def get_all_npz_files():
@@ -42,14 +23,14 @@ def get_all_npz_hashes():
     npz_hashes = {}
     for file in get_all_npz_files():
         file_agnostic = file.replace("\\", "/")
-        npz_hashes[file_agnostic] = history_to_hash(
-            load_npz(os.path.join("./models/bark/bark/assets/prompts/", file))
-        )
+        # npz_hashes[file_agnostic] = history_to_hash(
+        #     load_npz(os.path.join("./models/bark/bark/assets/prompts/", file))
+        # )
 
     return npz_hashes
 
 
-cached_hashes = {
+_cached_hashes = {
     "announcer.npz": "7f8d7a494683049b8eab735fdea5d558",
     "de_speaker_0.npz": "6213f01e28cd15fc3383b430fad11d67",
     "de_speaker_1.npz": "66d00f0909a7817ed7b23f000c2fec2c",
@@ -323,7 +304,8 @@ cached_hashes = {
     "v2/zh_speaker_9.npz": "31df4c91298dc61359d610c174961ae3",
 }
 
-cached_hashes = get_all_npz_hashes()
+# cached_hashes = get_all_npz_hashes()
+cached_hashes = _cached_hashes
 
 
 def get_hash_from_voice_name(voice_name):

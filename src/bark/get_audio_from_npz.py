@@ -1,4 +1,5 @@
 from typing import Tuple
+from src.bark.FullGeneration import FullGeneration
 from models.bark.bark.generation import (
     SAMPLE_RATE,
     codec_decode,
@@ -12,6 +13,12 @@ import numpy as np
 
 def get_audio_from_npz(file_path: str) -> Tuple[int, np.ndarray]:
     full_generation = load_npz(file_path)
+    return get_audio_from_full_generation(full_generation) # type: ignore
+
+
+def get_audio_from_full_generation(
+    full_generation: FullGeneration,
+) -> Tuple[int, np.ndarray]:
     fine_prompt = full_generation["fine_prompt"]
     if "codec" not in models:
         codec_use_gpu = config["model"]["codec_use_gpu"]
