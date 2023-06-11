@@ -299,17 +299,34 @@ def generation_tab_musicgen():
                     )
                 with gr.Row():
                     topk = gr.Number(label="Top-k", value=250, interactive=True)
-                    topp = gr.Number(label="Top-p", value=0, interactive=True)
-                    temperature = gr.Number(
-                        label="Temperature", value=1.0, interactive=True
+                    topp = gr.Slider(
+                        minimum=0.0,
+                        maximum=1.5,
+                        value=0.0,
+                        label="Top-p",
+                        interactive=True,
+                        step=0.05,
                     )
-                    cfg_coef = gr.Number(
-                        label="Classifier Free Guidance", value=3.0, interactive=True
+                    temperature = gr.Slider(
+                        minimum=0.0,
+                        maximum=1.5,
+                        value=1.0,
+                        label="Temperature",
+                        interactive=True,
+                        step=0.05,
+                    )
+                    cfg_coef = gr.Slider(
+                        minimum=0.0,
+                        maximum=10.0,
+                        value=3.0,
+                        label="Classifier Free Guidance",
+                        interactive=True,
+                        step=0.1,
                     )
             with gr.Column():
                 output = gr.Audio(label="Generated Music", type="numpy")
 
-    seed = gr.Number(label="Seed", value=-1, interactive=True)
+            seed = gr.Number(label="Seed", value=-1, interactive=True)
 
     outputs = [text, melody, model, duration, topk, topp, temperature, cfg_coef, seed]
 
@@ -355,6 +372,7 @@ def generation_tab_musicgen():
         fn=predict,
         inputs=musicgen_atom,
         outputs=[output],
+        api_name="MusicGen",
     )
 
     return tab, musicgen_atom
