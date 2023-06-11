@@ -74,7 +74,9 @@ with gr.Blocks(css=full_css) as demo:
         collections_directories_atom.render()
         history_tab(register_use_as_history_button)
         history_tab(register_use_as_history_button, directory="favorites")
-        history_tab(register_use_as_history_button, directory="outputs", show_collections=True)
+        history_tab(
+            register_use_as_history_button, directory="outputs", show_collections=True
+        )
         voices_tab(register_use_as_history_button)
 
         settings_tab_bark(config, save_config_bark, load_models)
@@ -97,4 +99,6 @@ if not gradio_interface_options["enable_queue"]:
 print_pretty_options(gradio_interface_options)
 
 if __name__ == "__main__":
-    demo.launch(**gradio_interface_options)
+    demo.queue(
+        concurrency_count=gradio_interface_options.get("concurrency_count", 5),
+    ).launch(**gradio_interface_options)
