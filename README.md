@@ -1,4 +1,4 @@
-# TTS Generation WebUI (Bark v2, MusicGen, Tortoise)
+# TTS Generation WebUI (Bark v2, MusicGen, Tortoise, Vocos)
 
 ## One click installers
 
@@ -109,3 +109,7 @@ This project utilizes the following open source libraries:
 - **audiocraft** - [MIT License](https://github.com/facebookresearch/audiocraft/blob/main/LICENSE)
   - Description: A library for audio generation and MusicGen.
   - Repository: [facebookresearch/audiocraft](https://github.com/facebookresearch/audiocraft)
+
+- **vocos** - [MIT License](https://github.com/charactr-platform/vocos/blob/master/LICENSE)
+  - Description: An improved decoder for encodec samples
+  - Repository: [charactr-platform/vocos](https://github.com/charactr-platform/vocos)
