@@ -1,0 +1,11 @@
+.tts-audio > .center.boundedheight.flex {
+  padding: var(--size-2);
+  width: var(--size-full);
+  height: var(--size-14);
+  min-height: var(--size-14);
+}
+
+.tts-audio > .center.boundedheight.flex > .wrap {
+  font-size: var(--text-sm);
+  min-height: 100%;
+}

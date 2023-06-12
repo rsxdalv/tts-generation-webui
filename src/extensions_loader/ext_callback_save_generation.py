@@ -9,6 +9,7 @@ import importlib
 # callbacks_save_generation: List[CallbackSaveGeneration] = [
 # ]
 callbacks_save_generation = []
+callbacks_save_generation_musicgen = []
 extensions_folder = os.path.join(os.path.dirname(__file__), "extensions")
 
 # Get the list of files in the extensions folder
@@ -25,9 +26,19 @@ for file_name in extension_files:
             spec.loader.exec_module(module)
 
             # Retrieve the function from the module
-            callback_save_generation = getattr(module, "callback_save_generation")
+            callback_save_generation = getattr(module, "callback_save_generation", None)
 
-            callbacks_save_generation.append(callback_save_generation)
+            if callback_save_generation is not None:
+                callbacks_save_generation.append(callback_save_generation)
+
+            callback_save_generation_musicgen = getattr(
+                module, "callback_save_generation_musicgen", None
+            )
+
+            if callback_save_generation_musicgen is not None:
+                callbacks_save_generation_musicgen.append(
+                    callback_save_generation_musicgen
+                )
             print("Loaded extension:", module_name)
         except ImportError:
             print(f"Failed to import module: {module_name}")
@@ -37,7 +48,11 @@ for file_name in extension_files:
                 f"Module {module_name} does not contain the function 'callback_save_generation'"
             )
 
-print(f"Loaded {len(callbacks_save_generation)} extensions.")
+# print(f"Loaded {len(callbacks_save_generation)} extensions.")
+print(f"Loaded {len(callbacks_save_generation)} callback_save_generation extensions.")
+print(
+    f"Loaded {len(callbacks_save_generation_musicgen)} callback_save_generation_musicgen extensions."
+)
 
 
 def ext_callback_save_generation(
@@ -48,7 +63,27 @@ def ext_callback_save_generation(
     metadata: Dict[str, Any],
 ) -> None:
     for callback in callbacks_save_generation:
-        callback(full_generation, audio_array, files, metadata)
+        callback(
+            full_generation=full_generation,
+            audio_array=audio_array,
+            files=files,
+            metadata=metadata,
+        )
+
+
+def ext_callback_save_generation_musicgen(
+    audio_array: np.ndarray,
+    files: Dict[str, str],
+    metadata: Dict[str, Any],
+    SAMPLE_RATE: int,
+) -> None:
+    for callback in callbacks_save_generation_musicgen:
+        callback(
+            audio_array=audio_array,
+            files=files,
+            metadata=metadata,
+            SAMPLE_RATE=SAMPLE_RATE,
+        )
 
 
 if __name__ == "__main__":
