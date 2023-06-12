@@ -1,149 +1,25 @@
-"""
-Copyright (c) Meta Platforms, Inc. and affiliates.
-All rights reserved.
-
-This source code is licensed under the MIT license found in 
-https://github.com/facebookresearch/audiocraft/blob/main/LICENSE
-"""
-
 import torch
 import gradio as gr
 from audiocraft.models.musicgen import MusicGen
 from typing import Optional, Tuple, TypedDict
 import numpy as np
-
+import os
+from src.bark.parse_or_set_seed import parse_or_set_seed
+from src.musicgen.audio_array_to_sha256 import audio_array_to_sha256
 from src.utils.set_seed import set_seed
 
-# import all
-from src.bark.FinalGenParams import FinalGenParams
-from src.bark.history_to_hash import history_to_hash
 from src.extensions_loader.ext_callback_save_generation import (
-    ext_callback_save_generation,
+    ext_callback_save_generation_musicgen,
 )
 from src.utils.create_base_filename import create_base_filename
 from src.history_tab.save_to_favorites import save_to_favorites
-from src.bark.generate_and_save_metadata import generate_and_save_metadata
-from src.bark.generate_choice_string import generate_choice_string
 from src.bark.get_filenames import get_filenames
-from src.bark.get_history_prompt import get_history_prompt
-from src.bark.log_generation import log_generation
-from src.bark.npz_tools import get_npz_files, load_npz, save_npz
-from src.bark.parse_or_set_seed import parse_or_set_seed
-from src.bark.split_text_functions import split_by_length_simple, split_by_lines
 from src.utils.date import get_date_string
-from models.bark.bark import SAMPLE_RATE, generate_audio
 from scipy.io.wavfile import write as write_wav
-from models.bark.bark.generation import SUPPORTED_LANGS
 from src.utils.save_waveform_plot import save_waveform_plot
-from src.model_manager import model_manager
-from src.config.config import config
-from src.utils.set_seed import set_seed
-from src.bark.generation_settings import (
-    HistorySettings,
-    PromptSplitSettings,
-    LongPromptHistorySettings,
-)
-
 
 import json
-from src.bark.history_to_hash import history_to_hash
-from src.bark.FullGeneration import FullGeneration
-from models.bark.bark.generation import models
 from typing import Optional
-
-
-def generate_and_save_metadata(
-    prompt: str,
-    language: Optional[str],
-    speaker_id: Optional[int],
-    text_temp: float,
-    waveform_temp: float,
-    seed: int,
-    date: str,
-    filename_json: str,
-    history_prompt_npz: Optional[str],
-    history_prompt: str,
-    history_hash: str,
-    full_generation: FullGeneration,
-):
-    metadata = {
-        "_version": "0.0.1",
-        "_hash_version": "0.0.2",
-        "_type": "musicgen",
-        # "id": generation_hash, # generation_hash is the same as history_hash but for current generation
-        "models": {},
-        "prompt": prompt,
-        "language": language,
-        "speaker_id": speaker_id,
-        "hash": None, # TODO: add hash
-        "history_prompt": history_prompt,
-        "history_prompt_npz": history_prompt_npz,
-        "history_hash": history_hash,
-        "text_temp": text_temp,
-        "waveform_temp": waveform_temp,
-        "date": date,
-        "seed": str(seed),
-        # "files": {
-        #     "wav": filename,
-        #     "png": filename_png,
-        #     "json": filename_json,
-        #     "npz": filename_npz,
-        # },
-    }
-    with open(filename_json, "w") as outfile:
-        json.dump(metadata, outfile, indent=2)
-
-    return metadata
-
-
-def save_generation(
-    prompt,
-    language,
-    speaker_id,
-    text_temp,
-    waveform_temp,
-    history_prompt,
-    seed,
-    use_voice,
-    history_prompt_verbal,
-    full_generation,
-    audio_array,
-    SAMPLE_RATE,
-):
-    date = get_date_string()
-    base_filename = create_base_filename(
-        history_prompt_verbal, "outputs", model="musicgen", date=date
-    )
-
-    filename, filename_png, filename_json, filename_npz = get_filenames(base_filename)
-    # save_wav(audio_array, filename)
-    write_wav(filename, SAMPLE_RATE, audio_array)
-    plot = save_waveform_plot(audio_array, filename_png)
-
-    # Generate metadata for the audio file
-    language = SUPPORTED_LANGS[language][0] if use_voice else None
-    history_hash = history_to_hash(history_prompt)
-    history_prompt_npz = history_prompt if isinstance(history_prompt, str) else None
-    speaker_id = speaker_id if use_voice else None
-    history_prompt = history_prompt_verbal
-
-    metadata = generate_and_save_metadata(
-        prompt=prompt,
-        language=language,
-        speaker_id=speaker_id,
-        text_temp=text_temp,
-        waveform_temp=waveform_temp,
-        seed=seed,
-        date=date,
-        filename_json=filename_json,
-        history_prompt_npz=history_prompt_npz,
-        history_prompt=history_prompt,
-        history_hash=history_hash,
-        full_generation=full_generation,
-    )
-    # save_npz(filename_npz, full_generation, metadata)
-
-    return filename, plot, filename_npz, metadata
 
 
 class MusicGenGeneration(TypedDict):
@@ -158,6 +34,75 @@ class MusicGenGeneration(TypedDict):
     seed: int
 
 
+def melody_to_sha256(melody: Optional[Tuple[int, np.ndarray]]) -> Optional[str]:
+    if melody is None:
+        return None
+    sr, audio_array = melody
+    return audio_array_to_sha256(audio_array)
+
+
+def generate_and_save_metadata(
+    prompt: str,
+    date: str,
+    filename_json: str,
+    params: MusicGenGeneration,
+    audio_array: np.ndarray,
+):
+    metadata = {
+        "_version": "0.0.1",
+        "_hash_version": "0.0.3",
+        "_type": "musicgen",
+        "models": {},
+        "prompt": prompt,
+        "hash": audio_array_to_sha256(audio_array),
+        "date": date,
+        **params,
+        "seed": str(params["seed"]),
+        "melody": melody_to_sha256(params.get("melody", None)),
+    }
+    with open(filename_json, "w") as outfile:
+        json.dump(metadata, outfile, indent=2)
+
+    return metadata
+
+
+def save_generation(
+    prompt: str,
+    audio_array: np.ndarray,
+    SAMPLE_RATE: int,
+    params: MusicGenGeneration,
+):
+    date = get_date_string()
+    title = prompt[:20].replace(" ", "_")
+    base_filename = create_base_filename(title, "outputs", model="musicgen", date=date)
+
+    filename, filename_png, filename_json, _ = get_filenames(base_filename)
+    write_wav(filename, SAMPLE_RATE, audio_array)
+    plot = save_waveform_plot(audio_array, filename_png)
+
+    metadata = generate_and_save_metadata(
+        prompt=prompt,
+        date=date,
+        filename_json=filename_json,
+        params=params,
+        audio_array=audio_array,
+    )
+
+    filename_ogg = filename.replace(".wav", ".ogg")
+    ext_callback_save_generation_musicgen(
+        audio_array=audio_array,
+        files={
+            "wav": filename,
+            "png": filename_png,
+            "ogg": filename_ogg,
+        },
+        metadata=metadata,
+        SAMPLE_RATE=SAMPLE_RATE,
+    )
+
+    return filename, plot, _, metadata
+
+
 MODEL = None
 
 
@@ -166,11 +111,44 @@ def load_model(version):
     return MusicGen.get_pretrained(version)
 
 
-def predict(params: MusicGenGeneration):
+def setup_seed_ui():
+    gr.Markdown("Seed")
+    with gr.Row():
+        seed_input = gr.Number(value=-1, show_label=False)
+        seed_input.style(container=False)
+        set_random_seed_button = gr.Button(
+            "backspace", elem_classes="btn-sm material-symbols-outlined"
+        )
+
+        set_random_seed_button.style(size="sm")
+        set_random_seed_button.click(
+            fn=lambda: gr.Textbox.update(value="-1"), outputs=[seed_input]
+        )
+
+        set_old_seed_button = gr.Button(
+            "repeat", elem_classes="btn-sm material-symbols-outlined"
+        )
+
+        set_old_seed_button.style(size="sm")
+    return seed_input, set_old_seed_button
+
+
+def log_generation_musicgen(
+    params: MusicGenGeneration,
+):
+    print("Generating: '''", params["text"], "'''")
+    print("Parameters:")
+    for key, value in params.items():
+        print(key, ":", value)
+
+
+def predict(params: MusicGenGeneration, melody_in: Optional[Tuple[int, np.ndarray]]):
     model = params["model"]
-    melody = params["melody"]
     duration = params["duration"]
     text = params["text"]
+    # due to JSON serialization limitations
+    params["melody"] = None if model != "melody" else melody_in
+    melody = params["melody"]
 
     global MODEL
     if MODEL is None or MODEL.name != model:
@@ -187,11 +165,12 @@ def predict(params: MusicGenGeneration):
         duration=params["duration"],
     )
 
-    print("Generating...")
     import time
 
     start = time.time()
-    set_seed(params["seed"])
+
+    params["seed"] = parse_or_set_seed(params["seed"], 0)
+    log_generation_musicgen(params)
     if melody:
         sr, melody = melody[0], torch.from_numpy(melody[1]).to(
             MODEL.device
@@ -216,26 +195,24 @@ def predict(params: MusicGenGeneration):
 
     output = output.detach().cpu().numpy().squeeze()
 
-    save_generation(
+    filename, plot, filename_npz, metadata = save_generation(
         prompt=text,
-        language="en",
-        speaker_id=None,
-        text_temp=None,
-        waveform_temp=None,
-        history_prompt=None,
-        seed=params["seed"],
-        use_voice=False,
-        history_prompt_verbal=None,
-        full_generation=output,
         audio_array=output,
         SAMPLE_RATE=MODEL.sample_rate,
+        params=params,
     )
 
-    return MODEL.sample_rate, output
+    return [
+        (MODEL.sample_rate, output),
+        os.path.dirname(filename),
+        plot,
+        params["seed"],
+    ]
 
 
 musicgen_atom = gr.JSON(
-    visible=True,
+    # visible=True,
+    visible=False,
     value={
         "text": "",
         "melody": None,
@@ -251,52 +228,32 @@ musicgen_atom = gr.JSON(
 
 
 def generation_tab_musicgen():
-    with gr.Tab("Generation (MusicGen) Demo") as tab:
+    with gr.Tab("MusicGen") as tab:
         musicgen_atom.render()
-        gr.Markdown(
-            """
-            This is the demo for MusicGen, a simple and controllable model for music generation presented at: "Simple and Controllable Music Generation".
-
-            Below we present 3 model variations:
-            1. Melody -- a music generation model capable of generating music condition on text and melody inputs. **Note**, you can also use text only.
-            2. Small -- a 300M transformer decoder conditioned on text only.
-            3. Medium -- a 1.5B transformer decoder conditioned on text only.
-            4. Large -- a 3.3B transformer decoder conditioned on text only (might OOM for the longest sequences.)
-
-            When the optional melody conditioning wav is provided, the model will extract
-            a broad melody and try to follow it in the generated samples.
-
-            See [github.com/facebookresearch/audiocraft](https://github.com/facebookresearch/audiocraft)
-            for more details.
-            """
-        )
         with gr.Row():
             with gr.Column():
-                with gr.Row():
-                    text = gr.Text(label="Input Text", interactive=True)
-                    melody = gr.Audio(
-                        source="upload",
-                        type="numpy",
-                        label="Melody Condition (optional)",
-                        interactive=True,
-                    )
-                with gr.Row():
-                    submit = gr.Button("Submit")
-                with gr.Row():
-                    model = gr.Radio(
-                        ["melody", "medium", "small", "large"],
-                        label="Model",
-                        value="melody",
-                        interactive=True,
-                    )
-                with gr.Row():
-                    duration = gr.Slider(
-                        minimum=1,
-                        maximum=30,
-                        value=10,
-                        label="Duration",
-                        interactive=True,
-                    )
+                text = gr.Textbox(
+                    label="Prompt", lines=3, placeholder="Enter text here..."
+                )
+                model = gr.Radio(
+                    ["melody", "medium", "small", "large"],
+                    label="Model",
+                    value="melody",
+                )
+                melody = gr.Audio(
+                    source="upload",
+                    type="numpy",
+                    label="Melody (optional)",
+                    elem_classes="tts-audio",
+                )
+                submit = gr.Button("Generate", variant="primary")
+            with gr.Column():
+                duration = gr.Slider(
+                    minimum=1,
+                    maximum=30,
+                    value=10,
+                    label="Duration",
+                )
                 with gr.Row():
                     topk = gr.Number(label="Top-k", value=250, interactive=True)
                     topp = gr.Slider(
@@ -323,17 +280,38 @@ def generation_tab_musicgen():
                         interactive=True,
                         step=0.1,
                     )
-            with gr.Column():
-                output = gr.Audio(label="Generated Music", type="numpy")
+                seed, set_old_seed_button = setup_seed_ui()
 
-            seed = gr.Number(label="Seed", value=-1, interactive=True)
+        with gr.Column():
+            output = gr.Audio(
+                label="Generated Music",
+                type="numpy",
+                interactive=False,
+                elem_classes="tts-audio",
+            )
+            image = gr.Image(label="Waveform", shape=(None, 100), elem_classes="tts-image")  # type: ignore
+            with gr.Row():
+                history_bundle_name_data = gr.State()  # type: ignore
+                save_button = gr.Button("Save to favorites", visible=True)
+                melody_button = gr.Button("Use as melody", visible=True)
+            save_button.click(
+                fn=save_to_favorites,
+                inputs=[history_bundle_name_data],
+                outputs=[save_button],
+            )
 
-    outputs = [text, melody, model, duration, topk, topp, temperature, cfg_coef, seed]
+            melody_button.click(
+                fn=lambda melody_in: melody_in,
+                inputs=[output],
+                outputs=[melody],
+            )
+
+    inputs = [text, melody, model, duration, topk, topp, temperature, cfg_coef, seed]
 
     def update_components(x):
         return {
             text: x["text"],
-            melody: x["melody"],
+            # melody: None,  # due to JSON serialization limitations
             model: x["model"],
             duration: x["duration"],
             topk: x["topk"],
@@ -346,15 +324,15 @@ def generation_tab_musicgen():
     musicgen_atom.change(
         fn=update_components,
         inputs=musicgen_atom,
-        outputs=outputs,
+        outputs=inputs,
     )
 
     def update_json(
-        text, melody, model, duration, topk, topp, temperature, cfg_coef, seed
+        text, _melody, model, duration, topk, topp, temperature, cfg_coef, seed
     ):
         return {
             "text": text,
-            "melody": melody,
+            "melody": "exists" if _melody else "None",  # due to JSON limits
             "model": model,
             "duration": float(duration),
             "topk": int(topk),
@@ -364,14 +342,22 @@ def generation_tab_musicgen():
             "seed": int(seed),
         }
 
+    seed_cache = gr.State()  # type: ignore
+
+    set_old_seed_button.click(
+        fn=lambda x: gr.Number.update(value=x),
+        inputs=seed_cache,
+        outputs=seed,
+    )
+
     submit.click(
         fn=update_json,
-        inputs=outputs,
+        inputs=inputs,
         outputs=[musicgen_atom],
     ).then(
         fn=predict,
-        inputs=musicgen_atom,
-        outputs=[output],
+        inputs=[musicgen_atom, melody],
+        outputs=[output, history_bundle_name_data, image, seed_cache],
         api_name="MusicGen",
     )
 
