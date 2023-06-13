@@ -11,7 +11,6 @@ from src.tortoise.generation_tab_tortoise import generation_tab_tortoise
 from src.config.load_config import default_config
 from src.settings_tab_gradio import settings_tab_gradio
 from src.bark.generation_tab_bark import generation_tab_bark
-from src.bark.clone.tab_voice_clone_demo import tab_voice_clone_demo
 import gradio as gr
 from src.history_tab.main import history_tab
 from src.model_manager import model_manager
@@ -68,7 +67,14 @@ with gr.Blocks(css=full_css) as demo:
     gr.Markdown("# TTS Generation WebUI (Bark, MusicGen, Tortoise)")
     with gr.Tabs() as tabs:
         register_use_as_history_button = generation_tab_bark(tabs)
-        tab_voice_clone_demo()
+
+        try:
+            from src.bark.clone.tab_voice_clone_demo import tab_voice_clone_demo
+            tab_voice_clone_demo()
+        except Exception as e:
+            print("Failed to load voice clone demo")
+            print(e)
+
         generation_tab_musicgen()
         vocos_tab_bark()
         generation_tab_tortoise()

@@ -4,6 +4,7 @@ from audiocraft.models.musicgen import MusicGen
 from typing import Optional, Tuple, TypedDict
 import numpy as np
 import os
+from src.musicgen.setup_seed_ui_musicgen import setup_seed_ui_musicgen
 from src.bark.parse_or_set_seed import parse_or_set_seed
 from src.musicgen.audio_array_to_sha256 import audio_array_to_sha256
 from src.utils.set_seed import set_seed
@@ -109,28 +110,6 @@ MODEL = None
 def load_model(version):
     print("Loading model", version)
     return MusicGen.get_pretrained(version)
-
-
-def setup_seed_ui():
-    gr.Markdown("Seed")
-    with gr.Row():
-        seed_input = gr.Number(value=-1, show_label=False)
-        seed_input.style(container=False)
-        set_random_seed_button = gr.Button(
-            "backspace", elem_classes="btn-sm material-symbols-outlined"
-        )
-
-        set_random_seed_button.style(size="sm")
-        set_random_seed_button.click(
-            fn=lambda: gr.Textbox.update(value="-1"), outputs=[seed_input]
-        )
-
-        set_old_seed_button = gr.Button(
-            "repeat", elem_classes="btn-sm material-symbols-outlined"
-        )
-
-        set_old_seed_button.style(size="sm")
-    return seed_input, set_old_seed_button
 
 
 def log_generation_musicgen(
@@ -280,7 +259,7 @@ def generation_tab_musicgen():
                         interactive=True,
                         step=0.1,
                     )
-                seed, set_old_seed_button = setup_seed_ui()
+                seed, set_old_seed_button = setup_seed_ui_musicgen()
 
         with gr.Column():
             output = gr.Audio(

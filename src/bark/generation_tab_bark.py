@@ -3,6 +3,7 @@ import shutil
 
 import numpy as np
 import gradio as gr
+from src.bark.setup_seed_ui_bark import setup_seed_ui_bark
 from src.bark.FinalGenParams import FinalGenParams
 from src.bark.history_to_hash import history_to_hash
 from src.extensions_loader.ext_callback_save_generation import (
@@ -197,7 +198,7 @@ def save_long_generation(
     history_prompt = history_setting
 
     metadata = generate_and_save_metadata(
-        prompt=prompt, # indicate how prompt is split, maybe as an array
+        prompt=prompt,  # indicate how prompt is split, maybe as an array
         language=language,
         speaker_id=speaker_id,
         text_temp=text_temp,
@@ -578,7 +579,7 @@ def generation_tab_bark(tabs):
                     step=0.05,
                 )
                 with gr.Column():
-                    seed_input, set_old_seed_button = setup_seed_ui()
+                    seed_input, set_old_seed_button = setup_seed_ui_bark()
 
         prompt = gr.Textbox(label="Prompt", lines=3, placeholder="Enter text here...")
 
@@ -671,28 +672,6 @@ def generation_tab_bark(tabs):
         )
 
     return register_use_as_history_button
-
-
-def setup_seed_ui():
-    gr.Markdown("Seed")
-    with gr.Row():
-        seed_input = gr.Textbox(value="-1", show_label=False)
-        seed_input.style(container=False)
-        set_random_seed_button = gr.Button(
-            "backspace", elem_classes="btn-sm material-symbols-outlined"
-        )
-
-        set_random_seed_button.style(size="sm")
-        set_random_seed_button.click(
-            fn=lambda: gr.Textbox.update(value="-1"), outputs=[seed_input]
-        )
-
-        set_old_seed_button = gr.Button(
-            "repeat", elem_classes="btn-sm material-symbols-outlined"
-        )
-
-        set_old_seed_button.style(size="sm")
-    return seed_input, set_old_seed_button
 
 
 def setup_bark_voice_prompt_ui():
