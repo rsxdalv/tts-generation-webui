@@ -24,3 +24,6 @@ node_modules/
 .vscode/
 .idea/
 .sourcery.yaml
+
+# Ignore temporary Jupiter notebooks
+*.temp.ipynb
