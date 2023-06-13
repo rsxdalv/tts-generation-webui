@@ -12,7 +12,7 @@ def setup_seed_ui_musicgen():
 
         set_random_seed_button.style(size="sm")
         set_random_seed_button.click(
-            fn=lambda: gr.Textbox.update(value="-1"), outputs=[seed_input]
+            fn=lambda: gr.Number.update(value=-1), outputs=[seed_input]
         )
 
         set_old_seed_button = gr.Button(
