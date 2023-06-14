@@ -69,8 +69,9 @@ with gr.Blocks(css=full_css) as demo:
         register_use_as_history_button = generation_tab_bark(tabs)
 
         try:
-            from src.bark.clone.tab_voice_clone_demo import tab_voice_clone_demo
-            tab_voice_clone_demo()
+            from src.bark.clone.tab_voice_clone_demo import tab_voice_clone
+
+            tab_voice_clone(register_use_as_history_button)
         except Exception as e:
             print("Failed to load voice clone demo")
             print(e)
@@ -98,9 +99,7 @@ def print_pretty_options(options):
     max_key_length = max(len(key) for key in options.keys())
     for key, value in options.items():
         if key == "auth" and value is not None:
-            print(
-                f"  {key}:{' ' * (max_key_length - len(key))} {value[0]}:******"
-            )
+            print(f"  {key}:{' ' * (max_key_length - len(key))} {value[0]}:******")
         else:
             print(f"  {key}:{' ' * (max_key_length - len(key))} {value}")
 
