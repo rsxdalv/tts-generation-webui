@@ -115,8 +115,6 @@ if gradio_interface_options["auth"] is not None:
         gradio_interface_options["auth"].split(":")
     )
     print("Gradio server authentication enabled")
-    print("  Username:", gradio_interface_options["auth"][0])
-    print("  Password:", gradio_interface_options["auth"][1])
 print_pretty_options(gradio_interface_options)
 
 if __name__ == "__main__":
