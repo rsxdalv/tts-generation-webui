@@ -32,7 +32,7 @@ def upsample_to_44100(audio):
 
 
 def vocos_tab_bark():
-    with gr.Tab("Vocos (NPZ))"):
+    with gr.Tab("Vocos (NPZ)"):
         npz_file = gr.File(label="Input NPZ", file_types=[".npz"], interactive=True)
         submit = gr.Button(value="Decode")
         current = gr.Audio(label="decoded with Encodec:")
@@ -43,7 +43,7 @@ def vocos_tab_bark():
         def get_audio(npz_file_obj: tempfile._TemporaryFileWrapper):
             if npz_file_obj is None:
                 print("No file selected")
-                return None
+                return [None, None]
 
             full_generation = load_npz(npz_file_obj.name)
             return [

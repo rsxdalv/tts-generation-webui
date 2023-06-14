@@ -97,13 +97,26 @@ def print_pretty_options(options):
     print("Gradio interface options:")
     max_key_length = max(len(key) for key in options.keys())
     for key, value in options.items():
-        print(f"  {key}:{' ' * (max_key_length - len(key))} {value}")
+        if key == "auth" and value is not None:
+            print(
+                f"  {key}:{' ' * (max_key_length - len(key))} {value[0]}:******"
+            )
+        else:
+            print(f"  {key}:{' ' * (max_key_length - len(key))} {value}")
 
 
 print("Starting Gradio server...")
 if not gradio_interface_options["enable_queue"]:
     print("Warning: Gradio server queue is disabled. Automatically enabling")
     gradio_interface_options["enable_queue"] = True
+if gradio_interface_options["auth"] is not None:
+    # split username:password into (username, password)
+    gradio_interface_options["auth"] = tuple(
+        gradio_interface_options["auth"].split(":")
+    )
+    print("Gradio server authentication enabled")
+    print("  Username:", gradio_interface_options["auth"][0])
+    print("  Password:", gradio_interface_options["auth"][1])
 print_pretty_options(gradio_interface_options)
 
 if __name__ == "__main__":
