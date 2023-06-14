@@ -66,7 +66,7 @@ def settings_tab_gradio(
                         value=gradio_interface_options["max_threads"],
                     ),
                     "auth": gr.Textbox(
-                        label="auth: Username and password required to access interface",
+                        label="auth: Username and password required to access interface, username:password",
                         value=gradio_interface_options["auth"],
                     ),
                     "auth_message": gr.Textbox(
