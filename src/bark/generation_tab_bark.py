@@ -630,6 +630,7 @@ def generation_tab_bark(tabs):
 
         def generate_button(text, count, variant):
             button = gr.Button(text, variant=variant)
+            # TODO: Use then() to chain together multiple actions
             button.click(fn=lambda: show(count), outputs=output_cols)
             button.click(
                 fn=generate_multi(count, output_components),

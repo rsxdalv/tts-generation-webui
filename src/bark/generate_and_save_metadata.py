@@ -26,7 +26,6 @@ def generate_and_save_metadata(
         "_version": "0.0.1",
         "_hash_version": "0.0.2",
         "_type": "bark",
-        # "id": generation_hash, # generation_hash is the same as history_hash but for current generation
         # "model_semantic_hash": model_semantic_hash,
         "is_big_semantic_model": is_big_semantic_model,
         # "model_coarse_hash": model_coarse_hash,
