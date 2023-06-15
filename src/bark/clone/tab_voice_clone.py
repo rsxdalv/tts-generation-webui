@@ -1,8 +1,8 @@
-import tempfile
 from src.bark.history_to_hash import history_to_hash
 from src.bark.npz_tools import save_npz
 from src.bark.FullGeneration import FullGeneration
 from src.utils.date import get_date_string
+from src.bark.get_audio_from_npz import get_audio_from_full_generation
 from models.bark_voice_cloning_hubert_quantizer.hubert.hubert_manager import (
     HuBERTManager,
 )
@@ -51,24 +51,29 @@ def get_semantic_vectors(path_to_wav: str):
 tokenizer = None
 
 
-def _load_tokenizer():
-    tokenizer_path = HuBERTManager.make_sure_tokenizer_installed()
+def _load_tokenizer(
+    model: str = "quantifier_hubert_base_ls960_14.pth",
+    repo: str = "GitMylo/bark-voice-cloning",
+    force_reload: bool = False,
+) -> CustomTokenizer:
+    tokenizer_path = HuBERTManager.make_sure_tokenizer_installed(
+        model=model,
+        repo=repo,
+        local_file=model,
+    )
     global tokenizer
-    if tokenizer is None:
+    if tokenizer is None or force_reload:
         tokenizer = CustomTokenizer.load_from_checkpoint(
-            "data/models/hubert/tokenizer.pth"
+            # "data/models/hubert/tokenizer.pth"
+            tokenizer_path
         )
         tokenizer.load_state_dict(torch.load(tokenizer_path))
     return tokenizer
 
 
-def _get_semantic_tokens(semantic_vectors: torch.Tensor, tokenizer: CustomTokenizer):
-    return tokenizer.get_token(semantic_vectors)
-
-
 def get_semantic_tokens(semantic_vectors: torch.Tensor):
     tokenizer = _load_tokenizer()
-    return _get_semantic_tokens(semantic_vectors, tokenizer)
+    return tokenizer.get_token(semantic_vectors)
 
 
 def get_semantic_prompt(path_to_wav: str):
@@ -111,7 +116,7 @@ def get_encodec_prompts(path_to_wav: str, use_gpu=True):
 def save_cloned_voice(
     full_generation: FullGeneration,
 ):
-    voice_name = f"test_clone_voice{str(np.random.randint(100000))}"
+    voice_name = f"voice_from_audio_{history_to_hash(full_generation)}"
     filename = f"voices/{voice_name}.npz"
     date = get_date_string()
     metadata = generate_cloned_voice_metadata(full_generation, date)
@@ -130,41 +135,73 @@ def generate_cloned_voice_metadata(full_generation, date):
 
 
 def tab_voice_clone(register_use_as_history_button):
-    with gr.Tab("Bark Voice Clone"):
-        gr.Markdown(
+    with gr.Tab("Bark Voice Clone"), gr.Row():
+        with gr.Column():
+            gr.Markdown(
+                """
+            Unethical use of this technology is prohibited.
+            This demo is based on https://github.com/gitmylo/bark-voice-cloning-HuBERT-quantizer repository.
             """
-        Unethical use of this technology is prohibited.
-        This demo is based on https://github.com/gitmylo/bark-voice-cloning-HuBERT-quantizer repository.
-        """
-        )
+            )
+            tokenizer_dropdown = gr.Dropdown(
+                label="Tokenizer",
+                choices=[
+                    "quantifier_hubert_base_ls960.pth @ GitMylo/bark-voice-cloning",
+                    "quantifier_hubert_base_ls960_14.pth @ GitMylo/bark-voice-cloning",
+                    "quantifier_V1_hubert_base_ls960_23.pth @ GitMylo/bark-voice-cloning",
+                    "polish-HuBERT-quantizer_8_epoch.pth @ Hobis/bark-voice-cloning-polish-HuBERT-quantizer",
+                ],
+                value="quantifier_hubert_base_ls960_14.pth @ GitMylo/bark-voice-cloning",
+                interactive=True,
+            )
 
-        file_input = gr.Audio(
-            label="Input Audio",
-            type="filepath",
-            source="upload",
-            interactive=True,
-        )
+            def load_tokenizer(tokenizer_and_repo: str):
+                tokenizer, repo = tokenizer_and_repo.split(" @ ")
+                _load_tokenizer(
+                    model=tokenizer,
+                    repo=repo,
+                    force_reload=True,
+                )
+                return tokenizer_and_repo
 
-        use_gpu_checkbox = gr.Checkbox(label="Use GPU", value=True)
+            tokenizer_dropdown.change(
+                load_tokenizer,
+                inputs=[tokenizer_dropdown],
+                outputs=[tokenizer_dropdown],
+            )
 
-        generate_voice_button = gr.Button(value="Generate Voice", variant="primary")
+            file_input = gr.Audio(
+                label="Input Audio",
+                type="filepath",
+                source="upload",
+                interactive=True,
+            )
+
+            use_gpu_checkbox = gr.Checkbox(label="Use GPU", value=True)
+
+            generate_voice_button = gr.Button(value="Generate Voice", variant="primary")
+
+        with gr.Column():
+            gr.Markdown("Generated voice:")
+            voice_file_name = gr.Textbox(
+                label="Voice file name", value="", interactive=False
+            )
+
+            audio_preview = gr.Audio(label="Encodec audio preview")
+
+            use_as_history_button = gr.Button(
+                value="Use as history", variant="secondary"
+            )
 
         def generate_voice(wav_file: str, use_gpu: bool):
             full_generation = get_prompts(wav_file, use_gpu)
             filename = save_cloned_voice(full_generation)
-            return filename
-
-        gr.Markdown("Generated voice:")
-        voice_file_name = gr.Textbox(
-            label="Voice file name", value="", interactive=False
-        )
-
-        use_as_history_button = gr.Button(value="Use as history", variant="secondary")
+            return filename, get_audio_from_full_generation(full_generation)
 
         generate_voice_button.click(
             fn=generate_voice,
             inputs=[file_input, use_gpu_checkbox],
-            outputs=voice_file_name,
+            outputs=[voice_file_name, audio_preview],
             preprocess=True,
         )
 
@@ -172,3 +209,9 @@ def tab_voice_clone(register_use_as_history_button):
             use_as_history_button,
             voice_file_name,
         )
+
+
+if __name__ == "__main__":
+    with gr.Blocks() as demo:
+        tab_voice_clone(lambda *args: None)
+    demo.launch()

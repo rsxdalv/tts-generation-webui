@@ -69,7 +69,7 @@ with gr.Blocks(css=full_css) as demo:
         register_use_as_history_button = generation_tab_bark(tabs)
 
         try:
-            from src.bark.clone.tab_voice_clone_demo import tab_voice_clone
+            from src.bark.clone.tab_voice_clone import tab_voice_clone
 
             tab_voice_clone(register_use_as_history_button)
         except Exception as e:

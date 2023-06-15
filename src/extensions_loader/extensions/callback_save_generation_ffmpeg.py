@@ -37,6 +37,8 @@ def callback_save_generation(
     attach_generation_meta(full_generation, "coarse_prompt", metadata)
     filename = files.get("ogg")
     input_data = audio_array.tobytes()
+    metadata["prompt"] = double_escape_quotes(metadata["prompt"])
+    metadata["prompt"] = double_escape_newlines(metadata["prompt"])
     metadata_str = json.dumps(metadata, ensure_ascii=False)
 
     pipe_input = ffmpeg.input("pipe:", format="f32le", ar=str(SAMPLE_RATE))
@@ -93,6 +95,14 @@ comment={metadata_str}
         print("ffmpeg stderr:", output_data[1].decode("utf-8"))
 
 
+def double_escape_newlines(prompt):
+    return prompt.replace("\n", "\\\n")
+
+
+def double_escape_quotes(prompt):
+    return prompt.replace('"', '\\"')
+
+
 def attach_generation_meta(full_generation, arg1, metadata):
     semantic_prompt: np.ndarray = full_generation[arg1]
     semantic_prompt_base64 = ndarray_to_base64(semantic_prompt)
@@ -117,7 +127,8 @@ if __name__ == "__main__":
         "is_big_semantic_model": False,
         "is_big_coarse_model": False,
         "is_big_fine_model": True,
-        "prompt": "♪ これはテストです。",
+        "prompt": """♪ これはテストです。
+        "This is a test.""",
         "language": None,
         "speaker_id": None,
         "hash": "04d5509a7fd1fabda167e219812ee617",
@@ -138,3 +149,9 @@ if __name__ == "__main__":
     import json
 
     print(json.dumps(b, indent=4, sort_keys=True))
+
+    x = b["streams"][0]["tags"]["comment"]
+    print(x)
+    b = json.loads(x)
+    print(b)
+    print(b["prompt"])

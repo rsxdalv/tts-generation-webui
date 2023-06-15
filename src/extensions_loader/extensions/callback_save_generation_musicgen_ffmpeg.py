@@ -16,6 +16,8 @@ def callback_save_generation_musicgen(
 
     filename = files.get("ogg")
     input_data = audio_array.tobytes()
+    metadata["prompt"] = double_escape_quotes(metadata["prompt"])
+    metadata["prompt"] = double_escape_newlines(metadata["prompt"])
     metadata_str = json.dumps(metadata, ensure_ascii=False)
 
     pipe_input = ffmpeg.input("pipe:", format="f32le", ar=str(SAMPLE_RATE))
@@ -72,6 +74,14 @@ comment={metadata_str}
         print("ffmpeg stderr:", output_data[1].decode("utf-8"))
 
 
+def double_escape_newlines(prompt):
+    return prompt.replace("\n", "\\\n")
+
+
+def double_escape_quotes(prompt):
+    return prompt.replace('"', '\\"')
+
+
 if __name__ == "__main__":
     wav_input = "./temp/ogg-vs-npz/audio__bark__None__2023-05-29_10-12-46.wav"
     args_output = "./temp/ogg-vs-npz/audio__bark__None__2023-05-29_10-12-46.ogg"
@@ -106,3 +116,9 @@ if __name__ == "__main__":
     import json
 
     print(json.dumps(b, indent=4, sort_keys=True))
+
+    x = b["streams"][0]["tags"]["comment"]
+    print(x)
+    b = json.loads(x)
+    print(b)
+    print(b["prompt"])
