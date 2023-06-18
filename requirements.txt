@@ -4,5 +4,6 @@ gradio==3.33.1
 python-dotenv==1.0.0
 soundfile==0.12.1 # torchaudio platform windows
 # run_cmd("pip install sox") # torchaudio platform linux
-audiocraft==0.0.1 # MIT License
+# audiocraft==0.0.1 # MIT License
+audiocraft @ git+https://git@github.com/facebookresearch/audiocraft#egg=audiocraft@c9179f8 # MIT License
 vocos==0.0.2 # MIT License

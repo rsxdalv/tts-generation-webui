@@ -133,8 +133,8 @@ def predict(params: MusicGenGeneration, melody_in: Optional[Tuple[int, np.ndarra
     if MODEL is None or MODEL.name != model:
         MODEL = load_model(model)
 
-    if duration > MODEL.lm.cfg.dataset.segment_duration:  # type: ignore
-        raise gr.Error("MusicGen currently supports durations of up to 30 seconds!")
+    # if duration > MODEL.lm.cfg.dataset.segment_duration:  # type: ignore
+    #     raise gr.Error("MusicGen currently supports durations of up to 30 seconds!")
     MODEL.set_generation_params(
         use_sampling=True,
         top_k=params["topk"],
@@ -229,7 +229,7 @@ def generation_tab_musicgen():
             with gr.Column():
                 duration = gr.Slider(
                     minimum=1,
-                    maximum=30,
+                    maximum=360,
                     value=10,
                     label="Duration",
                 )
@@ -341,3 +341,10 @@ def generation_tab_musicgen():
     )
 
     return tab, musicgen_atom
+
+
+if __name__ == "__main__":
+    with gr.Blocks() as demo:
+        generation_tab_musicgen()
+
+    demo.launch()

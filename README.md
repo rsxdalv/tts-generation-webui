@@ -36,6 +36,11 @@ This code requires the following dependencies:
 
 
 ## Changelog
+June 18:
+* Update to newest audiocraft, add longer generations
+
+...
+
 June 5:
 * Fix "Save to Favorites" button on bark generation page, clean up console (v4.1.1)
 * Add "Collections" tab for managing several different data sets and easier curration.
