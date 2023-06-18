@@ -21,6 +21,9 @@ from src.utils.save_waveform_plot import save_waveform_plot
 
 import json
 from typing import Optional
+from importlib.metadata import version
+
+AUDIOCRAFT_VERSION = version("audiocraft")
 
 
 class MusicGenGeneration(TypedDict):
@@ -53,6 +56,7 @@ def generate_and_save_metadata(
         "_version": "0.0.1",
         "_hash_version": "0.0.3",
         "_type": "musicgen",
+        "_audiocraft_version": AUDIOCRAFT_VERSION,
         "models": {},
         "prompt": prompt,
         "hash": audio_array_to_sha256(audio_array),
@@ -209,6 +213,7 @@ musicgen_atom = gr.JSON(
 def generation_tab_musicgen():
     with gr.Tab("MusicGen") as tab:
         musicgen_atom.render()
+        gr.Markdown(f"""Audiocraft version: {AUDIOCRAFT_VERSION}""")
         with gr.Row():
             with gr.Column():
                 text = gr.Textbox(
