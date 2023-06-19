@@ -9,28 +9,39 @@ import torchaudio
 
 from models.tortoise.tortoise.api import TextToSpeech, MODELS_DIR
 from models.tortoise.tortoise.utils.audio import load_voices
+import gradio as gr
 
 SAMPLE_RATE = 24_000
 OUTPUT_PATH = "outputs/"
+
+MODEL = None
+
+
+def get_tts():
+    global MODEL
+    if MODEL is None:
+        MODEL = TextToSpeech(models_dir=MODELS_DIR)
+    return MODEL
 
 
 def generate_tortoise(
     text="The expressiveness of autoregressive transformers is literally nuts! I absolutely adore them.",
     voice="random",
     preset="fast",
-    model_dir=MODELS_DIR,
     candidates=3,
     seed=None,
     cvvp_amount=0.0,
 ):
     os.makedirs(OUTPUT_PATH, exist_ok=True)
 
-    tts = TextToSpeech(models_dir=model_dir)
-
-    filenames = []
+    datas = []
     voice_sel = voice.split("&") if "&" in voice else [voice]
     voice_samples, conditioning_latents = load_voices(voice_sel)
 
+    if seed == -1:
+        seed = None
+
+    tts = get_tts()
     gen, state = tts.tts_with_preset(
         text,
         k=candidates,
@@ -46,16 +57,14 @@ def generate_tortoise(
 
     if isinstance(gen, list):
         for j, g in enumerate(gen):
-            process_gen(
-                text, voice, preset, candidates, seed, cvvp_amount, filenames, g, j
-            )
+            process_gen(text, voice, preset, candidates, seed, cvvp_amount, datas, g, j)
     else:
-        process_gen(text, voice, preset, candidates, seed, cvvp_amount, filenames, gen)
-    return filenames
+        process_gen(text, voice, preset, candidates, seed, cvvp_amount, datas, gen)
+    return datas
 
 
 def process_gen(
-    text, voice, preset, candidates, seed, cvvp_amount, filenames, gen, j=0
+    text, voice, preset, candidates, seed, cvvp_amount, datas, gen, j=0
 ):
     audio_tensor = gen.squeeze(0).cpu()
 
@@ -74,11 +83,14 @@ def process_gen(
     filename_json = f"{base_filename}.json"
 
     metadata = {
+        "_version": "0.0.1",
+        "_type": model,
+        "date": date,
         "text": text,
         "voice": voice,
         "preset": preset,
         "candidates": candidates,
-        "seed": seed,
+        "seed": str(seed),
         "cvvp_amount": cvvp_amount,
     }
     import json
@@ -86,7 +98,17 @@ def process_gen(
     with open(filename_json, "w") as f:
         json.dump(metadata, f)
 
-    filenames.extend((filename, filename_png))
+    history_bundle_name_data = os.path.dirname(filename)
+
+    datas.extend(
+        (
+            filename,
+            filename_png,
+            gr.Button.update(value="Save to favorites", visible=True),
+            seed,
+            history_bundle_name_data,
+        )
+    )
 
 
 def generate_tortoise_n(n):
