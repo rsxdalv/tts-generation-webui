@@ -264,7 +264,7 @@ def generation_tab_musicgen():
                         interactive=True,
                         step=0.1,
                     )
-                seed, set_old_seed_button = setup_seed_ui_musicgen()
+                seed, set_old_seed_button, _ = setup_seed_ui_musicgen()
 
         with gr.Column():
             output = gr.Audio(

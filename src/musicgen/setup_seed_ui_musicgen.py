@@ -20,4 +20,12 @@ def setup_seed_ui_musicgen():
         )
 
         set_old_seed_button.style(size="sm")
-    return seed_input, set_old_seed_button
+
+        def link_seed_cache(seed_cache):
+            set_old_seed_button.click(
+                fn=lambda x: gr.Number.update(value=x),
+                inputs=seed_cache,
+                outputs=seed_input,
+            )
+
+    return seed_input, set_old_seed_button, link_seed_cache
