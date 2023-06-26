@@ -489,7 +489,9 @@ def generation_tab_bark(tabs):
 
         # Show the language and speakerId radios only when useHistory is checked
         history_setting.change(
-            fn=lambda choice: gr.Column.update(visible=(choice == HistorySettings.VOICE)),
+            fn=lambda choice: gr.Column.update(
+                visible=(choice == HistorySettings.VOICE)
+            ),
             inputs=[history_setting],
             outputs=[column],  # type: ignore
         )
@@ -669,7 +671,6 @@ def setup_bark_voice_prompt_ui():
             useV2 = gr.Checkbox(label="Use V2", value=False)
             choice_string = gr.Markdown(
                 "Chosen voice: en_speaker_0, Gender: Unknown",
-
             )
 
         languages = [lang[0] for lang in SUPPORTED_LANGS]
