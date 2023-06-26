@@ -281,12 +281,12 @@ def generate_multi(count=1, outputs_ref=None):
     ):
         history_prompt = None
         if prompt is None or prompt == "":
-            raise Exception("Prompt is empty")
+            raise ValueError("Prompt is empty")
 
         print("gen", "old_generation_filename", old_generation_filename)
         if history_setting == HistorySettings.NPZ_FILE:
             if old_generation_filename is None:
-                raise Exception("old_generation_filename is None")
+                raise ValueError("old_generation_filename is None")
             history_prompt = load_npz(old_generation_filename)
 
         _original_history_prompt = history_prompt
@@ -669,7 +669,7 @@ def setup_bark_voice_prompt_ui():
             useV2 = gr.Checkbox(label="Use V2", value=False)
             choice_string = gr.Markdown(
                 "Chosen voice: en_speaker_0, Gender: Unknown",
-                
+
             )
 
         languages = [lang[0] for lang in SUPPORTED_LANGS]
