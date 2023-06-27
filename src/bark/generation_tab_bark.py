@@ -281,12 +281,12 @@ def generate_multi(count=1, outputs_ref=None):
     ):
         history_prompt = None
         if prompt is None or prompt == "":
-            raise Exception("Prompt is empty")
+            raise ValueError("Prompt is empty")
 
         print("gen", "old_generation_filename", old_generation_filename)
         if history_setting == HistorySettings.NPZ_FILE:
             if old_generation_filename is None:
-                raise Exception("old_generation_filename is None")
+                raise ValueError("old_generation_filename is None")
             history_prompt = load_npz(old_generation_filename)
 
         _original_history_prompt = history_prompt
@@ -482,21 +482,18 @@ def generation_tab_bark(tabs):
 
         (
             useV2,
-            choice_string,
             languageRadio,
             speakerIdRadio,
+            column,
         ) = setup_bark_voice_prompt_ui()
 
         # Show the language and speakerId radios only when useHistory is checked
         history_setting.change(
-            fn=lambda choice: [
-                gr.Radio.update(visible=(choice == HistorySettings.VOICE)),
-                gr.Radio.update(visible=(choice == HistorySettings.VOICE)),
-                gr.Checkbox.update(visible=(choice == HistorySettings.VOICE)),
-                gr.Markdown.update(visible=(choice == HistorySettings.VOICE)),
-            ],
+            fn=lambda choice: gr.Column.update(
+                visible=(choice == HistorySettings.VOICE)
+            ),
             inputs=[history_setting],
-            outputs=[languageRadio, speakerIdRadio, useV2, choice_string],
+            outputs=[column],  # type: ignore
         )
 
         with gr.Row():
@@ -597,13 +594,6 @@ def generation_tab_bark(tabs):
             seed_input,
         ]
 
-        voice_inputs = [useV2, languageRadio, speakerIdRadio]
-
-        for i in voice_inputs:
-            i.change(
-                fn=generate_choice_string, inputs=voice_inputs, outputs=[choice_string]
-            )
-
         MAX_OUTPUTS = 9
 
         with gr.Row():
@@ -676,23 +666,31 @@ def generation_tab_bark(tabs):
 
 
 def setup_bark_voice_prompt_ui():
-    with gr.Row():
-        useV2 = gr.Checkbox(label="Use V2", value=False, visible=False)
-        choice_string = gr.Markdown(
-            "Chosen voice: en_speaker_0, Gender: Unknown", visible=False
+    with gr.Column(visible=False) as column:
+        with gr.Row():
+            useV2 = gr.Checkbox(label="Use V2", value=False)
+            choice_string = gr.Markdown(
+                "Chosen voice: en_speaker_0, Gender: Unknown",
+            )
+
+        languages = [lang[0] for lang in SUPPORTED_LANGS]
+        languageRadio = gr.Radio(
+            languages, type="index", show_label=False, value="English"
         )
 
-    languages = [lang[0] for lang in SUPPORTED_LANGS]
-    languageRadio = gr.Radio(
-        languages, type="index", show_label=False, value="English", visible=False
-    )
+        speaker_ids = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
+        speakerIdRadio = gr.Radio(
+            speaker_ids, type="value", label="Speaker ID", value="0"
+        )
 
-    speaker_ids = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
-    speakerIdRadio = gr.Radio(
-        speaker_ids, type="value", label="Speaker ID", value="0", visible=False
-    )
+        voice_inputs = [useV2, languageRadio, speakerIdRadio]
 
-    return useV2, choice_string, languageRadio, speakerIdRadio
+        for i in voice_inputs:
+            i.change(
+                fn=generate_choice_string, inputs=voice_inputs, outputs=[choice_string]
+            )
+
+    return useV2, languageRadio, speakerIdRadio, column
 
 
 def insert_npz_file(npz_filename):
