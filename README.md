@@ -6,6 +6,14 @@
 [Release Page](https://github.com/rsxdalv/one-click-installers-tts/releases/tag/v4.0) ||
 [Installer Repo](https://github.com/rsxdalv/one-click-installers-tts)
 
+## Videos
+### **The AI Artist - Stable diffusion for MUSIC ?! tts-generation-webui**
+[![Watch the video](https://img.youtube.com/vi/Jfy0WGN4hts/sddefault.jpg)](https://youtu.be/Jfy0WGN4hts)
+
+
+### **The AI Artist - how to use BARK AI voice cloning locally**
+[![Watch the video](https://img.youtube.com/vi/hrYhk9Khyho/sddefault.jpg)](https://youtu.be/hrYhk9Khyho)
+
 ## Screenshots
 
 This code provides a Gradio interface for generating audio from text input using the Bark TTS and Tortoise TTS models. The interface takes a text prompt as input and generates audio as output.
