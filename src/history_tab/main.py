@@ -78,7 +78,7 @@ def history_content(
         create_collection_ui(collections_directories_atom)
 
     with gr.Accordion("Gallery Selector (Click to Open)", open=False):
-        history_list_as_gallery = gr.Gallery(value=get_wav_files_img(directory))
+        history_list_as_gallery = gr.Gallery(value=[])
         history_list_as_gallery.style(columns=8, object_fit="contain", height="auto")
     with gr.Row():
         with gr.Column():
@@ -93,7 +93,7 @@ def history_content(
             headers = ["Date and Time", "Name", "When", "Filename"]
 
             history_list = gr.Dataframe(
-                value=get_wav_files(directory),
+                value=[],
                 elem_classes="file-list",
                 type="array",
                 interactive=False,
@@ -153,7 +153,7 @@ def history_content(
                 collections_directories_atom,
             )
 
-    def _select_audio_history(filename, json_text):
+    def _select_audio_history(filename: str, json_text):
         return {
             history_bundle_name: gr.Textbox.update(value=os.path.dirname(filename)),
             history_bundle_name_data: os.path.dirname(filename),
@@ -204,7 +204,7 @@ def history_content(
         preprocess=False,
     )
 
-    def update_history_tab(directory):
+    def update_history_tab(directory: str):
         return [
             gr.Dataframe.update(value=get_wav_files(directory)),
             gr.Gallery.update(value=get_wav_files_img(directory)),
