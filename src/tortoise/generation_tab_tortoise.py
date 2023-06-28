@@ -1,11 +1,16 @@
 from typing import Any
 from src.musicgen.setup_seed_ui_musicgen import setup_seed_ui_musicgen
-from models.tortoise.tortoise.utils.audio import get_voices
+from tortoise.utils.audio import get_voices
 from src.css.css import full_css
 import gradio as gr
 from src.tortoise.TortoiseOutputRow import TortoiseOutputRow
 from src.tortoise.create_tortoise_output_row_ui import create_tortoise_output_row_ui
 from src.tortoise.gen_tortoise import generate_tortoise_long
+from src.tortoise.TortoiseParameters import (
+    TortoiseParameterComponents,
+    TortoiseParameterZipper,
+    TortoiseParameters,
+)
 
 MAX_OUTPUTS = 9
 
@@ -53,16 +58,20 @@ def tortoise_core_ui():
                         ]
 
                     reload_voices.click(fn=reload_voices_fn, outputs=[voice])
-            preset = gr.Dropdown(
-                label="Preset",
-                choices=[
-                    "ultra_fast",
-                    "fast",
-                    "standard",
-                    "high_quality",
-                ],
-                value="ultra_fast",
-            )
+            with gr.Box():
+                gr.Markdown("Preset")
+                preset = gr.Dropdown(
+                    show_label=False,
+                    choices=[
+                        "ultra_fast",
+                        "fast",
+                        "standard",
+                        "high_quality",
+                    ],
+                    value="ultra_fast",
+                )
+                preset.style(container=False)
+
         with gr.Column():
             cvvp_amount = gr.Slider(
                 label="CVVP Amount", value=0.0, minimum=0.0, maximum=1.0, step=0.1
@@ -79,7 +88,11 @@ def tortoise_core_ui():
 
     link_seed_cache(seed_cache=output_rows[0][2])
 
-    inputs = [prompt, voice, preset, seed, cvvp_amount, split_prompt]
+    inputs = list(
+        TortoiseParameterComponents(
+            prompt, voice, preset, seed, cvvp_amount, split_prompt
+        )
+    )
     return inputs, output_rows
 
 
@@ -99,6 +112,19 @@ def generate_button(text, count, variant, inputs, output_rows, total_columns):
         }
 
     output_cols: list[Any] = [col for _, col, _ in output_rows]
+    def wrapper(*args):
+        # return generate_tortoise_long(
+        #     get_all_outs(count),
+        #     count,
+        #     TortoiseParameters.from_list(list(args)),
+        # )
+        # properly return generator
+        yield from generate_tortoise_long(
+            get_all_outs(count),
+            count,
+            TortoiseParameters.from_list(list(args)),
+        )
+
     return (
         gr.Button(text, variant=variant)
         .click(fn=lambda: show(count), outputs=output_cols)
@@ -107,10 +133,12 @@ def generate_button(text, count, variant, inputs, output_rows, total_columns):
             outputs=get_output_list(count),
         )
         .then(
-            fn=generate_tortoise_long(
-                get_all_outs(count),
-                count,
-            ),
+            # fn=lambda *args: generate_tortoise_long(
+            #     get_all_outs(count),
+            #     count,
+            #     TortoiseParameters.from_list(list(args)),
+            # ),
+            fn=wrapper,
             inputs=inputs,
             outputs=get_output_list(count),
         )
