@@ -10,6 +10,13 @@ import ffmpeg
 import base64
 
 
+def check_ffmpeg():
+    if not hasattr(ffmpeg, "input"):
+        raise ImportError(
+            """Incorrect ffmpeg version. Please install ffmpeg-python with `pip install ffmpeg-python`"""
+        )
+
+
 def ndarray_to_base64(arr):
     # Convert ndarray to bytes
     arr_bytes = arr.tobytes()
@@ -31,6 +38,7 @@ def callback_save_generation(
     files: Dict[str, str],
     metadata: Dict[str, Any],
 ) -> None:
+    check_ffmpeg()
     print("Saving generation to", files.get("ogg"))
 
     attach_generation_meta(full_generation, "semantic_prompt", metadata)

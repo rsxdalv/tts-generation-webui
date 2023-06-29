@@ -1,11 +1,19 @@
 from typing import Any
 from src.musicgen.setup_seed_ui_musicgen import setup_seed_ui_musicgen
-from models.tortoise.tortoise.utils.audio import get_voices
+from tortoise.utils.audio import get_voices
 from src.css.css import full_css
 import gradio as gr
 from src.tortoise.TortoiseOutputRow import TortoiseOutputRow
 from src.tortoise.create_tortoise_output_row_ui import create_tortoise_output_row_ui
 from src.tortoise.gen_tortoise import generate_tortoise_long
+from src.tortoise.TortoiseParameters import (
+    TortoiseParameterComponents,
+    TortoiseParameters,
+)
+from src.tortoise.autoregressive_params import autoregressive_params
+from src.tortoise.diffusion_params import diffusion_params
+from src.tortoise.presets import presets
+from src.tortoise.gr_reload_button import gr_reload_button
 
 MAX_OUTPUTS = 9
 
@@ -38,31 +46,37 @@ def tortoise_core_ui():
                         choices=["random"] + list(get_voices()),
                         value="random",
                         show_label=False,
+                        container=False,
                     )
-                    voice.style(container=False)
-                    reload_voices = gr.Button(
-                        "refresh",
-                        elem_classes="btn-sm material-symbols-outlined",
+                    gr_reload_button().click(
+                        fn=lambda: gr.Dropdown.update(
+                            choices=["random"] + list(get_voices())
+                        ),
+                        outputs=[voice],
                     )
-                    reload_voices.style(size="sm")
+            with gr.Box():
+                gr.Markdown("Preset")
+                preset = gr.Dropdown(
+                    show_label=False,
+                    choices=[
+                        "ultra_fast",
+                        "fast",
+                        "standard",
+                        "high_quality",
+                    ],
+                    value="ultra_fast",
+                    container=False,
+                )
 
-                    def reload_voices_fn():
-                        choices = ["random"] + list(get_voices())
-                        return [
-                            gr.Dropdown.update(choices=choices),
-                        ]
+            (
+                num_autoregressive_samples,
+                temperature,
+                length_penalty,
+                repetition_penalty,
+                top_p,
+                max_mel_tokens,
+            ) = autoregressive_params()
 
-                    reload_voices.click(fn=reload_voices_fn, outputs=[voice])
-            preset = gr.Dropdown(
-                label="Preset",
-                choices=[
-                    "ultra_fast",
-                    "fast",
-                    "standard",
-                    "high_quality",
-                ],
-                value="ultra_fast",
-            )
         with gr.Column():
             cvvp_amount = gr.Slider(
                 label="CVVP Amount", value=0.0, minimum=0.0, maximum=1.0, step=0.1
@@ -72,14 +86,53 @@ def tortoise_core_ui():
 
             split_prompt = gr.Checkbox(label="Split prompt by lines", value=False)
 
-    prompt = gr.Textbox(label="Prompt", lines=3, placeholder="Enter text here...")
+            (
+                diffusion_iterations,
+                cond_free,
+                cond_free_k,
+                diffusion_temperature,
+            ) = diffusion_params()
+
+    preset.change(
+        fn=lambda x: [
+            num_autoregressive_samples.update(presets[x]["num_autoregressive_samples"]),
+            diffusion_iterations.update(presets[x]["diffusion_iterations"]),
+            cond_free.update(
+                presets[x]["cond_free"] if "cond_free" in presets[x] else True
+            ),
+        ],
+        inputs=[preset],
+        outputs=[num_autoregressive_samples, diffusion_iterations, cond_free],
+    )
+
+    text = gr.Textbox(label="Prompt", lines=3, placeholder="Enter text here...")
+
+    inputs = list(
+        TortoiseParameterComponents(
+            text=text,
+            voice=voice,
+            preset=preset,
+            seed=seed,
+            cvvp_amount=cvvp_amount,
+            split_prompt=split_prompt,
+            num_autoregressive_samples=num_autoregressive_samples,
+            diffusion_iterations=diffusion_iterations,
+            temperature=temperature,
+            length_penalty=length_penalty,
+            repetition_penalty=repetition_penalty,
+            top_p=top_p,
+            max_mel_tokens=max_mel_tokens,
+            cond_free=cond_free,
+            cond_free_k=cond_free_k,
+            diffusion_temperature=diffusion_temperature,
+        )
+    )
 
     with gr.Row():
         output_rows = [create_tortoise_output_row_ui(i) for i in range(MAX_OUTPUTS)]
 
     link_seed_cache(seed_cache=output_rows[0][2])
 
-    inputs = [prompt, voice, preset, seed, cvvp_amount, split_prompt]
     return inputs, output_rows
 
 
@@ -99,6 +152,14 @@ def generate_button(text, count, variant, inputs, output_rows, total_columns):
         }
 
     output_cols: list[Any] = [col for _, col, _ in output_rows]
+
+    def gen(*args):
+        yield from generate_tortoise_long(
+            get_all_outs(count),
+            count,
+            TortoiseParameters.from_list(list(args)),
+        )
+
     return (
         gr.Button(text, variant=variant)
         .click(fn=lambda: show(count), outputs=output_cols)
@@ -107,10 +168,7 @@ def generate_button(text, count, variant, inputs, output_rows, total_columns):
             outputs=get_output_list(count),
         )
         .then(
-            fn=generate_tortoise_long(
-                get_all_outs(count),
-                count,
-            ),
+            fn=gen,
             inputs=inputs,
             outputs=get_output_list(count),
         )

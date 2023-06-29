@@ -4,12 +4,13 @@ import numpy as np
 from src.utils.create_base_filename import create_base_filename
 from src.utils.date import get_date_string
 from src.utils.save_waveform_plot import save_waveform_plot
-from models.tortoise.tortoise.api import TextToSpeech, MODELS_DIR
-from models.tortoise.tortoise.utils.audio import load_voices
+from tortoise.api import TextToSpeech, MODELS_DIR
+from tortoise.utils.audio import load_voices
 import gradio as gr
 from src.tortoise.TortoiseOutputRow import TortoiseOutputRow, TortoiseOutputUpdate
 from src.tortoise.save_json import save_json
 from scipy.io.wavfile import write as write_wav
+from src.tortoise.TortoiseParameters import TortoiseParameters
 
 
 SAMPLE_RATE = 24_000
@@ -30,49 +31,53 @@ def get_tts():
 
 
 def generate_tortoise(
-    text="The expressiveness of autoregressive transformers is literally nuts! I absolutely adore them.",
-    voice="random",
-    preset="fast",
-    candidates=3,
-    seed=None,
-    cvvp_amount=0.0,
+    params: TortoiseParameters,
+    text: str,
+    candidates: int,
 ):
+    voice = params.voice
+
     os.makedirs(OUTPUT_PATH, exist_ok=True)
 
     voice_sel = voice.split("&") if "&" in voice else [voice]
     voice_samples, conditioning_latents = load_voices(voice_sel)
 
-    if seed == -1:
-        seed = None
-
     tts = get_tts()
     result, state = tts.tts_with_preset(
         text,
+        return_deterministic_state=True,
         k=candidates,
         voice_samples=voice_samples,
         conditioning_latents=conditioning_latents,
-        preset=preset,
-        use_deterministic_seed=seed,
-        return_deterministic_state=True,
-        cvvp_amount=cvvp_amount,
+        use_deterministic_seed=get_seed(params),
+        **{
+            k: v
+            for k, v in params.to_dict().items()
+            if k not in ["text", "voice", "split_prompt", "seed"]
+        }
     )
 
     seed, _, _, _ = state
+    params.seed = seed  # type: ignore
 
     gen_list = result if isinstance(result, list) else [result]
     audio_arrays = [tensor_to_audio_array(x) for x in gen_list]
     return [
-        _process_gen(text, voice, preset, candidates, seed, cvvp_amount, audio_array, j)
-        for j, audio_array in enumerate(audio_arrays)
+        _process_gen(candidates, audio_array, id, params)
+        for id, audio_array in enumerate(audio_arrays)
     ]
 
 
-def _process_gen(text, voice, preset, candidates, seed, cvvp_amount, audio_array, j):
+def get_seed(params):
+    return params.seed if params.seed != -1 else None
+
+
+def _process_gen(candidates, audio_array, id, params: TortoiseParameters):
     model = "tortoise"
     date = get_date_string()
 
     filename, filename_png, filename_json = get_filenames(
-        create_base_filename_tortoise(voice, j, model, date)
+        create_base_filename_tortoise(params.voice, id, model, date)
     )
     save_wav_tortoise(audio_array, filename)
     save_waveform_plot(audio_array, filename_png)
@@ -81,12 +86,8 @@ def _process_gen(text, voice, preset, candidates, seed, cvvp_amount, audio_array
         "_version": "0.0.1",
         "_type": model,
         "date": date,
-        "text": text,
-        "voice": voice,
-        "preset": preset,
         "candidates": candidates,
-        "seed": str(seed),
-        "cvvp_amount": cvvp_amount,
+        **params.to_metadata(),
     }
 
     save_json(filename_json, metadata)
@@ -97,7 +98,7 @@ def _process_gen(text, voice, preset, candidates, seed, cvvp_amount, audio_array
         audio=(SAMPLE_RATE, audio_array),
         image=filename_png,
         save_button=gr.Button.update(value="Save to favorites", visible=True),
-        seed=seed,
+        seed=params.seed,
         bundle_name=history_bundle_name_data,
     )
 
@@ -117,63 +118,50 @@ def get_filenames(base_filename):
     return filename, filename_png, filename_json
 
 
-def generate_tortoise_long(outs: list[TortoiseOutputRow], count: int):
-    def gen(
-            prompt_raw,
-            voice="random",
-            preset="ultra_fast",
-            seed=None,
-            cvvp_amount=0.0,
-            split_prompt=False,
-        ):
-        prompts = split_by_lines(prompt_raw) if split_prompt else [prompt_raw]
-        audio_pieces = [[] for _ in range(count)]
+def generate_tortoise_long(
+    outs: list[TortoiseOutputRow], count: int, params: TortoiseParameters
+):
+    print("Generating tortoise with params:")
+    print(params)
+    prompt_raw = params.text
+    split_prompt = params.split_prompt
 
-        for prompt in prompts:
-            datas = generate_tortoise(
-                text=prompt,
-                voice=voice,
-                preset=preset,
-                seed=seed,
-                cvvp_amount=cvvp_amount,
-                candidates=count,
-            )
-            for i, data in enumerate(datas):
-                yield {
-                    outs[i].audio: data.audio,
-                    outs[i].image: data.image,
-                    outs[i].save_button: data.save_button,
-                    outs[i].seed: data.seed,
-                    outs[i].bundle_name: data.bundle_name,
-                }
+    prompts = split_by_lines(prompt_raw) if split_prompt else [prompt_raw]
+    audio_pieces = [[] for _ in range(count)]
 
-            for i in range(count):
-                audio_array = datas[i].audio[1]
-                audio_pieces[i].append(audio_array)
-
-        # if there is only one prompt, then we don't need to concatenate
-        if len(prompts) == 1:
-            return {}
-
-        for i in range(count):
-            res = _process_gen(
-                prompt_raw,
-                voice,
-                preset,
-                count,
-                seed,
-                cvvp_amount,
-                np.concatenate(audio_pieces[i]),
-                j=f"_long_{str(i)}",
-            )
+    for prompt in prompts:
+        datas = generate_tortoise(
+            params,
+            text=prompt,
+            candidates=count,
+        )
+        for i, data in enumerate(datas):
             yield {
-                outs[i].audio: res.audio,
-                outs[i].image: res.image,
-                outs[i].save_button: res.save_button,
-                outs[i].seed: res.seed,
-                outs[i].bundle_name: res.bundle_name,
+                outs[i].audio: data.audio,
+                outs[i].image: data.image,
+                outs[i].save_button: data.save_button,
+                outs[i].seed: data.seed,
+                outs[i].bundle_name: data.bundle_name,
             }
 
+        for i in range(count):
+            audio_array = datas[i].audio[1]
+            audio_pieces[i].append(audio_array)
+
+    # if there is only one prompt, then we don't need to concatenate
+    if len(prompts) == 1:
         return {}
 
-    return gen
+    for i in range(count):
+        res = _process_gen(
+            count, np.concatenate(audio_pieces[i]), id=f"_long_{str(i)}", params=params
+        )
+        yield {
+            outs[i].audio: res.audio,
+            outs[i].image: res.image,
+            outs[i].save_button: res.save_button,
+            outs[i].seed: res.seed,
+            outs[i].bundle_name: res.bundle_name,
+        }
+
+    return {}

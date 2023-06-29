@@ -76,6 +76,9 @@ with gr.Blocks(
 
             tab_voice_clone(register_use_as_history_button)
         except Exception as e:
+            with gr.Tab("Bark Voice Clone (!)"):
+                gr.Markdown("Failed to load voice clone demo")
+                gr.Markdown(f"Error: {e}")
             print("Failed to load voice clone demo")
             print(e)
 

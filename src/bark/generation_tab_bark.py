@@ -505,12 +505,14 @@ def generation_tab_bark(tabs):
                 value=None,
                 allow_custom_value=True,
                 visible=False,
+                container=False,
             )
-            old_generation_dropdown.style(container=False)
             copy_old_generation_button = gr.Button(
-                "save", visible=False, elem_classes="btn-sm material-symbols-outlined"
+                "save",
+                visible=False,
+                elem_classes="btn-sm material-symbols-outlined",
+                size="sm",
             )
-            copy_old_generation_button.style(size="sm")
             copy_old_generation_button.click(
                 fn=lambda x: [
                     shutil.copy(x, os.path.join("voices", os.path.basename(x))),
@@ -522,8 +524,8 @@ def generation_tab_bark(tabs):
                 "refresh",
                 visible=False,
                 elem_classes="btn-sm material-symbols-outlined",
+                size="sm",
             )
-            reload_old_generation_dropdown.style(size="sm")
 
             reload_old_generation_dropdown.click(
                 fn=lambda: gr.Dropdown.update(choices=get_npz_files()),
