@@ -36,31 +36,29 @@ def generate_tortoise(
     candidates: int,
 ):
     voice = params.voice
-    preset = params.preset
-    seed = params.seed
-    cvvp_amount = params.cvvp_amount
 
     os.makedirs(OUTPUT_PATH, exist_ok=True)
 
     voice_sel = voice.split("&") if "&" in voice else [voice]
     voice_samples, conditioning_latents = load_voices(voice_sel)
 
-    if seed == -1:
-        seed = None
-
     tts = get_tts()
     result, state = tts.tts_with_preset(
         text,
+        return_deterministic_state=True,
         k=candidates,
         voice_samples=voice_samples,
         conditioning_latents=conditioning_latents,
-        preset=preset,
-        use_deterministic_seed=seed,
-        return_deterministic_state=True,
-        cvvp_amount=cvvp_amount,
+        use_deterministic_seed=get_seed(params),
+        **{
+            k: v
+            for k, v in params.to_dict().items()
+            if k not in ["text", "voice", "split_prompt", "seed"]
+        }
     )
 
     seed, _, _, _ = state
+    params.seed = seed  # type: ignore
 
     gen_list = result if isinstance(result, list) else [result]
     audio_arrays = [tensor_to_audio_array(x) for x in gen_list]
@@ -68,6 +66,10 @@ def generate_tortoise(
         _process_gen(candidates, audio_array, id, params)
         for id, audio_array in enumerate(audio_arrays)
     ]
+
+
+def get_seed(params):
+    return params.seed if params.seed != -1 else None
 
 
 def _process_gen(candidates, audio_array, id, params: TortoiseParameters):
@@ -119,6 +121,8 @@ def get_filenames(base_filename):
 def generate_tortoise_long(
     outs: list[TortoiseOutputRow], count: int, params: TortoiseParameters
 ):
+    print("Generating tortoise with params:")
+    print(params)
     prompt_raw = params.text
     split_prompt = params.split_prompt
 
