@@ -6,19 +6,16 @@ def setup_seed_ui_musicgen():
     with gr.Row():
         seed_input = gr.Number(value=-1, show_label=False, container=False)
         set_random_seed_button = gr.Button(
-            "backspace", elem_classes="btn-sm material-symbols-outlined"
+            "backspace", elem_classes="btn-sm material-symbols-outlined", size="sm"
         )
 
-        set_random_seed_button.style(size="sm")
         set_random_seed_button.click(
             fn=lambda: gr.Number.update(value=-1), outputs=[seed_input]
         )
 
         set_old_seed_button = gr.Button(
-            "repeat", elem_classes="btn-sm material-symbols-outlined"
+            "repeat", elem_classes="btn-sm material-symbols-outlined", size="sm"
         )
-
-        set_old_seed_button.style(size="sm")
 
         def link_seed_cache(seed_cache):
             set_old_seed_button.click(

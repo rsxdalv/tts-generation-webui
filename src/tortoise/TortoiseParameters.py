@@ -117,7 +117,6 @@ if __name__ == "__main__":
         )
 
         button = gr.Button("Generate")
-        button.style(margin="1rem")
         button.click(
             lambda *x: print(
                 TortoiseParameters(**TortoiseParameterZipper.from_list_to_dict(list(x)))

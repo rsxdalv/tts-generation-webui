@@ -78,8 +78,7 @@ def history_content(
         create_collection_ui(collections_directories_atom)
 
     with gr.Accordion("Gallery Selector (Click to Open)", open=False):
-        history_list_as_gallery = gr.Gallery(value=[])
-        history_list_as_gallery.style(columns=8, object_fit="contain", height="auto")
+        history_list_as_gallery = gr.Gallery(value=[], columns=8, object_fit="contain", height="auto")
     with gr.Row():
         with gr.Column():
             with gr.Row():

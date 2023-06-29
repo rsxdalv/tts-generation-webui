@@ -43,13 +43,13 @@ def tortoise_core_ui():
                         choices=["random"] + list(get_voices()),
                         value="random",
                         show_label=False,
+                        container=False,
                     )
-                    voice.style(container=False)
                     reload_voices = gr.Button(
                         "refresh",
                         elem_classes="btn-sm material-symbols-outlined",
+                        size="sm",
                     )
-                    reload_voices.style(size="sm")
 
                     def reload_voices_fn():
                         choices = ["random"] + list(get_voices())
@@ -69,8 +69,8 @@ def tortoise_core_ui():
                         "high_quality",
                     ],
                     value="ultra_fast",
+                    container=False,
                 )
-                preset.style(container=False)
 
         with gr.Column():
             cvvp_amount = gr.Slider(
