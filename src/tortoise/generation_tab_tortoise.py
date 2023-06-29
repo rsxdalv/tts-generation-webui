@@ -112,13 +112,7 @@ def generate_button(text, count, variant, inputs, output_rows, total_columns):
         }
 
     output_cols: list[Any] = [col for _, col, _ in output_rows]
-    def wrapper(*args):
-        # return generate_tortoise_long(
-        #     get_all_outs(count),
-        #     count,
-        #     TortoiseParameters.from_list(list(args)),
-        # )
-        # properly return generator
+    def gen(*args):
         yield from generate_tortoise_long(
             get_all_outs(count),
             count,
@@ -133,12 +127,7 @@ def generate_button(text, count, variant, inputs, output_rows, total_columns):
             outputs=get_output_list(count),
         )
         .then(
-            # fn=lambda *args: generate_tortoise_long(
-            #     get_all_outs(count),
-            #     count,
-            #     TortoiseParameters.from_list(list(args)),
-            # ),
-            fn=wrapper,
+            fn=gen,
             inputs=inputs,
             outputs=get_output_list(count),
         )
