@@ -6,12 +6,20 @@ import subprocess
 import ffmpeg
 
 
+def check_ffmpeg():
+    if not hasattr(ffmpeg, "input"):
+        raise ImportError(
+            """Incorrect ffmpeg version. Please install ffmpeg-python with `pip install ffmpeg-python`"""
+        )
+
+
 def callback_save_generation_musicgen(
     audio_array: np.ndarray,
     files: Dict[str, str],
     metadata: Dict[str, Any],
     SAMPLE_RATE: int,
 ) -> None:
+    check_ffmpeg()
     print("Saving generation to", files.get("ogg"))
 
     filename = files.get("ogg")

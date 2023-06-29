@@ -63,12 +63,15 @@ def ext_callback_save_generation(
     metadata: Dict[str, Any],
 ) -> None:
     for callback in callbacks_save_generation:
-        callback(
-            full_generation=full_generation,
-            audio_array=audio_array,
-            files=files,
-            metadata=metadata,
-        )
+        try:
+            callback(
+                full_generation=full_generation,
+                audio_array=audio_array,
+                files=files,
+                metadata=metadata,
+            )
+        except Exception as e:
+            print("Error in callback_save_generation extension:", e)
 
 
 def ext_callback_save_generation_musicgen(
@@ -78,12 +81,15 @@ def ext_callback_save_generation_musicgen(
     SAMPLE_RATE: int,
 ) -> None:
     for callback in callbacks_save_generation_musicgen:
-        callback(
-            audio_array=audio_array,
-            files=files,
-            metadata=metadata,
-            SAMPLE_RATE=SAMPLE_RATE,
-        )
+        try:
+            callback(
+                audio_array=audio_array,
+                files=files,
+                metadata=metadata,
+                SAMPLE_RATE=SAMPLE_RATE,
+            )
+        except Exception as e:
+            print("Error in callback_save_generation_musicgen extension:", e)
 
 
 if __name__ == "__main__":
