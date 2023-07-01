@@ -1,0 +1,20 @@
+.studio-slots-row.studio-slots-row {
+  flex-wrap: nowrap;
+  overflow-x: scroll;
+  padding-bottom: var(--layout-gap);
+}
+
+.tts-slot {
+  height: 210px;
+}
+
+.tts-image-tiny > .empty.large.unpadded_box {
+  height: 50px;
+  min-height: 50px;
+}
+
+.tts-image-tiny > img {
+  height: 50px;
+  min-height: 50px;
+  object-fit: fill;
+}

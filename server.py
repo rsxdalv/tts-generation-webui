@@ -1,9 +1,11 @@
 import os
-from src.musicgen.musicgen_tab import generation_tab_musicgen
-from src.css.css import full_css
 import src.utils.setup_or_recover as setup_or_recover
 import src.utils.dotenv_init as dotenv_init
+import gradio as gr
 
+from src.css.css import full_css
+from src.Joutai import Joutai
+from src.musicgen.musicgen_tab import generation_tab_musicgen
 from src.history_tab.collections_directories_atom import collections_directories_atom
 from src.config.save_config_bark import save_config_bark
 from src.config.save_config_gradio import save_config_gradio
@@ -11,13 +13,13 @@ from src.tortoise.generation_tab_tortoise import generation_tab_tortoise
 from src.config.load_config import default_config
 from src.settings_tab_gradio import settings_tab_gradio
 from src.bark.generation_tab_bark import generation_tab_bark
-import gradio as gr
 from src.history_tab.main import history_tab
 from src.model_manager import model_manager
 from src.bark.settings_tab_bark import settings_tab_bark
 from src.config.config import config
 from src.history_tab.voices_tab import voices_tab
 from src.vocos.vocos_tabs import vocos_tabs
+from src.studio.studio_tab import simple_remixer_tab
 
 setup_or_recover.dummy()
 dotenv_init.init()
@@ -66,10 +68,11 @@ gradio_interface_options = (
 with gr.Blocks(
     css=full_css,
     title="TTS Generation WebUI",
+    analytics_enabled=False,  # it broke too many times
 ) as demo:
     gr.Markdown("# TTS Generation WebUI (Bark, MusicGen, Tortoise)")
-    with gr.Tabs() as tabs:
-        register_use_as_history_button = generation_tab_bark(tabs)
+    with Joutai.singleton.tabs:
+        register_use_as_history_button = generation_tab_bark()
 
         try:
             from src.bark.clone.tab_voice_clone import tab_voice_clone
@@ -98,7 +101,8 @@ with gr.Blocks(
         settings_tab_gradio(
             save_config_gradio, reload_config_and_restart_ui, gradio_interface_options
         )
-
+        remixer_input = simple_remixer_tab()
+    Joutai.singleton.tabs.render()
 
 def print_pretty_options(options):
     print("Gradio interface options:")
