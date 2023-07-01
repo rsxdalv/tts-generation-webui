@@ -7,11 +7,27 @@ import numpy as np
 matplotlib.use("agg")
 
 
-def save_waveform_plot(audio_array: np.ndarray, filename_png: str):
+def plot_waveform(audio_array: np.ndarray):
     fig = plt.figure(figsize=(10, 3))
     plt.style.use("dark_background")
     plt.plot(audio_array, color="orange")
     plt.axis("off")
+    return fig
+
+def plot_waveform_as_image(audio_array: np.ndarray):
+    fig = plot_waveform(audio_array)
+    plt.close()
+    return figure_to_image(fig)
+
+
+def save_waveform_plot(audio_array: np.ndarray, filename_png: str):
+    # fig = plt.figure(figsize=(10, 3))
+    # plt.style.use("dark_background")
+    # plt.plot(audio_array, color="orange")
+    # plt.axis("off")
+    # plt.savefig(filename_png)
+    # plt.close()
+    fig = plot_waveform(audio_array)
     plt.savefig(filename_png)
     plt.close()
     return figure_to_image(fig)
