@@ -2,6 +2,7 @@ from src.utils.save_waveform_plot import plot_waveform_as_image
 import gradio as gr
 import torchaudio
 import torch
+from src.Joutai import Joutai
 
 
 def gr_mini_button(value, **kwargs):
@@ -14,7 +15,8 @@ def gr_mini_button(value, **kwargs):
 
 
 def simple_remixer_ui():
-    input_audio = gr.Audio(label="Input Audio")
+    input_audio = Joutai.singleton.remixer_input
+    input_audio.render()
 
     def create_slot(id=0):
         with gr.Group(
@@ -38,7 +40,11 @@ def simple_remixer_ui():
             )
             with gr.Row():
                 clear = gr_mini_button("delete").click(
-                    fn=lambda: audio.update(None), outputs=[audio]
+                    fn=lambda: [
+                        audio.update(None),
+                        image.update(None),
+                    ],
+                    outputs=[audio, image],
                 )
                 copy_from_input = gr_mini_button("keyboard_return").click(
                     fn=lambda input_value: [
@@ -70,15 +76,12 @@ def simple_remixer_ui():
     output_audio = gr.Audio(label="Output Audio")
 
     def concat_audio(*slot_audios):
-        print(slot_audios)
-        # restack slots
         sample_rate = max(x[0] for x in slot_audios if x is not None)
 
         resampled_audios = [
             resample_from_to(x[0], sample_rate, x[1]) if x is not None else None
             for x in slot_audios
         ]
-        print(resampled_audios)
         stacked_audios = [
             resampled_audios[i : i + 3] for i in range(0, len(slot_audios), 3)
         ]
@@ -134,7 +137,9 @@ def simple_remixer_ui():
         outputs=input_audio,
     )
 
+    return input_audio
+
 
 def simple_remixer_tab():
-    with gr.Tab("Simple Remixer"):
-        simple_remixer_ui()
+    with gr.Tab("Simple Remixer", id="simple_remixer"):
+        return simple_remixer_ui()

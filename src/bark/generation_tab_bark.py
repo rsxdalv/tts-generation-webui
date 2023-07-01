@@ -3,6 +3,7 @@ import shutil
 
 import numpy as np
 import gradio as gr
+from src.Joutai import Joutai
 from src.bark.setup_seed_ui_bark import setup_seed_ui_bark
 from src.bark.FinalGenParams import FinalGenParams
 from src.bark.history_to_hash import history_to_hash
@@ -235,6 +236,7 @@ def yield_generation(outputs_ref, i):
         image_,
         save_button_,
         continue_button_,
+        buttons_row_,
         npz_,
         seed_,
         json_text_,
@@ -246,6 +248,7 @@ def yield_generation(outputs_ref, i):
         image,
         save_button,
         continue_button,
+        buttons_row,
         npz,
         seed,
         json_text,
@@ -256,6 +259,7 @@ def yield_generation(outputs_ref, i):
             image_: image,
             save_button_: save_button,
             continue_button_: continue_button,
+            buttons_row_: buttons_row,
             npz_: npz,
             seed_: seed,
             json_text_: json_text,
@@ -265,7 +269,7 @@ def yield_generation(outputs_ref, i):
     return return_for_yield
 
 
-def generate_multi(count=1, outputs_ref=None):
+def generate_multi(count, outputs_ref):
     def gen(
         prompt,
         history_setting,
@@ -295,8 +299,9 @@ def generate_multi(count=1, outputs_ref=None):
             yield yield_generation(outputs_ref, i)(
                 audio=None,
                 image=None,
-                save_button=gr.Button.update(value="Save to favorites", visible=False),
-                continue_button=gr.Button.update(visible=False),
+                save_button=gr.Button.update(value="Save to favorites"),
+                continue_button=gr.Button.update(),
+                buttons_row=gr.Row.update(visible=False),
                 npz=None,
                 seed=None,
                 json_text=None,
@@ -305,7 +310,6 @@ def generate_multi(count=1, outputs_ref=None):
 
         _original_seed = seed
         if long_prompt_radio == PromptSplitSettings.NONE:
-            outputs = []
             for i in range(count):
                 filename, filename_png, _, _, filename_npz, seed, metadata = generate(
                     prompt,
@@ -319,25 +323,13 @@ def generate_multi(count=1, outputs_ref=None):
                     seed=_original_seed,
                     index=i,
                 )
-                outputs.extend(
-                    (
-                        filename,
-                        filename_png,
-                        gr.Button.update(value="Save to favorites", visible=True),
-                        gr.Button.update(visible=True),
-                        filename_npz,
-                        seed,
-                        metadata,
-                    )
-                )
 
                 yield yield_generation(outputs_ref, i)(
                     audio=filename,
                     image=filename_png,
-                    save_button=gr.Button.update(
-                        value="Save to favorites", visible=True
-                    ),
-                    continue_button=gr.Button.update(visible=True),
+                    save_button=gr.Button.update(value="Save to favorites"),
+                    continue_button=gr.Button.update(),
+                    buttons_row=gr.Row.update(visible=True),
                     npz=filename_npz,
                     seed=seed,
                     json_text=metadata,
@@ -350,7 +342,6 @@ def generate_multi(count=1, outputs_ref=None):
             if long_prompt_radio == PromptSplitSettings.LINES
             else split_by_length_simple(prompt)
         )
-        outputs = []
 
         for i in range(count):
             pieces = []
@@ -400,6 +391,7 @@ def generate_multi(count=1, outputs_ref=None):
                         value="Save to favorites", visible=True
                     ),
                     continue_button=gr.Button.update(visible=True),
+                    buttons_row=gr.Row.update(visible=True),
                     npz=filename_npz,
                     seed=seed,
                     json_text=_metadata,
@@ -420,22 +412,12 @@ def generate_multi(count=1, outputs_ref=None):
                 history_prompt=_original_history_prompt,
             )
 
-            outputs.extend(
-                (
-                    filename_long,
-                    filename_png,
-                    gr.Button.update(value="Save to favorites", visible=True),
-                    gr.Button.update(visible=True),
-                    filename_npz,
-                    seed,
-                    metadata,
-                )
-            )
             yield yield_generation(outputs_ref, i)(
                 audio=gr.Audio.update(value=filename_long, label="Generated audio"),
                 image=filename_png,
                 save_button=gr.Button.update(value="Save to favorites", visible=True),
                 continue_button=gr.Button.update(visible=True),
+                buttons_row=gr.Row.update(visible=True),
                 npz=filename_npz,
                 seed=seed,
                 json_text=metadata,
@@ -471,7 +453,7 @@ def get_long_gen_history_prompt(
     return None
 
 
-def generation_tab_bark(tabs):
+def generation_tab_bark():
     with gr.Tab(label="Generation (Bark)", id="generation_bark"):
         history_setting = gr.Radio(
             HistorySettings.choices,
@@ -613,7 +595,7 @@ def generation_tab_bark(tabs):
 
         seed_1 = seeds[0]
 
-        all_outputs_flat = [item for sublist in output_components for item in sublist]
+        all_outputs_flat = [item for sublist in output_components for item in sublist]  # type: ignore
 
         total_columns = len(output_cols)
 
@@ -623,7 +605,7 @@ def generation_tab_bark(tabs):
         def generate_button(text, count, variant):
             button = gr.Button(text, variant=variant)
             # TODO: Use then() to chain together multiple actions
-            button.click(fn=lambda: show(count), outputs=output_cols)
+            button.click(fn=lambda: show(count), outputs=output_cols)  # type: ignore
             button.click(
                 fn=generate_multi(count, output_components),
                 inputs=inputs,
@@ -640,7 +622,7 @@ def generation_tab_bark(tabs):
                     variant="primary" if num_columns == 1 else "secondary",
                 )
 
-        prompt.submit(fn=lambda: show(1), outputs=output_cols)
+        prompt.submit(fn=lambda: show(1), outputs=output_cols)  # type: ignore
         prompt.submit(
             fn=generate_multi(1, output_components),
             inputs=inputs,
@@ -649,7 +631,7 @@ def generation_tab_bark(tabs):
 
         set_old_seed_button.click(
             fn=lambda x: gr.Textbox.update(value=str(x)),
-            inputs=[seed_1],
+            inputs=[seed_1],  # type: ignore
             outputs=[seed_input],
         )
 
@@ -658,11 +640,10 @@ def generation_tab_bark(tabs):
             fn=lambda value: {
                 old_generation_dropdown: value,
                 history_setting: HistorySettings.NPZ_FILE,
-                tabs: gr.Tabs.update(selected="generation_bark"),
             },
             inputs=[source],
-            outputs=[old_generation_dropdown, history_setting, tabs],
-        )
+            outputs=[old_generation_dropdown, history_setting],
+        ).then(**Joutai.singleton.switch_to_tab(tab="generation_bark"))
 
     return register_use_as_history_button
 
@@ -708,9 +689,18 @@ def create_components(old_generation_dropdown, history_setting, index):
             type="filepath", label="Generated audio", elem_classes="tts-audio"
         )
         image = gr.Image(label="Waveform", shape=(None, 100), elem_classes="tts-image")  # type: ignore
-        with gr.Row():
-            save_button = gr.Button("Save to favorites", visible=False)
-            continue_button = gr.Button("Use as history", visible=False)
+        with gr.Row(visible=False) as buttons_row:
+            save_button = gr.Button("Save to favorites")
+            gr.Button("Send to remixer").click(
+                **Joutai.singleton.send_to_remixer(
+                    inputs=[audio],
+                )
+            ).then(
+                **Joutai.singleton.switch_to_tab(
+                    tab="simple_remixer",
+                )
+            )
+            continue_button = gr.Button("Use as history")
         npz = gr.State()  # type: ignore
         seed = gr.State()  # type: ignore
         json_text = gr.State()  # type: ignore
@@ -733,6 +723,7 @@ def create_components(old_generation_dropdown, history_setting, index):
                 image,
                 save_button,
                 continue_button,
+                buttons_row,
                 npz,
                 seed,
                 json_text,
