@@ -6,5 +6,6 @@ soundfile==0.12.1 # torchaudio platform windows
 # run_cmd("pip install sox") # torchaudio platform linux
 # audiocraft==0.0.1 # MIT License
 audiocraft @ git+https://git@github.com/facebookresearch/audiocraft#egg=audiocraft@c9179f8 # MIT License
+# audiocraft @ git+https://github.com/hypereikon/audiocraft#egg=audiocraft@4a114ef502b78e0f5f902012312c1b8645599bdc # MIT License
 vocos==0.0.2 # MIT License
 tortoise @ git+https://github.com/rsxdalv/tortoise-tts#egg=tortoise@f04f95e30245c85996be3af068cba4890952b1a1 # Apache 2.0
