@@ -72,11 +72,11 @@ def generate_and_save_metadata(
 
 
 def save_generation(
-    prompt: str,
     audio_array: np.ndarray,
     SAMPLE_RATE: int,
     params: MusicGenGeneration,
 ):
+    prompt = params["text"]
     date = get_date_string()
     title = prompt[:20].replace(" ", "_")
     base_filename = create_base_filename(title, "outputs", model="musicgen", date=date)
@@ -127,7 +127,6 @@ def log_generation_musicgen(
 
 def predict(params: MusicGenGeneration, melody_in: Optional[Tuple[int, np.ndarray]]):
     model = params["model"]
-    duration = params["duration"]
     text = params["text"]
     # due to JSON serialization limitations
     params["melody"] = None if model != "melody" else melody_in
@@ -153,6 +152,7 @@ def predict(params: MusicGenGeneration, melody_in: Optional[Tuple[int, np.ndarra
     start = time.time()
 
     params["seed"] = parse_or_set_seed(params["seed"], 0)
+    # generator = torch.Generator(device=MODEL.device).manual_seed(params["seed"])
     log_generation_musicgen(params)
     if melody:
         sr, melody = melody[0], torch.from_numpy(melody[1]).to(
@@ -167,19 +167,23 @@ def predict(params: MusicGenGeneration, melody_in: Optional[Tuple[int, np.ndarra
             melody_wavs=melody,
             melody_sample_rate=sr,
             progress=False,
+            # generator=generator,
         )
     else:
-        output = MODEL.generate(descriptions=[text], progress=True)
+        output = MODEL.generate(
+            descriptions=[text],
+            progress=True,
+            # generator=generator,
+        )
     set_seed(-1)
 
     elapsed = time.time() - start
     # print time taken
-    print("Generated in", elapsed, "seconds")
+    print("Generated in", "{:.3f}".format(elapsed), "seconds")
 
     output = output.detach().cpu().numpy().squeeze()
 
     filename, plot, filename_npz, metadata = save_generation(
-        prompt=text,
         audio_array=output,
         SAMPLE_RATE=MODEL.sample_rate,
         params=params,
