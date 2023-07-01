@@ -5,7 +5,10 @@ class BarkModelManager:
     def __init__(self, config):
         self.models_loaded = False
         if config["load_models_on_startup"]:
-            self.reload_models(config)
+            try:
+                self.reload_models(config)
+            except Exception as e:
+                print(f"Failed to load Bark models: {e}")
 
     def reload_models(self, config):
         print(f"{'Rel' if self.models_loaded else 'L'}oading Bark models")
