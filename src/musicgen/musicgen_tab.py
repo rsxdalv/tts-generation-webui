@@ -105,7 +105,7 @@ def save_generation(
         SAMPLE_RATE=SAMPLE_RATE,
     )
 
-    return filename, plot, _, metadata
+    return filename, plot, metadata
 
 
 MODEL = None
@@ -125,7 +125,7 @@ def log_generation_musicgen(
         print(key, ":", value)
 
 
-def predict(params: MusicGenGeneration, melody_in: Optional[Tuple[int, np.ndarray]]):
+def generate(params: MusicGenGeneration, melody_in: Optional[Tuple[int, np.ndarray]]):
     model = params["model"]
     text = params["text"]
     # due to JSON serialization limitations
@@ -183,7 +183,7 @@ def predict(params: MusicGenGeneration, melody_in: Optional[Tuple[int, np.ndarra
 
     output = output.detach().cpu().numpy().squeeze()
 
-    filename, plot, filename_npz, metadata = save_generation(
+    filename, plot, _metadata = save_generation(
         audio_array=output,
         SAMPLE_RATE=MODEL.sample_rate,
         params=params,
@@ -343,7 +343,7 @@ def generation_tab_musicgen():
         inputs=inputs,
         outputs=[musicgen_atom],
     ).then(
-        fn=predict,
+        fn=generate,
         inputs=[musicgen_atom, melody],
         outputs=[output, history_bundle_name_data, image, seed_cache],
         api_name="MusicGen",
