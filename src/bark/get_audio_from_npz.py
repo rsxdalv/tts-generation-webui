@@ -1,6 +1,6 @@
 from typing import Tuple
 from src.bark.FullGeneration import FullGeneration
-from models.bark.bark.generation import (
+from bark.generation import (
     SAMPLE_RATE,
     codec_decode,
     models,

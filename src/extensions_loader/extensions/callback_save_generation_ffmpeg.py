@@ -2,7 +2,7 @@
 import numpy as np
 import json
 from typing import Any, Dict, List
-from models.bark.bark.generation import SAMPLE_RATE
+from bark.generation import SAMPLE_RATE
 
 import subprocess
 import ffmpeg
@@ -118,7 +118,7 @@ def attach_generation_meta(full_generation, arg1, metadata):
 
 
 if __name__ == "__main__":
-    from models.bark.bark.generation import load_codec_model, codec_decode
+    from bark.generation import load_codec_model, codec_decode
 
     load_codec_model(use_gpu=True, force_reload=False)
     args_input = "./temp/ogg-vs-npz/audio__bark__None__2023-05-29_10-12-46.npz"
