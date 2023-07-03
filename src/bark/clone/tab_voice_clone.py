@@ -3,15 +3,9 @@ from src.bark.npz_tools import save_npz
 from src.bark.FullGeneration import FullGeneration
 from src.utils.date import get_date_string
 from src.bark.get_audio_from_npz import get_audio_from_full_generation
-from models.bark_voice_cloning_hubert_quantizer.hubert.hubert_manager import (
-    HuBERTManager,
-)
-from models.bark_voice_cloning_hubert_quantizer.hubert.pre_kmeans_hubert import (
-    CustomHubert,
-)
-from models.bark_voice_cloning_hubert_quantizer.hubert.customtokenizer import (
-    CustomTokenizer,
-)
+from bark_hubert_quantizer.hubert_manager import HuBERTManager
+from bark_hubert_quantizer.pre_kmeans_hubert import CustomHubert
+from bark_hubert_quantizer.customtokenizer import CustomTokenizer
 import torchaudio
 import torch
 from encodec.utils import convert_audio
