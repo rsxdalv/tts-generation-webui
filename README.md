@@ -4,7 +4,8 @@
 
 [Download](https://github.com/rsxdalv/one-click-installers-tts/archive/refs/tags/v4.0.zip) ||
 [Release Page](https://github.com/rsxdalv/one-click-installers-tts/releases/tag/v4.0) ||
-[Installer Repo](https://github.com/rsxdalv/one-click-installers-tts)
+[Installer Repo](https://github.com/rsxdalv/one-click-installers-tts) ||
+[Manual installation](#manual-installation) ||
 
 ## Videos
 ### **The AI Artist - Stable diffusion for MUSIC ?! tts-generation-webui**
@@ -94,9 +95,17 @@ May 2 Update 1:
 Before:
 * Added support for Tortoise TTS
 
-## To customize the installation, you may clone one of bark model forks within models/bark
+## Manual installation (not recommended, check installer source for reference)
 
-git clone https://github.com/rsxdalv/bark.git
+* Install conda or another virtual environment
+* Highly recommended to use Python 3.10
+* Install git (`conda install git`)
+* Install ffmpeg (`conda install -y -c pytorch ffmpeg`)
+* Set up pytorch with CUDA or CPU
+* Clone the repo: `git clone https://github.com/rsxdalv/tts-generation-webui.git`
+* install the root requirements.txt with `pip install -r requirements.txt`
+* clone the repos in the ./models/ directory and install requirements under them
+* run using `(venv) python server.py`
 
 ## Open Source Libraries
 
