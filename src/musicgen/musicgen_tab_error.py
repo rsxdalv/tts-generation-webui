@@ -1,12 +1,11 @@
 import gradio as gr
 
 
-def install_bark_voice_clone():
+def install_musicgen():
     import subprocess
 
-    # install requirements_bark_hubert_quantizer.txt
     process = subprocess.Popen(
-        "pip install -r requirements_bark_hubert_quantizer.txt",
+        "pip install -r requirements_audiocraft.txt",
         shell=True,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
@@ -23,29 +22,29 @@ def install_bark_voice_clone():
 
     # Check if the process was successful
     if process.returncode == 0:
-        print("Successfully installed bark voice clone")
-        yield "Successfully installed bark voice clone, please restart the webui"
+        print("Successfully installed MusicGen")
+        yield "Successfully installed MusicGen, please restart the webui"
     else:
-        print("Failed to install bark voice clone")
-        yield "Failed to install bark voice clone"
+        print("Failed to install MusicGen")
+        yield "Failed to install MusicGen"
 
 
-def tab_voice_clone_error(e: Exception):
-    with gr.Tab("Bark Voice Clone (!)"):
+def musicgen_tab_error(e: Exception):
+    with gr.Tab("MusicGen (!)"):
         gr.Markdown("Failed to load voice clone demo")
         gr.Markdown(f"Error: {e}")
         gr.Markdown("Please install the requirements_bark_hubert_quantizer.txt file")
         gr.Markdown("Please check the console for more information")
-        install_btn = gr.Button("Install Bark Voice Clone")
+        install_btn = gr.Button("Install MusicGen")
         gr.Markdown("Installation console:")
         console_text = gr.HTML()
         install_btn.click(
-            install_bark_voice_clone,
+            install_musicgen,
             outputs=[console_text],
         )
 
 
 if __name__ == "__main__":
     with gr.Blocks() as demo:
-        tab_voice_clone_error(Exception("Test"))
+        musicgen_tab_error(Exception("Test"))
     demo.launch()

@@ -197,26 +197,25 @@ def generate(params: MusicGenGeneration, melody_in: Optional[Tuple[int, np.ndarr
     ]
 
 
-musicgen_atom = gr.JSON(
-    # visible=True,
-    visible=False,
-    value={
-        "text": "",
-        "melody": None,
-        "model": "melody",
-        "duration": 10,
-        "topk": 250,
-        "topp": 0,
-        "temperature": 1.0,
-        "cfg_coef": 3.0,
-        "seed": -1,
-    },
-)
-
 
 def generation_tab_musicgen():
     with gr.Tab("MusicGen") as tab:
-        musicgen_atom.render()
+        musicgen_atom = gr.JSON(
+            # visible=True,
+            visible=False,
+            value={
+                "text": "",
+                "melody": None,
+                "model": "melody",
+                "duration": 10,
+                "topk": 250,
+                "topp": 0,
+                "temperature": 1.0,
+                "cfg_coef": 3.0,
+                "seed": -1,
+            },
+        )
+        # musicgen_atom.render()
         gr.Markdown(f"""Audiocraft version: {AUDIOCRAFT_VERSION}""")
         with gr.Row():
             with gr.Column():
