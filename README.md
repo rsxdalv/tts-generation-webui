@@ -2,7 +2,8 @@
 
 ## One click installers
 
-[Download](https://github.com/rsxdalv/one-click-installers-tts/archive/refs/tags/v4.0.zip) ||
+[Download](https://github.com/rsxdalv/one-click-installers-tts/archive/refs/tags/v5.0.zip) ||
+[Upgrading](#upgrading) ||
 [Manual installation](#manual-installation)
 
 ## Videos
@@ -27,15 +28,6 @@
 
 ## Extra Voices
 https://rsxdalv.github.io/bark-speaker-directory/
-
-## Dependencies
-
-This code requires the following dependencies:
-
-- `bark` in models/bark directory from https://github.com/suno-ai/bark
-- `scipy`
-- `gradio`
-
 
 ## Changelog
 July 2:
@@ -106,6 +98,14 @@ May 2 Update 1:
 
 Before:
 * Added support for Tortoise TTS
+
+## Upgrading
+*In case of issues, feel free to contact the developers*.
+
+### Upgrading from v4 to v5 installer
+* Download and run the new installer
+* Replace the "tts-generation-webui" directory in the newly installed directory
+* Run update_*platform*
 
 ## Manual installation (not recommended, check installer source for reference)
 
