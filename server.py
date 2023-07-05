@@ -3,12 +3,11 @@ import src.utils.setup_or_recover as setup_or_recover
 import src.utils.dotenv_init as dotenv_init
 import gradio as gr
 
-from src.bark.settings_tab_bark import load_models
+from src.bark.clone.tab_voice_clone_error import tab_voice_clone_error
 from src.css.css import full_css
 from src.Joutai import Joutai
 from src.musicgen.musicgen_tab import generation_tab_musicgen
 from src.history_tab.collections_directories_atom import collections_directories_atom
-from src.config.save_config_bark import save_config_bark
 from src.config.save_config_gradio import save_config_gradio
 from src.tortoise.generation_tab_tortoise import generation_tab_tortoise
 from src.config.load_config import default_config
@@ -55,9 +54,7 @@ with gr.Blocks(
 
             tab_voice_clone(register_use_as_history_button)
         except Exception as e:
-            with gr.Tab("Bark Voice Clone (!)"):
-                gr.Markdown("Failed to load voice clone demo")
-                gr.Markdown(f"Error: {e}")
+            tab_voice_clone_error(e)
             print("Failed to load voice clone demo")
             print(e)
 
