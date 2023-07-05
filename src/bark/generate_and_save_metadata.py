@@ -1,7 +1,7 @@
 import json
 from src.bark.history_to_hash import history_to_hash
 from src.bark.FullGeneration import FullGeneration
-from models.bark.bark.generation import models
+from bark.generation import models
 from typing import Optional
 
 

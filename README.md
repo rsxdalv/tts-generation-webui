@@ -2,28 +2,23 @@
 
 ## One click installers
 
-[Download](https://github.com/rsxdalv/one-click-installers-tts/archive/refs/tags/v4.0.zip) ||
-[Release Page](https://github.com/rsxdalv/one-click-installers-tts/releases/tag/v4.0) ||
-[Installer Repo](https://github.com/rsxdalv/one-click-installers-tts)
+[Download](https://github.com/rsxdalv/one-click-installers-tts/archive/refs/tags/v5.0.zip) ||
+[Upgrading](#upgrading) ||
+[Manual installation](#manual-installation)
 
 ## Videos
-### **The AI Artist - Stable diffusion for MUSIC ?! tts-generation-webui**
-[![Watch the video](https://img.youtube.com/vi/Jfy0WGN4hts/sddefault.jpg)](https://youtu.be/Jfy0WGN4hts)
 
-
-### **The AI Artist - how to use BARK AI voice cloning locally**
-[![Watch the video](https://img.youtube.com/vi/hrYhk9Khyho/sddefault.jpg)](https://youtu.be/hrYhk9Khyho)
+|                  **The AI Artist - Stable diffusion for MUSIC ?! tts-generation-webui**                  |                       **The AI Artist - how to use BARK AI voice cloning locally**                       |
+| :------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------: |
+| [![Watch the video](https://img.youtube.com/vi/Jfy0WGN4hts/sddefault.jpg)](https://youtu.be/Jfy0WGN4hts) | [![Watch the video](https://img.youtube.com/vi/hrYhk9Khyho/sddefault.jpg)](https://youtu.be/hrYhk9Khyho) |
 
 ## Screenshots
 
-This code provides a Gradio interface for generating audio from text input using the Bark TTS and Tortoise TTS models. The interface takes a text prompt as input and generates audio as output.
+|      ![musicgen](./screenshots/v2/musicgen.png)       |    ![generation](./screenshots/v2/generation.jpg)     | ![history](./screenshots/v2/history.jpg) |
+| :---------------------------------------------------: | :---------------------------------------------------: | :--------------------------------------: |
+| ![Screenshot 1](<./screenshots/screenshot%20(1).png>) | ![Screenshot 5](<./screenshots/screenshot%20(5).png>) | ![cloning](./screenshots/v2/cloning.png) |
 
-![musicgen](./screenshots/v2/musicgen.png)
-![generation](./screenshots/v2/generation.jpg)
-![history](./screenshots/v2/history.jpg)
-![Screenshot 1](./screenshots/screenshot%20(1).png)
-![Screenshot 5](./screenshots/screenshot%20(5).png)
-![cloning](./screenshots/v2/cloning.png)
+## Examples
 
 [audio__bark__continued_generation__2023-05-04_16-07-49_long.webm](https://user-images.githubusercontent.com/6757283/236218842-b9dc253e-05de-49e5-ada9-e714e1e2cbd4.webm)
 
@@ -32,22 +27,32 @@ This code provides a Gradio interface for generating audio from text input using
 [audio__bark__continued_generation__2023-05-04_16-10-55_long.webm](https://user-images.githubusercontent.com/6757283/236219243-dad96404-0879-4274-828e-7f3afc6bac65.webm)
 
 ## Extra Voices
-https://rsxdalv.github.io/bark-speaker-directory/ (https://github.com/rsxdalv/bark-speaker-directory)
-
-## Dependencies
-
-This code requires the following dependencies:
-
-- `bark` in models/bark directory from https://github.com/suno-ai/bark
-- `scipy`
-- `gradio`
-
+https://rsxdalv.github.io/bark-speaker-directory/
 
 ## Changelog
+July 2:
+* Upgrade bark settings #59
+
+July 1:
+* Studio-tab #58
+
+Jun 29:
+* Tortoise new params #54
+
+Jun 27:
+* Fix eager loading errors, refactor #50
+
+Jun 20
+* Tortoise: proper long form generation files #46
+
+Jun 19
+* Tortoise-upgrade #45
+
 June 18:
 * Update to newest audiocraft, add longer generations
 
-...
+Jun 14:
+* add vocos wav tab #42
 
 June 5:
 * Fix "Save to Favorites" button on bark generation page, clean up console (v4.1.1)
@@ -59,7 +64,7 @@ June 4:
 June 3:
 * Update to v4 - new output structure, improved history view, codebase reorganization, improved metadata, output extensions support
 
-May __:
+May 21:
 * Update to v3 - voice clone demo
 
 May 17:
@@ -94,9 +99,27 @@ May 2 Update 1:
 Before:
 * Added support for Tortoise TTS
 
-## To customize the installation, you may clone one of bark model forks within models/bark
+## Upgrading
+*In case of issues, feel free to contact the developers*.
 
-git clone https://github.com/rsxdalv/bark.git
+### Upgrading from v4 to v5 installer
+* Download and run the new installer
+* Replace the "tts-generation-webui" directory in the newly installed directory
+* Run update_*platform*
+
+## Manual installation (not recommended, check installer source for reference)
+
+* Install conda or another virtual environment
+* Highly recommended to use Python 3.10
+* Install git (`conda install git`)
+* Install ffmpeg (`conda install -y -c pytorch ffmpeg`)
+* Set up pytorch with CUDA or CPU (https://pytorch.org/audio/stable/build.windows.html#install-pytorch)
+* Clone the repo: `git clone https://github.com/rsxdalv/tts-generation-webui.git`
+* install the root requirements.txt with `pip install -r requirements.txt`
+* clone the repos in the ./models/ directory and install requirements under them
+* run using `(venv) python server.py`
+
+* Potentially needed to install build tools (without Visual Studio): https://visualstudio.microsoft.com/visual-cpp-build-tools/
 
 ## Open Source Libraries
 

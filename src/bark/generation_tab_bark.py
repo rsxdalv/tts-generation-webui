@@ -21,9 +21,9 @@ from src.bark.npz_tools import get_npz_files, load_npz, save_npz
 from src.bark.parse_or_set_seed import parse_or_set_seed
 from src.bark.split_text_functions import split_by_length_simple, split_by_lines
 from src.utils.date import get_date_string
-from models.bark.bark import SAMPLE_RATE, generate_audio
+from bark import SAMPLE_RATE, generate_audio
 from scipy.io.wavfile import write as write_wav
-from models.bark.bark.generation import SUPPORTED_LANGS
+from bark.generation import SUPPORTED_LANGS
 from src.utils.save_waveform_plot import save_waveform_plot
 from src.model_manager import model_manager
 from src.config.config import config

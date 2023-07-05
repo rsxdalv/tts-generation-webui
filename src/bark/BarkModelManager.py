@@ -1,4 +1,4 @@
-from models.bark.bark.generation import preload_models
+from bark.generation import preload_models
 
 
 class BarkModelManager:

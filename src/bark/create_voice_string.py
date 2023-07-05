@@ -1,4 +1,4 @@
-from models.bark.bark.generation import SUPPORTED_LANGS
+from bark.generation import SUPPORTED_LANGS
 from typing import Union
 import os
 
