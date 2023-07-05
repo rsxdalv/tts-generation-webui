@@ -1,4 +1,4 @@
-# TTS Generation WebUI (Bark v2, MusicGen, Tortoise, Vocos)
+# TTS Generation WebUI (Bark, MusicGen, Tortoise, Vocos)
 
 ## One click installers
 
@@ -152,3 +152,38 @@ This project utilizes the following open source libraries:
 - **vocos** - [MIT License](https://github.com/charactr-platform/vocos/blob/master/LICENSE)
   - Description: An improved decoder for encodec samples
   - Repository: [charactr-platform/vocos](https://github.com/charactr-platform/vocos)
+
+## Ethical and Responsible Use
+This technology is intended for enablement and creativity, not for harm.
+
+By engaging with this AI model, you acknowledge and agree to abide by these guidelines, employing the AI model in a responsible, ethical, and legal manner.
+- Non-Malicious Intent: Do not use this AI model for malicious, harmful, or unlawful activities. It should only be used for lawful and ethical purposes that promote positive engagement, knowledge sharing, and constructive conversations.
+- No Impersonation: Do not use this AI model to impersonate or misrepresent yourself as someone else, including individuals, organizations, or entities. It should not be used to deceive, defraud, or manipulate others.
+- No Fraudulent Activities: This AI model must not be used for fraudulent purposes, such as financial scams, phishing attempts, or any form of deceitful practices aimed at acquiring sensitive information, monetary gain, or unauthorized access to systems.
+- Legal Compliance: Ensure that your use of this AI model complies with applicable laws, regulations, and policies regarding AI usage, data protection, privacy, intellectual property, and any other relevant legal obligations in your jurisdiction.
+- Acknowledgement: By engaging with this AI model, you acknowledge and agree to abide by these guidelines, using the AI model in a responsible, ethical, and legal manner.
+
+## License
+
+### Codebase and Dependencies
+
+The codebase is licensed under MIT. However, it's important to note that when installing the dependencies, you will also be subject to their respective licenses. Although most of these licenses are permissive, there may be some that are not. Therefore, it's essential to understand that the permissive license only applies to the codebase itself, not the entire project.
+
+That being said, the goal is to maintain MIT compatibility throughout the project. If you come across a dependency that is not compatible with the MIT license, please feel free to open an issue and bring it to our attention.
+
+Known non-permissive dependencies:
+| Library     | License           | Notes                                                                                     |
+|-------------|-------------------|-------------------------------------------------------------------------------------------|
+| encodec     | CC BY-NC 4.0      | Newer versions are MIT, but need to be installed manually                                  |
+| diffq       | CC BY-NC 4.0      | Optional in the future, not necessary to run, can be uninstalled, should be updated with demucs |
+| lameenc     | GPL License       | Future versions will make it LGPL, but need to be installed manually                      |
+| unidecode   | GPL License       | Not mission critical, can be replaced with another library, issue: https://github.com/neonbjb/tortoise-tts/issues/494 |
+
+
+### Model Weights
+Model weights have different licenses, please pay attention to the license of the model you are using.
+
+Most notably:
+- Bark: CC BY-NC 4.0 (MIT According to repo, but CC BY-NC 4.0 according to HuggingFace)
+- Tortoise: *Unknown* (Apache-2.0 according to repo, but no license file in HuggingFace)
+- MusicGen: CC BY-NC 4.0
