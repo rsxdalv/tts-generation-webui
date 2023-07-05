@@ -30,29 +30,32 @@
 https://rsxdalv.github.io/bark-speaker-directory/
 
 ## Changelog
+July 5:
+* Improved v5 installer - faster and more reliable
+
 July 2:
-* Upgrade bark settings #59
+* Upgrade bark settings https://github.com/rsxdalv/tts-generation-webui/pull/59
 
 July 1:
-* Studio-tab #58
+* Studio-tab https://github.com/rsxdalv/tts-generation-webui/pull/58
 
 Jun 29:
-* Tortoise new params #54
+* Tortoise new params https://github.com/rsxdalv/tts-generation-webui/pull/54
 
 Jun 27:
-* Fix eager loading errors, refactor #50
+* Fix eager loading errors, refactor https://github.com/rsxdalv/tts-generation-webui/pull/50
 
 Jun 20
-* Tortoise: proper long form generation files #46
+* Tortoise: proper long form generation files https://github.com/rsxdalv/tts-generation-webui/pull/46
 
 Jun 19
-* Tortoise-upgrade #45
+* Tortoise-upgrade https://github.com/rsxdalv/tts-generation-webui/pull/45
 
 June 18:
 * Update to newest audiocraft, add longer generations
 
 Jun 14:
-* add vocos wav tab #42
+* add vocos wav tab https://github.com/rsxdalv/tts-generation-webui/pull/42
 
 June 5:
 * Fix "Save to Favorites" button on bark generation page, clean up console (v4.1.1)

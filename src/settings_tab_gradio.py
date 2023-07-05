@@ -1,9 +1,9 @@
-from typing import Any, Callable, Dict, List
+from typing import Any, Callable, Dict
 import gradio as gr
+from src.config.save_config_gradio import save_config_gradio
 
 
 def settings_tab_gradio(
-    save_config: Callable[[List[str], List[Any]], str],
     reload_config_and_restart_ui: Callable[[], None],
     gradio_interface_options: Dict[str, Any],
 ):
@@ -155,7 +155,7 @@ def settings_tab_gradio(
                 # Map over the UI elements
                 for i in inputs:
                     i.change(
-                        fn=lambda *input_values: save_config(keys, input_values),
+                        fn=lambda *input_values: save_config_gradio(keys, input_values),
                         inputs=inputs,
                         outputs=[save_beacon],
                     )
