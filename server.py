@@ -35,7 +35,7 @@ with gr.Blocks(
     title="TTS Generation WebUI",
     analytics_enabled=False,  # it broke too many times
 ) as demo:
-    gr.Markdown("# TTS Generation WebUI (Bark, MusicGen, Tortoise)")
+    gr.Markdown("# TTS Generation WebUI (Bark, MusicGen, Tortoise, RVC)")
     with Joutai.singleton.tabs:
         from src.tortoise.generation_tab_tortoise import generation_tab_tortoise
         from src.settings_tab_gradio import settings_tab_gradio
@@ -68,6 +68,17 @@ with gr.Blocks(
 
             musicgen_tab_error(e)
             print("Failed to load musicgen demo")
+            print(e)
+
+        try:
+            from src.rvc_tab.rvc_tab import rvc_conversion_tab
+
+            rvc_conversion_tab()
+        except Exception as e:
+            from src.rvc_tab.rvc_tab_error import rvc_tab_error
+
+            rvc_tab_error(e)
+            print("Failed to load rvc demo")
             print(e)
 
         vocos_tabs()
