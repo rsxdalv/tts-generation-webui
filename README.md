@@ -2,7 +2,7 @@
 
 ## One click installers
 
-[Download](https://github.com/rsxdalv/one-click-installers-tts/archive/refs/tags/v5.0.zip) ||
+[Download](https://github.com/rsxdalv/one-click-installers-tts/archive/refs/tags/v6.0.zip) ||
 [Upgrading](#upgrading) ||
 [Manual installation](#manual-installation)
 
@@ -14,7 +14,7 @@
 
 ## Screenshots
 
-|      ![musicgen](./screenshots/v2/musicgen.png)       |    ![generation](./screenshots/v2/generation.jpg)     | ![history](./screenshots/v2/history.jpg) |
+|      ![musicgen](./screenshots/v2/musicgen.png)       |    ![rvc](./screenshots/v2/rvc.png)     | ![history](./screenshots/v2/history.jpg) |
 | :---------------------------------------------------: | :---------------------------------------------------: | :--------------------------------------: |
 | ![Screenshot 1](<./screenshots/screenshot%20(1).png>) | ![Screenshot 5](<./screenshots/screenshot%20(5).png>) | ![cloning](./screenshots/v2/cloning.png) |
 
@@ -30,6 +30,9 @@
 https://rsxdalv.github.io/bark-speaker-directory/
 
 ## Changelog
+July 9:
+* RVC Demo + Tortoise, v6 installer with update script and automatic attempts to install extra modules
+
 July 5:
 * Improved v5 installer - faster and more reliable
 
@@ -105,6 +108,15 @@ Before:
 ## Upgrading
 *In case of issues, feel free to contact the developers*.
 
+### Upgrading from v5 to v6 installer
+* Download and run the new installer
+* Replace the "tts-generation-webui" directory in the newly installed directory
+* Run update_*platform*
+
+#### *Is there any more optimal way to do this?*
+
+Not exactly, the dependencies clash, especially between conda and python (and dependencies are already in a critical state, moving them to conda is ways off). Therefore, while it might be possible to just replace the old installer with the new one and running the update, the problems are unpredictable and **unfixable**. Making an update to installer requires a lot of testing so it's not done lightly.
+
 ### Upgrading from v4 to v5 installer
 * Download and run the new installer
 * Replace the "tts-generation-webui" directory in the newly installed directory
@@ -152,6 +164,10 @@ This project utilizes the following open source libraries:
 - **vocos** - [MIT License](https://github.com/charactr-platform/vocos/blob/master/LICENSE)
   - Description: An improved decoder for encodec samples
   - Repository: [charactr-platform/vocos](https://github.com/charactr-platform/vocos)
+
+- **RVC** - [MIT License](https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI/blob/main/LICENSE)
+  - Description: An easy-to-use Voice Conversion framework based on VITS.
+  - Repository: [RVC-Project/Retrieval-based-Voice-Conversion-WebUI](https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI)
 
 ## Ethical and Responsible Use
 This technology is intended for enablement and creativity, not for harm.
