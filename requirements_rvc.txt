@@ -1,0 +1,2 @@
+torchcrepe @ git+https://github.com/rsxdalv/torchcrepe@patch-1 # MIT License
+rvc-beta @ git+https://github.com/rsxdalv/Retrieval-based-Voice-Conversion-WebUI@package # MIT License
