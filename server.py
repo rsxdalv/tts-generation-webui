@@ -81,6 +81,17 @@ with gr.Blocks(
             print("Failed to load rvc demo")
             print(e)
 
+        try:
+            from src.demucs.demucs_tab import demucs_tab
+
+            demucs_tab()
+        except Exception as e:
+            from src.demucs.demucs_tab_error import demucs_tab_error
+
+            demucs_tab_error(e)
+            print("Failed to load demucs demo")
+            print(e)
+
         vocos_tabs()
         generation_tab_tortoise()
 
