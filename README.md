@@ -1,4 +1,4 @@
-# TTS Generation WebUI (Bark, MusicGen, Tortoise, Vocos)
+# TTS Generation WebUI (Bark, MusicGen, Tortoise, RVC, Vocos, Demucs)
 
 ## One click installers
 
@@ -30,11 +30,14 @@
 https://rsxdalv.github.io/bark-speaker-directory/
 
 ## Changelog
+July 10:
+* Demucs Demo https://github.com/rsxdalv/tts-generation-webui/pull/67
+
 July 9:
-* RVC Demo + Tortoise, v6 installer with update script and automatic attempts to install extra modules
+* RVC Demo + Tortoise, v6 installer with update script and automatic attempts to install extra modules https://github.com/rsxdalv/tts-generation-webui/pull/66
 
 July 5:
-* Improved v5 installer - faster and more reliable
+* Improved v5 installer - faster and more reliable https://github.com/rsxdalv/tts-generation-webui/pull/63
 
 July 2:
 * Upgrade bark settings https://github.com/rsxdalv/tts-generation-webui/pull/59

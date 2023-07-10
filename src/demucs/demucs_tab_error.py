@@ -22,16 +22,18 @@ def install_musicgen():
 
     # Check if the process was successful
     if process.returncode == 0:
-        print("Successfully installed MusicGen")
-        yield "Successfully installed MusicGen, please restart the webui"
+        print(
+            "Successfully installed MusicGen/Audiocraft/Demucs, please restart the webui"
+        )
+        yield "Successfully installed MusicGen/Audiocraft/Demucs, please restart the webui"
     else:
-        print("Failed to install MusicGen")
-        yield "Failed to install MusicGen"
+        print("Failed to install MusicGen/Audiocraft/Demucs")
+        yield "Failed to install MusicGen/Audiocraft/Demucs"
 
 
-def musicgen_tab_error(e: Exception):
-    with gr.Tab("MusicGen (!)"):
-        gr.Markdown("Failed to MusicGen")
+def demucs_tab_error(e: Exception):
+    with gr.Tab("Demucs Demo (!)"):
+        gr.Markdown("Failed to load Demucs demo")
         gr.Markdown(f"Error: {e}")
         gr.Markdown("Please install the requirements_bark_hubert_quantizer.txt file")
         gr.Markdown("Please check the console for more information")
@@ -46,5 +48,5 @@ def musicgen_tab_error(e: Exception):
 
 if __name__ == "__main__":
     with gr.Blocks() as demo:
-        musicgen_tab_error(Exception("Test"))
+        demucs_tab_error(Exception("Test"))
     demo.launch()
