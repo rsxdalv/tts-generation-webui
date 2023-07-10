@@ -31,7 +31,7 @@ def install_musicgen():
 
 def musicgen_tab_error(e: Exception):
     with gr.Tab("MusicGen (!)"):
-        gr.Markdown("Failed to load voice clone demo")
+        gr.Markdown("Failed to MusicGen")
         gr.Markdown(f"Error: {e}")
         gr.Markdown("Please install the requirements_bark_hubert_quantizer.txt file")
         gr.Markdown("Please check the console for more information")
