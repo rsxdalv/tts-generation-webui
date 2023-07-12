@@ -8,9 +8,9 @@
 
 ## Videos
 
-|                  **The AI Artist - Stable diffusion for MUSIC ?! tts-generation-webui**                  |                       **The AI Artist - how to use BARK AI voice cloning locally**                       |
+|                  **Demo - How to use RVC with Tortoise**                                                 |                       **How To Get More Voices for Bark TTS**                                            |
 | :------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------: |
-| [![Watch the video](https://img.youtube.com/vi/Jfy0WGN4hts/sddefault.jpg)](https://youtu.be/Jfy0WGN4hts) | [![Watch the video](https://img.youtube.com/vi/hrYhk9Khyho/sddefault.jpg)](https://youtu.be/hrYhk9Khyho) |
+| [![Watch the video](https://img.youtube.com/vi/mhp_e8WSpxA/sddefault.jpg)](https://youtu.be/mhp_e8WSpxA) | [![Watch the video](https://img.youtube.com/vi/yeC5vJoavOE/sddefault.jpg)](https://youtu.be/yeC5vJoavOE) |
 
 ## Screenshots
 
