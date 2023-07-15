@@ -1,11 +1,10 @@
 from typing import Any
 from src.musicgen.setup_seed_ui_musicgen import setup_seed_ui_musicgen
-from tortoise.utils.audio import get_voices
 from src.css.css import full_css
 import gradio as gr
 from src.tortoise.TortoiseOutputRow import TortoiseOutputRow
 from src.tortoise.create_tortoise_output_row_ui import create_tortoise_output_row_ui
-from src.tortoise.gen_tortoise import generate_tortoise_long
+from src.tortoise.gen_tortoise import generate_tortoise_long, get_voice_list
 from src.tortoise.TortoiseParameters import (
     TortoiseParameterComponents,
     TortoiseParameters,
@@ -43,15 +42,13 @@ def tortoise_core_ui():
                 gr.Markdown("Voice")
                 with gr.Row():
                     voice = gr.Dropdown(
-                        choices=["random"] + list(get_voices()),
+                        choices=get_voice_list(),
                         value="random",
                         show_label=False,
                         container=False,
                     )
                     gr_reload_button().click(
-                        fn=lambda: gr.Dropdown.update(
-                            choices=["random"] + list(get_voices())
-                        ),
+                        fn=lambda: gr.Dropdown.update(choices=get_voice_list()),
                         outputs=[voice],
                     )
             with gr.Box():

@@ -5,7 +5,7 @@ from src.utils.create_base_filename import create_base_filename
 from src.utils.date import get_date_string
 from src.utils.save_waveform_plot import save_waveform_plot
 from tortoise.api import TextToSpeech, MODELS_DIR
-from tortoise.utils.audio import load_voices
+from tortoise.utils.audio import load_voices, get_voices
 import gradio as gr
 from src.tortoise.TortoiseOutputRow import TortoiseOutputRow, TortoiseOutputUpdate
 from src.tortoise.save_json import save_json
@@ -17,6 +17,11 @@ SAMPLE_RATE = 24_000
 OUTPUT_PATH = "outputs/"
 
 MODEL = None
+TORTOISE_VOICE_DIR = "voices-tortoise"
+
+
+def get_voice_list():
+    return ["random"] + list(get_voices(extra_voice_dirs=[TORTOISE_VOICE_DIR]))
 
 
 def save_wav_tortoise(audio_array, filename):
@@ -40,7 +45,9 @@ def generate_tortoise(
     os.makedirs(OUTPUT_PATH, exist_ok=True)
 
     voice_sel = voice.split("&") if "&" in voice else [voice]
-    voice_samples, conditioning_latents = load_voices(voice_sel)
+    voice_samples, conditioning_latents = load_voices(
+        voice_sel, extra_voice_dirs=[TORTOISE_VOICE_DIR]
+    )
 
     tts = get_tts()
     result, state = tts.tts_with_preset(
@@ -54,7 +61,7 @@ def generate_tortoise(
             k: v
             for k, v in params.to_dict().items()
             if k not in ["text", "voice", "split_prompt", "seed"]
-        }
+        },
     )
 
     seed, _, _, _ = state
