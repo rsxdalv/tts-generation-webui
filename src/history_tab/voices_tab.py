@@ -15,7 +15,7 @@ import shutil
 
 
 def voices_tab(register_use_as_history_button, directory="voices"):
-    with gr.Tab(directory.capitalize()) as voices_tab, gr.Row():
+    with gr.Tab(directory.capitalize()) as voices_tab, gr.Row(equal_height=False):
         with gr.Column():
             with gr.Row():
                 button_output = gr.Button(value=f"Open {directory} folder")
