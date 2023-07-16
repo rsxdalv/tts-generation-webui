@@ -6,7 +6,7 @@ if sys.platform == "darwin":
     def open_folder(folder_path: str):
         subprocess.check_call(["open", "--", folder_path])
 
-elif sys.platform == "linux2":
+elif sys.platform.startswith('linux'):
 
     def open_folder(folder_path: str):
         subprocess.check_call(["xdg-open", "--", folder_path])

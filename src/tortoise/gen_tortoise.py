@@ -11,6 +11,7 @@ from src.tortoise.TortoiseOutputRow import TortoiseOutputRow, TortoiseOutputUpda
 from src.tortoise.save_json import save_json
 from scipy.io.wavfile import write as write_wav
 from src.tortoise.TortoiseParameters import TortoiseParameters
+from src.utils.get_path_from_root import get_path_from_root
 
 
 SAMPLE_RATE = 24_000
@@ -19,25 +20,8 @@ OUTPUT_PATH = "outputs/"
 MODEL = None
 TORTOISE_VOICE_DIR = "voices-tortoise"
 
-TORTOISE_VOICE_DIR_ABS = os.path.abspath(
-    os.path.join(
-        *os.path.split(os.path.dirname(os.path.realpath(__file__))),
-        "..",
-        "..",
-        "voices-tortoise",
-    )
-)
-
-TORTOISE_LOCAL_MODELS_DIR = os.path.abspath(
-    os.path.join(
-        *os.path.split(os.path.dirname(os.path.realpath(__file__))),
-        "..",
-        "..",
-        "data",
-        "models",
-        "tortoise",
-    )
-)
+TORTOISE_VOICE_DIR_ABS = get_path_from_root("voices-tortoise")
+TORTOISE_LOCAL_MODELS_DIR = get_path_from_root("data", "models", "tortoise")
 
 
 def get_model_list():
