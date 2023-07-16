@@ -19,6 +19,50 @@ OUTPUT_PATH = "outputs/"
 MODEL = None
 TORTOISE_VOICE_DIR = "voices-tortoise"
 
+TORTOISE_VOICE_DIR_ABS = os.path.abspath(
+    os.path.join(
+        *os.path.split(os.path.dirname(os.path.realpath(__file__))),
+        "..",
+        "..",
+        "voices-tortoise",
+    )
+)
+
+TORTOISE_LOCAL_MODELS_DIR = os.path.abspath(
+    os.path.join(
+        *os.path.split(os.path.dirname(os.path.realpath(__file__))),
+        "..",
+        "..",
+        "data",
+        "models",
+        "tortoise",
+    )
+)
+
+
+def get_model_list():
+    try:
+        return ["Default"] + [
+            x for x in os.listdir(TORTOISE_LOCAL_MODELS_DIR) if x != ".gitkeep"
+        ]
+    except FileNotFoundError as e:
+        print(e)
+        return ["Default"]
+
+
+def get_full_model_dir(model_dir: str):
+    return os.path.join(TORTOISE_LOCAL_MODELS_DIR, model_dir)
+
+
+def switch_model(model_dir: str):
+    get_tts(
+        models_dir=MODELS_DIR
+        if model_dir == "Default"
+        else get_full_model_dir(model_dir),
+        force_reload=True,
+    )
+    return gr.Dropdown.update()
+
 
 def get_voice_list():
     return ["random"] + list(get_voices(extra_voice_dirs=[TORTOISE_VOICE_DIR]))
@@ -28,10 +72,10 @@ def save_wav_tortoise(audio_array, filename):
     write_wav(filename, SAMPLE_RATE, audio_array)
 
 
-def get_tts():
+def get_tts(models_dir=MODELS_DIR, force_reload=False):
     global MODEL
-    if MODEL is None:
-        MODEL = TextToSpeech(models_dir=MODELS_DIR)
+    if MODEL is None or force_reload:
+        MODEL = TextToSpeech(models_dir=models_dir)
     return MODEL
 
 
@@ -60,7 +104,7 @@ def generate_tortoise(
         **{
             k: v
             for k, v in params.to_dict().items()
-            if k not in ["text", "voice", "split_prompt", "seed"]
+            if k not in ["text", "voice", "split_prompt", "seed", "model"]
         },
     )
 
