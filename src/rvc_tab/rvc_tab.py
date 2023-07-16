@@ -8,6 +8,9 @@ from rvc_beta.infer_batch_rvc import vc_single, get_vc
 from src.rvc_tab.get_and_load_hubert import get_and_load_hubert
 from src.Joutai import Joutai
 from src.history_tab.open_folder import open_folder
+from src.utils.get_path_from_root import get_path_from_root
+import glob
+from src.tortoise.gr_reload_button import gr_reload_button, gr_open_button_simple
 
 
 def inject_hubert(hubert_model: torch.nn.Module):
@@ -54,7 +57,8 @@ def run_rvc(
     )
 
     from rvc_beta.infer_batch_rvc import config
-    if device == "cpu":  # Workaround for "slow_conv2d_cpu" not implemented for 'Half' 
+
+    if device == "cpu":  # Workaround for "slow_conv2d_cpu" not implemented for 'Half'
         config.is_half = is_half
 
     if infer_batch_rvc.hubert_model is None:
@@ -72,25 +76,116 @@ def run_rvc(
     )
 
 
+RVC_LOCAL_MODELS_DIR = get_path_from_root("data", "models", "rvc", "checkpoints")
+
+
+def remove_path_base(path: str, pos: int = 0):
+    return os.path.join(*path.split(os.path.sep)[pos:])
+
+
+def get_list(type: str):
+    try:
+        return [
+            remove_path_base(x, 4).replace(f".{type}", "")
+            for x in glob.glob(
+                os.path.join("data", "models", "rvc", "checkpoints", "**", f"*.{type}")
+            )
+            if x != ".gitkeep"
+        ]
+    except FileNotFoundError as e:
+        print(e)
+        return []
+
+
+def get_rvc_model_list():
+    return get_list("pth")
+
+
+def get_rvc_index_list():
+    return get_list("index")
+
+
+def rvc_ui_model_or_index_path_ui(label: str):
+    file_type = "pth" if label == "Model" else "index"
+    extension = f".{file_type}"
+    file_types = [extension]
+    get_list_fn = get_rvc_model_list if label == "Model" else get_rvc_index_list
+
+    with gr.Box():
+        gr.Markdown(f"{label}")
+        with gr.Row():
+            file_path_dropdown = gr.Dropdown(
+                label=label,
+                choices=get_list_fn(),
+                show_label=False,
+                container=False,
+            )
+            gr_open_button_simple(RVC_LOCAL_MODELS_DIR)
+            gr_reload_button().click(
+                lambda: file_path_dropdown.update(
+                    choices=get_list_fn(),
+                ),
+                outputs=[file_path_dropdown],
+            )
+    gr.Markdown(
+        """
+<div style="text-align: center;">
+- or -
+</div>
+    """
+    )
+    file_path_file = gr.File(
+        label=label,
+        type="file",
+        file_count="single",
+        file_types=file_types,
+    )
+    file_path = gr.File(
+        label=label,
+        type="file",
+        file_count="single",
+        file_types=file_types,
+        visible=False,
+    )
+    file_path_file.change(
+        lambda file: [
+            file_path.update(value=file.name),
+            file_path_dropdown.update(value=None),
+        ]
+        if file is not None
+        else [
+            file_path.update(),
+            file_path_dropdown.update(),
+        ],
+        inputs=[file_path_file],
+        outputs=[file_path, file_path_dropdown],
+    )
+    file_path_dropdown.change(
+        lambda model: [
+            file_path.update(
+                value=os.path.join(RVC_LOCAL_MODELS_DIR, f"{model}{extension}")
+            ),
+            file_path_file.update(value=None),
+        ] if model is not None
+        else [
+            file_path.update(),
+            file_path_file.update(),
+        ],
+        inputs=[file_path_dropdown],
+        outputs=[file_path, file_path_file],
+    )
+    return file_path
+
+
 def rvc_ui():
     gr.Markdown("# RVC Beta Demo")
     with gr.Row(equal_height=False):
         with gr.Column():
             with gr.Row():
-                model_path = gr.File(
-                    label="Model Path",
-                    type="file",
-                    file_count="single",
-                    file_types=[".pth"],
-                    # value="c:\\Users\\admin\\Desktop\\one-click-installers-tts-main\\tts-generation-webui\\temp\\rvc-webui\\models\\checkpoints\\Alina_Gray.pth",
-                )
-                index_path = gr.File(
-                    label="Index Path",
-                    type="file",
-                    file_count="single",
-                    file_types=[".index"],
-                    # value="c:\\Users\\admin\\Desktop\\one-click-installers-tts-main\\tts-generation-webui\\temp\\rvc-webui\\models\\checkpoints\\added_IVF1429_Flat_nprobe_1_Alina_Gray_v1.index",
-                )
+                with gr.Column():
+                    model_path = rvc_ui_model_or_index_path_ui("Model")
+                with gr.Column():
+                    index_path = rvc_ui_model_or_index_path_ui("Index")
             with gr.Row():
                 f0up_key = gr.Textbox(label="f0 Up key", value="0")
                 # f0method = gr.Dropdown(
@@ -137,7 +232,9 @@ def rvc_ui():
             original_audio.render()
             button = gr.Button(value="Convert", variant="primary")
             result = gr.Audio(label="result", interactive=False)
-            open_folder_button = gr.Button(value="Open outputs folder", variant="secondary")
+            open_folder_button = gr.Button(
+                value="Open outputs folder", variant="secondary"
+            )
             open_folder_button.click(lambda: open_folder("outputs-rvc"))
 
         button.click(
@@ -160,6 +257,9 @@ def rvc_ui():
         )
 
     return original_audio
+
+
+print(__file__)
 
 
 def rvc_conversion_tab():

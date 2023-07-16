@@ -1,5 +1,4 @@
 from typing import Any
-from src.history_tab.open_folder import open_folder
 from src.musicgen.setup_seed_ui_musicgen import setup_seed_ui_musicgen
 from src.css.css import full_css
 import gradio as gr
