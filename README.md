@@ -8,9 +8,9 @@
 
 ## Videos
 
-|                  **Demo - How to use RVC with Tortoise**                                                 |                       **How To Get More Voices for Bark TTS**                                            |
-| :------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------: |
-| [![Watch the video](https://img.youtube.com/vi/mhp_e8WSpxA/sddefault.jpg)](https://youtu.be/mhp_e8WSpxA) | [![Watch the video](https://img.youtube.com/vi/yeC5vJoavOE/sddefault.jpg)](https://youtu.be/yeC5vJoavOE) |
+|                  **Refining Bark TTS vocals using Demucs & Vocos**                                                 |                  **Demo - How to use RVC with Tortoise**                                                 |                       **How To Get More Voices for Bark TTS**                                            |
+| :------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------: |
+| [![Watch the video](https://img.youtube.com/vi/jCb-8JE7pk8/sddefault.jpg)](https://youtu.be/jCb-8JE7pk8) | [![Watch the video](https://img.youtube.com/vi/mhp_e8WSpxA/sddefault.jpg)](https://youtu.be/mhp_e8WSpxA) | [![Watch the video](https://img.youtube.com/vi/yeC5vJoavOE/sddefault.jpg)](https://youtu.be/yeC5vJoavOE) |
 
 ## Screenshots
 

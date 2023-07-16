@@ -1,11 +1,18 @@
 from typing import Any
+from src.history_tab.open_folder import open_folder
 from src.musicgen.setup_seed_ui_musicgen import setup_seed_ui_musicgen
-from tortoise.utils.audio import get_voices
 from src.css.css import full_css
 import gradio as gr
 from src.tortoise.TortoiseOutputRow import TortoiseOutputRow
 from src.tortoise.create_tortoise_output_row_ui import create_tortoise_output_row_ui
-from src.tortoise.gen_tortoise import generate_tortoise_long
+from src.tortoise.gen_tortoise import (
+    generate_tortoise_long,
+    get_model_list,
+    get_voice_list,
+    TORTOISE_LOCAL_MODELS_DIR,
+    TORTOISE_VOICE_DIR_ABS,
+    switch_model,
+)
 from src.tortoise.TortoiseParameters import (
     TortoiseParameterComponents,
     TortoiseParameters,
@@ -13,7 +20,7 @@ from src.tortoise.TortoiseParameters import (
 from src.tortoise.autoregressive_params import autoregressive_params
 from src.tortoise.diffusion_params import diffusion_params
 from src.tortoise.presets import presets
-from src.tortoise.gr_reload_button import gr_reload_button
+from src.tortoise.gr_reload_button import gr_open_button_simple, gr_reload_button
 
 MAX_OUTPUTS = 9
 
@@ -40,18 +47,33 @@ def tortoise_core_ui():
     with gr.Row():
         with gr.Column():
             with gr.Box():
+                gr.Markdown("Model")
+                with gr.Row():
+                    model = gr.Dropdown(
+                        choices=get_model_list(),
+                        value="Default",
+                        show_label=False,
+                        container=False,
+                    )
+                    gr_open_button_simple(TORTOISE_LOCAL_MODELS_DIR)
+                    gr_reload_button().click(
+                        fn=lambda: gr.Dropdown.update(choices=get_model_list()),
+                        outputs=[model],
+                    )
+
+                    model.select(fn=switch_model, inputs=[model], outputs=[model])
+            with gr.Box():
                 gr.Markdown("Voice")
                 with gr.Row():
                     voice = gr.Dropdown(
-                        choices=["random"] + list(get_voices()),
+                        choices=get_voice_list(),
                         value="random",
                         show_label=False,
                         container=False,
                     )
+                    gr_open_button_simple(TORTOISE_VOICE_DIR_ABS)
                     gr_reload_button().click(
-                        fn=lambda: gr.Dropdown.update(
-                            choices=["random"] + list(get_voices())
-                        ),
+                        fn=lambda: gr.Dropdown.update(choices=get_voice_list()),
                         outputs=[voice],
                     )
             with gr.Box():
@@ -125,6 +147,7 @@ def tortoise_core_ui():
             cond_free=cond_free,
             cond_free_k=cond_free_k,
             diffusion_temperature=diffusion_temperature,
+            model=model,
         )
     )
 
