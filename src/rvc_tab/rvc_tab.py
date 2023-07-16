@@ -53,6 +53,10 @@ def run_rvc(
         _protect=protect,
     )
 
+    from rvc_beta.infer_batch_rvc import config
+    if device == "cpu":  # Workaround for "slow_conv2d_cpu" not implemented for 'Half' 
+        config.is_half = is_half
+
     if infer_batch_rvc.hubert_model is None:
         get_and_load_hubert()
 
@@ -134,7 +138,7 @@ def rvc_ui():
             button = gr.Button(value="Convert", variant="primary")
             result = gr.Audio(label="result", interactive=False)
             open_folder_button = gr.Button(value="Open outputs folder", variant="secondary")
-            open_folder_button.click(lambda: open_folder("outputs-rvc"), inputs=result)
+            open_folder_button.click(lambda: open_folder("outputs-rvc"))
 
         button.click(
             run_rvc,
