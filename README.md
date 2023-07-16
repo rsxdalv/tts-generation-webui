@@ -31,6 +31,7 @@ https://rsxdalv.github.io/bark-speaker-directory/
 
 ## Changelog
 July 16:
+* Voice Photo Demo
 * Add a directory to store RVC models/indexes in and a dropdown
 * Workaround rvc not respecting is_half for CPU https://github.com/rsxdalv/tts-generation-webui/pull/74
 * Tortoise model and voice selection improvements https://github.com/rsxdalv/tts-generation-webui/pull/73
