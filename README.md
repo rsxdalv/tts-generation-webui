@@ -30,6 +30,9 @@
 https://rsxdalv.github.io/bark-speaker-directory/
 
 ## Changelog
+July 19:
+* Add Tortoise Optimizations, Thank you https://github.com/manmay-nakhashi https://github.com/rsxdalv/tts-generation-webui/pull/79 (Implements https://github.com/rsxdalv/tts-generation-webui/issues/18)
+
 July 16:
 * Voice Photo Demo
 * Add a directory to store RVC models/indexes in and a dropdown
