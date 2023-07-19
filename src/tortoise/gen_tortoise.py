@@ -38,12 +38,20 @@ def get_full_model_dir(model_dir: str):
     return os.path.join(TORTOISE_LOCAL_MODELS_DIR, model_dir)
 
 
-def switch_model(model_dir: str):
+def switch_model(
+    model_dir: str,
+    kv_cache=False,
+    use_deepspeed=False,
+    half=False,
+):
     get_tts(
         models_dir=MODELS_DIR
         if model_dir == "Default"
         else get_full_model_dir(model_dir),
         force_reload=True,
+        kv_cache=kv_cache,
+        use_deepspeed=use_deepspeed,
+        half=half,
     )
     return gr.Dropdown.update()
 
@@ -56,10 +64,22 @@ def save_wav_tortoise(audio_array, filename):
     write_wav(filename, SAMPLE_RATE, audio_array)
 
 
-def get_tts(models_dir=MODELS_DIR, force_reload=False):
+def get_tts(
+    models_dir=MODELS_DIR,
+    force_reload=False,
+    kv_cache=False,
+    use_deepspeed=False,
+    half=False,
+):
     global MODEL
     if MODEL is None or force_reload:
-        MODEL = TextToSpeech(models_dir=models_dir)
+        # TODO - clear the old model from memory
+        MODEL = TextToSpeech(
+            models_dir=models_dir,
+            kv_cache=kv_cache,
+            use_deepspeed=use_deepspeed,
+            half=half,
+        )
     return MODEL
 
 
