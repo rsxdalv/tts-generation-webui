@@ -6,11 +6,8 @@ from src.tortoise.TortoiseOutputRow import TortoiseOutputRow
 from src.tortoise.create_tortoise_output_row_ui import create_tortoise_output_row_ui
 from src.tortoise.gen_tortoise import (
     generate_tortoise_long,
-    get_model_list,
     get_voice_list,
-    TORTOISE_LOCAL_MODELS_DIR,
     TORTOISE_VOICE_DIR_ABS,
-    switch_model,
 )
 from src.tortoise.TortoiseParameters import (
     TortoiseParameterComponents,
@@ -20,6 +17,7 @@ from src.tortoise.autoregressive_params import autoregressive_params
 from src.tortoise.diffusion_params import diffusion_params
 from src.tortoise.presets import presets
 from src.tortoise.gr_reload_button import gr_open_button_simple, gr_reload_button
+from src.tortoise.tortoise_model_settings_ui import tortoise_model_settings_ui
 
 MAX_OUTPUTS = 9
 
@@ -45,22 +43,7 @@ def generation_tab_tortoise():
 def tortoise_core_ui():
     with gr.Row():
         with gr.Column():
-            with gr.Box():
-                gr.Markdown("Model")
-                with gr.Row():
-                    model = gr.Dropdown(
-                        choices=get_model_list(),
-                        value="Default",
-                        show_label=False,
-                        container=False,
-                    )
-                    gr_open_button_simple(TORTOISE_LOCAL_MODELS_DIR)
-                    gr_reload_button().click(
-                        fn=lambda: gr.Dropdown.update(choices=get_model_list()),
-                        outputs=[model],
-                    )
-
-                    model.select(fn=switch_model, inputs=[model], outputs=[model])
+            model = tortoise_model_settings_ui()
             with gr.Box():
                 gr.Markdown("Voice")
                 with gr.Row():
