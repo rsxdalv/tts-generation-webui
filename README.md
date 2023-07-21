@@ -34,8 +34,9 @@ https://rsxdalv.github.io/bark-speaker-directory/
 
 ## Changelog
 July 21:
-* Fix hubert not working with CPU only
-* Add Google Colab demo
+* Fix hubert not working with CPU only (https://github.com/rsxdalv/tts-generation-webui/pull/87)
+* Add Google Colab demo (https://github.com/rsxdalv/tts-generation-webui/pull/88)
+* New settings tab and model locations (for advanced users) (https://github.com/rsxdalv/tts-generation-webui/pull/90)
 
 July 19:
 * Add Tortoise Optimizations, Thank you https://github.com/manmay-nakhashi https://github.com/rsxdalv/tts-generation-webui/pull/79 (Implements https://github.com/rsxdalv/tts-generation-webui/issues/18)
