@@ -19,27 +19,32 @@ import numpy as np
 hubert_model = None
 
 
-def _load_hubert_model():
+def _load_hubert_model(device):
     hubert_path = HuBERTManager.make_sure_hubert_installed()
     global hubert_model
     if hubert_model is None:
-        hubert_model = CustomHubert(checkpoint_path=hubert_path)
+        hubert_model = CustomHubert(
+            checkpoint_path=hubert_path,
+            device=device,
+        )
     return hubert_model
 
 
-def _get_semantic_vectors(hubert_model: CustomHubert, path_to_wav: str):
+def _get_semantic_vectors(hubert_model: CustomHubert, path_to_wav: str, device):
     # This is where you load your wav, with soundfile or torchaudio for example
     wav, sr = torchaudio.load(path_to_wav)
 
     if wav.shape[0] == 2:  # Stereo to mono if needed
         wav = wav.mean(0, keepdim=True)
 
+    wav = wav.to(device)
+
     return hubert_model.forward(wav, input_sample_hz=sr)
 
 
-def get_semantic_vectors(path_to_wav: str):
-    hubert_model = _load_hubert_model()
-    return _get_semantic_vectors(hubert_model, path_to_wav)
+def get_semantic_vectors(path_to_wav: str, device):
+    hubert_model = _load_hubert_model(device)
+    return _get_semantic_vectors(hubert_model, path_to_wav, device)
 
 
 tokenizer = None
@@ -49,6 +54,7 @@ def _load_tokenizer(
     model: str = "quantifier_hubert_base_ls960_14.pth",
     repo: str = "GitMylo/bark-voice-cloning",
     force_reload: bool = False,
+    device="cpu",
 ) -> CustomTokenizer:
     tokenizer_path = HuBERTManager.make_sure_tokenizer_installed(
         model=model,
@@ -59,24 +65,26 @@ def _load_tokenizer(
     if tokenizer is None or force_reload:
         tokenizer = CustomTokenizer.load_from_checkpoint(
             # "data/models/hubert/tokenizer.pth"
-            tokenizer_path
+            tokenizer_path,
+            map_location=device,
         )
-        tokenizer.load_state_dict(torch.load(tokenizer_path))
+        tokenizer.load_state_dict(torch.load(tokenizer_path, map_location=device))
     return tokenizer
 
 
-def get_semantic_tokens(semantic_vectors: torch.Tensor):
-    tokenizer = _load_tokenizer()
+def get_semantic_tokens(semantic_vectors: torch.Tensor, device):
+    tokenizer = _load_tokenizer(device=device)
     return tokenizer.get_token(semantic_vectors)
 
 
-def get_semantic_prompt(path_to_wav: str):
-    semantic_vectors = get_semantic_vectors(path_to_wav)
-    return get_semantic_tokens(semantic_vectors).cpu().numpy()
+def get_semantic_prompt(path_to_wav: str, device):
+    semantic_vectors = get_semantic_vectors(path_to_wav, device)
+    return get_semantic_tokens(semantic_vectors, device).cpu().numpy()
 
 
 def get_prompts(path_to_wav: str, use_gpu: bool):
-    semantic_prompt = get_semantic_prompt(path_to_wav)
+    device = "cuda" if use_gpu else "cpu"
+    semantic_prompt = get_semantic_prompt(path_to_wav, device)
     fine_prompt, coarse_prompt = get_encodec_prompts(path_to_wav, use_gpu)
     return FullGeneration(
         semantic_prompt=semantic_prompt,
@@ -129,7 +137,7 @@ def generate_cloned_voice_metadata(full_generation, date):
 
 
 def tab_voice_clone(register_use_as_history_button):
-    with gr.Tab("Bark Voice Clone"), gr.Row():
+    with gr.Tab("Bark Voice Clone"), gr.Row(equal_height=False):
         with gr.Column():
             gr.Markdown(
                 """
@@ -150,21 +158,6 @@ def tab_voice_clone(register_use_as_history_button):
                 interactive=True,
             )
 
-            def load_tokenizer(tokenizer_and_repo: str):
-                tokenizer, repo = tokenizer_and_repo.split(" @ ")
-                _load_tokenizer(
-                    model=tokenizer,
-                    repo=repo,
-                    force_reload=True,
-                )
-                return tokenizer_and_repo
-
-            tokenizer_dropdown.change(
-                load_tokenizer,
-                inputs=[tokenizer_dropdown],
-                outputs=[tokenizer_dropdown],
-            )
-
             file_input = gr.Audio(
                 label="Input Audio",
                 type="filepath",
@@ -172,9 +165,46 @@ def tab_voice_clone(register_use_as_history_button):
                 interactive=True,
             )
 
-            use_gpu_checkbox = gr.Checkbox(label="Use GPU", value=True)
+            with gr.Row():
+                use_gpu_checkbox = gr.Checkbox(label="Use GPU", value=True)
+                clear_models_button = gr.Button(
+                    "Clear models",
+                    variant="secondary",
+                )
+                
+                def clear_models():
+                    global hubert_model
+                    global tokenizer
+                    hubert_model = None
+                    tokenizer = None
+                    torch.cuda.empty_cache()
+                    return gr.Button.update(
+                        value="Models cleared",
+                    )
+
+                clear_models_button.click(
+                    fn=clear_models,
+                    outputs=[clear_models_button],
+                )
 
             generate_voice_button = gr.Button(value="Generate Voice", variant="primary")
+
+            def load_tokenizer(tokenizer_and_repo: str, use_gpu: bool):
+                tokenizer, repo = tokenizer_and_repo.split(" @ ")
+                device = "cuda" if use_gpu else "cpu"
+                _load_tokenizer(
+                    model=tokenizer,
+                    repo=repo,
+                    force_reload=True,
+                    device=device,
+                )
+                return tokenizer_and_repo
+
+            tokenizer_dropdown.change(
+                load_tokenizer,
+                inputs=[tokenizer_dropdown, use_gpu_checkbox],
+                outputs=[tokenizer_dropdown],
+            )
 
         with gr.Column():
             gr.Markdown("Generated voice:")
