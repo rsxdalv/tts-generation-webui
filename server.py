@@ -103,8 +103,20 @@ with gr.Blocks(
         )
         voices_tab(register_use_as_history_button)
 
-        settings_tab_bark()
-        settings_tab_gradio(reload_config_and_restart_ui, gradio_interface_options)
+        with gr.Tab("Settings"):
+            from src.settings_tab_gradio import settings_tab_gradio
+
+            settings_tab_gradio(reload_config_and_restart_ui, gradio_interface_options)
+
+            from src.bark.settings_tab_bark import settings_tab_bark
+
+            settings_tab_bark()
+            from src.utils.model_location_settings_tab import (
+                model_location_settings_tab,
+            )
+
+            model_location_settings_tab()
+
         remixer_input = simple_remixer_tab()
     Joutai.singleton.tabs.render()
 

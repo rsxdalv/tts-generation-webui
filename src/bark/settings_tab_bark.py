@@ -50,8 +50,9 @@ def settings_tab_bark() -> None:
             with gr.Row(variant="panel"):
                 gr.Markdown("### Codec:")
                 codec_use_gpu = gr.Checkbox(
-                    label="Use GPU for codec", value=config["model"]["codec_use_gpu"],
-                    scale=2
+                    label="Use GPU for codec",
+                    value=config["model"]["codec_use_gpu"],
+                    scale=2,
                 )
 
             save_beacon = gr.Markdown("")
@@ -86,10 +87,6 @@ def settings_tab_bark() -> None:
                 label="Offload GPU models to CPU", value=ENV_OFFLOAD_CPU
             )
 
-            save_environment_button = gr.Button(
-                value="Save Environment Variables and Exit"
-            )
-
             def save_environment_variables(
                 environment_suno_use_small_models,
                 environment_suno_enable_mps,
@@ -100,24 +97,24 @@ def settings_tab_bark() -> None:
                 )
                 os.environ["SUNO_ENABLE_MPS"] = str(environment_suno_enable_mps)
                 os.environ["SUNO_OFFLOAD_CPU"] = str(environment_suno_offload_cpu)
-                with open("../../.env", "w") as outfile:
-                    outfile.write(
-                        generate_env(
-                            environment_suno_use_small_models,
-                            environment_suno_enable_mps,
-                            environment_suno_offload_cpu,
-                        )
-                    )
-                os._exit(0)
+                from src.utils.setup_or_recover import write_env
 
-            save_environment_button.click(
-                fn=save_environment_variables,
-                inputs=[
-                    environment_suno_use_small_models,
-                    environment_suno_enable_mps,
-                    environment_suno_offload_cpu,
-                ],
-            )
+                write_env(
+                    generate_env(
+                        environment_suno_use_small_models=environment_suno_use_small_models,
+                        environment_suno_enable_mps=environment_suno_enable_mps,
+                        environment_suno_offload_cpu=environment_suno_offload_cpu,
+                    )
+                )
+
+            env_inputs = [
+                environment_suno_use_small_models,
+                environment_suno_enable_mps,
+                environment_suno_offload_cpu,
+            ]
+
+            for i in env_inputs:
+                i.change(fn=save_environment_variables, inputs=env_inputs)
 
             inputs = [
                 text_use_gpu,
