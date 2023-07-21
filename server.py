@@ -119,6 +119,12 @@ def print_pretty_options(options):
             print(f"  {key}:{' ' * (max_key_length - len(key))} {value}")
 
 
+# detect if --share is passed
+if "--share" in os.sys.argv:
+    print("Gradio share mode enabled")
+    gradio_interface_options["share"] = True
+
+
 print("Starting Gradio server...")
 if not gradio_interface_options["enable_queue"]:
     print("Warning: Gradio server queue is disabled. Automatically enabling")

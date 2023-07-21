@@ -6,6 +6,9 @@
 [Upgrading](#upgrading) ||
 [Manual installation](#manual-installation)
 
+Google Colab demo: [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rsxdalv/tts-generation-webui/blob/main/notebooks/google_collab.ipynb)
+
+
 ## Videos
 
 |                  **Refining Bark TTS vocals using Demucs & Vocos**                                                 |                  **Demo - How to use RVC with Tortoise**                                                 |                       **How To Get More Voices for Bark TTS**                                            |
@@ -30,6 +33,10 @@
 https://rsxdalv.github.io/bark-speaker-directory/
 
 ## Changelog
+July 21:
+* Fix hubert not working with CPU only
+* Add Google Colab demo
+
 July 19:
 * Add Tortoise Optimizations, Thank you https://github.com/manmay-nakhashi https://github.com/rsxdalv/tts-generation-webui/pull/79 (Implements https://github.com/rsxdalv/tts-generation-webui/issues/18)
 
