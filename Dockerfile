@@ -29,11 +29,5 @@ RUN pip3 install -r requirements_audiocraft.txt
 RUN pip3 install -r requirements_bark_hubert_quantizer.txt
 RUN pip3 install -r requirements_rvc.txt
 
-# Install requirements for models
-WORKDIR /app/tts-generation-webui/models
-
-# Set working directory back to the root of the repo
-WORKDIR /app/tts-generation-webui
-
 # Run the server
 CMD python server.py
