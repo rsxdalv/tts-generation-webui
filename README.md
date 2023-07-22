@@ -158,13 +158,13 @@ Not exactly, the dependencies clash, especially between conda and python (and de
 
 ## Docker Setup
 
-tts-generation-webui can also be ran inside of a Docker container. To get started, first build the Docker container while in the root directory:
+tts-generation-webui can also be ran inside of a Docker container. To get started, first build the Docker image while in the root directory:
 
 ```
 docker build -t rsxdalv/tts-generation-webui .
 ```
 
-Once the container has built it can be started with Docker Compose:
+Once the image has built it can be started with Docker Compose:
 
 ```
 docker compose up -d
