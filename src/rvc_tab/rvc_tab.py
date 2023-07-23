@@ -166,7 +166,8 @@ def rvc_ui_model_or_index_path_ui(label: str):
                 value=os.path.join(RVC_LOCAL_MODELS_DIR, f"{model}{extension}")
             ),
             file_path_file.update(value=None),
-        ] if model is not None
+        ]
+        if model is not None
         else [
             file_path.update(),
             file_path_file.update(),
@@ -187,34 +188,40 @@ def rvc_ui():
                 with gr.Column():
                     index_path = rvc_ui_model_or_index_path_ui("Index")
             with gr.Row():
-                f0up_key = gr.Textbox(label="f0 Up key", value="0")
+                f0up_key = gr.Textbox(label="Pitch Up key", value="0")
                 # f0method = gr.Dropdown(
                 #     ["harvest", "pm", "crepe"], label="f0 Method", value="harvest"
                 # )
                 f0method = gr.Radio(
-                    ["harvest", "pm", "crepe"], label="f0 Method", value="harvest"
+                    ["harvest", "pm", "crepe"],
+                    label="Pitch Collection Method",
+                    value="harvest",
                 )
                 index_rate = gr.Slider(
-                    minimum=0.0, maximum=1.0, step=0.01, value=0.66, label="Index Rate"
+                    minimum=0.0, maximum=1.0, step=0.01, value=0.66, label="Search Feature Ratio"
                 )
                 filter_radius = gr.Slider(
-                    minimum=0, maximum=10, step=1, value=3, label="Filter Radius"
+                    minimum=0, maximum=10, step=1, value=3, label="Filter Radius (Pitch)"
                 )
             with gr.Row():
                 resample_sr = gr.Slider(
-                    minimum=0, maximum=48000, step=1, value=0, label="Resample SR"
+                    minimum=0,
+                    maximum=48000,
+                    step=1,
+                    value=0,
+                    label="Resample Sample-rate (Bug)",
                 )
                 rms_mix_rate = gr.Slider(
-                    minimum=0.0, maximum=1.0, step=0.01, value=1, label="RMS Mix Rate"
+                    minimum=0.0, maximum=1.0, step=0.01, value=1, label="Voice Envelope Normalizaiton"
                 )
                 protect = gr.Slider(
-                    minimum=0.0, maximum=1.0, step=0.01, value=0.33, label="Protect"
+                    minimum=0.0, maximum=0.5, step=0.01, value=0.33, label="Protect Breath Sounds"
                 )
             with gr.Group():
                 gr.Markdown("### Hubert")
                 with gr.Row():
                     device = gr.Dropdown(
-                        ["cuda:0", "cpu"], label="Device", value="cuda:0"
+                        ["cuda:0", "cpu", "mps"], label="Device", value="cuda:0"
                     )
                     is_half = gr.Checkbox(
                         label="Use half precision model (Depends on GPU support)",
@@ -224,8 +231,8 @@ def rvc_ui():
                         value="Clear Hubert (to reload on next generation)",
                         variant="secondary",
                     ).click(
-                        fn=lambda: inject_hubert(None)
-                    )  # type: ignore
+                        fn=lambda: inject_hubert(None)  # type: ignore
+                    )
 
         with gr.Column():
             original_audio = Joutai.singleton.rvc_input
