@@ -156,6 +156,26 @@ Not exactly, the dependencies clash, especially between conda and python (and de
 
 * Potentially needed to install build tools (without Visual Studio): https://visualstudio.microsoft.com/visual-cpp-build-tools/
 
+## Docker Setup
+
+tts-generation-webui can also be ran inside of a Docker container. To get started, first build the Docker image while in the root directory:
+
+```
+docker build -t rsxdalv/tts-generation-webui .
+```
+
+Once the image has built it can be started with Docker Compose:
+
+```
+docker compose up -d
+```
+
+The container will take some time to generate the first output while models are downloaded in the background. The status of this download can be verified by checking the container logs:
+
+```
+docker logs tts-generation-webui
+```
+
 ## Open Source Libraries
 
 This project utilizes the following open source libraries:

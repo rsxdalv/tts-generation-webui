@@ -1,0 +1,15 @@
+version: '3'
+services:
+  tts-generation-webui:
+    image: rsxdalv/tts-generation-webui
+    restart: unless-stopped
+    ports:
+      - "7860:7860"
+    container_name: tts-generation-webui
+    deploy:
+        resources:
+          reservations:
+            devices:
+              - driver: nvidia
+                device_ids: ['0']
+                capabilities: [gpu]
