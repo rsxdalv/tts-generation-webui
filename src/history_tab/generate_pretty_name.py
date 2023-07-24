@@ -15,6 +15,8 @@ def generate_pretty_name(directory: str):
     name = name.replace("_long", "(long)")
     # replace continued_generation with history: continued
     name = name.replace("continued_generation", "history: continued")
+    # replace the new continued_from_ with history: 
+    name = name.replace("from_", "history: ")
     # replace none with history: none
     name = name.replace("None", "history: none")
     # __bark__None

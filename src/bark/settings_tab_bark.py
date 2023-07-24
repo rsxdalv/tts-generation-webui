@@ -92,6 +92,11 @@ def settings_tab_bark() -> None:
                 environment_suno_enable_mps,
                 environment_suno_offload_cpu,
             ):
+                from bark import generation
+                generation.USE_SMALL_MODELS = environment_suno_use_small_models
+                generation.GLOBAL_ENABLE_MPS = environment_suno_enable_mps
+                generation.OFFLOAD_CPU = environment_suno_offload_cpu
+                
                 os.environ["SUNO_USE_SMALL_MODELS"] = str(
                     environment_suno_use_small_models
                 )

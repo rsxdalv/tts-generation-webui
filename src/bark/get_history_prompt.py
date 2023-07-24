@@ -1,4 +1,5 @@
 from typing import Optional
+from src.bark.history_to_hash import history_to_hash
 from src.bark.create_voice_string import create_voice_string
 
 
@@ -18,7 +19,7 @@ def get_history_prompt(
         history_prompt_verbal = (
             history_prompt
             if isinstance(history_prompt, str)
-            else "continued_generation"
+            else f"from_{history_to_hash(history_prompt)[:8]}"
         )
 
     return history_prompt, history_prompt_verbal

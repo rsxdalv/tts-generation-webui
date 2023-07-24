@@ -34,6 +34,9 @@ https://echo.play.ai/
 https://rsxdalv.github.io/bark-speaker-directory/
 
 ## Changelog
+July 24:
+* Change bark file format to include history hash: ...continued_generation... -> ...from_3ea0d063...
+
 July 23:
 * Docker Image thanks to https://github.com/jonfairbanks
 * RVC UI naming improvements
