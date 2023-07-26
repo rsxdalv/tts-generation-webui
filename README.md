@@ -30,10 +30,16 @@ Google Colab demo: [![Open In Colab](https://colab.research.google.com/assets/co
 [audio__bark__continued_generation__2023-05-04_16-10-55_long.webm](https://user-images.githubusercontent.com/6757283/236219243-dad96404-0879-4274-828e-7f3afc6bac65.webm)
 
 ## Extra Voices for Bark
-https://echo.play.ai/
+![Echo AI][(https://echo.play.ai/echo.play.ai.jpg)](https://echo.play.ai/)
 https://rsxdalv.github.io/bark-speaker-directory/
 
 ## Changelog
+July 26:
+* Voice gallery
+* Voice cropping
+* Fix voice rename bug, rename picture as well, add a hash textbox
+* Easier downloading of voices (https://github.com/rsxdalv/tts-generation-webui/pull/98)
+
 July 24:
 * Change bark file format to include history hash: ...continued_generation... -> ...from_3ea0d063...
 
