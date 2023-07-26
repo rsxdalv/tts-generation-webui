@@ -30,7 +30,7 @@ Google Colab demo: [![Open In Colab](https://colab.research.google.com/assets/co
 [audio__bark__continued_generation__2023-05-04_16-10-55_long.webm](https://user-images.githubusercontent.com/6757283/236219243-dad96404-0879-4274-828e-7f3afc6bac65.webm)
 
 ## Extra Voices for Bark
-![Echo AI][(https://echo.play.ai/echo.play.ai.jpg)](https://echo.play.ai/)
+[![Echo AI](https://echo.play.ai/echo.play.ai.jpg)](https://echo.play.ai/)
 https://rsxdalv.github.io/bark-speaker-directory/
 
 ## Changelog
