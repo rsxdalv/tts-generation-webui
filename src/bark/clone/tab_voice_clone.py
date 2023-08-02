@@ -153,8 +153,10 @@ def tab_voice_clone(register_use_as_history_button):
                     "quantifier_V1_hubert_base_ls960_23.pth @ GitMylo/bark-voice-cloning",
                     "polish-HuBERT-quantizer_8_epoch.pth @ Hobis/bark-voice-cloning-polish-HuBERT-quantizer",
                     "german-HuBERT-quantizer_14_epoch.pth @ CountFloyd/bark-voice-cloning-german-HuBERT-quantizer",
+                    "es_tokenizer.pth @ Lancer1408/bark-es-tokenizer",
                 ],
                 value="quantifier_hubert_base_ls960_14.pth @ GitMylo/bark-voice-cloning",
+                allow_custom_value=True,
                 interactive=True,
             )
 
