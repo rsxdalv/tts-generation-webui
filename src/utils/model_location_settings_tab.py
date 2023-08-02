@@ -1,4 +1,5 @@
 import gradio as gr
+import os
 
 def model_location_settings():
     with gr.Column():
@@ -33,16 +34,14 @@ Using these environment variables allows for better management and sharing of ca
         )
         # Hugging Face cache
         gr.Markdown("### Hugging Face Cache")
-        # HUGGINGFACE_HUB_CACHE env variable
         model_location_hf_env_var = gr.Textbox(
             label="Environment: HUGGINGFACE_HUB_CACHE",
-            value="",
+            value=os.environ.get("HUGGINGFACE_HUB_CACHE", ""),
             placeholder="Unset",
         )
-        # HF_HOME env variable
         model_location_hf_env_var2 = gr.Textbox(
             label="Environment: HF_HOME",
-            value="",
+            value=os.environ.get("HF_HOME", ""),
             placeholder="Unset",
         )
 
@@ -53,12 +52,12 @@ Using these environment variables allows for better management and sharing of ca
         # )  # for hub.set_dir(<PATH_TO_HUB_DIR>)
         model_location_th_home = gr.Textbox(
             label="Environment: TORCH_HOME",
-            value="",
+            value=os.environ.get("TORCH_HOME", ""),
             placeholder="Unset, default: ~/.cache/torch/",
         )
         model_location_th_xdg = gr.Textbox(
             label="Environment: XDG_CACHE_HOME",
-            value="",
+            value=os.environ.get("XDG_CACHE_HOME", ""),
             placeholder="Unset, default: ~/.cache/",
         )
         # tts-generation-webui directory
@@ -84,8 +83,6 @@ Using these environment variables allows for better management and sharing of ca
             model_location_th_home,
             model_location_th_xdg,
         ):
-            import os
-
             os.environ["HUGGINGFACE_HUB_CACHE"] = str(model_location_hf_env_var)
             os.environ["HF_HOME"] = str(model_location_hf_env_var2)
             os.environ["TORCH_HOME"] = str(model_location_th_home)
