@@ -1,4 +1,4 @@
-# TTS Generation WebUI (Bark, MusicGen, Tortoise, RVC, Vocos, Demucs)
+# TTS Generation WebUI (Bark, MusicGen + AudioGen, Tortoise, RVC, Vocos, Demucs)
 
 ## One click installers
 
@@ -35,7 +35,7 @@ https://rsxdalv.github.io/bark-speaker-directory/
 
 ## Changelog
 Aug 3:
-* Add AudioGen
+* Add AudioGen https://github.com/rsxdalv/tts-generation-webui/pull/105
 
 Aug 2:
 * Fix Model locations not showing after restart
