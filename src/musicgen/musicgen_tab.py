@@ -1,6 +1,7 @@
 import torch
 import gradio as gr
 from audiocraft.models.musicgen import MusicGen
+from audiocraft.models.audiogen import AudioGen
 from typing import Optional, Tuple, TypedDict
 import numpy as np
 import os
@@ -112,6 +113,8 @@ MODEL = None
 
 
 def load_model(version):
+    if version == "facebook/audiogen-medium":
+        return AudioGen.get_pretrained(version)
     print("Loading model", version)
     return MusicGen.get_pretrained(version)
 
@@ -197,9 +200,8 @@ def generate(params: MusicGenGeneration, melody_in: Optional[Tuple[int, np.ndarr
     ]
 
 
-
 def generation_tab_musicgen():
-    with gr.Tab("MusicGen") as tab:
+    with gr.Tab("MusicGen + AudioGen") as tab:
         musicgen_atom = gr.JSON(
             # visible=True,
             visible=False,
@@ -223,7 +225,7 @@ def generation_tab_musicgen():
                     label="Prompt", lines=3, placeholder="Enter text here..."
                 )
                 model = gr.Radio(
-                    ["melody", "medium", "small", "large"],
+                    ["melody", "medium", "small", "large", "facebook/audiogen-medium"],
                     label="Model",
                     value="melody",
                 )
