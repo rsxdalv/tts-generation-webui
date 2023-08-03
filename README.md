@@ -34,6 +34,9 @@ Google Colab demo: [![Open In Colab](https://colab.research.google.com/assets/co
 https://rsxdalv.github.io/bark-speaker-directory/
 
 ## Changelog
+Aug 3:
+* Add AudioGen
+
 Aug 2:
 * Fix Model locations not showing after restart
 
@@ -260,3 +263,4 @@ Most notably:
 - Bark: CC BY-NC 4.0 (MIT According to repo, but CC BY-NC 4.0 according to HuggingFace)
 - Tortoise: *Unknown* (Apache-2.0 according to repo, but no license file in HuggingFace)
 - MusicGen: CC BY-NC 4.0
+- AudioGen: CC BY-NC 4.0
