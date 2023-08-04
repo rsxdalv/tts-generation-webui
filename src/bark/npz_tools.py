@@ -3,6 +3,7 @@ from typing import Any
 import numpy as np
 from src.bark.FullGeneration import FullGeneration
 import json
+import torch
 
 
 def compress_history(full_generation: FullGeneration):
@@ -13,14 +14,25 @@ def compress_history(full_generation: FullGeneration):
     }
 
 
-def save_npz(filename: str, full_generation: FullGeneration, metadata: dict[str, Any]):
-    def pack_metadata(metadata: dict[str, Any]):
-        return list(json.dumps(metadata))
+def pack_metadata(metadata: dict[str, Any]):
+    return list(json.dumps(metadata))
 
+
+def save_npz(filename: str, full_generation: FullGeneration, metadata: dict[str, Any]):
     np.savez(
         filename,
         **{
             **compress_history(full_generation),
+            "metadata": pack_metadata(metadata),
+        },
+    )
+
+
+def save_npz_musicgen(filename: str, tokens: torch.Tensor, metadata: dict[str, Any]):
+    np.savez(
+        filename,
+        **{
+            "tokens": tokens.cpu().numpy(),
             "metadata": pack_metadata(metadata),
         },
     )
