@@ -11,9 +11,9 @@ Google Colab demo: [![Open In Colab](https://colab.research.google.com/assets/co
 
 ## Videos
 
-|                  **Refining Bark TTS vocals using Demucs & Vocos**                                                 |                  **Demo - How to use RVC with Tortoise**                                                 |                       **How To Get More Voices for Bark TTS**                                            |
+|                  **TTS Generation WebUI - A Tool for Text to Speech and Voice Cloning**                  |                  **Text to speech and voice cloning - TTS Generation WebUI**                             |                       **AudioGen Unveils New Text-to-Audio Capabilities**                                |
 | :------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------: |
-| [![Watch the video](https://img.youtube.com/vi/jCb-8JE7pk8/sddefault.jpg)](https://youtu.be/jCb-8JE7pk8) | [![Watch the video](https://img.youtube.com/vi/mhp_e8WSpxA/sddefault.jpg)](https://youtu.be/mhp_e8WSpxA) | [![Watch the video](https://img.youtube.com/vi/yeC5vJoavOE/sddefault.jpg)](https://youtu.be/yeC5vJoavOE) |
+| [![Watch the video](https://img.youtube.com/vi/JXojhFjZ39k/sddefault.jpg)](https://youtu.be/JXojhFjZ39k) | [![Watch the video](https://img.youtube.com/vi/ScN2ypewABc/sddefault.jpg)](https://youtu.be/ScN2ypewABc) | [![Watch the video](https://img.youtube.com/vi/fDqyw9JG6PY/sddefault.jpg)](https://youtu.be/fDqyw9JG6PY) |
 
 ## Screenshots
 
@@ -34,6 +34,10 @@ Google Colab demo: [![Open In Colab](https://colab.research.google.com/assets/co
 https://rsxdalv.github.io/bark-speaker-directory/
 
 ## Changelog
+Aug 4:
+* Add MultiBandDiffusion option to MusicGen https://github.com/rsxdalv/tts-generation-webui/pull/109
+* MusicGen/AudioGen save tokens on generation as .npz files. 
+
 Aug 3:
 * Add AudioGen https://github.com/rsxdalv/tts-generation-webui/pull/105
 
