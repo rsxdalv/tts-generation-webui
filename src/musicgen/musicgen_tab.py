@@ -78,7 +78,7 @@ def save_generation(
     audio_array: np.ndarray,
     SAMPLE_RATE: int,
     params: MusicGenGeneration,
-    tokens: torch.Tensor,
+    tokens: Optional[torch.Tensor] = None,
 ):
     prompt = params["text"]
     date = get_date_string()
@@ -96,7 +96,8 @@ def save_generation(
         params=params,
         audio_array=audio_array,
     )
-    save_npz_musicgen(filename_npz, tokens, metadata)
+    if tokens is not None:
+        save_npz_musicgen(filename_npz, tokens, metadata)
 
     filename_ogg = filename.replace(".wav", ".ogg")
     ext_callback_save_generation_musicgen(
@@ -154,6 +155,8 @@ def generate(params: MusicGenGeneration, melody_in: Optional[Tuple[int, np.ndarr
         duration=params["duration"],
     )
 
+    tokens = None
+
     import time
 
     start = time.time()
@@ -178,12 +181,20 @@ def generate(params: MusicGenGeneration, melody_in: Optional[Tuple[int, np.ndarr
             # generator=generator,
         )
     else:
-        output, tokens = MODEL.generate(
-            descriptions=[text],
-            progress=True,
-            return_tokens=True,
-            # generator=generator,
-        )
+        # if AudioGen then don't return tokens
+        if model == "facebook/audiogen-medium":
+            output = MODEL.generate(
+                descriptions=[text],
+                progress=True,
+                # generator=generator,
+            )
+        else:
+            output, tokens = MODEL.generate(
+                descriptions=[text],
+                progress=True,
+                return_tokens=True,
+                # generator=generator,
+            )
     set_seed(-1)
 
     elapsed = time.time() - start
@@ -191,10 +202,16 @@ def generate(params: MusicGenGeneration, melody_in: Optional[Tuple[int, np.ndarr
     print("Generated in", "{:.3f}".format(elapsed), "seconds")
 
     if params["use_multi_band_diffusion"]:
-        from audiocraft.models.multibanddiffusion import MultiBandDiffusion
-        mbd = MultiBandDiffusion.get_mbd_musicgen()
-        wav_diffusion = mbd.tokens_to_wav(tokens)
-        output = wav_diffusion.detach().cpu().numpy().squeeze()
+        if model != "facebook/audiogen-medium":
+            from audiocraft.models.multibanddiffusion import MultiBandDiffusion
+
+            mbd = MultiBandDiffusion.get_mbd_musicgen()
+            wav_diffusion = mbd.tokens_to_wav(tokens)
+            output = wav_diffusion.detach().cpu().numpy().squeeze()
+        else:
+            print("NOTICE: Multi-band diffusion is not supported for AudioGen")
+            params["use_multi_band_diffusion"] = False
+            output = output.detach().cpu().numpy().squeeze()
     else:
         output = output.detach().cpu().numpy().squeeze()
 
@@ -358,7 +375,16 @@ def generation_tab_musicgen():
     )
 
     def update_json(
-        text, _melody, model, duration, topk, topp, temperature, cfg_coef, seed, use_multi_band_diffusion
+        text,
+        _melody,
+        model,
+        duration,
+        topk,
+        topp,
+        temperature,
+        cfg_coef,
+        seed,
+        use_multi_band_diffusion,
     ):
         return {
             "text": text,
