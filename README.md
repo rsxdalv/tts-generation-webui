@@ -34,6 +34,16 @@ Google Colab demo: [![Open In Colab](https://colab.research.google.com/assets/co
 https://rsxdalv.github.io/bark-speaker-directory/
 
 ## Changelog
+Aug 8:
+* Update AudioCraft, improving MultiBandDiffusion performance
+* Fix Tortoise parameter 'cond_free' mismatch with 'ultra_fast' preset
+
+Aug 7:
+* add tortoise deepspeed fix to colab
+
+Aug 6:
+* Fix audiogen + mbd error, add tortoise fix for colab 
+
 Aug 4:
 * Add MultiBandDiffusion option to MusicGen https://github.com/rsxdalv/tts-generation-webui/pull/109
 * MusicGen/AudioGen save tokens on generation as .npz files. 

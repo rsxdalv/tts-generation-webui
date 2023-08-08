@@ -70,6 +70,7 @@ def get_tts(
     kv_cache=False,
     use_deepspeed=False,
     half=False,
+    device=None,
 ):
     global MODEL
     if MODEL is None or force_reload:
@@ -79,6 +80,7 @@ def get_tts(
             kv_cache=kv_cache,
             use_deepspeed=use_deepspeed,
             half=half,
+            device=device,
         )
     return MODEL
 
