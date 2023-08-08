@@ -34,6 +34,10 @@ Google Colab demo: [![Open In Colab](https://colab.research.google.com/assets/co
 https://rsxdalv.github.io/bark-speaker-directory/
 
 ## Changelog
+
+Aug 8:
+* CI: Add a GitHub Action to automatically publish docker image.
+
 Aug 4:
 * Add MultiBandDiffusion option to MusicGen https://github.com/rsxdalv/tts-generation-webui/pull/109
 * MusicGen/AudioGen save tokens on generation as .npz files. 
