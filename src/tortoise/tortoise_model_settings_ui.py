@@ -25,20 +25,26 @@ def tortoise_model_settings_ui_inner():
         kv_cache = gr.Checkbox(label="KV Cache", value=False)
         use_deepspeed = gr.Checkbox(label="Use Deepspeed", value=False)
         half = gr.Checkbox(label="Half", value=False)
-        apply_model_settings = gr.Button(
-            "Apply optimizations",
-            variant="secondary",
+        use_basic_cleaners = gr.Checkbox(label="Use basic cleaners", value=False)
+        tokenizer = gr.File(
+            label="Tokenizer",
+            accept=".json",
+
         )
+    apply_model_settings = gr.Button(
+        "Apply model settings",
+        variant="secondary",
+    )
 
     apply_model_settings.click(
         fn=switch_model,
-        inputs=[model, kv_cache, use_deepspeed, half],
+        inputs=[model, kv_cache, use_deepspeed, half, tokenizer, use_basic_cleaners],
         outputs=[model],
     )
 
     model.select(
         fn=switch_model,
-        inputs=[model, kv_cache, use_deepspeed, half],
+        inputs=[model, kv_cache, use_deepspeed, half, tokenizer, use_basic_cleaners],
         outputs=[model],
     )
 

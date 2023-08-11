@@ -43,6 +43,8 @@ def switch_model(
     kv_cache=False,
     use_deepspeed=False,
     half=False,
+    tokenizer=None,
+    use_basic_cleaners=False,
 ):
     get_tts(
         models_dir=MODELS_DIR
@@ -52,6 +54,8 @@ def switch_model(
         kv_cache=kv_cache,
         use_deepspeed=use_deepspeed,
         half=half,
+        tokenizer_path=tokenizer.name if tokenizer else None,
+        tokenizer_basic=use_basic_cleaners,
     )
     return gr.Dropdown.update()
 
@@ -71,6 +75,8 @@ def get_tts(
     use_deepspeed=False,
     half=False,
     device=None,
+    tokenizer_path=None,
+    tokenizer_basic=False,
 ):
     global MODEL
     if MODEL is None or force_reload:
@@ -81,6 +87,8 @@ def get_tts(
             use_deepspeed=use_deepspeed,
             half=half,
             device=device,
+            tokenizer_vocab_file=tokenizer_path,
+            tokenizer_basic=tokenizer_basic,
         )
     return MODEL
 

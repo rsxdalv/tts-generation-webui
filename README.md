@@ -34,6 +34,9 @@ Google Colab demo: [![Open In Colab](https://colab.research.google.com/assets/co
 https://rsxdalv.github.io/bark-speaker-directory/
 
 ## Changelog
+Aug 11:
+* Tortoise hotfix thanks to [manmay-nakhashi](https://github.com/manmay-nakhashi)
+
 Aug 8:
 * Update AudioCraft, improving MultiBandDiffusion performance
 * Fix Tortoise parameter 'cond_free' mismatch with 'ultra_fast' preset
