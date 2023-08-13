@@ -28,8 +28,7 @@ def tortoise_model_settings_ui_inner():
         use_basic_cleaners = gr.Checkbox(label="Use basic cleaners", value=False)
         tokenizer = gr.File(
             label="Tokenizer",
-            accept=".json",
-
+            file_types=[".json"],
         )
     apply_model_settings = gr.Button(
         "Apply model settings",
