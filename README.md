@@ -36,6 +36,7 @@ https://rsxdalv.github.io/bark-speaker-directory/
 ## Changelog
 Aug 11:
 * Tortoise hotfix thanks to [manmay-nakhashi](https://github.com/manmay-nakhashi)
+* Add Tortoise option to change tokenizer
 
 Aug 8:
 * Update AudioCraft, improving MultiBandDiffusion performance
