@@ -36,7 +36,7 @@ https://rsxdalv.github.io/bark-speaker-directory/
 ## Changelog
 Aug 14:
 * Pin torch to 2.0.0 in all requirements.txt files
-* Update audiocraft
+* Bump audiocraft and bark versions
 * Remove Tortoise transformers fix from colab
 
 Aug 13:
