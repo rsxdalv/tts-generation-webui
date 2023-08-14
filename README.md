@@ -34,6 +34,11 @@ Google Colab demo: [![Open In Colab](https://colab.research.google.com/assets/co
 https://rsxdalv.github.io/bark-speaker-directory/
 
 ## Changelog
+Aug 14:
+* Pin torch to 2.0.0 in all requirements.txt files
+* Update audiocraft
+* Remove Tortoise transformers fix from colab
+
 Aug 13:
 * Potentially big fix for new user installs that had issues with GPU not being supported
 
