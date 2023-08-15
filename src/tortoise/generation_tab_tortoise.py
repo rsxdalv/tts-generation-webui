@@ -97,6 +97,8 @@ def tortoise_core_ui():
                 diffusion_temperature,
             ) = diffusion_params()
 
+            name = gr.Textbox(label="Generation Name", placeholder="Enter name here...")
+
     preset.change(
         fn=lambda x: [
             num_autoregressive_samples.update(presets[x]["num_autoregressive_samples"]),
@@ -130,6 +132,7 @@ def tortoise_core_ui():
             cond_free_k=cond_free_k,
             diffusion_temperature=diffusion_temperature,
             model=model,
+            name=name,
         )
     )
 
