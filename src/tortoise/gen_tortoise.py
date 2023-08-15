@@ -118,7 +118,7 @@ def generate_tortoise(
         **{
             k: v
             for k, v in params.to_dict().items()
-            if k not in ["text", "voice", "split_prompt", "seed", "model"]
+            if k not in ["text", "voice", "split_prompt", "seed", "model", "name"]
         },
     )
 
@@ -141,8 +141,9 @@ def _process_gen(candidates, audio_array, id, params: TortoiseParameters):
     model = "tortoise"
     date = get_date_string()
 
+    name = params.name or params.voice
     filename, filename_png, filename_json = get_filenames(
-        create_base_filename_tortoise(params.voice, id, model, date)
+        create_base_filename_tortoise(name, id, model, date)
     )
     save_wav_tortoise(audio_array, filename)
     save_waveform_plot(audio_array, filename_png)
@@ -168,8 +169,8 @@ def _process_gen(candidates, audio_array, id, params: TortoiseParameters):
     )
 
 
-def create_base_filename_tortoise(voice, j, model, date):
-    return f"{create_base_filename(f'{voice}__n{j}', OUTPUT_PATH, model, date)}"
+def create_base_filename_tortoise(name, j, model, date):
+    return f"{create_base_filename(f'{name}__n{j}', OUTPUT_PATH, model, date)}"
 
 
 def tensor_to_audio_array(gen):

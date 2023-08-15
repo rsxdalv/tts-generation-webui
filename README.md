@@ -34,6 +34,9 @@ Google Colab demo: [![Open In Colab](https://colab.research.google.com/assets/co
 https://rsxdalv.github.io/bark-speaker-directory/
 
 ## Changelog
+Aug 16:
+* Add "name" to tortoise generation parameters
+
 Aug 15:
 * Pin torch to 2.0.0 in all requirements.txt files
 * Bump audiocraft and bark versions
