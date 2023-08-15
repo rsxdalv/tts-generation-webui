@@ -1,3 +1,4 @@
+torch==2.0.0 # BSD 3-Clause - ensures torch is not reinstalled
 # audiocraft==0.0.1 # MIT License
 xformers==0.0.19 # For torch==2.0.0 project plane
-audiocraft @ git+https://git@github.com/facebookresearch/audiocraft@d6df4f0fff69a69299c5883fae4a4d6d7b8a7948#egg=audiocraft # MIT License
+audiocraft @ git+https://git@github.com/facebookresearch/audiocraft@e96018613ac82b1afe0f0cce7861dfe08ba2b3bf#egg=audiocraft # MIT License
