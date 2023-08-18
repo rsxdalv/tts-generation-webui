@@ -23,4 +23,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: xiaohaihuang/tts-generation-webui
+          tags: ${{ secrets.DOCKER_USERNAME }}/tts-generation-webui
