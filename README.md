@@ -35,8 +35,36 @@ https://rsxdalv.github.io/bark-speaker-directory/
 
 ## Changelog
 
-Aug 8:
+
+Aug 18:
 * CI: Add a GitHub Action to automatically publish docker image.
+
+Aug 16:
+* Add "name" to tortoise generation parameters
+
+Aug 15:
+* Pin torch to 2.0.0 in all requirements.txt files
+* Bump audiocraft and bark versions
+* Remove Tortoise transformers fix from colab
+* Update Tortoise to 2.8.0
+
+Aug 13:
+* Potentially big fix for new user installs that had issues with GPU not being supported
+
+Aug 11:
+* Tortoise hotfix thanks to [manmay-nakhashi](https://github.com/manmay-nakhashi)
+* Add Tortoise option to change tokenizer
+
+Aug 8:
+* Update AudioCraft, improving MultiBandDiffusion performance
+* Fix Tortoise parameter 'cond_free' mismatch with 'ultra_fast' preset
+
+Aug 7:
+* add tortoise deepspeed fix to colab
+
+Aug 6:
+* Fix audiogen + mbd error, add tortoise fix for colab 
+
 
 Aug 4:
 * Add MultiBandDiffusion option to MusicGen https://github.com/rsxdalv/tts-generation-webui/pull/109

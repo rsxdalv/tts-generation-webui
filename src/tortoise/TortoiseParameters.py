@@ -21,6 +21,7 @@ class TortoiseParameters:
         cond_free_k: int = 2,
         diffusion_temperature: float = 1.0,
         model: str = "Default",
+        name: str = "",
     ):  # sourcery skip: remove-unnecessary-cast
         self.text = text
         self.voice = voice
@@ -39,6 +40,7 @@ class TortoiseParameters:
         self.cond_free_k = cond_free_k
         self.diffusion_temperature = float(diffusion_temperature)
         self.model = model
+        self.name = name
 
     def __repr__(self):
         params = ",\n    ".join(f"{k}={v!r}" for k, v in self.__dict__.items())
@@ -83,6 +85,7 @@ class TortoiseParameterComponents:
         cond_free_k: gr.Slider,
         diffusion_temperature: gr.Slider,
         model: gr.Dropdown,
+        name: gr.Textbox,
     ):
         self.text = text
         self.voice = voice
@@ -101,6 +104,7 @@ class TortoiseParameterComponents:
         self.cond_free_k = cond_free_k
         self.diffusion_temperature = diffusion_temperature
         self.model = model
+        self.name = name
 
     def __repr__(self):
         params = ",\n    ".join(f"{k}={v!r}" for k, v in self.__dict__.items())
@@ -131,6 +135,7 @@ class TortoiseParameterZipper:
             components.cond_free_k,
             components.diffusion_temperature,
             components.model,
+            components.name,
         ]
 
     @staticmethod
@@ -158,6 +163,7 @@ class TortoiseParameterZipper:
             "cond_free_k": components[next_idx()],
             "diffusion_temperature": components[next_idx()],
             "model": components[next_idx()],
+            "name": components[next_idx()],
         }
 
 
@@ -245,6 +251,10 @@ if __name__ == "__main__":
                 show_label=False,
                 choices=["Default"],
                 value="Default",
+            ),
+            name=gr.Textbox(
+                label="Name",
+                placeholder="Enter name here...",
             ),
         )
 
