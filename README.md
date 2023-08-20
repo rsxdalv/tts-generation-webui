@@ -34,6 +34,11 @@ Google Colab demo: [![Open In Colab](https://colab.research.google.com/assets/co
 https://rsxdalv.github.io/bark-speaker-directory/
 
 ## Changelog
+
+
+Aug 18:
+* CI: Add a GitHub Action to automatically publish docker image.
+
 Aug 16:
 * Add "name" to tortoise generation parameters
 
@@ -59,6 +64,7 @@ Aug 7:
 
 Aug 6:
 * Fix audiogen + mbd error, add tortoise fix for colab 
+
 
 Aug 4:
 * Add MultiBandDiffusion option to MusicGen https://github.com/rsxdalv/tts-generation-webui/pull/109
