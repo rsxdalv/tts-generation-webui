@@ -35,6 +35,8 @@ https://rsxdalv.github.io/bark-speaker-directory/
 
 ## Changelog
 
+Aug 20:
+* Fix MBD by reinstalling hydra-core at the end of an update
 
 Aug 18:
 * CI: Add a GitHub Action to automatically publish docker image.
