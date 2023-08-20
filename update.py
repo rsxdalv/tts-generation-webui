@@ -25,6 +25,8 @@ def main():
     try_install("requirements_audiocraft.txt", "musicgen, audiocraft")
     try_install("requirements_bark_hubert_quantizer.txt", "Bark Voice Clone, bark-hubert-quantizer")
     try_install("requirements_rvc.txt", "RVC")
+    # hydracore fix because of fairseq
+    do("pip install hydra-core==1.3.2")
 
 
 if __name__ == "__main__":
