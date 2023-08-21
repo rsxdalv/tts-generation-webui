@@ -266,9 +266,6 @@ def rvc_ui():
     return original_audio
 
 
-print(__file__)
-
-
 def rvc_conversion_tab():
     with gr.Tab("RVC Beta Demo", id="rvc_tab"):
         rvc_ui()
