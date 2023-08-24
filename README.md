@@ -36,6 +36,10 @@ https://rsxdalv.github.io/bark-speaker-directory/
 
 ## Changelog
 
+Aug 24:
+* Add date to RVC outputs to fix https://github.com/rsxdalv/tts-generation-webui/issues/147
+* Fix safetensors missing wheel
+
 Aug 21:
 * Add torchvision install to colab for musicgen issue fix
 * Remove rvc_tab file logging
