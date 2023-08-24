@@ -303,7 +303,7 @@ Known non-permissive dependencies:
 Model weights have different licenses, please pay attention to the license of the model you are using.
 
 Most notably:
-- Bark: CC BY-NC 4.0 (MIT According to repo, but CC BY-NC 4.0 according to HuggingFace)
+- Bark: *CC BY-NC 4.0* (MIT but HuggingFace has not been updated yet)
 - Tortoise: *Unknown* (Apache-2.0 according to repo, but no license file in HuggingFace)
 - MusicGen: CC BY-NC 4.0
 - AudioGen: CC BY-NC 4.0

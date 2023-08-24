@@ -11,6 +11,7 @@ from src.history_tab.open_folder import open_folder
 from src.utils.get_path_from_root import get_path_from_root
 import glob
 from src.tortoise.gr_reload_button import gr_reload_button, gr_open_button_simple
+from src.utils.date import get_date_string
 
 
 def inject_hubert(hubert_model: torch.nn.Module):
@@ -26,9 +27,10 @@ def infer_rvc(
     model_path,
     index_rate,
 ):
+    date = get_date_string()
     get_vc(model_path)
     wav_opt = vc_single(0, input_path, f0up_key, None, f0method, index_path, index_rate)
-    out_path = os.path.join(opt_path, f"{os.path.basename(input_path)}.wav")
+    out_path = os.path.join(opt_path, f"{os.path.basename(input_path)}_{date}.wav")
     wavfile.write(out_path, infer_batch_rvc.tgt_sr, wav_opt)
     return out_path
 
