@@ -7,6 +7,7 @@ class Joutai:
         self.tabs = gr.Tabs()
         self.remixer_input = gr.Audio(label="Input Audio")
         self.rvc_input = gr.Audio(label="Original Audio", type="filepath")
+        self.demucs_input = gr.Audio(label="Input", type="filepath")
 
     def send_to_remixer(self, **kwargs):
         remixer_input = self.remixer_input
@@ -21,6 +22,14 @@ class Joutai:
         return {
             "fn": lambda x: rvc_input.update(value=x),
             "outputs": [rvc_input],
+            **kwargs,
+        }
+
+    def send_to_demucs(self, **kwargs):
+        demucs_input = self.demucs_input
+        return {
+            "fn": lambda x: demucs_input.update(value=x),
+            "outputs": [demucs_input],
             **kwargs,
         }
 

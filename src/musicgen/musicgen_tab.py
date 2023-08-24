@@ -5,6 +5,7 @@ from audiocraft.models.audiogen import AudioGen
 from typing import Optional, Tuple, TypedDict
 import numpy as np
 import os
+from src.Joutai import Joutai
 from src.bark.npz_tools import save_npz_musicgen
 from src.musicgen.setup_seed_ui_musicgen import setup_seed_ui_musicgen
 from src.bark.parse_or_set_seed import parse_or_set_seed
@@ -327,6 +328,7 @@ def generation_tab_musicgen():
             image = gr.Image(label="Waveform", shape=(None, 100), elem_classes="tts-image")  # type: ignore
             with gr.Row():
                 history_bundle_name_data = gr.State()  # type: ignore
+                send_to_demucs_button = gr.Button("Send to Demucs", visible=True)
                 save_button = gr.Button("Save to favorites", visible=True)
                 melody_button = gr.Button("Use as melody", visible=True)
             save_button.click(
@@ -339,6 +341,16 @@ def generation_tab_musicgen():
                 fn=lambda melody_in: melody_in,
                 inputs=[output],
                 outputs=[melody],
+            )
+
+            send_to_demucs_button.click(
+                **Joutai.singleton.send_to_demucs(
+                    inputs=[output],
+                )
+            ).then(
+                **Joutai.singleton.switch_to_tab(
+                    tab="demucs",
+                )
             )
 
     inputs = [
@@ -426,3 +438,21 @@ if __name__ == "__main__":
         generation_tab_musicgen()
 
     demo.launch()
+
+    from src.musicgen.musicgen_tab import generate, MusicGenGeneration
+
+    generate(
+        params=MusicGenGeneration(
+            model="facebook/musicgen-small",
+            text="I am a robot",
+            cfg_coef=3.0,
+            duration=10,
+            melody=None,
+            seed=0,
+            temperature=1.0,
+            topk=250,
+            topp=0.0,
+            use_multi_band_diffusion=False,
+        ),
+        melody_in=None,
+    )
