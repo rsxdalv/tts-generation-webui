@@ -4,7 +4,7 @@ from src.vocos.vocos_tab_wav import vocos_tab_wav
 
 
 def vocos_tabs():
-    with gr.Tab("Vocos"):
+    with gr.Tab("Vocos", id="vocos"):
         vocos_tab_bark()
         vocos_tab_wav()
 

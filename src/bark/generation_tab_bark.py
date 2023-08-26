@@ -3,6 +3,7 @@ import shutil
 
 import numpy as np
 import gradio as gr
+from src.bark.ICON_ELEM_CLASS import ICON_ELEM_CLASS
 from src.Joutai import Joutai
 from src.bark.setup_seed_ui_bark import setup_seed_ui_bark
 from src.bark.FinalGenParams import FinalGenParams
@@ -299,7 +300,7 @@ def generate_multi(count, outputs_ref):
             yield yield_generation(outputs_ref, i)(
                 audio=None,
                 image=None,
-                save_button=gr.Button.update(value="Save to favorites"),
+                save_button=gr.Button.update(value="Save"),
                 continue_button=gr.Button.update(),
                 buttons_row=gr.Row.update(visible=False),
                 npz=None,
@@ -327,7 +328,7 @@ def generate_multi(count, outputs_ref):
                 yield yield_generation(outputs_ref, i)(
                     audio=filename,
                     image=filename_png,
-                    save_button=gr.Button.update(value="Save to favorites"),
+                    save_button=gr.Button.update(value="Save"),
                     continue_button=gr.Button.update(),
                     buttons_row=gr.Row.update(visible=True),
                     npz=filename_npz,
@@ -388,7 +389,7 @@ def generate_multi(count, outputs_ref):
                     ),
                     image=filename_png,
                     save_button=gr.Button.update(
-                        value="Save to favorites", visible=True
+                        value="Save", visible=True
                     ),
                     continue_button=gr.Button.update(visible=True),
                     buttons_row=gr.Row.update(visible=True),
@@ -415,7 +416,7 @@ def generate_multi(count, outputs_ref):
             yield yield_generation(outputs_ref, i)(
                 audio=gr.Audio.update(value=filename_long, label="Generated audio"),
                 image=filename_png,
-                save_button=gr.Button.update(value="Save to favorites", visible=True),
+                save_button=gr.Button.update(value="Save", visible=True),
                 continue_button=gr.Button.update(visible=True),
                 buttons_row=gr.Row.update(visible=True),
                 npz=filename_npz,
@@ -586,7 +587,7 @@ def generation_tab_bark():
                 zip(
                     *[
                         create_components(
-                            old_generation_dropdown, history_setting, index
+                            old_generation_dropdown, history_setting, index, seed_input
                         )
                         for index in range(MAX_OUTPUTS)
                     ]
@@ -683,15 +684,22 @@ def insert_npz_file(npz_filename):
     ]
 
 
-def create_components(old_generation_dropdown, history_setting, index):
+def create_components(old_generation_dropdown, history_setting, index, seed_input):
     with gr.Column(visible=index == 0) as col:
         audio = gr.Audio(
             type="filepath", label="Generated audio", elem_classes="tts-audio"
         )
         image = gr.Image(label="Waveform", shape=(None, 100), elem_classes="tts-image")  # type: ignore
         with gr.Row(visible=False) as buttons_row:
-            save_button = gr.Button("Save to favorites")
-            gr.Button("Send to remixer").click(
+            save_button = gr.Button(
+                "Save", size="sm"
+            )
+            reuse_seed_button = gr.Button(
+                "Seed", size="sm"
+            )
+            gr.Button(
+                "Remix", size="sm"
+            ).click(
                 **Joutai.singleton.send_to_remixer(
                     inputs=[audio],
                 )
@@ -700,21 +708,65 @@ def create_components(old_generation_dropdown, history_setting, index):
                     tab="simple_remixer",
                 )
             )
-            continue_button = gr.Button("Use as history")
+            gr.Button(
+                "RVC", size="sm"
+            ).click(
+                **Joutai.singleton.sent_to_rvc(
+                    inputs=[audio],
+                )
+            ).then(
+                **Joutai.singleton.switch_to_tab(
+                    tab="rvc_tab",
+                )
+            )
+            gr.Button(
+                "Demucs", size="sm"
+            ).click(
+                **Joutai.singleton.send_to_demucs(
+                    inputs=[audio],
+                )
+            ).then(
+                **Joutai.singleton.switch_to_tab(
+                    tab="demucs",
+                )
+            )
+            send_to_vocos_button = gr.Button(
+                "Vocos", size="sm"
+            )
+            continue_button = gr.Button(
+                "Use as history", size="sm"
+            )
         npz = gr.State()  # type: ignore
         seed = gr.State()  # type: ignore
         json_text = gr.State()  # type: ignore
         history_bundle_name_data = gr.State()  # type: ignore
 
-        continue_button.click(
-            fn=insert_npz_file,
-            inputs=[npz],
-            outputs=[old_generation_dropdown, history_setting],
-        )
         save_button.click(
             fn=save_to_favorites,
             inputs=[history_bundle_name_data],
             outputs=[save_button],
+        )
+
+        reuse_seed_button.click(
+            fn=lambda x: gr.Textbox.update(value=str(x)),
+            inputs=[seed],
+            outputs=[seed_input],
+        )
+
+        send_to_vocos_button.click(
+            **Joutai.singleton.send_to_vocos_npz(
+                inputs=[npz],
+            )
+        ).then(
+            **Joutai.singleton.switch_to_tab(
+                tab="vocos",
+            )
+        )
+
+        continue_button.click(
+            fn=insert_npz_file,
+            inputs=[npz],
+            outputs=[old_generation_dropdown, history_setting],
         )
 
         return (

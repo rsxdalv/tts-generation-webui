@@ -8,6 +8,7 @@ class Joutai:
         self.remixer_input = gr.Audio(label="Input Audio")
         self.rvc_input = gr.Audio(label="Original Audio", type="filepath")
         self.demucs_input = gr.Audio(label="Input", type="filepath")
+        self.vocos_input_npz = gr.File(label="Input NPZ", file_types=[".npz"], interactive=True)
 
     def send_to_remixer(self, **kwargs):
         remixer_input = self.remixer_input
@@ -30,6 +31,14 @@ class Joutai:
         return {
             "fn": lambda x: demucs_input.update(value=x),
             "outputs": [demucs_input],
+            **kwargs,
+        }
+
+    def send_to_vocos_npz(self, **kwargs):
+        vocos_input_npz = self.vocos_input_npz
+        return {
+            "fn": lambda x: vocos_input_npz.update(value=x),
+            "outputs": [vocos_input_npz],
             **kwargs,
         }
 
