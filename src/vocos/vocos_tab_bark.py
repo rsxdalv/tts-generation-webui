@@ -5,6 +5,7 @@ import torch
 import gradio as gr
 import tempfile
 from src.bark.npz_tools import load_npz
+from src.Joutai import Joutai
 
 
 def get_device():
@@ -33,10 +34,33 @@ def upsample_to_44100(audio):
 
 def vocos_tab_bark():
     with gr.Tab("Vocos (NPZ)"):
-        npz_file = gr.File(label="Input NPZ", file_types=[".npz"], interactive=True)
+        npz_file = Joutai.singleton.vocos_input_npz
+        npz_file.render()
+
         submit = gr.Button(value="Decode")
         current = gr.Audio(label="decoded with Encodec:")
         output = gr.Audio(label="decoded with Vocos:")
+        gr.Button("To Demucs").click(
+            **Joutai.singleton.send_to_demucs(
+                inputs=[output],
+            )
+        ).then(
+            **Joutai.singleton.switch_to_tab("demucs"),
+        )
+        gr.Button("To Remixer").click(
+            **Joutai.singleton.send_to_remixer(
+                inputs=[output],
+            )
+        ).then(
+            **Joutai.singleton.switch_to_tab("simple_remixer"),
+        )
+        gr.Button("To RVC").click(
+            **Joutai.singleton.sent_to_rvc(
+                inputs=[output],
+            )
+        ).then(
+            **Joutai.singleton.switch_to_tab("rvc_tab"),
+        )
 
         from src.bark.get_audio_from_npz import get_audio_from_full_generation
 

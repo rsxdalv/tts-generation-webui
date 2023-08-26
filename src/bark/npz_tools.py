@@ -55,8 +55,8 @@ def load_npz(filename):
 def get_npz_files():
     return (
         glob.glob("voices/*.npz")
-        + glob.glob("favorites/*.npz")
-        + glob.glob("outputs/*.npz")
+        + glob.glob("favorites/*/*.npz")
+        + glob.glob("outputs/*/*.npz")
     )
 
 
