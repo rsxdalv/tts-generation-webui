@@ -23,8 +23,7 @@ Google Colab demo: [![Open In Colab](https://colab.research.google.com/assets/co
 
 ## Examples
 
-[audio__bark__continued_generation__2023-05-04_16-07-49_long.webm](https://user-images.githubuserc
-ontent.com/6757283/236218842-b9dc253e-05de-49e5-ada9-e714e1e2cbd4.webm)
+[audio__bark__continued_generation__2023-05-04_16-07-49_long.webm](https://user-images.githubusercontent.com/6757283/236218842-b9dc253e-05de-49e5-ada9-e714e1e2cbd4.webm)
 
 [audio__bark__continued_generation__2023-05-04_16-09-21_long.webm](https://user-images.githubusercontent.com/6757283/236219228-518d2b70-51a3-4175-af44-b24c01d14932.webm)
 
@@ -35,6 +34,9 @@ ontent.com/6757283/236218842-b9dc253e-05de-49e5-ada9-e714e1e2cbd4.webm)
 https://rsxdalv.github.io/bark-speaker-directory/
 
 ## Changelog
+
+Aug 27:
+* Fix MusicGen ignoring the melody https://github.com/rsxdalv/tts-generation-webui/issues/153
 
 Aug 26:
 * Add Send to RVC, Demucs, Vocos buttons to Bark and Vocos

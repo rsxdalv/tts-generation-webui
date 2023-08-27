@@ -27,7 +27,7 @@ from typing import Optional
 from importlib.metadata import version
 
 AUDIOCRAFT_VERSION = version("audiocraft")
-
+FB_MUSICGEN_MELODY = "facebook/musicgen-melody"
 
 class MusicGenGeneration(TypedDict):
     model: str
@@ -138,7 +138,7 @@ def generate(params: MusicGenGeneration, melody_in: Optional[Tuple[int, np.ndarr
     model = params["model"]
     text = params["text"]
     # due to JSON serialization limitations
-    params["melody"] = None if model != "melody" else melody_in
+    params["melody"] = None if model != FB_MUSICGEN_MELODY else melody_in
     melody = params["melody"]
 
     global MODEL
@@ -165,7 +165,7 @@ def generate(params: MusicGenGeneration, melody_in: Optional[Tuple[int, np.ndarr
     params["seed"] = parse_or_set_seed(params["seed"], 0)
     # generator = torch.Generator(device=MODEL.device).manual_seed(params["seed"])
     log_generation_musicgen(params)
-    if melody:
+    if model == FB_MUSICGEN_MELODY and melody is not None:
         sr, melody = melody[0], torch.from_numpy(melody[1]).to(
             MODEL.device
         ).float().t().unsqueeze(0)
@@ -181,21 +181,19 @@ def generate(params: MusicGenGeneration, melody_in: Optional[Tuple[int, np.ndarr
             return_tokens=True,
             # generator=generator,
         )
+    elif model == "facebook/audiogen-medium":
+        output = MODEL.generate(
+            descriptions=[text],
+            progress=True,
+            # generator=generator,
+        )
     else:
-        # if AudioGen then don't return tokens
-        if model == "facebook/audiogen-medium":
-            output = MODEL.generate(
-                descriptions=[text],
-                progress=True,
-                # generator=generator,
-            )
-        else:
-            output, tokens = MODEL.generate(
-                descriptions=[text],
-                progress=True,
-                return_tokens=True,
-                # generator=generator,
-            )
+        output, tokens = MODEL.generate(
+            descriptions=[text],
+            progress=True,
+            return_tokens=True,
+            # generator=generator,
+        )
     set_seed(-1)
 
     elapsed = time.time() - start
@@ -258,7 +256,7 @@ def generation_tab_musicgen():
                 )
                 model = gr.Radio(
                     [
-                        "facebook/musicgen-melody",
+                        FB_MUSICGEN_MELODY,
                         # "musicgen-melody",
                         "facebook/musicgen-medium",
                         # "musicgen-medium",
