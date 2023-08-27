@@ -177,7 +177,7 @@ def generate(params: MusicGenGeneration, melody_in: Optional[Tuple[int, np.ndarr
             descriptions=[text],
             melody_wavs=melody,
             melody_sample_rate=sr,
-            progress=False,
+            progress=True,
             return_tokens=True,
             # generator=generator,
         )
