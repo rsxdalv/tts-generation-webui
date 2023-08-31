@@ -317,3 +317,55 @@ Most notably:
 - Tortoise: *Unknown* (Apache-2.0 according to repo, but no license file in HuggingFace)
 - MusicGen: CC BY-NC 4.0
 - AudioGen: CC BY-NC 4.0
+
+
+
+## Configuration Guide
+
+You can configure the interface through the "Settings" tab or, for advanced users, via the config.json file in the root directory (not recommended). Below is a detailed explanation of each setting:
+
+
+### Model Configuration
+
+| Argument                | Default Value     | Description                                                                                     |
+|-------------------------|-------------------|-------------------------------------------------------------------------------------------------|
+| `text_use_gpu`          | `true`            | Determines whether the GPU should be used for text processing.                                  |
+| `text_use_small`        | `true`            | Determines whether a "small" or reduced version of the text model should be used.               |
+| `coarse_use_gpu`        | `true`            | Determines whether the GPU should be used for "coarse" processing.                              |
+| `coarse_use_small`      | `true`            | Determines whether a "small" or reduced version of the "coarse" model should be used.           |
+| `fine_use_gpu`          | `true`            | Determines whether the GPU should be used for "fine" processing.                                |
+| `fine_use_small`        | `true`            | Determines whether a "small" or reduced version of the "fine" model should be used.             |
+| `codec_use_gpu`         | `true`            | Determines whether the GPU should be used for codec processing.                                 |
+| `load_models_on_startup`| `false`           | Determines whether the models should be loaded during application startup.                      |
+  
+  
+### Gradio Interface Options
+
+| Argument                | Default Value     | Description                                                                                     |
+|-------------------------|-------------------|-------------------------------------------------------------------------------------------------|
+| `inline`                | `false`           | Display inline in an iframe.                                                                    |
+| `inbrowser`             | `true`            | Automatically launch in a new tab.                                                              |
+| `share`                 | `false`           | Create a publicly shareable link.                                                               |
+| `debug`                 | `false`           | Block the main thread from running.                                                             |
+| `enable_queue`          | `true`            | Serve inference requests through a queue.                                                       |
+| `max_threads`           | `40`              | Maximum number of total threads.                                                                |
+| `auth`                  | `null`            | Username and password required to access interface, format: `username:password`.                |
+| `auth_message`          | `null`            | HTML message provided on login page.                                                            |
+| `prevent_thread_lock`   | `false`           | Block the main thread while the server is running.                                              |
+| `show_error`            | `false`           | Display errors in an alert modal.                                                               |
+| `server_name`           | `0.0.0.0`         | Make app accessible on local network.                                                           |
+| `server_port`           | `null`            | Start Gradio app on this port.                                                                  |
+| `show_tips`             | `false`           | Show tips about new Gradio features.                                                            |
+| `height`                | `500`             | Height in pixels of the iframe element.                                                         |
+| `width`                 | `100%`            | Width in pixels of the iframe element.                                                          |
+| `favicon_path`          | `null`            | Path to a file (.png, .gif, or .ico) to use as the favicon.                                     |
+| `ssl_keyfile`           | `null`            | Path to a file to use as the private key file for a local server running on HTTPS.              |
+| `ssl_certfile`          | `null`            | Path to a file to use as the signed certificate for HTTPS.                                      |
+| `ssl_keyfile_password`  | `null`            | Password to use with the SSL certificate for HTTPS.                                            |
+| `ssl_verify`            | `true`            | Skip certificate validation.                                                                    |
+| `quiet`                 | `true`            | Suppress most print statements.                                                                 |
+| `show_api`              | `true`            | Show the API docs in the footer of the app.                                                     |
+| `file_directories`      | `null`            | List of directories that Gradio is allowed to serve files from.                                 |
+| `_frontend`             | `true`            | Frontend.                                                                                       |
+
+
