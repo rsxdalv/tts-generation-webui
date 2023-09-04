@@ -21,6 +21,7 @@ from src.bark.log_generation import log_generation
 from src.bark.npz_tools import get_npz_files, load_npz, save_npz
 from src.bark.parse_or_set_seed import parse_or_set_seed
 from src.bark.split_text_functions import split_by_length_simple, split_by_lines
+from src.bark.extended_generate import custom_generate_audio
 from src.utils.date import get_date_string
 from bark import SAMPLE_RATE, generate_audio
 from scipy.io.wavfile import write as write_wav
@@ -35,8 +36,12 @@ from src.bark.generation_settings import (
     LongPromptHistorySettings,
 )
 
+MAX_LENGTH_GLOBAL = 15
+FREEZE_SEMANTIC = False
+
 
 def generate(
+    burn_in_prompt,
     prompt,
     history_setting,
     language=None,
@@ -45,6 +50,7 @@ def generate(
     text_temp=0.7,
     waveform_temp=0.7,
     history_prompt=None,
+    history_prompt_semantic=None,
     seed=None,
     index=0,
 ):
@@ -57,24 +63,26 @@ def generate(
     )
 
     final_gen_params: FinalGenParams = {
+        "burn_in_prompt": burn_in_prompt,
         "text": prompt,
         "history_prompt": history_prompt,
+        "history_prompt_semantic": history_prompt_semantic,
         "text_temp": text_temp,
         "waveform_temp": waveform_temp,
         "output_full": True,
     }
 
-    # log_generation(
-    #     history_prompt_verbal=history_prompt_verbal,
-    #     final_gen_params=final_gen_params,
-    # )
     log_generation(
         **final_gen_params,
         history_prompt_verbal=history_prompt_verbal,
     )
 
     indexed_seed = parse_or_set_seed(seed, index)
-    full_generation, audio_array = generate_audio(**final_gen_params)
+    full_generation, audio_array = custom_generate_audio(
+        **final_gen_params,
+        max_gen_duration_s=MAX_LENGTH_GLOBAL,
+        cache_semantic=FREEZE_SEMANTIC,
+    )
     set_seed(-1)
 
     filename, filename_png, filename_npz, metadata = save_generation(
@@ -272,6 +280,7 @@ def yield_generation(outputs_ref, i):
 
 def generate_multi(count, outputs_ref):
     def gen(
+        burn_in_prompt,
         prompt,
         history_setting,
         language=None,
@@ -283,12 +292,24 @@ def generate_multi(count, outputs_ref):
         long_prompt_history_radio=LongPromptHistorySettings.CONTINUE,
         old_generation_filename=None,
         seed=None,
+        history_prompt_semantic=None,
     ):
         history_prompt = None
         if prompt is None or prompt == "":
             raise ValueError("Prompt is empty")
 
-        print("gen", "old_generation_filename", old_generation_filename)
+        print(
+            "gen",
+            "old_generation_filename",
+            old_generation_filename,
+            "semantic",
+            history_prompt_semantic,
+        )
+        if history_prompt_semantic == "":
+            history_prompt_semantic = None
+        if history_prompt_semantic is not None:
+            history_prompt_semantic = load_npz(history_prompt_semantic)
+
         if history_setting == HistorySettings.NPZ_FILE:
             if old_generation_filename is None:
                 raise ValueError("old_generation_filename is None")
@@ -313,6 +334,7 @@ def generate_multi(count, outputs_ref):
         if long_prompt_radio == PromptSplitSettings.NONE:
             for i in range(count):
                 filename, filename_png, _, _, filename_npz, seed, metadata = generate(
+                    burn_in_prompt,
                     prompt,
                     history_setting,
                     language,
@@ -321,6 +343,7 @@ def generate_multi(count, outputs_ref):
                     text_temp=text_temp,
                     waveform_temp=waveform_temp,
                     history_prompt=history_prompt,
+                    history_prompt_semantic=history_prompt_semantic,
                     seed=_original_seed,
                     index=i,
                 )
@@ -378,6 +401,7 @@ def generate_multi(count, outputs_ref):
                     text_temp=text_temp,
                     waveform_temp=waveform_temp,
                     history_prompt=history_prompt,
+                    history_prompt_semantic=history_prompt_semantic,
                     seed=seed,
                     index=i,
                 )
@@ -388,9 +412,7 @@ def generate_multi(count, outputs_ref):
                         label=f"Generated audio fragment... `{prompt_piece}`",
                     ),
                     image=filename_png,
-                    save_button=gr.Button.update(
-                        value="Save", visible=True
-                    ),
+                    save_button=gr.Button.update(value="Save", visible=True),
                     continue_button=gr.Button.update(visible=True),
                     buttons_row=gr.Row.update(visible=True),
                     npz=filename_npz,
@@ -480,40 +502,18 @@ def generation_tab_bark():
         )
 
         with gr.Row():
-            old_generation_dropdown = gr.Dropdown(
-                label="Old generation",
-                choices=get_npz_files(),
-                type="value",
-                show_label=False,
-                value=None,
-                allow_custom_value=True,
-                visible=False,
-                container=False,
-            )
-            copy_old_generation_button = gr.Button(
-                "save",
-                visible=False,
-                elem_classes="btn-sm material-symbols-outlined",
-                size="sm",
-            )
-            copy_old_generation_button.click(
-                fn=lambda x: [
-                    shutil.copy(x, os.path.join("voices", os.path.basename(x))),
-                ],
-                inputs=[old_generation_dropdown],
-            )
+            (
+                history_prompt_semantic_dropdown,
+                copy_history_prompt_semantic_button,
+                reload_history_prompt_semantic_dropdown,
+            ) = old_generation_dropdown_ui("Semantic Voice (Optional)")
 
-            reload_old_generation_dropdown = gr.Button(
-                "refresh",
-                visible=False,
-                elem_classes="btn-sm material-symbols-outlined",
-                size="sm",
-            )
-
-            reload_old_generation_dropdown.click(
-                fn=lambda: gr.Dropdown.update(choices=get_npz_files()),
-                outputs=old_generation_dropdown,
-            )
+        with gr.Row():
+            (
+                old_generation_dropdown,
+                copy_old_generation_button,
+                reload_old_generation_dropdown,
+            ) = old_generation_dropdown_ui("Audio Voice")
 
         history_setting.change(
             fn=lambda choice: [
@@ -526,6 +526,20 @@ def generation_tab_bark():
                 old_generation_dropdown,
                 copy_old_generation_button,
                 reload_old_generation_dropdown,
+            ],
+        )
+
+        history_setting.change(
+            fn=lambda choice: [
+                gr.Dropdown.update(visible=(choice == HistorySettings.NPZ_FILE)),
+                gr.Button.update(visible=(choice == HistorySettings.NPZ_FILE)),
+                gr.Button.update(visible=(choice == HistorySettings.NPZ_FILE)),
+            ],
+            inputs=[history_setting],
+            outputs=[
+                history_prompt_semantic_dropdown,
+                copy_history_prompt_semantic_button,
+                reload_history_prompt_semantic_dropdown,
             ],
         )
 
@@ -544,6 +558,54 @@ def generation_tab_bark():
                     label="For each subsequent generation:",
                     value=LongPromptHistorySettings.CONTINUE,
                 )
+
+                max_length = gr.Slider(
+                    label="Max length",
+                    value=15,
+                    minimum=0.1,
+                    maximum=18,
+                    step=0.1,
+                )
+
+                def update_max_length(value):
+                    global MAX_LENGTH_GLOBAL
+                    MAX_LENGTH_GLOBAL = value
+
+                max_length.change(
+                    fn=update_max_length,
+                    inputs=[max_length],
+                )
+
+                # freeze_cache_button = gr.Checkbox(
+                #     label="Freeze semantic",
+                #     value=False,
+                # )
+
+                # # def freeze_cache():
+                # #     global FREEZE_CACHE
+                # #     FREEZE_CACHE = True
+                # def freeze_cache(value):
+                #     global FREEZE_SEMANTIC
+                #     FREEZE_SEMANTIC = value
+
+                # freeze_cache_button.change(
+                #     fn=freeze_cache,
+                #     inputs=[freeze_cache_button],
+                # )
+
+                # clear_cache_button = gr.Button(
+                #     "Clear cache",
+                #     size="sm",
+                # )
+
+                # def clear_cache():
+                #     from src.bark.extended_generate import semantic_cache
+
+                #     semantic_cache.clear()
+
+                # clear_cache_button.click(
+                #     fn=clear_cache,
+                # )
             with gr.Column():
                 # TODO: Add gradient temperature options (requires model changes)
                 text_temp = gr.Slider(
@@ -563,9 +625,13 @@ def generation_tab_bark():
                 with gr.Column():
                     seed_input, set_old_seed_button = setup_seed_ui_bark()
 
+        burn_in_prompt = gr.Textbox(
+            label="Burn In Prompt", lines=3, placeholder="Enter text here..."
+        )
         prompt = gr.Textbox(label="Prompt", lines=3, placeholder="Enter text here...")
 
         inputs = [
+            burn_in_prompt,
             prompt,
             history_setting,
             languageRadio,
@@ -577,6 +643,7 @@ def generation_tab_bark():
             long_prompt_history_radio,
             old_generation_dropdown,
             seed_input,
+            history_prompt_semantic_dropdown,
         ]
 
         MAX_OUTPUTS = 9
@@ -649,6 +716,48 @@ def generation_tab_bark():
     return register_use_as_history_button
 
 
+def old_generation_dropdown_ui(label):
+    old_generation_dropdown = gr.Dropdown(
+        label=label,
+        choices=get_npz_files(),
+        type="value",
+        value=None,
+        allow_custom_value=True,
+        visible=False,
+        container=False,
+    )
+    copy_old_generation_button = gr.Button(
+        "save",
+        visible=False,
+        elem_classes="btn-sm material-symbols-outlined",
+        size="sm",
+    )
+    copy_old_generation_button.click(
+        fn=lambda x: [
+            shutil.copy(x, os.path.join("voices", os.path.basename(x))),
+        ],
+        inputs=[old_generation_dropdown],
+    )
+
+    reload_old_generation_dropdown = gr.Button(
+        "refresh",
+        visible=False,
+        elem_classes=ICON_ELEM_CLASS,
+        size="sm",
+    )
+
+    reload_old_generation_dropdown.click(
+        fn=lambda: gr.Dropdown.update(choices=get_npz_files()),
+        outputs=old_generation_dropdown,
+    )
+
+    return (
+        old_generation_dropdown,
+        copy_old_generation_button,
+        reload_old_generation_dropdown,
+    )
+
+
 def setup_bark_voice_prompt_ui():
     with gr.Column(visible=False) as column:
         with gr.Row():
@@ -691,15 +800,9 @@ def create_components(old_generation_dropdown, history_setting, index, seed_inpu
         )
         image = gr.Image(label="Waveform", shape=(None, 100), elem_classes="tts-image")  # type: ignore
         with gr.Row(visible=False) as buttons_row:
-            save_button = gr.Button(
-                "Save", size="sm"
-            )
-            reuse_seed_button = gr.Button(
-                "Seed", size="sm"
-            )
-            gr.Button(
-                "Remix", size="sm"
-            ).click(
+            save_button = gr.Button("Save", size="sm")
+            reuse_seed_button = gr.Button("Seed", size="sm")
+            gr.Button("Remix", size="sm").click(
                 **Joutai.singleton.send_to_remixer(
                     inputs=[audio],
                 )
@@ -708,9 +811,7 @@ def create_components(old_generation_dropdown, history_setting, index, seed_inpu
                     tab="simple_remixer",
                 )
             )
-            gr.Button(
-                "RVC", size="sm"
-            ).click(
+            gr.Button("RVC", size="sm").click(
                 **Joutai.singleton.sent_to_rvc(
                     inputs=[audio],
                 )
@@ -719,9 +820,7 @@ def create_components(old_generation_dropdown, history_setting, index, seed_inpu
                     tab="rvc_tab",
                 )
             )
-            gr.Button(
-                "Demucs", size="sm"
-            ).click(
+            gr.Button("Demucs", size="sm").click(
                 **Joutai.singleton.send_to_demucs(
                     inputs=[audio],
                 )
@@ -730,12 +829,8 @@ def create_components(old_generation_dropdown, history_setting, index, seed_inpu
                     tab="demucs",
                 )
             )
-            send_to_vocos_button = gr.Button(
-                "Vocos", size="sm"
-            )
-            continue_button = gr.Button(
-                "Use as history", size="sm"
-            )
+            send_to_vocos_button = gr.Button("Vocos", size="sm")
+            continue_button = gr.Button("Use as history", size="sm")
         npz = gr.State()  # type: ignore
         seed = gr.State()  # type: ignore
         json_text = gr.State()  # type: ignore

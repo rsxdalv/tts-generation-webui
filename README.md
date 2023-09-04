@@ -11,9 +11,9 @@ Google Colab demo: [![Open In Colab](https://colab.research.google.com/assets/co
 
 ## Videos
 
-|                  **TTS Generation WebUI - A Tool for Text to Speech and Voice Cloning**                  |                  **Text to speech and voice cloning - TTS Generation WebUI**                             |                       **AudioGen Unveils New Text-to-Audio Capabilities**                                |
+|                  **How To Use TTS Voice Generation Web UI With AI Voice Cloning Technology (Bark AI Tutorial)**                  |                  **TTS Generation WebUI - A Tool for Text to Speech and Voice Cloning**                             |                       **Text to speech and voice cloning - TTS Generation WebUI**                                |
 | :------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------: |
-| [![Watch the video](https://img.youtube.com/vi/JXojhFjZ39k/sddefault.jpg)](https://youtu.be/JXojhFjZ39k) | [![Watch the video](https://img.youtube.com/vi/ScN2ypewABc/sddefault.jpg)](https://youtu.be/ScN2ypewABc) | [![Watch the video](https://img.youtube.com/vi/fDqyw9JG6PY/sddefault.jpg)](https://youtu.be/fDqyw9JG6PY) |
+| [![Watch the video](https://img.youtube.com/vi/gYNCnltAHzY/sddefault.jpg)](https://youtu.be/gYNCnltAHzY) | [![Watch the video](https://img.youtube.com/vi/ScN2ypewABc/sddefault.jpg)](https://youtu.be/ScN2ypewABc) | [![Watch the video](https://img.youtube.com/vi/JXojhFjZ39k/sddefault.jpg)](https://youtu.be/JXojhFjZ39k) |
 
 ## Screenshots
 
@@ -34,6 +34,11 @@ Google Colab demo: [![Open In Colab](https://colab.research.google.com/assets/co
 https://rsxdalv.github.io/bark-speaker-directory/
 
 ## Changelog
+
+Sep 5:
+* Add voice mixing to Bark
+* Add v1 Burn in prompt to Bark (Burn in prompts are for directing the semantic model without spending time on generating the audio. The v1 works by generating the semantic tokens and then using it as a prompt for the semantic model.)
+* Add generation length limiter to Bark
 
 Aug 27:
 * Fix MusicGen ignoring the melody https://github.com/rsxdalv/tts-generation-webui/issues/153

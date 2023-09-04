@@ -5,6 +5,6 @@ gradio==3.35.2
 python-dotenv==1.0.0
 soundfile==0.12.1; sys_platform == 'win32' # torchaudio
 # sox # torchaudio for linux
-suno-bark @ git+https://github.com/suno-ai/bark@56b0ba13f7c281cbffa07ea9abf7b30273a60b6a#egg=suno-bark # MIT License
+suno-bark @ git+https://github.com/rsxdalv/bark@0d91823ead3d87c317f12d01d325fca9408c669e#egg=suno-bark # MIT License
 vocos==0.0.2 # MIT License
 tortoise @ git+https://github.com/rsxdalv/tortoise-tts@72eccabcb7d4c7a9d943a2c9b63211e4286cf385#egg=tortoise # Apache 2.0
