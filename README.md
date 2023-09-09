@@ -35,6 +35,10 @@ https://rsxdalv.github.io/bark-speaker-directory/
 
 ## Changelog
 
+Sep 9:
+* Fix xdg-open command line, thanks to https://github.com/JFronny
+* Fix multi-line bark generations, thanks to https://github.com/slack-t and https://github.com/bkutasi
+
 Sep 5:
 * Add voice mixing to Bark
 * Add v1 Burn in prompt to Bark (Burn in prompts are for directing the semantic model without spending time on generating the audio. The v1 works by generating the semantic tokens and then using it as a prompt for the semantic model.)

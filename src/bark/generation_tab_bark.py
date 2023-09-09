@@ -393,6 +393,7 @@ def generate_multi(count, outputs_ref):
                     seed,
                     _metadata,
                 ) = generate(
+                    burn_in_prompt,
                     prompt_piece,
                     history_setting,
                     language,
