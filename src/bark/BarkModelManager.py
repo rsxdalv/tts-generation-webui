@@ -1,4 +1,4 @@
-from bark.generation import preload_models
+from bark.generation import preload_models, clean_models
 
 
 class BarkModelManager:
@@ -39,3 +39,12 @@ class BarkModelManager:
             codec_use_gpu=codec_use_gpu,
             force_reload=True,
         )
+
+    def unload_models(self):
+        print("Unloading Bark models")
+        self.models_loaded = False
+        clean_models()
+
+    def unload_model(self, model_key):
+        print(f"Unloading Bark model {model_key}")
+        clean_models(model_key=model_key)

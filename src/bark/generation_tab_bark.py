@@ -479,12 +479,31 @@ def get_long_gen_history_prompt(
 
 def generation_tab_bark():
     with gr.Tab(label="Generation (Bark)", id="generation_bark"):
-        history_setting = gr.Radio(
-            HistorySettings.choices,
-            value="Empty history",
-            type="value",
-            label="History Prompt (voice) setting:",
-        )
+        with gr.Row():
+            history_setting = gr.Radio(
+                HistorySettings.choices,
+                value="Empty history",
+                type="value",
+                label="History Prompt (voice) setting:",
+            )
+
+            unload_models_button = gr.Button(
+                "Unload models",
+                size="sm",
+            )
+
+            def unload_models():
+                model_manager.unload_models()
+                return {
+                    unload_models_button: gr.Button.update(
+                        value="Unloaded"
+                    ),
+                }
+
+            unload_models_button.click(
+                fn=unload_models,
+                outputs=[unload_models_button],
+            )
 
         (
             useV2,
