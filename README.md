@@ -33,7 +33,17 @@ Google Colab demo: [![Open In Colab](https://colab.research.google.com/assets/co
 [![Echo AI](https://echo.ps.ai/echo.play.ai.jpg)](https://echo.ps.ai/)
 https://rsxdalv.github.io/bark-speaker-directory/
 
+## Bark Readme
+[README_Bark.md](./README_Bark.md)
+
 ## Changelog
+
+Sep 9:
+* Fix xdg-open command line, thanks to https://github.com/JFronny
+* Fix multi-line bark generations, thanks to https://github.com/slack-t and https://github.com/bkutasi
+* Add unload model button to Bark as requested by https://github.com/Aamir3d
+* Add Bark details to README_Bark.md as requested by https://github.com/Maki9009
+* Add "optional" to burn in prompt, thanks to https://github.com/Maki9009
 
 Sep 5:
 * Add voice mixing to Bark

@@ -393,6 +393,7 @@ def generate_multi(count, outputs_ref):
                     seed,
                     _metadata,
                 ) = generate(
+                    burn_in_prompt,
                     prompt_piece,
                     history_setting,
                     language,
@@ -478,12 +479,31 @@ def get_long_gen_history_prompt(
 
 def generation_tab_bark():
     with gr.Tab(label="Generation (Bark)", id="generation_bark"):
-        history_setting = gr.Radio(
-            HistorySettings.choices,
-            value="Empty history",
-            type="value",
-            label="History Prompt (voice) setting:",
-        )
+        with gr.Row():
+            history_setting = gr.Radio(
+                HistorySettings.choices,
+                value="Empty history",
+                type="value",
+                label="History Prompt (voice) setting:",
+            )
+
+            unload_models_button = gr.Button(
+                "Unload models",
+                size="sm",
+            )
+
+            def unload_models():
+                model_manager.unload_models()
+                return {
+                    unload_models_button: gr.Button.update(
+                        value="Unloaded"
+                    ),
+                }
+
+            unload_models_button.click(
+                fn=unload_models,
+                outputs=[unload_models_button],
+            )
 
         (
             useV2,
@@ -626,7 +646,7 @@ def generation_tab_bark():
                     seed_input, set_old_seed_button = setup_seed_ui_bark()
 
         burn_in_prompt = gr.Textbox(
-            label="Burn In Prompt", lines=3, placeholder="Enter text here..."
+            label="Burn In Prompt (Optional)", lines=3, placeholder="Enter text here..."
         )
         prompt = gr.Textbox(label="Prompt", lines=3, placeholder="Enter text here...")
 
