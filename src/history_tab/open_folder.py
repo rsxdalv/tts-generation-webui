@@ -9,7 +9,7 @@ if sys.platform == "darwin":
 elif sys.platform.startswith('linux'):
 
     def open_folder(folder_path: str):
-        subprocess.check_call(["xdg-open", "--", folder_path])
+        subprocess.check_call(["xdg-open", folder_path])
 
 elif sys.platform == "win32":
 
