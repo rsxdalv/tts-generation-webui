@@ -646,7 +646,7 @@ def generation_tab_bark():
                     seed_input, set_old_seed_button = setup_seed_ui_bark()
 
         burn_in_prompt = gr.Textbox(
-            label="Burn In Prompt", lines=3, placeholder="Enter text here..."
+            label="Burn In Prompt (Optional)", lines=3, placeholder="Enter text here..."
         )
         prompt = gr.Textbox(label="Prompt", lines=3, placeholder="Enter text here...")
 
