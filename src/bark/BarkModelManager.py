@@ -41,10 +41,12 @@ class BarkModelManager:
         )
 
     def unload_models(self):
-        print("Unloading Bark models")
+        print("Unloading Bark models...")
         self.models_loaded = False
         clean_models()
+        print("Unloaded Bark models")
 
     def unload_model(self, model_key):
         print(f"Unloading Bark model {model_key}")
         clean_models(model_key=model_key)
+        print(f"Unloaded Bark model {model_key}")
