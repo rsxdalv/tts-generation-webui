@@ -37,6 +37,8 @@ https://rsxdalv.github.io/bark-speaker-directory/
 [README_Bark.md](./README_Bark.md)
 
 ## Changelog
+Sep 21:
+* Fix server_port option in config https://github.com/rsxdalv/tts-generation-webui/issues/168 , thanks to https://github.com/Dartvauder
 
 Sep 9:
 * Fix xdg-open command line, thanks to https://github.com/JFronny
