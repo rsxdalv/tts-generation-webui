@@ -36,7 +36,7 @@ def settings_tab_gradio(
                 # file_directories: List of directories that gradio is allowed to serve files from (in addition to the directory containing the gradio python file). Must be absolute paths. Warning: any files in these directories or its children are potentially accessible to all users of your app.
 
                 gradio_interface_options_ui: Dict[
-                    str, gr.Checkbox | gr.Slider | gr.Textbox
+                    str, gr.Checkbox | gr.Slider | gr.Textbox | gr.Number
                 ] = {
                     "inline": gr.Checkbox(
                         label="inline: Display inline in an iframe",
@@ -85,7 +85,7 @@ def settings_tab_gradio(
                         label="server_name: Make app accessible on local network",
                         value=gradio_interface_options.get("server_name", None),
                     ),
-                    "server_port": gr.Textbox(
+                    "server_port": gr.Number(
                         label="server_port: Start gradio app on this port",
                         value=gradio_interface_options.get("server_port", None),
                     ),
