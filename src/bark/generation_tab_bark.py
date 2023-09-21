@@ -674,7 +674,11 @@ def generation_tab_bark():
                 zip(
                     *[
                         create_components(
-                            old_generation_dropdown, history_setting, index, seed_input
+                            old_generation_dropdown,
+                            history_prompt_semantic_dropdown,
+                            history_setting,
+                            index,
+                            seed_input,
                         )
                         for index in range(MAX_OUTPUTS)
                     ]
@@ -813,7 +817,13 @@ def insert_npz_file(npz_filename):
     ]
 
 
-def create_components(old_generation_dropdown, history_setting, index, seed_input):
+def create_components(
+    old_generation_dropdown,
+    history_prompt_semantic_dropdown,
+    history_setting,
+    index,
+    seed_input,
+):
     with gr.Column(visible=index == 0) as col:
         audio = gr.Audio(
             type="filepath", label="Generated audio", elem_classes="tts-audio"
@@ -851,6 +861,7 @@ def create_components(old_generation_dropdown, history_setting, index, seed_inpu
             )
             send_to_vocos_button = gr.Button("Vocos", size="sm")
             continue_button = gr.Button("Use as history", size="sm")
+            continue_semantic_button = gr.Button("Use as semantic history", size="sm")
         npz = gr.State()  # type: ignore
         seed = gr.State()  # type: ignore
         json_text = gr.State()  # type: ignore
@@ -883,6 +894,14 @@ def create_components(old_generation_dropdown, history_setting, index, seed_inpu
             inputs=[npz],
             outputs=[old_generation_dropdown, history_setting],
         )
+
+        continue_semantic_button.click(
+            fn=insert_npz_file,
+            inputs=[npz],
+            outputs=[history_prompt_semantic_dropdown, history_setting],
+        )
+
+        # fix the bug where selecting No history does not work with burn in prompt
 
         return (
             [
