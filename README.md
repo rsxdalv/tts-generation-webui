@@ -38,6 +38,8 @@ https://rsxdalv.github.io/bark-speaker-directory/
 
 ## Changelog
 Sep 21:
+* Switch to github docker image storage, new docker image:
+  * `docker pull ghcr.io/rsxdalv/tts-generation-webui:latest`
 * Fix server_port option in config https://github.com/rsxdalv/tts-generation-webui/issues/168 , thanks to https://github.com/Dartvauder
 
 Sep 9:
