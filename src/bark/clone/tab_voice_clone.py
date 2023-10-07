@@ -154,6 +154,7 @@ def tab_voice_clone(register_use_as_history_button):
                     "polish-HuBERT-quantizer_8_epoch.pth @ Hobis/bark-voice-cloning-polish-HuBERT-quantizer",
                     "german-HuBERT-quantizer_14_epoch.pth @ CountFloyd/bark-voice-cloning-german-HuBERT-quantizer",
                     "es_tokenizer.pth @ Lancer1408/bark-es-tokenizer",
+                    "portuguese-HuBERT-quantizer_24_epoch.pth @ MadVoyager/bark-voice-cloning-portuguese-HuBERT-quantizer",
                 ],
                 value="quantifier_hubert_base_ls960_14.pth @ GitMylo/bark-voice-cloning",
                 allow_custom_value=True,
@@ -173,7 +174,7 @@ def tab_voice_clone(register_use_as_history_button):
                     "Clear models",
                     variant="secondary",
                 )
-                
+
                 def clear_models():
                     global hubert_model
                     global tokenizer
