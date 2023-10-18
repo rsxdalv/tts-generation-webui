@@ -1,7 +1,7 @@
 version: '3'
 services:
   tts-generation-webui:
-    image: rsxdalv/tts-generation-webui
+    image: "ghcr.io/rsxdalv/tts-generation-webui:main"
     restart: unless-stopped
     ports:
       - "7860:7860"
