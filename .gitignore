@@ -6,15 +6,15 @@ config.json
 .env
 
 # Ignore generated files
-outputs/
-favorites/
-voices/
-collections/
-outputs-rvc/
-voices-tortoise/
+/outputs/
+/favorites/
+/voices/
+/collections/
+/outputs-rvc/
+/voices-tortoise/
 
 # Ignore model checkpoints
-data/
+/data
 
 # Ignore temporary files
 temp/
