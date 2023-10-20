@@ -425,7 +425,7 @@ def generation_tab_musicgen():
         fn=generate,
         inputs=[musicgen_atom, melody],
         outputs=[output, history_bundle_name_data, image, seed_cache],
-        api_name="MusicGen",
+        api_name="musicgen",
     )
 
     return tab, musicgen_atom
