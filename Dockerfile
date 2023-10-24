@@ -29,5 +29,8 @@ RUN pip3 install -r requirements_audiocraft.txt
 RUN pip3 install -r requirements_bark_hubert_quantizer.txt
 RUN pip3 install -r requirements_rvc.txt
 
+# Add React webui (testing)
+# RUN cd react-ui && npm install && npm run build
+
 # Run the server
 CMD python server.py
