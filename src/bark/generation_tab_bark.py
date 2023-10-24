@@ -403,7 +403,7 @@ def generate_multi(count, outputs_ref):
                     waveform_temp=waveform_temp,
                     history_prompt=history_prompt,
                     history_prompt_semantic=history_prompt_semantic,
-                    seed=seed,
+                    seed=_original_seed,
                     index=i,
                 )
                 pieces += [audio_array]
@@ -702,6 +702,7 @@ def generation_tab_bark():
                 fn=generate_multi(count, output_components),
                 inputs=inputs,
                 outputs=all_outputs_flat,
+                # api_name=f"bark_{count}",
             )
             return button
 

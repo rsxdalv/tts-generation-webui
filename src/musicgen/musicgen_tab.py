@@ -29,6 +29,7 @@ from importlib.metadata import version
 AUDIOCRAFT_VERSION = version("audiocraft")
 FB_MUSICGEN_MELODY = "facebook/musicgen-melody"
 
+
 class MusicGenGeneration(TypedDict):
     model: str
     text: str
@@ -226,6 +227,7 @@ def generate(params: MusicGenGeneration, melody_in: Optional[Tuple[int, np.ndarr
         os.path.dirname(filename),
         plot,
         params["seed"],
+        _metadata,
     ]
 
 
@@ -410,6 +412,9 @@ def generation_tab_musicgen():
         }
 
     seed_cache = gr.State()  # type: ignore
+    result_json = gr.JSON(
+        visible=False,
+    )
 
     set_old_seed_button.click(
         fn=lambda x: gr.Number.update(value=x),
@@ -424,8 +429,8 @@ def generation_tab_musicgen():
     ).then(
         fn=generate,
         inputs=[musicgen_atom, melody],
-        outputs=[output, history_bundle_name_data, image, seed_cache],
-        api_name="MusicGen",
+        outputs=[output, history_bundle_name_data, image, seed_cache, result_json],
+        api_name="musicgen",
     )
 
     return tab, musicgen_atom

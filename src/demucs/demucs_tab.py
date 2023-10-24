@@ -68,6 +68,7 @@ def demucs_ui():
         inputs=demucs_input,
         outputs=outputs,
         fn=demucs_audio,
+        api_name="demucs",
     )
 
 
