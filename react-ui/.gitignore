@@ -36,3 +36,7 @@ next-env.d.ts
 
 # vscode
 .vscode
+
+# upload cache
+/file-input-cache/
+
