@@ -37,6 +37,9 @@ https://rsxdalv.github.io/bark-speaker-directory/
 [README_Bark.md](./README_Bark.md)
 
 ## Changelog
+Oct 26:
+* Improve model selection UX for Musicgen
+
 Oct 24:
 * Add initial React UI for Musicgen and Demucs (https://github.com/rsxdalv/tts-generation-webui/pull/202)
 * Fix Bark long generation seed drifting (thanks to https://github.com/520Pig520)
