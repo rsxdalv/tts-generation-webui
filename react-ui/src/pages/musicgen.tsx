@@ -186,7 +186,8 @@ const MusicgenPage = () => {
 
             <div className="flex flex-col space-y-2">
               <label className="text-sm">
-                Duration: {musicgenParams.duration}s
+                Duration: {musicgenParams.duration}s{" "}
+                {musicgenParams.duration > 30 && "(spliced)"}
               </label>
               <input
                 type="range"
@@ -238,7 +239,8 @@ const MusicgenPage = () => {
               />
 
               <label className="text-sm">
-                Classifier Free Guidance Coefficient: {musicgenParams.cfg_coef}
+                Classifier Free Guidance Coefficient:{" "}
+                {musicgenParams.cfg_coef.toFixed(1)}
               </label>
               <input
                 type="range"
@@ -272,7 +274,16 @@ const MusicgenPage = () => {
               </button>
 
               <div className="flex space-x-2 items-center">
-                <label className="text-sm">Use Multi Band Diffusion:</label>
+                <label className="text-sm">
+                  Use{" "}
+                  <a
+                    className="underline"
+                    href="https://huggingface.co/facebook/multiband-diffusion"
+                    target="_blank"
+                  >
+                    Multi Band Diffusion:
+                  </a>
+                </label>
                 <input
                   type="checkbox"
                   name="use_multi_band_diffusion"
