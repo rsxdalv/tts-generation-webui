@@ -36,7 +36,13 @@ https://rsxdalv.github.io/bark-speaker-directory/
 ## Bark Readme
 [README_Bark.md](./README_Bark.md)
 
+## Info about managing models, caches and system space for AI projects
+https://github.com/rsxdalv/tts-generation-webui/discussions/186#discussioncomment-7291274
+
 ## Changelog
+Oct 26:
+* Improve model selection UX for Musicgen
+
 Oct 24:
 * Add initial React UI for Musicgen and Demucs (https://github.com/rsxdalv/tts-generation-webui/pull/202)
 * Fix Bark long generation seed drifting (thanks to https://github.com/520Pig520)
