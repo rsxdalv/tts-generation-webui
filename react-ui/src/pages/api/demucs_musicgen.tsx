@@ -30,17 +30,35 @@ export async function demucsHandler(
 }
 
 async function demucs(file: string) {
-  const exampleAudio = fs.readFileSync(
-    path.join(process.cwd(), "file-input-cache", file)
-  );
+  const audioBlob = await getFile(file);
 
   const app = await client("http://127.0.0.1:7865/");
   const result = await app.predict("/demucs", [
-    exampleAudio, // blob in 'Input' Audio component
+    audioBlob, // blob in 'Input' Audio component
   ]);
 
   return result?.data;
 }
+
+const readFromDisk = (file: string) =>
+  new Promise((resolve, reject) => {
+    fs.readFile(
+      path.join(process.cwd(), "file-input-cache", file),
+      (err, data) => {
+        if (err) reject(err);
+        resolve(data);
+      }
+    );
+  });
+
+const readFromURL = (file: string) => fetch(file).then((r) => r.blob());
+
+const getFile = (file: string) =>
+  file
+    ? file.startsWith("http") || file.startsWith("data")
+      ? readFromURL(file)
+      : readFromDisk(file)
+    : null;
 
 // musicgen handler
 export async function musicgenHandler(
@@ -52,21 +70,8 @@ export async function musicgenHandler(
   res.status(200).json({ data: result });
 }
 
-function getMelody(melody: string) {
-  if (melody) {
-    const filename = melody.split("/").pop();
-    console.log("filename", filename);
-    const exampleAudio = fs.readFileSync(
-      path.join(process.cwd(), "file-input-cache", filename)
-    );
-    return exampleAudio;
-  } else {
-    return null;
-  }
-}
-
 async function musicgen({ melody, ...params }) {
-  const melodyBlob = getMelody(melody);
+  const melodyBlob = await getFile(melody);
 
   const app = await client("http://127.0.0.1:7865/");
   const result = await app.predict("/musicgen", [

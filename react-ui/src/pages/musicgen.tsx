@@ -17,6 +17,7 @@ const musicgenParams0: MusicgenParams = {
   // text: "",
   text: "lofi hip hop beats to relax/study to",
   melody: null,
+  // melody: "https://www.mfiles.co.uk/mp3-downloads/gs-cd-track2.mp3",
   model: "Small",
   duration: 1,
   topk: 250,
@@ -56,7 +57,9 @@ const MusicgenPage = () => {
   const [audioUrl, setAudioUrl] = useState<string>("");
   const [musicgenParams, setMusicgenParams] =
     useState<MusicgenParams>(musicgenParams0);
-  const [melody, setMelody] = useState<string | undefined>();
+  const [melody, setMelody] = useState<string | undefined>(
+    musicgenParams.melody || undefined
+  );
 
   async function musicgen() {
     const body = JSON.stringify({
