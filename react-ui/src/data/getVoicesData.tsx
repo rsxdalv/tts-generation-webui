@@ -8,63 +8,21 @@ import { npyToUtf8 } from "./npyToUtf8";
 
 const __next__base__dirname = __dirname.split(".next")[0];
 const basePath = path.join(__next__base__dirname, "public");
-// const basePath = path.join(__dirname, "../../../public");
-// const basePath = path.join(__dirname, "../../public");
-const voicesPath = path.join(basePath, "voices");
-const getVoices = () => fs.readdirSync(voicesPath);
+export const webuiBasePath = path.join(__next__base__dirname, "..");
 
-const generationsPath = path.join(basePath, "generations");
-const getGenerations = () => fs.readdirSync(generationsPath);
-
-// const oggPath = path.join(basePath, "ogg");
-const oggPath = path.join(basePath, "..", "..", "favorites");
+const oggPath = path.join(webuiBasePath, "favorites");
 const getOgg = () => fs.readdirSync(oggPath);
 
 const npzPath = path.join(basePath, "voice-drafts");
 const getNpzs = () => fs.readdirSync(npzPath);
 
-// const baseUrlPath = process.env.BASE_URL_PATH || "/bark-speaker-directory";
 const baseUrlPath = "";
-
-// For each voice get voice.json file and parse it
-// Return array of objects
-// --------------------------------------------------
-export const getVoicesData = () => {
-  const voices = getVoices();
-  const voicesData = voices.map((voice) => {
-    const voiceData = fs.readFileSync(
-      path.join(voicesPath, voice, "voice.json"),
-      "utf8"
-    );
-    return JSON.parse(voiceData);
-  });
-  // include the directory name in the object
-  voicesData.forEach((voice, index) => {
-    voice.directory = voices[index];
-  });
-  // join path for image, audio and download keys with directory
-  voicesData.forEach((voice) => {
-    const fixPath = (key: string) => {
-      if (voice[key]) {
-        voice[key] = path
-          .join(baseUrlPath, "voices", voice.directory, voice[key])
-          .split(path.sep)
-          .join("/");
-      }
-    };
-    fixPath("image");
-    fixPath("audio");
-    fixPath("download");
-  });
-  return voicesData;
-};
 
 export const getOggData = async () => {
   const ogg = getOgg();
-  console.log("ogg: ", ogg);
   const oggData = ogg.map(async (ogg) => {
-    const filename = path.join(oggPath, ogg, ogg + ".ogg");
-    console.log("filename: ", filename);
+    const coreFilename = path.join(ogg, ogg + ".ogg");
+    const filename = path.join(oggPath, coreFilename);
     const metadata = await parseFile(filename);
     try {
       const result = JSON.parse(
@@ -76,7 +34,16 @@ export const getOggData = async () => {
       result.coarse_prompt = null;
       return {
         ...result,
-        filename: path.join(baseUrlPath, "ogg", ogg).split(path.sep).join("/"),
+        filename: path
+          .join(
+            baseUrlPath,
+            "api",
+            "webui-generations",
+            "favorites",
+            coreFilename
+          )
+          .split(path.sep)
+          .join("/"),
       };
     } catch (error) {
       console.error(error);

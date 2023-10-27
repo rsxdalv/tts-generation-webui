@@ -93,8 +93,7 @@ export const CardGeneration = ({
         </div>
         {/* <p className="text-gray-500">{filename}</p> */}
         <div className="flex w-full justify-between">
-          {/* <AudioPlayer audio={filename} /> */}
-          (audio is not yet available)
+          <AudioPlayer audio={filename} />
           <p className="text-gray-500">{prettifyDate(date)}</p>
           {/* {language && <Flag language={parseMetadataLanguage(language)} />} */}
         </div>
@@ -346,7 +345,12 @@ const AudioPlayer = ({ audio }: Pick<Voice, "audio">) => {
           className="select-none w-full h-full"
         />
       </button>
-      <audio ref={audioRef} src={audio} />
+      <audio
+        ref={audioRef}
+        src={audio}
+        //  prevent preload
+        preload="none"
+      />
     </div>
   );
 };
