@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { Template } from "../components/Template";
-import FileInput from "../components/FileInput";
+import FileInput, { getAudioURL } from "../components/FileInput";
 import { AudioPlayer } from "../components/MemoizedWaveSurferPlayer";
 import { WaveSurferOptions } from "wavesurfer.js";
+import useLocalStorage from "../hooks/useLocalStorage";
 
 type AudioOutput = {
   name: string;
@@ -29,14 +30,27 @@ function addTypeNamesToAudioOutputs(
 type MusicgenParams = {
   file: string | null;
 };
+const initialState = {
+  file: "https://www.mfiles.co.uk/mp3-downloads/gs-cd-track2.mp3",
+};
+// type MusicgenParams = string | undefined;
 
-const GradioPage = () => {
-  const [data, setData] = useState<AudioOutput[] | null>(null);
+const DemucsPage = () => {
+  // const [data, setData] = useState<AudioOutput[] | null>(null);
+  // local storage
+  const [data, setData] = useLocalStorage<AudioOutput[] | null>("data", null);
 
-  const [musicgenParams, setMusicgenParams] = useState<MusicgenParams>({
-    // file: null,
-    file: "https://www.mfiles.co.uk/mp3-downloads/gs-cd-track2.mp3",
-  });
+  // const [musicgenParams, setMusicgenParams] = useState<MusicgenParams>({
+  //   // file: null,
+  //   file: "https://www.mfiles.co.uk/mp3-downloads/gs-cd-track2.mp3",
+  // });
+  // local storage
+  const [musicgenParams, setMusicgenParams] = useLocalStorage<MusicgenParams>(
+    "musicgenParams5",
+    // "",
+    initialState
+    // "https://www.mfiles.co.uk/mp3-downloads/gs-cd-track2.mp3"
+  );
 
   async function demucs() {
     const response = await fetch("/api/demucs_musicgen", {
@@ -57,11 +71,14 @@ const GradioPage = () => {
       <div className="p-4">
         <div>
           <MusicFileInput
+            // url={musicgenParams}
+            url={musicgenParams?.file}
             callback={(melody) => {
               setMusicgenParams({
                 ...musicgenParams,
                 file: melody,
               });
+              // setMusicgenParams(melody || undefined);
             }}
             sendAudioTo={(audio) => {
               setData([
@@ -89,6 +106,7 @@ const GradioPage = () => {
             );
             return (
               <MusicFileOutput
+                key={typeName}
                 audioOutput={audioOutput}
                 label={typeName}
                 sendAudioTo={(audio) => {
@@ -109,31 +127,28 @@ const GradioPage = () => {
   );
 };
 
-export default GradioPage;
+export default DemucsPage;
 
 const MusicFileInput = ({
   callback,
   sendAudioTo,
+  url,
 }: {
   callback: (melody: string | null) => void;
   sendAudioTo: (audio: string | undefined) => void;
-}) => {
-  const [melody, setMelody] = useState<string | undefined>(undefined);
-
-  return (
-    <div className="mt-4 border border-gray-300 p-2 rounded">
-      <label className="text-sm">Input file:</label>
-      <FileInput
-        callback={(file: File | undefined) => {
-          const melody = file?.name || null;
-          setMelody(file && URL.createObjectURL(file));
-          callback(melody);
-        }}
-      />
-      <AudioPlayerHelper url={melody} sendAudioTo={sendAudioTo} />
-    </div>
-  );
-};
+  url: string | undefined;
+}) => (
+  <div className="mt-4 border border-gray-300 p-2 rounded">
+    <label className="text-sm">Input file:</label>
+    <FileInput
+      callback={(file: File | undefined) => {
+        const melody = getAudioURL(file) || null;
+        callback(melody);
+      }}
+    />
+    <AudioPlayerHelper url={url} sendAudioTo={sendAudioTo} />
+  </div>
+);
 
 const MusicFileOutput = ({
   audioOutput,
@@ -169,11 +184,13 @@ const AudioPlayerHelper = (
         height={100}
         waveColor="#ffa500"
         progressColor="#d59520"
-        volume={0.4}
+        // volume={0.4}
         barWidth={2}
         barGap={1}
         barRadius={2}
-        {...props}
+        // {...props}
+        volume={props.volume || 0.4}
+        url={props.url}
       />
       <button
         className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"

@@ -43,7 +43,7 @@ async function demucs(file: string) {
 const readFromDisk = (file: string) =>
   new Promise((resolve, reject) => {
     fs.readFile(
-      path.join(process.cwd(), "file-input-cache", file),
+      path.join(process.cwd(), "public", file),
       (err, data) => {
         if (err) reject(err);
         resolve(data);

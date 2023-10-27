@@ -61,7 +61,7 @@ export const MemoizedWaveSurferPlayer = React.memo(WaveSurferPlayerRaw);
 export const AudioPlayer = (
   props: Omit<WaveSurferOptions, "container"> & {
     volume: number;
-    sendAudioTo: (audio: string | undefined) => void;
+    // sendAudioTo: (audio: string | undefined) => void;
   }
 ) => {
   const [plugins, setPlugins] = useState<any[]>([]);

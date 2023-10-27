@@ -68,7 +68,7 @@ const MusicgenPage = () => {
       model: modelNameMapping[musicgenParams.model],
     });
     console.log(body);
-    return;
+    // return;
     const response = await fetch("/api/demucs_musicgen", {
       method: "POST",
       body,

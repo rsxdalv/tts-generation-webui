@@ -46,3 +46,6 @@ export default function FileInput({
     </div>
   );
 }
+
+export const getAudioURL = (file: File | null | undefined): string | undefined =>
+  (file && "/file-input-cache/" + file.name) || undefined;
