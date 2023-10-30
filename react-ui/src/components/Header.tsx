@@ -19,6 +19,10 @@ const routes = [
     href: "/vocos_npz",
     text: "Vocos NPZ",
   },
+  {
+    href: "/bark_voice_generation",
+    text: "Bark Voice Generation",
+  },
   // {
   //   href: "/",
   //   text: "Voices",

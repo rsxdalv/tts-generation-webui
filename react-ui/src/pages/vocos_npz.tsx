@@ -60,6 +60,7 @@ const VocosPageNPZ = () => {
                 npz_file,
               });
             }}
+            hide_text={false}
           />
 
           <button

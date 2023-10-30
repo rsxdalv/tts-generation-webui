@@ -3,7 +3,7 @@ import { ChangeEvent, useState } from "react";
 export default function FileInput({
   callback,
   accept = "audio/*",
-  hide_text = false,
+  hide_text = true,
 }: {
   callback: (file?: string) => void;
   accept?: string;

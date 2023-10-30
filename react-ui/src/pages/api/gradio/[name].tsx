@@ -21,6 +21,8 @@ export default async function handler(
     vocos_wav,
     vocos_npz,
     encodec_decode,
+    bark_voice_tokenizer_load,
+    bark_voice_generate,
   };
   if (!name || typeof name !== "string" || !endpoints[name]) {
     res.status(404).json({ data: { error: "Not found" } });
@@ -106,4 +108,36 @@ async function musicgen({ melody, ...params }) {
     ];
   };
   return result?.data;
+}
+
+async function bark_voice_tokenizer_load({ tokenizer, use_gpu }) {
+  const app = await getClient();
+  const result = (await app.predict("/bark_voice_tokenizer_load", [
+    tokenizer, // string (Option from: ['quantifier_hubert_base_ls960.pth @ GitMylo/bark-voice-cloning', 'quantifier_hubert_base_ls960_14.pth @ GitMylo/bark-voice-cloning', 'quantifier_V1_hubert_base_ls960_23.pth @ GitMylo/bark-voice-cloning', 'polish-HuBERT-quantizer_8_epoch.pth @ Hobis/bark-voice-cloning-polish-HuBERT-quantizer', 'german-HuBERT-quantizer_14_epoch.pth @ CountFloyd/bark-voice-cloning-german-HuBERT-quantizer', 'es_tokenizer.pth @ Lancer1408/bark-es-tokenizer', 'portuguese-HuBERT-quantizer_24_epoch.pth @ MadVoyager/bark-voice-cloning-portuguese-HuBERT-quantizer']) in 'Tokenizer' Dropdown component
+    use_gpu, // boolean  in 'Use GPU' Checkbox component
+  ])) as {
+    data: [string];
+  };
+
+  return result?.data[0];
+}
+
+async function bark_voice_generate({ audio, use_gpu }) {
+  const audioBlob = await getFile(audio);
+
+  const app = await getClient();
+  const result = (await app.predict("/bark_voice_generate", [
+    audioBlob, // blob in 'Input Audio' Audio component
+    use_gpu, // boolean  in 'Use GPU' Checkbox component
+  ])) as {
+    data: [
+      string, // string representing output in 'Voice file name' Textbox component
+      GradioFile // { name: string; data: string; size?: number; is_file?: boolean; orig_name?: string} representing output in 'Encodec audio preview' Audio component
+    ];
+  };
+
+  return {
+    filename: result?.data[0],
+    preview: result?.data[1],
+  };
 }

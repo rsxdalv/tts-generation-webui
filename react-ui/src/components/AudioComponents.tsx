@@ -6,6 +6,7 @@ import { sendToDemucs } from "../tabs/DemucsParams";
 import { sendToMusicgen } from "../tabs/MusicgenParams";
 import { sendToVocos } from "../tabs/VocosParams";
 import { GradioFile } from "../types/GradioFile";
+import { sendToBarkVoiceGeneration } from "../tabs/BarkVoiceGenerationParams";
 
 export const AudioInput = ({
   callback,
@@ -56,6 +57,7 @@ const sendToFuncs = {
   sendToDemucs,
   sendToMusicgen,
   sendToVocos,
+  sendToBarkVoiceGeneration,
 } as Record<string, (audio: string | undefined) => void>;
 
 const listOfFuncs = Object.keys(sendToFuncs);
