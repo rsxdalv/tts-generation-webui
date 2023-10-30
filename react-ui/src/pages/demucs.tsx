@@ -27,35 +27,32 @@ function addTypeNamesToAudioOutputs(
   );
 }
 
-type MusicgenParams = {
+type DemucsParams = {
   file: string | null;
 };
 const initialState = {
   file: "https://www.mfiles.co.uk/mp3-downloads/gs-cd-track2.mp3",
 };
-// type MusicgenParams = string | undefined;
 
 const DemucsPage = () => {
   // const [data, setData] = useState<AudioOutput[] | null>(null);
   // local storage
   const [data, setData] = useLocalStorage<AudioOutput[] | null>("data", null);
 
-  // const [musicgenParams, setMusicgenParams] = useState<MusicgenParams>({
+  // const [demucsParams, setDemucsParams] = useState<DemucsParams>({
   //   // file: null,
   //   file: "https://www.mfiles.co.uk/mp3-downloads/gs-cd-track2.mp3",
   // });
   // local storage
-  const [musicgenParams, setMusicgenParams] = useLocalStorage<MusicgenParams>(
-    "musicgenParams5",
-    // "",
+  const [demucsParams, setDemucsParams] = useLocalStorage<DemucsParams>(
+    "demucs-tab",
     initialState
-    // "https://www.mfiles.co.uk/mp3-downloads/gs-cd-track2.mp3"
   );
 
   async function demucs() {
-    const response = await fetch("/api/demucs_musicgen", {
+    const response = await fetch("/api/demucs_demucs", {
       method: "POST",
-      body: JSON.stringify(musicgenParams),
+      body: JSON.stringify(demucsParams),
     });
 
     const result = await response.json();
@@ -71,14 +68,12 @@ const DemucsPage = () => {
       <div className="p-4">
         <div>
           <MusicFileInput
-            // url={musicgenParams}
-            url={musicgenParams?.file}
+            url={demucsParams?.file}
             callback={(melody) => {
-              setMusicgenParams({
-                ...musicgenParams,
+              setDemucsParams({
+                ...demucsParams,
                 file: melody,
               });
-              // setMusicgenParams(melody || undefined);
             }}
             sendAudioTo={(audio) => {
               setData([
