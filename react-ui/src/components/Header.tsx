@@ -11,9 +11,13 @@ const routes = [
     href: "/demucs",
     text: "Demucs",
   },
+  // {
+  //   href: "/vocos",
+  //   text: "Vocos",
+  // },
   {
-    href: "/vocos",
-    text: "Vocos",
+    href: "/vocos_wav",
+    text: "Vocos Wav",
   },
   // {
   //   href: "/",

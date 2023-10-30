@@ -10,17 +10,6 @@ type TypedGradioFile = GradioFile & {
   type_name?: string;
 };
 
-const typeNames = ["drums", "bass", "other", "vocals"];
-
-const addTypeNamesToAudioOutputs = (
-  audioOutputs: TypedGradioFile[],
-  typeNames: string[]
-) =>
-  audioOutputs.map((audioOutput, index) => ({
-    ...audioOutput,
-    type_name: typeNames[index],
-  }));
-
 const VocosPage = () => {
   const [data, setData] = useLocalStorage<TypedGradioFile[] | null>(
     "vocosOutput",
@@ -32,7 +21,7 @@ const VocosPage = () => {
   );
 
   async function vocos() {
-    const response = await fetch("/api/gradio/vocos", {
+    const response = await fetch("/api/gradio/vocos_wav", {
       method: "POST",
       body: JSON.stringify(vocosParams),
     });
@@ -41,14 +30,18 @@ const VocosPage = () => {
     setData(result);
   }
 
-  const sampleWithTypeNames =
-    data && addTypeNamesToAudioOutputs(data, typeNames);
-
   const useAsInput = (audio?: string) => {
     if (!audio) return;
     setVocosParams({
       ...vocosParams,
       audio,
+    });
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setVocosParams({
+      ...vocosParams,
+      bandwidth: e.target.value,
     });
   };
 
@@ -70,6 +63,28 @@ const VocosPage = () => {
             filter={["sendToVocos"]}
           />
 
+          <div className="space-y-2">
+            <label className="text-sm">Bandwidth in kbps:</label>
+            <div className="flex flex-row space-x-2">
+              {["1.5", "3.0", "6.0", "12.0"].map((bandwidth) => (
+                <div key={bandwidth} className="flex items-center">
+                  <input
+                    type="radio"
+                    name="model"
+                    id={bandwidth}
+                    value={bandwidth}
+                    checked={vocosParams.bandwidth === bandwidth}
+                    onChange={handleChange}
+                    className="border border-gray-300 p-2 rounded"
+                  />
+                  <label className="ml-1" htmlFor={bandwidth}>
+                    {bandwidth}
+                  </label>
+                </div>
+              ))}
+            </div>
+          </div>
+
           <button
             className="border border-gray-300 p-2 rounded"
             onClick={vocos}
@@ -78,20 +93,12 @@ const VocosPage = () => {
           </button>
         </div>
         <div className="flex flex-col space-y-4">
-          {typeNames.map((typeName) => {
-            const audioOutput = sampleWithTypeNames?.find(
-              (item) => item.type_name === typeName
-            );
-            return (
-              <AudioOutput
-                key={typeName}
-                audioOutput={audioOutput}
-                label={typeName[0].toUpperCase() + typeName.slice(1)}
-                funcs={[useAsInput]}
-                filter={["sendToVocos"]}
-              />
-            );
-          })}
+          <AudioOutput
+            audioOutput={data}
+            label="Vocos Output"
+            funcs={[useAsInput]}
+            filter={["sendToVocos"]}
+          />
         </div>
       </div>
     </Template>

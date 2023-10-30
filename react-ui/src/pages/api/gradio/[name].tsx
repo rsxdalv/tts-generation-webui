@@ -17,7 +17,7 @@ export default async function handler(
 
   const endpoints = {
     demucs,
-    vocos,
+    vocos_wav,
     musicgen,
   };
   if (!name || typeof name !== "string" || !endpoints[name]) {
@@ -44,7 +44,7 @@ async function demucs({ file }: { file: string }) {
   return result?.data;
 }
 
-async function vocos({ audio, bandwidth }) {
+async function vocos_wav({ audio, bandwidth }) {
   const audioBlob = await getFile(audio);
 
   const app = await getClient();
@@ -55,7 +55,7 @@ async function vocos({ audio, bandwidth }) {
     data: [GradioFile];
   };
 
-  return result?.data;
+  return result?.data[0];
 }
 
 async function musicgen({ melody, ...params }) {

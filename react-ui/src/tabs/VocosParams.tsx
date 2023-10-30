@@ -11,7 +11,7 @@ export const initialState: VocosParams = {
   bandwidth: "1.5",
 };
 
-export const vocosId = "vocos-tab";
+export const vocosId = "vocos_wav-tab";
 
 export const sendToVocos = (audio?: string) => {
   if (!audio) return;
@@ -20,5 +20,5 @@ export const sendToVocos = (audio?: string) => {
     (vocosParams: VocosParams = initialState) =>
       ({ ...vocosParams, audio } as VocosParams)
   );
-  router.push("/vocos");
+  router.push("/vocos_wav");
 };
