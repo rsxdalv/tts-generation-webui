@@ -28,7 +28,7 @@ const addTypeNamesToAudioOutputs = (
 
 const DemucsPage = () => {
   const [data, setData] = useLocalStorage<TypedGradioFile[] | null>(
-    "data",
+    "demucsOutput",
     null
   );
   const [demucsParams, setDemucsParams] = useLocalStorage<DemucsParams>(
@@ -49,8 +49,12 @@ const DemucsPage = () => {
   const sampleWithTypeNames =
     data && addTypeNamesToAudioOutputs(data, typeNames);
 
-  const sendAudioTo = (audio: string | undefined) => {
-    if (audio) sendToDemucs(audio);
+  const useAsInput = (audio?: string) => {
+    if (!audio) return;
+    setDemucsParams({
+      ...demucsParams,
+      file: audio,
+    });
   };
 
   return (
@@ -59,7 +63,7 @@ const DemucsPage = () => {
         <title>Demucs - TTS Generation Webui</title>
       </Head>
       <div className="flex space-x-4">
-        <div className="flex flex-col">
+        <div className="flex flex-col space-y-2">
           <AudioInput
             url={demucsParams?.file}
             callback={(file) => {
@@ -68,7 +72,7 @@ const DemucsPage = () => {
                 file,
               });
             }}
-            sendAudioTo={sendAudioTo}
+            filter={["sendToDemucs"]}
           />
 
           <button
@@ -78,7 +82,7 @@ const DemucsPage = () => {
             Split with Demucs
           </button>
         </div>
-        <div className="flex flex-col">
+        <div className="flex flex-col space-y-4">
           {typeNames.map((typeName) => {
             const audioOutput = sampleWithTypeNames?.find(
               (item) => item.type_name === typeName
@@ -87,8 +91,9 @@ const DemucsPage = () => {
               <AudioOutput
                 key={typeName}
                 audioOutput={audioOutput}
-                label={typeName}
-                sendAudioTo={sendAudioTo}
+                label={typeName[0].toUpperCase() + typeName.slice(1)}
+                funcs={[useAsInput]}
+                filter={["sendToDemucs"]}
               />
             );
           })}

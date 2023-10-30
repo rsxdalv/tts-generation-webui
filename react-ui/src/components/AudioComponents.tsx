@@ -3,58 +3,76 @@ import FileInput, { getAudioURL } from "./FileInput";
 import { AudioPlayer } from "./MemoizedWaveSurferPlayer";
 import { WaveSurferOptions } from "wavesurfer.js";
 import { GradioFile } from "../pages/api/demucs_musicgen";
-import { GradioFileInfo } from "../pages/GradioFileInfo";
 import { sendToDemucs } from "../tabs/DemucsParams";
+import { sendToMusicgen } from "../tabs/MusicgenParams";
 
 export const AudioInput = ({
   callback,
-  sendAudioTo,
+  funcs: sendAudioTo,
   url,
+  label,
+  filter,
 }: {
   callback: (melody?: string) => void;
-  sendAudioTo: (audio?: string) => void;
+  funcs?: Array<(audio: string | undefined) => void>;
   url?: string;
+  label?: string;
+  filter?: string[];
 }) => (
-  <div className="mt-4 border border-gray-300 p-2 rounded">
-    <label className="text-sm">Input file:</label>
+  <div className="border border-gray-300 p-2 rounded flex flex-col space-y-2">
+    <p className="text-sm">{label || "Input file:"}</p>
     <FileInput
       callback={(file?: File) => {
         const melody = getAudioURL(file);
         callback(melody);
       }}
     />
-    <AudioPlayerHelper url={url} sendAudioTo={sendAudioTo} />
+    <AudioPlayerHelper url={url} sendAudioTo={sendAudioTo} filter={filter} />
   </div>
 );
 
 export const AudioOutput = ({
   audioOutput,
   label,
-  sendAudioTo,
+  funcs: sendAudioTo,
+  filter,
 }: {
   audioOutput?: GradioFile;
   label: string;
-  sendAudioTo: (audio: string | undefined) => void;
+  funcs?: Array<(audio: string | undefined) => void>;
+  filter?: string[];
 }) => {
   return (
-    <div className="mt-4 border border-gray-300 p-2 rounded">
+    <div className="border border-gray-300 p-2 rounded">
       <p className="text-sm">{label}</p>
       {audioOutput && (
         <>
-          <AudioPlayerHelper url={audioOutput.data} sendAudioTo={sendAudioTo} />
-          {/* <GradioFileInfo audioOutput={audioOutput} /> */}
+          <AudioPlayerHelper
+            url={audioOutput.data}
+            sendAudioTo={sendAudioTo}
+            filter={filter}
+          />
         </>
       )}
     </div>
   );
 };
 
+const sendToFuncs = {
+  sendToDemucs,
+  sendToMusicgen,
+} as Record<string, (audio: string | undefined) => void>;
+
+const listOfFuncs = Object.keys(sendToFuncs);
+
 const AudioPlayerHelper = (
   props: Omit<WaveSurferOptions, "container"> & {
     volume?: number;
-    sendAudioTo: (audio: string | undefined) => void;
+    filter?: string[];
+    sendAudioTo?: Array<(audio: string | undefined) => void>;
   }
 ) => {
+  const { filter: outputFilters, sendAudioTo: funcs, url, volume } = props;
   return (
     <>
       <AudioPlayer
@@ -64,38 +82,33 @@ const AudioPlayerHelper = (
         barWidth={2}
         barGap={1}
         barRadius={2}
-        volume={props.volume || 0.4}
-        url={props.url}
+        volume={volume || 0.4}
+        url={url}
       />
-      <button
-        className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
-        onClick={() => props.sendAudioTo(props.url)}
-      >
-        Send Audio
-      </button>
-      <button
-        className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
-        onClick={() => sendToDemucs(props.url)}
-      >
-        Send Audio to Demucs
-      </button>
-      <DownloadButton {...props} />
+      <div className="mt-2 flex flex-wrap space-x-2">
+        {funcs?.map((func) => (
+          <FuncButton key={func.name} func={func} url={url} />
+        ))}
+        {listOfFuncs
+          .filter((funcName) =>
+            outputFilters ? !outputFilters.includes(funcName) : true
+          )
+          .map((funcName) => (
+            <FuncButton key={funcName} func={sendToFuncs[funcName]} url={url} />
+          ))}
+        <DownloadButton url={url} />
+      </div>
     </>
   );
 };
 
-const DownloadButton = (
-  props: Omit<WaveSurferOptions, "container"> & {
-    volume?: number | undefined;
-    sendAudioTo: (audio: string | undefined) => void;
-  }
-) => {
+const DownloadButton = ({ url }: { url?: string }) => {
   const [downloadURL, setDownloadURL] = React.useState<string | undefined>(
     undefined
   );
 
   React.useEffect(() => {
-    if (!props.url) return;
+    if (!url) return;
     const download = (url) => {
       if (!url) {
         throw new Error("Resource URL not provided! You need to provide one");
@@ -107,8 +120,8 @@ const DownloadButton = (
           setDownloadURL(blobURL);
         });
     };
-    download(props.url);
-  }, [props.url]);
+    download(url);
+  }, [url]);
 
   return (
     <a
@@ -120,3 +133,23 @@ const DownloadButton = (
     </a>
   );
 };
+
+// function FuncButton(func: (audio: string | undefined) => void, url: string | undefined): JSX.Element {
+const FuncButton = ({
+  func,
+  url,
+}: {
+  func: (audio: string | undefined) => void;
+  url: string | undefined;
+}) => (
+  <button
+    className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+    onClick={() => func(url)}
+  >
+    {/* {func.name} */}
+    {/* camelCase to Title Case */}
+    {func.name
+      .replace(/([A-Z])/g, " $1")
+      .replace(/^./, (str) => str.toUpperCase())}
+  </button>
+);

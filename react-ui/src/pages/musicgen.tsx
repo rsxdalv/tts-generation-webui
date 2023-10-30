@@ -1,8 +1,14 @@
-import React, { useState } from "react";
+import React from "react";
 import { Template } from "../components/Template";
 import Head from "next/head";
-import FileInput from "../components/FileInput";
-import { AudioPlayer } from "../components/MemoizedWaveSurferPlayer";
+import useLocalStorage from "../hooks/useLocalStorage";
+import { AudioInput, AudioOutput } from "../components/AudioComponents";
+import { GradioFile } from "./api/demucs_musicgen";
+import {
+  MusicgenParams,
+  initialMusicgenParams,
+  musicgenId,
+} from "../tabs/MusicgenParams";
 
 type AudioOutput = {
   name: string;
@@ -13,34 +19,6 @@ type AudioOutput = {
   type_name?: string;
 };
 
-const musicgenParams0: MusicgenParams = {
-  // text: "",
-  text: "lofi hip hop beats to relax/study to",
-  melody: null,
-  // melody: "https://www.mfiles.co.uk/mp3-downloads/gs-cd-track2.mp3",
-  model: "Small",
-  duration: 1,
-  topk: 250,
-  topp: 0,
-  temperature: 1.0,
-  cfg_coef: 3.0,
-  seed: -1,
-  use_multi_band_diffusion: false,
-};
-
-type MusicgenParams = {
-  text: string;
-  melody: string | null;
-  model: string;
-  duration: number;
-  topk: number;
-  topp: number;
-  temperature: number;
-  cfg_coef: number;
-  seed: number;
-  use_multi_band_diffusion: boolean;
-};
-
 const modelNameMapping = {
   Melody: "facebook/musicgen-melody",
   Medium: "facebook/musicgen-medium",
@@ -49,16 +27,22 @@ const modelNameMapping = {
   Audiogen: "facebook/audiogen-medium",
 };
 
+const initialHistory = []; // prevent infinite loop
 const MusicgenPage = () => {
-  const [musicgenData, setMusicgenData] = useState<AudioOutput[] | null>(null);
-  const [historyData, setHistoryData] = useState<AudioOutput[]>([]);
-  const [lastSeed, setLastSeed] = useState<number>(-1);
-  const [image, setImage] = useState<string>("");
-  const [audioUrl, setAudioUrl] = useState<string>("");
-  const [musicgenParams, setMusicgenParams] =
-    useState<MusicgenParams>(musicgenParams0);
-  const [melody, setMelody] = useState<string | undefined>(
-    musicgenParams.melody || undefined
+  const [historyData, setHistoryData] = useLocalStorage<GradioFile[]>(
+    "musicgenHistory",
+    initialHistory
+  );
+  const [lastSeed, setLastSeed] = useLocalStorage<number>(
+    "musicgenLastSeed",
+    -1
+  );
+  const [musicgenOutput, setMusicgenOutput] = useLocalStorage<
+    GradioFile | undefined
+  >("musicgenOutput", undefined);
+  const [musicgenParams, setMusicgenParams] = useLocalStorage<MusicgenParams>(
+    musicgenId,
+    initialMusicgenParams
   );
 
   async function musicgen() {
@@ -75,15 +59,18 @@ const MusicgenPage = () => {
     });
 
     const result = await response.json();
-    const data = result?.data;
-    const [generated_audio, , image, , json] = data;
-    console.log(generated_audio, image, json);
+    const data = result?.data as [
+      GradioFile, // output
+      any, // history_bundle_name_data
+      any, // image
+      any, // seed_cache
+      any // result_json
+    ];
+    const [generated_audio, , , , json] = data;
     const { seed } = json;
-    setMusicgenData(result?.data);
-    setHistoryData((x) => [result?.data[0], ...x]);
     setLastSeed(seed);
-    setImage(image);
-    setAudioUrl(generated_audio.data);
+    setMusicgenOutput(generated_audio);
+    setHistoryData((x) => [generated_audio, ...x]);
   }
 
   const handleChange = async (
@@ -93,22 +80,6 @@ const MusicgenPage = () => {
       | React.ChangeEvent<HTMLSelectElement>
   ) => {
     const { name, value, type } = event.target;
-
-    if (name === "melody") {
-      if (!(event.target instanceof HTMLInputElement)) return;
-      const file = event.target.files?.[0];
-      console.log(file);
-      const reader = new FileReader();
-      reader.readAsDataURL(file!);
-      console.log(reader);
-      console.log(reader.result);
-      setMusicgenParams({
-        ...musicgenParams,
-        [name]: reader.result,
-      });
-      return;
-    }
-
     setMusicgenParams({
       ...musicgenParams,
       [name]:
@@ -120,10 +91,18 @@ const MusicgenPage = () => {
     });
   };
 
+  const useAsMelody = (melody?: string) => {
+    if (!melody) return;
+    setMusicgenParams({
+      ...musicgenParams,
+      melody,
+    });
+  };
+
   return (
     <Template>
       <Head>
-        <title>TTS Generation Webui - Musicgen</title>
+        <title>Musicgen - TTS Generation Webui</title>
       </Head>
       <div className="p-4">
         <div className="my-4">
@@ -162,28 +141,16 @@ const MusicgenPage = () => {
                   )}
                 </div>
               </div>
-
-              <label className="text-sm">Melody:</label>
-              <FileInput
-                callback={(file: File | undefined) => {
-                  const melody = file?.name || null;
-                  setMelody(file && URL.createObjectURL(file));
+              <AudioInput
+                url={musicgenParams.melody}
+                label="Melody"
+                callback={(file) => {
                   setMusicgenParams({
                     ...musicgenParams,
-                    melody,
+                    melody: file,
                   });
                 }}
-              />
-              {/* Preview melody */}
-              <AudioPlayer
-                height={100}
-                waveColor="#ffa500"
-                progressColor="#d59520"
-                url={melody}
-                volume={0.4}
-                barWidth={2}
-                barGap={1}
-                barRadius={2}
+                filter={["sendToMusicgen"]}
               />
             </div>
 
@@ -300,55 +267,33 @@ const MusicgenPage = () => {
         </div>
 
         <div className="my-4 flex flex-col space-y-2">
-          <div>
-            <label className="text-sm">Output:</label>
-            <AudioPlayer
-              height={100}
-              waveColor="#ffa500"
-              progressColor="#d59520"
-              url={audioUrl}
-              volume={0.4}
-              barWidth={2}
-              barGap={1}
-              barRadius={2}
-            />
-          </div>
           <button
             className="border border-gray-300 p-2 rounded"
             onClick={musicgen}
           >
             Generate
           </button>
+          <AudioOutput
+            audioOutput={musicgenOutput}
+            label="Musicgen Output"
+            funcs={[useAsMelody]}
+            filter={["sendToMusicgen"]}
+          />
         </div>
 
-        {/* History */}
-        <div className="my-4">
+        <div className="flex flex-col space-y-2 border border-gray-300 p-2 rounded">
+          <label className="text-sm">History:</label>
           <div className="flex flex-col space-y-2">
-            <label className="text-sm">History:</label>
-            <div className="flex flex-col space-y-2">
-              {historyData &&
-                historyData.map((item, index) => (
-                  // <div key={index}>
-                  //   <audio src={item.data} controls></audio>
-                  // </div>
-                  <AudioPlayer
-                    height={100}
-                    waveColor="#ffa500"
-                    progressColor="#d59520"
-                    url={item.data}
-                    volume={0.4}
-                    // // Set a bar width
-                    // barWidth: 2,
-                    // // Optionally, specify the spacing between bars
-                    // barGap: 1,
-                    // // And the bar radius
-                    // barRadius: 2,
-                    barWidth={2}
-                    barGap={1}
-                    barRadius={2}
-                  />
-                ))}
-            </div>
+            {historyData &&
+              historyData.map((item, index) => (
+                <AudioOutput
+                  key={index}
+                  audioOutput={item}
+                  label={`History ${index}`}
+                  funcs={[useAsMelody]}
+                  filter={["sendToMusicgen"]}
+                />
+              ))}
           </div>
         </div>
       </div>
