@@ -2,11 +2,14 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 
 export default function useLocalStorage<T>(
   key: string,
-  initialValue: T
+  initialValue: T,
+  namespace = "tts-generation-webui__",
 ): [T, Dispatch<SetStateAction<T>>] {
   const [storedValue, setStoredValue] = useState(initialValue);
   // We will use this flag to trigger the reading from localStorage
   const [firstLoadDone, setFirstLoadDone] = useState(false);
+
+  const prefixedKey = namespace + key;
 
   // Use an effect hook in order to prevent SSR inconsistencies and errors.
   // This will update the state with the value from the local storage after
@@ -17,7 +20,7 @@ export default function useLocalStorage<T>(
         return initialValue;
       }
       try {
-        const item = window.localStorage.getItem(key);
+        const item = window.localStorage.getItem(prefixedKey);
         return item ? (JSON.parse(item) as T) : initialValue;
       } catch (error) {
         console.error(error);
@@ -25,23 +28,11 @@ export default function useLocalStorage<T>(
       }
     };
 
-    // Set the value from localStorage
+    // Set  the value from localStorage
     setStoredValue(fromLocal);
     // First load is done
     setFirstLoadDone(true);
-  }, [initialValue, key]);
-
-  // Instead of replacing the setState function, react to changes.
-  // Whenever the state value changes, save it in the local storage.
-  // useEffect(() => {
-  //   // If it's the first load, don't store the value.
-  //   // Otherwise, the initial value will overwrite the local storage.
-  //   if (!firstLoadDone) {
-  //     return;
-  //   }
-
-  //   setLocalValue();
-  // }, [storedValue, firstLoadDone, key]);
+  }, [initialValue, prefixedKey]);
 
   function setLocalValue(value: T) {
     if (!firstLoadDone) {
@@ -50,7 +41,7 @@ export default function useLocalStorage<T>(
 
     try {
       if (typeof window !== "undefined") {
-        window.localStorage.setItem(key, JSON.stringify(value));
+        window.localStorage.setItem(prefixedKey, JSON.stringify(value));
       }
     } catch (error) {
       console.log(error);
