@@ -702,7 +702,7 @@ def generation_tab_bark():
                 fn=generate_multi(count, output_components),
                 inputs=inputs,
                 outputs=all_outputs_flat,
-                # api_name=f"bark_{count}",
+                # api_name=f"bark_{count}", # gradio literally can't support this
             )
             return button
 
