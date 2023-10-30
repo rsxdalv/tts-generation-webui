@@ -1,15 +1,10 @@
 import React from "react";
 import { Template } from "../components/Template";
 import useLocalStorage from "../hooks/useLocalStorage";
-import { GradioFile } from "./api/demucs_musicgen";
 import { AudioInput, AudioOutput } from "../components/AudioComponents";
 import Head from "next/head";
-import {
-  DemucsParams,
-  demucsId,
-  initialState,
-  sendToDemucs,
-} from "../tabs/DemucsParams";
+import { DemucsParams, demucsId, initialState } from "../tabs/DemucsParams";
+import { GradioFile } from "../types/GradioFile";
 
 type TypedGradioFile = GradioFile & {
   type_name?: string;
@@ -37,13 +32,13 @@ const DemucsPage = () => {
   );
 
   async function demucs() {
-    const response = await fetch("/api/demucs_musicgen", {
+    const response = await fetch("/api/gradio/demucs", {
       method: "POST",
       body: JSON.stringify(demucsParams),
     });
 
     const result = await response.json();
-    setData(result?.data);
+    setData(result);
   }
 
   const sampleWithTypeNames =

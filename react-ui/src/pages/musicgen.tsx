@@ -3,12 +3,12 @@ import { Template } from "../components/Template";
 import Head from "next/head";
 import useLocalStorage from "../hooks/useLocalStorage";
 import { AudioInput, AudioOutput } from "../components/AudioComponents";
-import { GradioFile } from "./api/demucs_musicgen";
 import {
   MusicgenParams,
   initialMusicgenParams,
   musicgenId,
 } from "../tabs/MusicgenParams";
+import { GradioFile } from "../types/GradioFile";
 
 type AudioOutput = {
   name: string;
@@ -53,13 +53,13 @@ const MusicgenPage = () => {
     });
     console.log(body);
     // return;
-    const response = await fetch("/api/demucs_musicgen", {
+    const response = await fetch("/api/gradio/musicgen", {
       method: "POST",
       body,
     });
 
     const result = await response.json();
-    const data = result?.data as [
+    const data = result as [
       GradioFile, // output
       any, // history_bundle_name_data
       any, // image
@@ -283,6 +283,15 @@ const MusicgenPage = () => {
 
         <div className="flex flex-col space-y-2 border border-gray-300 p-2 rounded">
           <label className="text-sm">History:</label>
+          {/* Clear history */}
+          <button
+            className="border border-gray-300 p-2 rounded"
+            onClick={() => {
+              setHistoryData([]);
+            }}
+          >
+            Clear History
+          </button>
           <div className="flex flex-col space-y-2">
             {historyData &&
               historyData.map((item, index) => (

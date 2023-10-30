@@ -96,6 +96,7 @@ def vocos_tab_bark():
             fn=vocos_predict,
             inputs=[npz_file],
             outputs=output,
+            api_name="vocos_npz",
         )
 
 
