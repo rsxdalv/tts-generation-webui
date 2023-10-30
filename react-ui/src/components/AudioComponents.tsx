@@ -5,6 +5,7 @@ import { WaveSurferOptions } from "wavesurfer.js";
 import { GradioFile } from "../pages/api/demucs_musicgen";
 import { sendToDemucs } from "../tabs/DemucsParams";
 import { sendToMusicgen } from "../tabs/MusicgenParams";
+import { sendToVocos } from "../tabs/VocosParams";
 
 export const AudioInput = ({
   callback,
@@ -61,6 +62,7 @@ export const AudioOutput = ({
 const sendToFuncs = {
   sendToDemucs,
   sendToMusicgen,
+  sendToVocos,
 } as Record<string, (audio: string | undefined) => void>;
 
 const listOfFuncs = Object.keys(sendToFuncs);

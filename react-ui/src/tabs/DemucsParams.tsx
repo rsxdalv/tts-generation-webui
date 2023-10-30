@@ -15,7 +15,8 @@ export const sendToDemucs = (file?: string) => {
   if (!file) return;
   updateLocalStorageWithFunction(
     demucsId,
-    (demucsParams: DemucsParams) => ({ ...demucsParams, file } as DemucsParams)
+    (demucsParams: DemucsParams = initialState) =>
+      ({ ...demucsParams, file } as DemucsParams)
   );
   router.push("/demucs");
 };

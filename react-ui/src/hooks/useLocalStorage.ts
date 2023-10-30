@@ -5,7 +5,7 @@ const defaultNamespace = "tts-generation-webui__";
 const readLocalStorage = (key: string) => {
   const prefixedKey = defaultNamespace + key;
   const item = localStorage.getItem(prefixedKey);
-  return item ? (JSON.parse(item) as any) : null;
+  return item ? (JSON.parse(item) as any) : undefined;
 };
 
 const updateLocalStorage = (key: string, value: any) => {

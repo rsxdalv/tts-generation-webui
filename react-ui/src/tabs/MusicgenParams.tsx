@@ -35,7 +35,7 @@ export const sendToMusicgen = (melody?: string) => {
   if (!melody) return;
   updateLocalStorageWithFunction(
     musicgenId,
-    (musicgenParams: MusicgenParams) =>
+    (musicgenParams: MusicgenParams = initialMusicgenParams) =>
       ({ ...musicgenParams, melody } as MusicgenParams)
   );
   router.push("/musicgen");

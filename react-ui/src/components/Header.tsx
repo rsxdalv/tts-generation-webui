@@ -11,6 +11,10 @@ const routes = [
     href: "/demucs",
     text: "Demucs",
   },
+  {
+    href: "/vocos",
+    text: "Vocos",
+  },
   // {
   //   href: "/",
   //   text: "Voices",
