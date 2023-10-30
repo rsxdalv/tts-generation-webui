@@ -4,6 +4,7 @@ import { AudioPlayer } from "./MemoizedWaveSurferPlayer";
 import { WaveSurferOptions } from "wavesurfer.js";
 import { GradioFile } from "../pages/api/demucs_musicgen";
 import { GradioFileInfo } from "../pages/GradioFileInfo";
+import { sendToDemucs } from "../tabs/DemucsParams";
 
 export const AudioInput = ({
   callback,
@@ -25,6 +26,7 @@ export const AudioInput = ({
     <AudioPlayerHelper url={url} sendAudioTo={sendAudioTo} />
   </div>
 );
+
 export const AudioOutput = ({
   audioOutput,
   label,
@@ -40,12 +42,13 @@ export const AudioOutput = ({
       {audioOutput && (
         <>
           <AudioPlayerHelper url={audioOutput.data} sendAudioTo={sendAudioTo} />
-          <GradioFileInfo audioOutput={audioOutput} />
+          {/* <GradioFileInfo audioOutput={audioOutput} /> */}
         </>
       )}
     </div>
   );
 };
+
 const AudioPlayerHelper = (
   props: Omit<WaveSurferOptions, "container"> & {
     volume?: number;
@@ -70,13 +73,50 @@ const AudioPlayerHelper = (
       >
         Send Audio
       </button>
-      <a
-        className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded inline-block"
-        href={props.url}
-        download
+      <button
+        className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+        onClick={() => sendToDemucs(props.url)}
       >
-        Download
-      </a>
+        Send Audio to Demucs
+      </button>
+      <DownloadButton {...props} />
     </>
+  );
+};
+
+const DownloadButton = (
+  props: Omit<WaveSurferOptions, "container"> & {
+    volume?: number | undefined;
+    sendAudioTo: (audio: string | undefined) => void;
+  }
+) => {
+  const [downloadURL, setDownloadURL] = React.useState<string | undefined>(
+    undefined
+  );
+
+  React.useEffect(() => {
+    if (!props.url) return;
+    const download = (url) => {
+      if (!url) {
+        throw new Error("Resource URL not provided! You need to provide one");
+      }
+      fetch(url)
+        .then((response) => response.blob())
+        .then((blob) => {
+          const blobURL = URL.createObjectURL(blob);
+          setDownloadURL(blobURL);
+        });
+    };
+    download(props.url);
+  }, [props.url]);
+
+  return (
+    <a
+      className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded inline-block"
+      href={downloadURL}
+      download="audio.wav"
+    >
+      Download
+    </a>
   );
 };

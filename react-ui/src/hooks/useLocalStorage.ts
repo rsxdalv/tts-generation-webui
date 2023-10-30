@@ -1,9 +1,28 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 
+const defaultNamespace = "tts-generation-webui__";
+
+const readLocalStorage = (key: string) => {
+  const prefixedKey = defaultNamespace + key;
+  const item = localStorage.getItem(prefixedKey);
+  return item ? (JSON.parse(item) as any) : null;
+};
+
+const updateLocalStorage = (key: string, value: any) => {
+  const prefixedKey = defaultNamespace + key;
+  localStorage.setItem(prefixedKey, JSON.stringify(value));
+};
+
+export const updateLocalStorageWithFunction = (key: string, value: any) =>
+  updateLocalStorage(
+    key,
+    value instanceof Function ? value(readLocalStorage(key)) : value
+  );
+
 export default function useLocalStorage<T>(
   key: string,
   initialValue: T,
-  namespace = "tts-generation-webui__",
+  namespace = defaultNamespace
 ): [T, Dispatch<SetStateAction<T>>] {
   const [storedValue, setStoredValue] = useState(initialValue);
   // We will use this flag to trigger the reading from localStorage
@@ -57,6 +76,22 @@ export default function useLocalStorage<T>(
     // Save state
     setStoredValue(valueToStore);
   };
+
+  // watch localStorage changes
+  // useEffect(() => {
+  //   const onStorageChange = (e: StorageEvent) => {
+  //     console.log("onStorageChange", e);
+  //     if (e.key === prefixedKey) {
+  //       setStoredValue(JSON.parse(e.newValue || "null"));
+  //     }
+  //   };
+
+  //   window.addEventListener("storage", onStorageChange);
+
+  //   return () => {
+  //     window.removeEventListener("storage", onStorageChange);
+  //   };
+  // }, [prefixedKey]);
 
   // Return the original useState functions
   // return [storedValue, setStoredValue];

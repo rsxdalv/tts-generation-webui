@@ -1,9 +1,15 @@
-import React, { useState } from "react";
+import React from "react";
 import { Template } from "../components/Template";
 import useLocalStorage from "../hooks/useLocalStorage";
 import { GradioFile } from "./api/demucs_musicgen";
-import { useRouter } from "next/router";
 import { AudioInput, AudioOutput } from "../components/AudioComponents";
+import Head from "next/head";
+import {
+  DemucsParams,
+  demucsId,
+  initialState,
+  sendToDemucs,
+} from "../tabs/DemucsParams";
 
 type TypedGradioFile = GradioFile & {
   type_name?: string;
@@ -20,21 +26,13 @@ const addTypeNamesToAudioOutputs = (
     type_name: typeNames[index],
   }));
 
-type DemucsParams = {
-  file?: string;
-};
-
-const initialState: DemucsParams = {
-  file: "https://www.mfiles.co.uk/mp3-downloads/gs-cd-track2.mp3",
-};
-
 const DemucsPage = () => {
   const [data, setData] = useLocalStorage<TypedGradioFile[] | null>(
     "data",
     null
   );
   const [demucsParams, setDemucsParams] = useLocalStorage<DemucsParams>(
-    "demucs-tab",
+    demucsId,
     initialState
   );
 
@@ -51,23 +49,17 @@ const DemucsPage = () => {
   const sampleWithTypeNames =
     data && addTypeNamesToAudioOutputs(data, typeNames);
 
-  const router = useRouter();
-
-  const sendToDemucs = (file: string) => {
-    setDemucsParams(
-      (demucsParams) => ({ ...demucsParams, file } as DemucsParams)
-    );
-    router.push("/demucs");
-  };
-
   const sendAudioTo = (audio: string | undefined) => {
     if (audio) sendToDemucs(audio);
   };
 
   return (
     <Template>
-      <div className="p-4">
-        <div>
+      <Head>
+        <title>Demucs - TTS Generation Webui</title>
+      </Head>
+      <div className="flex space-x-4">
+        <div className="flex flex-col">
           <AudioInput
             url={demucsParams?.file}
             callback={(file) => {
@@ -85,7 +77,9 @@ const DemucsPage = () => {
           >
             Split with Demucs
           </button>
-          {typeNames.map((typeName, index) => {
+        </div>
+        <div className="flex flex-col">
+          {typeNames.map((typeName) => {
             const audioOutput = sampleWithTypeNames?.find(
               (item) => item.type_name === typeName
             );
