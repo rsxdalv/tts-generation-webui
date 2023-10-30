@@ -6,6 +6,7 @@ import { GradioFile } from "../pages/api/demucs_musicgen";
 import { sendToDemucs } from "../tabs/DemucsParams";
 import { sendToMusicgen } from "../tabs/MusicgenParams";
 import { sendToVocos } from "../tabs/VocosParams";
+import { sendToVocosNPZ } from "../tabs/VocosParamsNPZ";
 
 export const AudioInput = ({
   callback,

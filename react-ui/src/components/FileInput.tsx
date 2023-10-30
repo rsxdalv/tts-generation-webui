@@ -2,8 +2,12 @@ import { ChangeEvent, useState } from "react";
 
 export default function FileInput({
   callback,
+  accept = "audio/*",
+  hide_text = false,
 }: {
   callback: (file?: File) => void;
+  accept?: string;
+  hide_text?: boolean;
 }) {
   const parseFileEvent = (e: ChangeEvent<HTMLInputElement>) =>
     e.target.files?.[0];
@@ -37,9 +41,9 @@ export default function FileInput({
           await uploadFile(file);
           callback(file);
         }}
-        accept="audio/*"
+        accept={accept}
         style={{
-          color: "transparent",
+          color: hide_text ? "transparent" : undefined,
         }}
       />
       <button onClick={() => callback(undefined)}>Clear File</button>
@@ -48,4 +52,4 @@ export default function FileInput({
 }
 
 export const getAudioURL = (file?: File) =>
-  (file && "/file-input-cache/" + file.name);
+  file && "/file-input-cache/" + file.name;

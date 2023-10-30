@@ -17,8 +17,9 @@ export default async function handler(
 
   const endpoints = {
     demucs,
-    vocos_wav,
     musicgen,
+    vocos_wav,
+    vocos_npz,
   };
   if (!name || typeof name !== "string" || !endpoints[name]) {
     res.status(404).json({ data: { error: "Not found" } });
@@ -51,6 +52,19 @@ async function vocos_wav({ audio, bandwidth }) {
   const result = (await app.predict("/vocos_wav", [
     audioBlob, // blob in 'Input Audio' Audio component
     bandwidth, // string (Option from: ['1.5', '3.0', '6.0', '12.0']) in 'Bandwidth in kbps' Dropdown component
+  ])) as {
+    data: [GradioFile];
+  };
+
+  return result?.data[0];
+}
+
+async function vocos_npz({ npz_file }) {
+  const npzBlob = await getFile(npz_file);
+
+  const app = await getClient();
+  const result = (await app.predict("/vocos_npz", [
+    npzBlob, // blob in 'Input NPZ' File component
   ])) as {
     data: [GradioFile];
   };
