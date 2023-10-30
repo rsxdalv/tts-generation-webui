@@ -5,7 +5,7 @@ export default function FileInput({
   accept = "audio/*",
   hide_text = false,
 }: {
-  callback: (file?: File) => void;
+  callback: (file?: string) => void;
   accept?: string;
   hide_text?: boolean;
 }) {
@@ -39,7 +39,7 @@ export default function FileInput({
         onChange={async (e) => {
           const file = parseFileEvent(e);
           await uploadFile(file);
-          callback(file);
+          callback(getLocalFileURL(file));
         }}
         accept={accept}
         style={{
@@ -51,5 +51,5 @@ export default function FileInput({
   );
 }
 
-export const getAudioURL = (file?: File) =>
+const getLocalFileURL = (file?: File) =>
   file && "/file-input-cache/" + file.name;

@@ -11,12 +11,12 @@ export const initialState: VocosParamsNPZ = {
 
 export const vocosIdNPZ = "vocos_npz-tab";
 
-export const sendToVocosNPZ = (audio?: string) => {
-  if (!audio) return;
+export const sendToVocosNPZ = (npz_file?: string) => {
+  if (!npz_file) return;
   updateLocalStorageWithFunction(
     vocosIdNPZ,
     (vocosParams: VocosParamsNPZ = initialState) =>
-      ({ ...vocosParams, npz_file: audio } as VocosParamsNPZ)
+      ({ ...vocosParams, npz_file } as VocosParamsNPZ)
   );
-  router.push("/vocos_wav");
+  router.push("/vocos_npz");
 };

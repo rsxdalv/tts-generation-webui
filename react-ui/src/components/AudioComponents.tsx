@@ -1,12 +1,11 @@
 import React from "react";
-import FileInput, { getAudioURL } from "./FileInput";
+import FileInput from "./FileInput";
 import { AudioPlayer } from "./MemoizedWaveSurferPlayer";
 import { WaveSurferOptions } from "wavesurfer.js";
-import { GradioFile } from "../pages/api/demucs_musicgen";
 import { sendToDemucs } from "../tabs/DemucsParams";
 import { sendToMusicgen } from "../tabs/MusicgenParams";
 import { sendToVocos } from "../tabs/VocosParams";
-import { sendToVocosNPZ } from "../tabs/VocosParamsNPZ";
+import { GradioFile } from "../types/GradioFile";
 
 export const AudioInput = ({
   callback,
@@ -23,12 +22,7 @@ export const AudioInput = ({
 }) => (
   <div className="border border-gray-300 p-2 rounded flex flex-col space-y-2">
     <p className="text-sm">{label || "Input file:"}</p>
-    <FileInput
-      callback={(file?: File) => {
-        const melody = getAudioURL(file);
-        callback(melody);
-      }}
-    />
+    <FileInput callback={(file?: string) => callback(file)} />
     <AudioPlayerHelper url={url} sendAudioTo={sendAudioTo} filter={filter} />
   </div>
 );
@@ -48,13 +42,11 @@ export const AudioOutput = ({
     <div className="border border-gray-300 p-2 rounded">
       <p className="text-sm">{label}</p>
       {audioOutput && (
-        <>
-          <AudioPlayerHelper
-            url={audioOutput.data}
-            sendAudioTo={sendAudioTo}
-            filter={filter}
-          />
-        </>
+        <AudioPlayerHelper
+          url={audioOutput.data}
+          sendAudioTo={sendAudioTo}
+          filter={filter}
+        />
       )}
     </div>
   );

@@ -20,6 +20,7 @@ export default async function handler(
     musicgen,
     vocos_wav,
     vocos_npz,
+    encodec_decode,
   };
   if (!name || typeof name !== "string" || !endpoints[name]) {
     res.status(404).json({ data: { error: "Not found" } });
@@ -64,6 +65,19 @@ async function vocos_npz({ npz_file }) {
 
   const app = await getClient();
   const result = (await app.predict("/vocos_npz", [
+    npzBlob, // blob in 'Input NPZ' File component
+  ])) as {
+    data: [GradioFile];
+  };
+
+  return result?.data[0];
+}
+
+async function encodec_decode({ npz_file }) {
+  const npzBlob = await getFile(npz_file);
+
+  const app = await getClient();
+  const result = (await app.predict("/encodec_decode", [
     npzBlob, // blob in 'Input NPZ' File component
   ])) as {
     data: [GradioFile];
