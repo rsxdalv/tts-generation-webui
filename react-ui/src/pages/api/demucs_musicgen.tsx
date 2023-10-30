@@ -19,6 +19,14 @@ export default async function handler(
   }
 }
 
+export type GradioFile = {
+  name: string;
+  data: string;
+  size?: number;
+  is_file?: boolean;
+  orig_name?: string;
+};
+
 // demucs handler
 export async function demucsHandler(
   req: NextApiRequest,
@@ -33,22 +41,21 @@ async function demucs(file: string) {
   const audioBlob = await getFile(file);
 
   const app = await client("http://127.0.0.1:7865/");
-  const result = await app.predict("/demucs", [
+  const result = (await app.predict("/demucs", [
     audioBlob, // blob in 'Input' Audio component
-  ]);
+  ])) as {
+    data: [GradioFile, GradioFile, GradioFile, GradioFile];
+  };
 
   return result?.data;
 }
 
 const readFromDisk = (file: string) =>
   new Promise((resolve, reject) => {
-    fs.readFile(
-      path.join(process.cwd(), "public", file),
-      (err, data) => {
-        if (err) reject(err);
-        resolve(data);
-      }
-    );
+    fs.readFile(path.join(process.cwd(), "public", file), (err, data) => {
+      if (err) reject(err);
+      resolve(data);
+    });
   });
 
 const readFromURL = (file: string) => fetch(file).then((r) => r.blob());

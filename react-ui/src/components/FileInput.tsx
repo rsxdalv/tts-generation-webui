@@ -3,12 +3,12 @@ import { ChangeEvent, useState } from "react";
 export default function FileInput({
   callback,
 }: {
-  callback: (file: File | undefined) => void;
+  callback: (file?: File) => void;
 }) {
   const parseFileEvent = (e: ChangeEvent<HTMLInputElement>) =>
     e.target.files?.[0];
 
-  const uploadFile = async (file: File | undefined) => {
+  const uploadFile = async (file?: File) => {
     if (!file) return;
 
     try {
@@ -47,5 +47,5 @@ export default function FileInput({
   );
 }
 
-export const getAudioURL = (file: File | null | undefined): string | undefined =>
-  (file && "/file-input-cache/" + file.name) || undefined;
+export const getAudioURL = (file?: File) =>
+  (file && "/file-input-cache/" + file.name);
