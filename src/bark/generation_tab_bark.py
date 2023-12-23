@@ -720,6 +720,7 @@ def generation_tab_bark():
             fn=generate_multi(1, output_components),
             inputs=inputs,
             outputs=all_outputs_flat,
+            api_name="bark",
         )
 
         set_old_seed_button.click(

@@ -23,6 +23,10 @@ const routes = [
     href: "/bark_voice_generation",
     text: "Bark Voice Generation",
   },
+  {
+    href: "/bark",
+    text: "Bark",
+  },
   // {
   //   href: "/",
   //   text: "Voices",

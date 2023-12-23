@@ -5,7 +5,7 @@ import { GradioFile } from "../../../types/GradioFile";
 
 type Data = { data: any };
 
-const defaultBackend = "http://127.0.0.1:7865/";
+const defaultBackend = "http://127.0.0.1:7860/";
 const getClient = () => client(defaultBackend, {});
 
 export default async function handler(
@@ -23,13 +23,15 @@ export default async function handler(
     encodec_decode,
     bark_voice_tokenizer_load,
     bark_voice_generate,
+    bark,
   };
   if (!name || typeof name !== "string" || !endpoints[name]) {
     res.status(404).json({ data: { error: "Not found" } });
     return;
   }
 
-  const body = JSON.parse(req.body);
+  // const body = JSON.parse(req.body);
+  const body = {};
   const result = await endpoints[name](body);
 
   res.status(200).json(result);
@@ -136,8 +138,80 @@ async function bark_voice_generate({ audio, use_gpu }) {
     ];
   };
 
+  const [filename, preview] = result?.data;
+  return { filename, preview };
+}
+
+
+async function bark({
+  burn_in_prompt,
+  prompt,
+  history_setting,
+  languageRadio,
+  speakerIdRadio,
+  useV2,
+  text_temp,
+  waveform_temp,
+  long_prompt_radio,
+  long_prompt_history_radio,
+  old_generation_dropdown,
+  seed_input,
+  history_prompt_semantic_dropdown,
+}) {
+  const app = await getClient();
+
+
+
+  const result = (await app.predict("/bark", [
+    burn_in_prompt,
+    prompt,
+    history_setting,
+    languageRadio,
+    speakerIdRadio,
+    useV2,
+    text_temp,
+    waveform_temp,
+    long_prompt_radio,
+    long_prompt_history_radio,
+    old_generation_dropdown,
+    seed_input,
+    history_prompt_semantic_dropdown,
+  ])) as {
+    data: [
+      GradioFile, // audio
+      string, // image
+      Object, // save_button
+      Object, // continue_button
+      Object, // buttons_row
+      null, // npz
+      null, // seed
+      null, // json_text
+      null // history_bundle_name_data
+      // note - ignore other 8 rows of data
+    ];
+  };
+
+  const [
+    audio,
+    image,
+    save_button,
+    continue_button,
+    buttons_row,
+    npz,
+    seed,
+    json_text,
+    history_bundle_name_data,
+  ] = result?.data;
+
   return {
-    filename: result?.data[0],
-    preview: result?.data[1],
+    audio,
+    image,
+    save_button,
+    continue_button,
+    buttons_row,
+    npz,
+    seed,
+    json_text,
+    history_bundle_name_data,
   };
 }
