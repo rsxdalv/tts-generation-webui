@@ -39,7 +39,7 @@ export const initialState: BarkGenerationParams = {
   ...inputs,
 };
 
-export const barkGenerationId = "bark_voice_generation-tab";
+export const barkGenerationId = "bark_generation-tab";
 
 export const sendToBarkVoiceGeneration = (audio?: string) => {
   if (!audio) return;
