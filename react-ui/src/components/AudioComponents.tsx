@@ -10,21 +10,28 @@ import { sendToBarkVoiceGeneration } from "../tabs/BarkVoiceGenerationParams";
 
 export const AudioInput = ({
   callback,
-  funcs: sendAudioTo,
+  funcs,
   url,
   label,
   filter,
+  metadata,
 }: {
   callback: (melody?: string) => void;
-  funcs?: Array<(audio: string | undefined) => void>;
+  funcs?: Array<(audio: string | undefined | any) => void>;
   url?: string;
   label?: string;
   filter?: string[];
+  metadata?: any;
 }) => (
   <div className="border border-gray-300 p-2 rounded flex flex-col space-y-2">
     <p className="text-sm">{label || "Input file:"}</p>
     <FileInput callback={(file?: string) => callback(file)} />
-    <AudioPlayerHelper url={url} sendAudioTo={sendAudioTo} filter={filter} />
+    <AudioPlayerHelper
+      url={url}
+      funcs={funcs}
+      filter={filter}
+      metadata={metadata}
+    />
   </div>
 );
 
@@ -33,11 +40,13 @@ export const AudioOutput = ({
   label,
   funcs: sendAudioTo,
   filter,
+  metadata,
 }: {
   audioOutput?: GradioFile;
   label: string;
-  funcs?: Array<(audio: string | undefined) => void>;
+  funcs?: Array<(audio: string | undefined | any) => void>;
   filter?: string[];
+  metadata?: any;
 }) => {
   return (
     <div className="border border-gray-300 p-2 rounded">
@@ -45,8 +54,9 @@ export const AudioOutput = ({
       {audioOutput && (
         <AudioPlayerHelper
           url={audioOutput.data}
-          sendAudioTo={sendAudioTo}
+          funcs={sendAudioTo}
           filter={filter}
+          metadata={metadata}
         />
       )}
     </div>
@@ -66,10 +76,12 @@ const AudioPlayerHelper = (
   props: Omit<WaveSurferOptions, "container"> & {
     volume?: number;
     filter?: string[];
-    sendAudioTo?: Array<(audio: string | undefined) => void>;
+    // sendAudioTo?: Array<(audio: string | undefined) => void>;
+    metadata?: any;
+    funcs?: Array<(metadata: string | any) => void>;
   }
 ) => {
-  const { filter: outputFilters, sendAudioTo: funcs, url, volume } = props;
+  const { filter: outputFilters, funcs, url, volume, metadata } = props;
   return (
     <>
       <AudioPlayer
@@ -82,16 +94,20 @@ const AudioPlayerHelper = (
         volume={volume || 0.4}
         url={url}
       />
-      <div className="mt-2 flex flex-wrap space-x-2">
+      <div className="mt-2 flex flex-wrap gap-1">
         {funcs?.map((func) => (
-          <FuncButton key={func.name} func={func} url={url} />
+          <FuncButton key={func.name} func={func} url={metadata || url} />
         ))}
         {listOfFuncs
           .filter((funcName) =>
             outputFilters ? !outputFilters.includes(funcName) : true
           )
           .map((funcName) => (
-            <FuncButton key={funcName} func={sendToFuncs[funcName]} url={url} />
+            <FuncButton
+              key={funcName}
+              func={sendToFuncs[funcName]}
+              url={metadata || url}
+            />
           ))}
         <DownloadButton url={url} />
       </div>
@@ -122,7 +138,7 @@ const DownloadButton = ({ url }: { url?: string }) => {
 
   return (
     <a
-      className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded inline-block"
+      className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-2 rounded inline-block text-sm"
       href={downloadURL}
       download="audio.wav"
     >
@@ -131,20 +147,17 @@ const DownloadButton = ({ url }: { url?: string }) => {
   );
 };
 
-// function FuncButton(func: (audio: string | undefined) => void, url: string | undefined): JSX.Element {
 const FuncButton = ({
   func,
   url,
 }: {
   func: (audio: string | undefined) => void;
-  url: string | undefined;
+  url: string | undefined | any;
 }) => (
   <button
-    className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+    className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-2 rounded text-sm"
     onClick={() => func(url)}
   >
-    {/* {func.name} */}
-    {/* camelCase to Title Case */}
     {func.name
       .replace(/([A-Z])/g, " $1")
       .replace(/^./, (str) => str.toUpperCase())}

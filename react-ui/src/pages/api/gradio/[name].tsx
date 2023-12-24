@@ -15,17 +15,6 @@ export default async function handler(
   const { name } = req.query;
   console.log("gradio api handler", name, req.body);
 
-  const endpoints = {
-    demucs,
-    musicgen,
-    vocos_wav,
-    vocos_npz,
-    encodec_decode,
-    bark_voice_tokenizer_load,
-    bark_voice_generate,
-    bark,
-    reload_old_generation_dropdown,
-  };
   if (!name || typeof name !== "string" || !endpoints[name]) {
     res.status(404).json({ data: { error: "Not found" } });
     return;
@@ -228,3 +217,30 @@ async function reload_old_generation_dropdown() {
 
   return result?.data[0].choices;
 }
+
+async function bark_favorite({ history_bundle_name_data }) {
+  const app = await getClient();
+
+  const result = (await app.predict("/bark_favorite", [
+    history_bundle_name_data,
+  ])) as {
+    data: [
+      Object // save_button
+    ];
+  };
+
+  return result?.data;
+}
+
+const endpoints = {
+  demucs,
+  musicgen,
+  vocos_wav,
+  vocos_npz,
+  encodec_decode,
+  bark_voice_tokenizer_load,
+  bark_voice_generate,
+  bark,
+  reload_old_generation_dropdown,
+  bark_favorite,
+};

@@ -16,15 +16,35 @@ type Result = {
   save_button: Object;
   continue_button: Object;
   buttons_row: Object;
-  npz: null;
+  npz: string;
   seed: null;
-  json_text: null;
-  history_bundle_name_data: null;
+  json_text: {
+    _version: string;
+    _hash_version: string;
+    _type: string;
+    is_big_semantic_model: boolean;
+    is_big_coarse_model: boolean;
+    is_big_fine_model: boolean;
+    prompt: string;
+    language: string;
+    speaker_id: string;
+    hash: string;
+    history_prompt: string;
+    history_prompt_npz: string;
+    history_hash: string;
+    text_temp: number;
+    waveform_temp: number;
+    date: string;
+    seed: string;
+    semantic_prompt: string;
+    coarse_prompt: string;
+  };
+  history_bundle_name_data: string;
 };
 
 const initialHistory = []; // prevent infinite loop
 const BarkGenerationPage = () => {
-  const [historyData, setHistoryData] = useLocalStorage<GradioFile[]>(
+  const [historyData, setHistoryData] = useLocalStorage<Result[]>(
     "barkGenerationHistory",
     initialHistory
   );
@@ -34,8 +54,11 @@ const BarkGenerationPage = () => {
   );
   const [barkGenerationParams, setBarkVoiceGenerationParams] =
     useLocalStorage<BarkGenerationParams>(barkGenerationId, initialState);
+  // loading state
+  const [loading, setLoading] = React.useState<boolean>(false);
 
   async function barkGeneration() {
+    setLoading(true);
     const response = await fetch("/api/gradio/bark", {
       method: "POST",
       body: JSON.stringify(barkGenerationParams),
@@ -43,32 +66,56 @@ const BarkGenerationPage = () => {
 
     const result = await response.json();
     setData(result);
-    setHistoryData((historyData) => [...historyData, result.audio]);
+    setHistoryData((historyData) => [result, ...historyData]);
+    setLoading(false);
   }
 
-  const useAsInput = (audio?: string) => {
-    return;
+  const useAsHistory = (data?: Result) => {
+    const npz = data?.npz;
+    if (!npz) return;
+    setBarkVoiceGenerationParams({
+      ...barkGenerationParams,
+      old_generation_dropdown: npz,
+    });
   };
 
-  // async function barkTokenizerLoad(
-  //   barkGenerationParams: BarkGenerationParams
-  // ) {
-  //   const response = await fetch("/api/gradio/bark_voice_tokenizer_load", {
-  //     method: "POST",
-  //     body: JSON.stringify(barkGenerationParams),
-  //   });
+  const useAsHistoryPromptSemantic = (data?: Result) => {
+    const npz = data?.npz;
+    if (!npz) return;
+    setBarkVoiceGenerationParams({
+      ...barkGenerationParams,
+      history_prompt_semantic_dropdown: npz,
+    });
+  };
 
-  //   const result = await response.json();
-  //   // setData(result);
-  // }
+  const useSeed = (data?: Result) => {
+    const seed_input = data?.json_text?.seed;
+    console.log("useSeed");
+    console.log(seed_input);
+    console.log(data);
+    console.log(data?.json_text);
+    console.log(data?.json_text?.seed);
+    if (!seed_input) return;
+    setBarkVoiceGenerationParams({
+      ...barkGenerationParams,
+      seed_input,
+    });
+  };
 
-  // const useAsInput = (audio?: string) => {
-  //   if (!audio) return;
-  //   setBarkVoiceGenerationParams({
-  //     ...barkGenerationParams,
-  //     audio,
-  //   });
-  // };
+  const favorite = async (data?: Result) => {
+    const history_bundle_name_data = data?.history_bundle_name_data;
+    if (!history_bundle_name_data) return;
+    const response = await fetch("/api/gradio/bark_favorite", {
+      method: "POST",
+      body: JSON.stringify({
+        history_bundle_name_data,
+      }),
+    });
+    const result = await response.json();
+    console.log(result);
+  };
+
+  const funcs = [useAsHistory, useAsHistoryPromptSemantic, useSeed, favorite];
 
   const handleChange = (
     event:
@@ -93,29 +140,27 @@ const BarkGenerationPage = () => {
       <Head>
         <title>Bark - TTS Generation Webui</title>
       </Head>
-      <div className="flex space-x-6 w-full flex-col">
+      <div className="flex w-full flex-col">
         <Inputs
           barkGenerationParams={barkGenerationParams}
           setBarkVoiceGenerationParams={setBarkVoiceGenerationParams}
           handleChange={handleChange}
+          data={data}
         />
-        <div className="flex space-x-4">
-          <div className="flex flex-col space-y-2">
-            <button
-              className="border border-gray-300 p-2 rounded"
-              onClick={barkGeneration}
-            >
-              Generate
-            </button>
-          </div>
-          <div className="flex flex-col space-y-4">
-            <AudioOutput
-              audioOutput={data?.audio}
-              label="Bark Output"
-              funcs={[useAsInput]}
-              filter={["sendToBarkVoiceGeneration"]}
-            />
-          </div>
+        <div className="flex flex-col space-y-4">
+          <button
+            className="border border-gray-300 p-2 rounded hover:bg-gray-100"
+            onClick={barkGeneration}
+          >
+            {loading ? "Generating..." : "Generate"}
+          </button>
+          <AudioOutput
+            audioOutput={data?.audio}
+            label="Bark Output"
+            funcs={funcs}
+            metadata={data}
+            filter={["sendToBark", "sendToBarkVoiceGeneration"]}
+          />
         </div>
         <div className="flex flex-col space-y-2 border border-gray-300 p-2 rounded">
           <label className="text-sm">History:</label>
@@ -132,16 +177,17 @@ const BarkGenerationPage = () => {
               historyData.map((item, index) => (
                 <AudioOutput
                   key={index}
-                  audioOutput={item}
-                  label={`History ${index}`}
-                  funcs={[useAsInput]}
-                  filter={["sendToMusicgen"]}
+                  audioOutput={item.audio}
+                  label={`${item?.json_text?.date}`}
+                  funcs={funcs}
+                  metadata={item}
+                  filter={["sendToBark", "sendToBarkVoiceGeneration"]}
                 />
               ))}
           </div>
         </div>
       </div>
-      <pre>{JSON.stringify(barkGenerationParams, null, 2)}</pre>
+      {/* <pre>{JSON.stringify(barkGenerationParams, null, 2)}</pre> */}
     </Template>
   );
 };
@@ -152,6 +198,7 @@ function Inputs({
   barkGenerationParams,
   setBarkVoiceGenerationParams,
   handleChange,
+  data,
 }: {
   barkGenerationParams: BarkGenerationParams;
   setBarkVoiceGenerationParams: (
@@ -163,6 +210,7 @@ function Inputs({
       | React.ChangeEvent<HTMLTextAreaElement>
       | React.ChangeEvent<HTMLSelectElement>
   ) => void;
+  data: Result | null;
 }) {
   return (
     <div className="flex flex-col space-y-2">
@@ -225,6 +273,7 @@ function Inputs({
             barkGenerationParams={barkGenerationParams}
             setBarkVoiceGenerationParams={setBarkVoiceGenerationParams}
             handleChange={handleChange}
+            lastSeed={data?.json_text?.seed}
           />
         </div>
       </div>
@@ -287,12 +336,14 @@ const Seed = ({
   barkGenerationParams,
   setBarkVoiceGenerationParams,
   handleChange,
+  lastSeed,
 }: {
   barkGenerationParams: BarkGenerationParams;
   setBarkVoiceGenerationParams: (
     barkGenerationParams: BarkGenerationParams
   ) => void;
   handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  lastSeed?: string;
 }) => {
   return (
     <div className="flex items-center space-x-2">
@@ -304,17 +355,17 @@ const Seed = ({
         onChange={handleChange}
         className="border border-gray-300 p-2 rounded"
       />
-      {/* <button
+      <button
         className="border border-gray-300 p-2 rounded"
         onClick={() => {
           setBarkVoiceGenerationParams({
             ...barkGenerationParams,
-            seed_input: "99999999",
+            seed_input: lastSeed ?? "-1",
           });
         }}
       >
         Restore Last
-      </button> */}
+      </button>
       <button
         className="border border-gray-300 p-2 rounded"
         onClick={() => {
@@ -359,6 +410,7 @@ const OldGenerationDropdown = ({
     })();
   }, []);
 
+  const selected = barkGenerationParams?.[name];
   return (
     <div>
       <label className="text-sm">{label}:</label>
@@ -366,14 +418,18 @@ const OldGenerationDropdown = ({
         name={name}
         id={name}
         className="border border-gray-300 p-2 rounded text-black w-full"
-        value={barkGenerationParams?.[name]}
+        value={selected}
         onChange={handleChange}
       >
-        {options.map((bandwidth) => (
-          <option key={bandwidth} value={bandwidth}>
-            {bandwidth}
-          </option>
-        ))}
+        {options
+          // concat to ensure selected is at the top and present
+          .filter((option) => option !== selected)
+          .concat(selected)
+          .map((bandwidth) => (
+            <option key={bandwidth} value={bandwidth}>
+              {bandwidth}
+            </option>
+          ))}
       </select>
       <button
         className="border border-gray-300 p-2 rounded"
