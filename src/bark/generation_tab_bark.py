@@ -720,7 +720,7 @@ def generation_tab_bark():
             fn=generate_multi(1, output_components),
             inputs=inputs,
             outputs=all_outputs_flat,
-            api_name="bark",
+            api_name="bark", # toggle
         )
 
         set_old_seed_button.click(
@@ -775,6 +775,7 @@ def old_generation_dropdown_ui(label):
     reload_old_generation_dropdown.click(
         fn=lambda: gr.Dropdown.update(choices=get_npz_files()),
         outputs=old_generation_dropdown,
+        api_name="reload_old_generation_dropdown",
     )
 
     return (

@@ -73,7 +73,7 @@ const MusicgenPage = () => {
     setHistoryData((x) => [generated_audio, ...x]);
   }
 
-  const handleChange = async (
+  const handleChange = (
     event:
       | React.ChangeEvent<HTMLInputElement>
       | React.ChangeEvent<HTMLTextAreaElement>

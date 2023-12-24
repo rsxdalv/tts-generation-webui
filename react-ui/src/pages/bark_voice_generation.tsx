@@ -68,7 +68,7 @@ const BarkVoiceGenerationPage = () => {
   return (
     <Template>
       <Head>
-        <title>Vocos - TTS Generation Webui</title>
+        <title>Bark Voice Generation - TTS Generation Webui</title>
       </Head>
       <div className="space-y-2">
         <label className="text-sm">Tokenizer:</label>

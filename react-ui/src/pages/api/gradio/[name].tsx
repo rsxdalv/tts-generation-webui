@@ -24,15 +24,16 @@ export default async function handler(
     bark_voice_tokenizer_load,
     bark_voice_generate,
     bark,
+    reload_old_generation_dropdown,
   };
   if (!name || typeof name !== "string" || !endpoints[name]) {
     res.status(404).json({ data: { error: "Not found" } });
     return;
   }
 
-  // const body = JSON.parse(req.body);
-  const body = {};
-  const result = await endpoints[name](body);
+  const { body } = req;
+  const parsedBody = body && typeof body === "string" ? JSON.parse(body) : body;
+  const result = await endpoints[name](parsedBody);
 
   res.status(200).json(result);
 }
@@ -142,7 +143,6 @@ async function bark_voice_generate({ audio, use_gpu }) {
   return { filename, preview };
 }
 
-
 async function bark({
   burn_in_prompt,
   prompt,
@@ -159,8 +159,6 @@ async function bark({
   history_prompt_semantic_dropdown,
 }) {
   const app = await getClient();
-
-
 
   const result = (await app.predict("/bark", [
     burn_in_prompt,
@@ -214,4 +212,19 @@ async function bark({
     json_text,
     history_bundle_name_data,
   };
+}
+
+async function reload_old_generation_dropdown() {
+  const app = await getClient();
+
+  const result = (await app.predict("/reload_old_generation_dropdown")) as {
+    data: [
+      {
+        choices: string[];
+        __type__: "update";
+      }
+    ];
+  };
+
+  return result?.data[0].choices;
 }
