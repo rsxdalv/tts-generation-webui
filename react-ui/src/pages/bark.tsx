@@ -224,21 +224,10 @@ function Inputs({
       <div className="flex flex-row space-x-2">
         <div className="space-y-2 flex flex-col w-1/2">
           {barkGenerationParams.history_setting === "or Use a voice:" && (
-            <div className="flex flex-col border border-gray-300 p-2 rounded">
-              <h2 className="text-md">Voice:</h2>
-              <Language
-                barkGenerationParams={barkGenerationParams}
-                handleChange={handleChange}
-              />
-              <SpeakerID
-                barkGenerationParams={barkGenerationParams}
-                handleChange={handleChange}
-              />
-              <UseV2
-                barkGenerationParams={barkGenerationParams}
-                handleChange={handleChange}
-              />
-            </div>
+            <Voice
+              barkGenerationParams={barkGenerationParams}
+              handleChange={handleChange}
+            />
           )}
           {barkGenerationParams.history_setting ===
             "or Use old generation as history:" && (
@@ -489,6 +478,216 @@ const HistoryPromptSemantic = ({
       name="history_prompt_semantic_dropdown"
       label="History prompt semantic"
     />
+  );
+};
+
+const create_voice_string = (
+  language: string,
+  speaker_id: string,
+  use_v2: boolean
+) => {
+  const language_to_code = {
+    English: "en",
+    Chinese: "zh",
+    French: "fr",
+    German: "de",
+    Hindi: "hi",
+    Italian: "it",
+    Japanese: "ja",
+    Korean: "ko",
+    Polish: "pl",
+    Portuguese: "pt",
+    Russian: "ru",
+    Spanish: "es",
+    Turkish: "tr",
+  };
+  let history_prompt = `${language_to_code[language]}_speaker_${speaker_id}`;
+  if (use_v2) {
+    history_prompt = `v2/${history_prompt}`;
+  }
+  return history_prompt;
+};
+
+const voice_to_trait = {
+  "v2/en_speaker_0": "Male",
+  "v2/en_speaker_1": "Male",
+  "v2/en_speaker_2": "Male",
+  "v2/en_speaker_3": "Male",
+  "v2/en_speaker_4": "Male",
+  "v2/en_speaker_5": "Male",
+  "v2/en_speaker_6": "Male",
+  "v2/en_speaker_7": "Male",
+  "v2/en_speaker_8": "Male",
+  "v2/en_speaker_9": "Female",
+  "v2/zh_speaker_0": "Male",
+  "v2/zh_speaker_1": "Male",
+  "v2/zh_speaker_2": "Male",
+  "v2/zh_speaker_3": "Male",
+  "v2/zh_speaker_4": "Female",
+  "v2/zh_speaker_5": "Male",
+  "v2/zh_speaker_6": "Female",
+  "v2/zh_speaker_7": "Female",
+  "v2/zh_speaker_8": "Male",
+  "v2/zh_speaker_9": "Female",
+  "v2/fr_speaker_0": "Male",
+  "v2/fr_speaker_1": "Female",
+  "v2/fr_speaker_2": "Female",
+  "v2/fr_speaker_3": "Male",
+  "v2/fr_speaker_4": "Male",
+  "v2/fr_speaker_5": "Female",
+  "v2/fr_speaker_6": "Male",
+  "v2/fr_speaker_7": "Male",
+  "v2/fr_speaker_8": "Male",
+  "v2/fr_speaker_9": "Male",
+  "v2/de_speaker_0": "Male",
+  "v2/de_speaker_1": "Male",
+  "v2/de_speaker_2": "Male",
+  "v2/de_speaker_3": "Female",
+  "v2/de_speaker_4": "Male",
+  "v2/de_speaker_5": "Male",
+  "v2/de_speaker_6": "Male",
+  "v2/de_speaker_7": "Male",
+  "v2/de_speaker_8": "Female",
+  "v2/de_speaker_9": "Male",
+  "v2/hi_speaker_0": "Female",
+  "v2/hi_speaker_1": "Female",
+  "v2/hi_speaker_2": "Male",
+  "v2/hi_speaker_3": "Female",
+  "v2/hi_speaker_4": "Female",
+  "v2/hi_speaker_5": "Male",
+  "v2/hi_speaker_6": "Male",
+  "v2/hi_speaker_7": "Male",
+  "v2/hi_speaker_8": "Male",
+  "v2/hi_speaker_9": "Female",
+  "v2/it_speaker_0": "Male",
+  "v2/it_speaker_1": "Male",
+  "v2/it_speaker_2": "Female",
+  "v2/it_speaker_3": "Male",
+  "v2/it_speaker_4": "Male",
+  "v2/it_speaker_5": "Male",
+  "v2/it_speaker_6": "Male",
+  "v2/it_speaker_7": "Female",
+  "v2/it_speaker_8": "Male",
+  "v2/it_speaker_9": "Female",
+  "v2/ja_speaker_0": "Female",
+  "v2/ja_speaker_1": "Female",
+  "v2/ja_speaker_2": "Male",
+  "v2/ja_speaker_3": "Female",
+  "v2/ja_speaker_4": "Female",
+  "v2/ja_speaker_5": "Female",
+  "v2/ja_speaker_6": "Male",
+  "v2/ja_speaker_7": "Female",
+  "v2/ja_speaker_8": "Female",
+  "v2/ja_speaker_9": "Female",
+  "v2/ko_speaker_0": "Female",
+  "v2/ko_speaker_1": "Male",
+  "v2/ko_speaker_2": "Male",
+  "v2/ko_speaker_3": "Male",
+  "v2/ko_speaker_4": "Male",
+  "v2/ko_speaker_5": "Male",
+  "v2/ko_speaker_6": "Male",
+  "v2/ko_speaker_7": "Male",
+  "v2/ko_speaker_8": "Male",
+  "v2/ko_speaker_9": "Male",
+  "v2/pl_speaker_0": "Male",
+  "v2/pl_speaker_1": "Male",
+  "v2/pl_speaker_2": "Male",
+  "v2/pl_speaker_3": "Male",
+  "v2/pl_speaker_4": "Female",
+  "v2/pl_speaker_5": "Male",
+  "v2/pl_speaker_6": "Female",
+  "v2/pl_speaker_7": "Male",
+  "v2/pl_speaker_8": "Male",
+  "v2/pl_speaker_9": "Female",
+  "v2/pt_speaker_0": "Male",
+  "v2/pt_speaker_1": "Male",
+  "v2/pt_speaker_2": "Male",
+  "v2/pt_speaker_3": "Male",
+  "v2/pt_speaker_4": "Male",
+  "v2/pt_speaker_5": "Male",
+  "v2/pt_speaker_6": "Male",
+  "v2/pt_speaker_7": "Male",
+  "v2/pt_speaker_8": "Male",
+  "v2/pt_speaker_9": "Male",
+  "v2/ru_speaker_0": "Male",
+  "v2/ru_speaker_1": "Male",
+  "v2/ru_speaker_2": "Male",
+  "v2/ru_speaker_3": "Male",
+  "v2/ru_speaker_4": "Male",
+  "v2/ru_speaker_5": "Female",
+  "v2/ru_speaker_6": "Female",
+  "v2/ru_speaker_7": "Male",
+  "v2/ru_speaker_8": "Male",
+  "v2/ru_speaker_9": "Female",
+  "v2/es_speaker_0": "Male",
+  "v2/es_speaker_1": "Male",
+  "v2/es_speaker_2": "Male",
+  "v2/es_speaker_3": "Male",
+  "v2/es_speaker_4": "Male",
+  "v2/es_speaker_5": "Male",
+  "v2/es_speaker_6": "Male",
+  "v2/es_speaker_7": "Male",
+  "v2/es_speaker_8": "Female",
+  "v2/es_speaker_9": "Female",
+  "v2/tr_speaker_0": "Male",
+  "v2/tr_speaker_1": "Male",
+  "v2/tr_speaker_2": "Male",
+  "v2/tr_speaker_3": "Male",
+  "v2/tr_speaker_4": "Female",
+  "v2/tr_speaker_5": "Female",
+  "v2/tr_speaker_6": "Male",
+  "v2/tr_speaker_7": "Male",
+  "v2/tr_speaker_8": "Male",
+  "v2/tr_speaker_9": "Male",
+};
+
+const generate_choice_string = (
+  use_v2: boolean,
+  language: string,
+  speaker_id: string
+) => {
+  const history_prompt = create_voice_string(language, speaker_id, use_v2);
+  return `Chosen voice: ${history_prompt}, gender: ${voice_to_trait[history_prompt]}`;
+};
+
+const Voice = ({
+  barkGenerationParams,
+  handleChange,
+}: {
+  barkGenerationParams: BarkGenerationParams;
+  handleChange: (
+    event:
+      | React.ChangeEvent<HTMLInputElement>
+      | React.ChangeEvent<HTMLTextAreaElement>
+      | React.ChangeEvent<HTMLSelectElement>
+  ) => void;
+}) => {
+  return (
+    <div className="flex flex-col gap-2 border border-gray-300 p-2 rounded">
+      <h2 className="text-md">Voice:</h2>
+      <Language
+        barkGenerationParams={barkGenerationParams}
+        handleChange={handleChange}
+      />
+      <SpeakerID
+        barkGenerationParams={barkGenerationParams}
+        handleChange={handleChange}
+      />
+      <UseV2
+        barkGenerationParams={barkGenerationParams}
+        handleChange={handleChange}
+      />
+      {/* Display selected voice info */}
+      <div className="flex flex-col space-y-2">
+        <div className="border border-gray-300 p-2 rounded">
+          {generate_choice_string(
+            barkGenerationParams.useV2,
+            barkGenerationParams.languageRadio,
+            barkGenerationParams.speakerIdRadio
+          )}
+        </div>
+      </div>
+    </div>
   );
 };
 
