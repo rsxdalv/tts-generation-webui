@@ -96,7 +96,12 @@ const AudioPlayerHelper = (
       />
       <div className="mt-2 flex flex-wrap gap-1">
         {funcs?.map((func) => (
-          <FuncButton key={func.name} func={func} url={metadata || url} />
+          <FuncButton
+            key={func.name}
+            func={func}
+            url={url}
+            metadata={metadata}
+          />
         ))}
         {listOfFuncs
           .filter((funcName) =>
@@ -106,7 +111,8 @@ const AudioPlayerHelper = (
             <FuncButton
               key={funcName}
               func={sendToFuncs[funcName]}
-              url={metadata || url}
+              url={url}
+              metadata={metadata}
             />
           ))}
         <DownloadButton url={url} />
@@ -150,13 +156,15 @@ const DownloadButton = ({ url }: { url?: string }) => {
 const FuncButton = ({
   func,
   url,
+  metadata,
 }: {
-  func: (audio: string | undefined) => void;
+  func: (audio: string | undefined | any, metadata?: any) => void;
   url: string | undefined | any;
+  metadata?: any;
 }) => (
   <button
     className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-2 rounded text-sm"
-    onClick={() => func(url)}
+    onClick={() => func(url, metadata)}
   >
     {func.name
       .replace(/([A-Z])/g, " $1")

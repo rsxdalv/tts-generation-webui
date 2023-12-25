@@ -70,7 +70,7 @@ const BarkGenerationPage = () => {
     setLoading(false);
   }
 
-  const useAsHistory = (data?: Result) => {
+  const useAsHistory = (_url: string, data?: Result) => {
     const npz = data?.npz;
     if (!npz) return;
     setBarkVoiceGenerationParams({
@@ -79,7 +79,7 @@ const BarkGenerationPage = () => {
     });
   };
 
-  const useAsHistoryPromptSemantic = (data?: Result) => {
+  const useAsHistoryPromptSemantic = (_url: string, data?: Result) => {
     const npz = data?.npz;
     if (!npz) return;
     setBarkVoiceGenerationParams({
@@ -88,13 +88,8 @@ const BarkGenerationPage = () => {
     });
   };
 
-  const useSeed = (data?: Result) => {
+  const useSeed = (_url: string, data?: Result) => {
     const seed_input = data?.json_text?.seed;
-    console.log("useSeed");
-    console.log(seed_input);
-    console.log(data);
-    console.log(data?.json_text);
-    console.log(data?.json_text?.seed);
     if (!seed_input) return;
     setBarkVoiceGenerationParams({
       ...barkGenerationParams,
@@ -102,7 +97,7 @@ const BarkGenerationPage = () => {
     });
   };
 
-  const favorite = async (data?: Result) => {
+  const favorite = async (_url: string, data?: Result) => {
     const history_bundle_name_data = data?.history_bundle_name_data;
     if (!history_bundle_name_data) return;
     const response = await fetch("/api/gradio/bark_favorite", {
