@@ -4,6 +4,10 @@ import { useRouter } from "next/router";
 
 const routes = [
   {
+    href: "/bark",
+    text: "Bark",
+  },
+  {
     href: "/musicgen",
     text: "Musicgen",
   },
@@ -22,10 +26,6 @@ const routes = [
   {
     href: "/bark_voice_generation",
     text: "Bark Voice Generation",
-  },
-  {
-    href: "/bark",
-    text: "Bark",
   },
   // {
   //   href: "/",
