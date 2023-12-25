@@ -223,31 +223,36 @@ function Inputs({
       </div>
       <div className="flex flex-row space-x-2">
         <div className="space-y-2 flex flex-col w-1/2">
-          <div className="flex flex-col border border-gray-300 p-2 rounded">
-            <h2 className="text-md">Voice:</h2>
-            <Language
-              barkGenerationParams={barkGenerationParams}
-              handleChange={handleChange}
-            />
-            <SpeakerID
-              barkGenerationParams={barkGenerationParams}
-              handleChange={handleChange}
-            />
-            <UseV2
-              barkGenerationParams={barkGenerationParams}
-              handleChange={handleChange}
-            />
-          </div>
-          <div className="flex flex-col border border-gray-300 p-2 rounded">
-            <OldGeneration
-              barkGenerationParams={barkGenerationParams}
-              handleChange={handleChange}
-            />
-            <HistoryPromptSemantic
-              barkGenerationParams={barkGenerationParams}
-              handleChange={handleChange}
-            />
-          </div>
+          {barkGenerationParams.history_setting === "or Use a voice:" && (
+            <div className="flex flex-col border border-gray-300 p-2 rounded">
+              <h2 className="text-md">Voice:</h2>
+              <Language
+                barkGenerationParams={barkGenerationParams}
+                handleChange={handleChange}
+              />
+              <SpeakerID
+                barkGenerationParams={barkGenerationParams}
+                handleChange={handleChange}
+              />
+              <UseV2
+                barkGenerationParams={barkGenerationParams}
+                handleChange={handleChange}
+              />
+            </div>
+          )}
+          {barkGenerationParams.history_setting ===
+            "or Use old generation as history:" && (
+            <div className="flex flex-col border border-gray-300 p-2 rounded">
+              <OldGeneration
+                barkGenerationParams={barkGenerationParams}
+                handleChange={handleChange}
+              />
+              <HistoryPromptSemantic
+                barkGenerationParams={barkGenerationParams}
+                handleChange={handleChange}
+              />
+            </div>
+          )}
         </div>
         <div className="space-y-2 w-1/2">
           {/* {PromptType({ barkGenerationParams, handleChange })} */}
