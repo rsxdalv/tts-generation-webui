@@ -57,6 +57,7 @@ def tortoise_core_ui():
                     gr_reload_button().click(
                         fn=lambda: gr.Dropdown.update(choices=get_voice_list()),
                         outputs=[voice],
+                        api_name="tortoise_refresh_voices",
                     )
             with gr.Box():
                 gr.Markdown("Preset")

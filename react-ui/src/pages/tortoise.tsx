@@ -221,20 +221,22 @@ const Speaker = ({
   handleChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
 }) => {
   const [options, setOptions] = React.useState<string[]>([]);
+  const [loading, setLoading] = React.useState<boolean>(false);
 
   const fetchOptions = async () => {
-    const response = await fetch("/api/gradio/reload_speaker_dropdown", {
+    setLoading(true);
+    const response = await fetch("/api/gradio/tortoise_refresh_voices", {
       method: "POST",
     });
 
     const result = await response.json();
     setOptions(result);
+    setLoading(false);
   };
 
-  // TODO: fix
-  // React.useEffect(() => {
-  //   fetchOptions();
-  // }, []);
+  React.useEffect(() => {
+    fetchOptions();
+  }, []);
 
   const selected = tortoiseGenerationParams?.speaker;
   return (
@@ -261,7 +263,7 @@ const Speaker = ({
         className="border border-gray-300 p-2 rounded"
         onClick={fetchOptions}
       >
-        Refresh
+        {loading ? "Refreshing..." : "Refresh"}
       </button>
     </div>
   );

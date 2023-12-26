@@ -317,6 +317,21 @@ async function tortoise_refresh_models() {
   return result?.data[0].choices;
 }
 
+async function tortoise_refresh_voices() {
+  const app = await getClient();
+
+  const result = (await app.predict("/tortoise_refresh_voices")) as {
+    data: [
+      {
+        choices: string[];
+        __type__: "update";
+      }
+    ];
+  };
+
+  return result?.data[0].choices;
+}
+
 const endpoints = {
   demucs,
   musicgen,
@@ -330,4 +345,5 @@ const endpoints = {
   bark_favorite,
   tortoise,
   tortoise_refresh_models,
+  tortoise_refresh_voices,
 };
