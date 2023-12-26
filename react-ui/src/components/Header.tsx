@@ -8,6 +8,10 @@ const routes = [
     text: "Bark",
   },
   {
+    href: "/tortoise",
+    text: "Tortoise",
+  },
+  {
     href: "/musicgen",
     text: "Musicgen",
   },

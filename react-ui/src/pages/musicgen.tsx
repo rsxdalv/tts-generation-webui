@@ -19,6 +19,31 @@ type AudioOutput = {
   type_name?: string;
 };
 
+type Result = {
+  audio: GradioFile;
+  history_bundle_name_data: string;
+  json: {
+    _version: string;
+    _hash_version: string;
+    _type: string;
+    _audiocraft_version: string;
+    models: {};
+    prompt: string;
+    hash: string;
+    date: string;
+    melody?: any;
+    text: string;
+    model: string;
+    duration: number;
+    topk: number;
+    topp: number;
+    temperature: number;
+    cfg_coef: number;
+    seed: string;
+    use_multi_band_diffusion: boolean;
+  };
+};
+
 const modelNameMapping = {
   Melody: "facebook/musicgen-melody",
   Medium: "facebook/musicgen-medium",
@@ -29,17 +54,14 @@ const modelNameMapping = {
 
 const initialHistory = []; // prevent infinite loop
 const MusicgenPage = () => {
-  const [historyData, setHistoryData] = useLocalStorage<GradioFile[]>(
+  const [data, setData] = useLocalStorage<Result | null>(
+    "musicgenGenerationOutput",
+    null
+  );
+  const [historyData, setHistoryData] = useLocalStorage<Result[]>(
     "musicgenHistory",
     initialHistory
   );
-  const [lastSeed, setLastSeed] = useLocalStorage<number>(
-    "musicgenLastSeed",
-    -1
-  );
-  const [musicgenOutput, setMusicgenOutput] = useLocalStorage<
-    GradioFile | undefined
-  >("musicgenOutput", undefined);
   const [musicgenParams, setMusicgenParams] = useLocalStorage<MusicgenParams>(
     musicgenId,
     initialMusicgenParams
@@ -51,26 +73,14 @@ const MusicgenPage = () => {
       melody: musicgenParams.model === "Melody" ? musicgenParams.melody : null,
       model: modelNameMapping[musicgenParams.model],
     });
-    console.log(body);
-    // return;
     const response = await fetch("/api/gradio/musicgen", {
       method: "POST",
       body,
     });
 
-    const result = await response.json();
-    const data = result as [
-      GradioFile, // output
-      any, // history_bundle_name_data
-      any, // image
-      any, // seed_cache
-      any // result_json
-    ];
-    const [generated_audio, , , , json] = data;
-    const { seed } = json;
-    setLastSeed(seed);
-    setMusicgenOutput(generated_audio);
-    setHistoryData((x) => [generated_audio, ...x]);
+    const result: Result = await response.json();
+    setData(result);
+    setHistoryData((x) => [result, ...x]);
   }
 
   const handleChange = (
@@ -91,13 +101,51 @@ const MusicgenPage = () => {
     });
   };
 
-  const useAsMelody = (melody?: string) => {
+  const useAsMelody = (melody?: string, metadata?: Result) => {
     if (!melody) return;
     setMusicgenParams({
       ...musicgenParams,
       melody,
     });
   };
+
+  const favorite = async (_url: string, data?: Result) => {
+    const history_bundle_name_data = data?.history_bundle_name_data;
+    if (!history_bundle_name_data) return;
+    const response = await fetch("/api/gradio/bark_favorite", {
+      method: "POST",
+      body: JSON.stringify({
+        history_bundle_name_data,
+      }),
+    });
+    const result = await response.json();
+    return result;
+  };
+
+  const useSeed = (_url: string, data?: Result) => {
+    const seed = data?.json.seed;
+    if (!seed) return;
+    setMusicgenParams({
+      ...musicgenParams,
+      seed: Number(seed),
+    });
+  };
+
+  const useParameters = (_url: string, data?: Result) => {
+    const params = data?.json;
+    if (!params) return;
+    setMusicgenParams({
+      ...musicgenParams,
+      ...params,
+      seed: Number(params.seed),
+      model:
+        Object.keys(modelNameMapping).find(
+          (key) => modelNameMapping[key] === params.model
+        ) || "Small",
+    });
+  };
+
+  const funcs = [useAsMelody, favorite, useSeed, useParameters];
 
   return (
     <Template>
@@ -236,7 +284,7 @@ const MusicgenPage = () => {
                 onClick={() =>
                   setMusicgenParams({
                     ...musicgenParams,
-                    seed: lastSeed,
+                    seed: Number(data?.json.seed) || -1,
                   })
                 }
               >
@@ -274,9 +322,10 @@ const MusicgenPage = () => {
             Generate
           </button>
           <AudioOutput
-            audioOutput={musicgenOutput}
+            audioOutput={data?.audio}
             label="Musicgen Output"
-            funcs={[useAsMelody]}
+            funcs={funcs}
+            metadata={data}
             filter={["sendToMusicgen"]}
           />
         </div>
@@ -297,9 +346,10 @@ const MusicgenPage = () => {
               historyData.map((item, index) => (
                 <AudioOutput
                   key={index}
-                  audioOutput={item}
-                  label={`History ${index}`}
-                  funcs={[useAsMelody]}
+                  audioOutput={item.audio}
+                  metadata={item}
+                  label={item.history_bundle_name_data}
+                  funcs={funcs}
                   filter={["sendToMusicgen"]}
                 />
               ))}

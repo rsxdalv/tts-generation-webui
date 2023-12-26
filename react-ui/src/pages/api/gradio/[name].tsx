@@ -93,13 +93,18 @@ async function musicgen({ melody, ...params }) {
   ])) as {
     data: [
       GradioFile, // output
-      any, // history_bundle_name_data
-      any, // image
-      any, // seed_cache
-      any // result_json
+      string, // history_bundle_name_data
+      string, // image
+      null, // seed_cache
+      Object // result_json
     ];
   };
-  return result?.data;
+  const [audio, history_bundle_name_data, , , json] = result?.data;
+  return {
+    audio,
+    history_bundle_name_data,
+    json,
+  };
 }
 
 async function bark_voice_tokenizer_load({ tokenizer, use_gpu }) {
@@ -232,6 +237,71 @@ async function bark_favorite({ history_bundle_name_data }) {
   return result?.data;
 }
 
+async function tortoise({
+  prompt,
+  speaker,
+  preset,
+  seed,
+  cvvp_amount,
+  split_prompt,
+  samples,
+  diffusion_iterations,
+  temperature,
+  length_penalty,
+  repetition_penalty,
+  top_p,
+  max_mel_tokens,
+  cond_free,
+  cond_free_k,
+  diffusion_temperature,
+  model,
+  generation_name,
+}) {
+  const app = await getClient();
+
+  const result = (await app.predict("/generate_tortoise_1", [
+    prompt, // string  in 'Prompt' Textbox component
+    speaker, // string (Option from: ['random', 'angie', 'applejack', 'cond_latent_example', 'daniel', 'deniro', 'emma', 'freeman', 'geralt', 'halle', 'jlaw', 'lj', 'mol', 'myself', 'pat', 'pat2', 'rainbow', 'snakes', 'tim_reynolds', 'tom', 'train_atkins', 'train_daws', 'train_dotrice', 'train_dreams', 'train_empire', 'train_grace', 'train_kennard', 'train_lescault', 'train_mouse', 'weaver', 'william', 'freeman_2a', 'freeman_3', 'pat4']) in 'parameter_2502' Dropdown component
+    preset, // string (Option from: ['ultra_fast', 'fast', 'standard', 'high_quality']) in 'parameter_2507' Dropdown component
+    seed, // number  in 'parameter_2521' Number component
+    cvvp_amount, // number (numeric value between 0.0 and 1.0) in 'CVVP Amount' Slider component
+    split_prompt, // boolean  in 'Split prompt by lines' Checkbox component
+    samples, // number (numeric value between 4 and 256) in 'Samples' Slider component
+    diffusion_iterations, // number (numeric value between 4 and 400) in 'Diffusion Iterations' Slider component
+    temperature, // number (numeric value between 0.0 and 1.0) in 'Temperature' Slider component
+    length_penalty, // number (numeric value between 0.0 and 10.0) in 'Length Penalty' Slider component
+    repetition_penalty, // number (numeric value between 0.0 and 10.0) in 'Repetition Penalty' Slider component
+    top_p, // number (numeric value between 0.0 and 1.0) in 'Top P' Slider component
+    max_mel_tokens, // number (numeric value between 10 and 600) in 'Max Mel Tokens' Slider component
+    cond_free, // boolean  in 'Cond Free' Checkbox component
+    cond_free_k, // number (numeric value between 0 and 10) in 'Cond Free K' Slider component
+    diffusion_temperature, // number (numeric value between 0.0 and 1.0) in 'Temperature' Slider component
+    model, // string (Option from: ['Default']) in 'parameter_2488' Dropdown component
+    generation_name, // string  in 'Generation Name' Textbox component
+  ])) as {
+    data: [
+      GradioFile, // audio
+      string, // image
+      Object, // save_button
+      string, // seed
+      string, // bundle_name
+      Object // metadata
+    ];
+  };
+
+  const [audio, image, save_button, seed2, bundle_name, metadata] =
+    result?.data;
+
+  return {
+    audio,
+    image,
+    save_button,
+    seed: seed2,
+    bundle_name,
+    metadata,
+  };
+}
+
 const endpoints = {
   demucs,
   musicgen,
@@ -243,4 +313,5 @@ const endpoints = {
   bark,
   reload_old_generation_dropdown,
   bark_favorite,
+  tortoise,
 };

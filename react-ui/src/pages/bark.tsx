@@ -107,7 +107,7 @@ const BarkGenerationPage = () => {
       }),
     });
     const result = await response.json();
-    console.log(result);
+    return result;
   };
 
   const funcs = [useAsHistory, useAsHistoryPromptSemantic, useSeed, favorite];
@@ -173,7 +173,7 @@ const BarkGenerationPage = () => {
                 <AudioOutput
                   key={index}
                   audioOutput={item.audio}
-                  label={`${item?.json_text?.date}`}
+                  label={item.history_bundle_name_data}
                   funcs={funcs}
                   metadata={item}
                   filter={["sendToBark", "sendToBarkVoiceGeneration"]}

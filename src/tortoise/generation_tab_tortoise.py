@@ -179,6 +179,7 @@ def generate_button(text, count, variant, inputs, output_rows, total_columns):
             fn=gen,
             inputs=inputs,
             outputs=get_output_list(count),
+            api_name=f"generate_tortoise_{count}",
         )
     )
 
