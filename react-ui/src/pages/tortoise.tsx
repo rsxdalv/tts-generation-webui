@@ -9,6 +9,7 @@ import {
   initialState,
 } from "../tabs/TortoiseGenerationParams";
 import { GradioFile } from "../types/GradioFile";
+import FileInput from "../components/FileInput";
 
 type Result = {
   audio: GradioFile;
@@ -234,13 +235,19 @@ const Speaker = ({
     setLoading(false);
   };
 
+  const openVoices = async () => {
+    await fetch("/api/gradio/tortoise_open_voices", {
+      method: "POST",
+    });
+  };
+
   React.useEffect(() => {
     fetchOptions();
   }, []);
 
   const selected = tortoiseGenerationParams?.speaker;
   return (
-    <div>
+    <div className="flex gap-2">
       <label className="text-sm">Speaker:</label>
       <select
         name="speaker"
@@ -259,6 +266,12 @@ const Speaker = ({
             </option>
           ))}
       </select>
+      <button
+        className="border border-gray-300 p-2 rounded"
+        onClick={openVoices}
+      >
+        Open
+      </button>
       <button
         className="border border-gray-300 p-2 rounded"
         onClick={fetchOptions}
@@ -364,10 +377,17 @@ const Model = ({
   handleChange,
 }: {
   tortoiseGenerationParams: TortoiseGenerationParams;
-  handleChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
+  handleChange: (
+    event:
+      | React.ChangeEvent<HTMLInputElement>
+      | React.ChangeEvent<HTMLTextAreaElement>
+      | React.ChangeEvent<HTMLSelectElement>
+  ) => void;
 }) => {
   const [options, setOptions] = React.useState<string[]>([]);
   const [loading, setLoading] = React.useState<boolean>(false);
+  const [applyModelSettingsLoading, setApplyModelSettingsLoading] =
+    React.useState<boolean>(false);
 
   const fetchOptions = async () => {
     setLoading(true);
@@ -380,37 +400,146 @@ const Model = ({
     setLoading(false);
   };
 
+  const openModels = async () => {
+    await fetch("/api/gradio/tortoise_open_models", {
+      method: "POST",
+    });
+  };
+
+  const applyModelSettings = async () => {
+    setApplyModelSettingsLoading(true);
+    const params = {
+      model: tortoiseGenerationParams.model,
+      kv_cache: tortoiseGenerationParams.kv_cache,
+      use_deepspeed: tortoiseGenerationParams.use_deepspeed,
+      half: tortoiseGenerationParams.half,
+      tokenizer: tortoiseGenerationParams.tokenizer,
+      use_basic_cleaners: tortoiseGenerationParams.use_basic_cleaners,
+    };
+    const response = await fetch("/api/gradio/tortoise_apply_model_settings", {
+      method: "POST",
+      body: JSON.stringify(params),
+    });
+    const result = await response.json();
+    console.log(result);
+    setApplyModelSettingsLoading(false);
+  };
+
+  const BasicModelCheckbox = ({
+    name,
+    label,
+    handleChange,
+  }: {
+    name: string;
+    label: string;
+    handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  }) => (
+    <div className="flex items-center space-x-2">
+      <label className="text-sm">{label}:</label>
+      <input
+        type="checkbox"
+        name={name}
+        checked={tortoiseGenerationParams[name]}
+        onChange={handleChange}
+        className="border border-gray-300 p-2 rounded"
+      />
+    </div>
+  );
+
   React.useEffect(() => {
     fetchOptions();
   }, []);
 
   const selected = tortoiseGenerationParams?.model;
   return (
-    <div>
-      <label className="text-sm">Model:</label>
-      <select
-        name="model"
-        id="model"
-        className="border border-gray-300 p-2 rounded text-black w-full"
-        value={selected}
-        onChange={handleChange}
-      >
-        {options
-          // concat to ensure selected is at the top and present
-          .filter((option) => option !== selected)
-          .concat(selected)
-          .map((bandwidth) => (
-            <option key={bandwidth} value={bandwidth}>
-              {bandwidth}
-            </option>
-          ))}
-      </select>
-      <button
-        className="border border-gray-300 p-2 rounded"
-        onClick={fetchOptions}
-      >
-        {loading ? "Refreshing..." : "Refresh"}
-      </button>
+    <div className="flex flex-col space-y-2">
+      <div className="flex gap-2">
+        <label className="text-sm">Model:</label>
+        <select
+          name="model"
+          id="model"
+          className="border border-gray-300 p-2 rounded text-black w-full"
+          value={selected}
+          onChange={handleChange}
+        >
+          {options
+            // concat to ensure selected is at the top and present
+            .filter((option) => option !== selected)
+            .concat(selected)
+            .map((bandwidth) => (
+              <option key={bandwidth} value={bandwidth}>
+                {bandwidth}
+              </option>
+            ))}
+        </select>
+        <button
+          className="border border-gray-300 p-2 rounded"
+          onClick={openModels}
+        >
+          Open
+        </button>
+        <button
+          className="border border-gray-300 p-2 rounded"
+          onClick={fetchOptions}
+        >
+          {loading ? "Refreshing..." : "Refresh"}
+        </button>
+      </div>
+      {/* 2x2 */}
+      <div className="grid grid-cols-2 gap-2">
+        <BasicModelCheckbox
+          name="kv_cache"
+          label="KV Cache"
+          handleChange={handleChange}
+        />
+        <BasicModelCheckbox
+          name="use_deepspeed"
+          label="Use Deepspeed"
+          handleChange={handleChange}
+        />
+        <BasicModelCheckbox
+          name="half"
+          label="Half"
+          handleChange={handleChange}
+        />
+        <BasicModelCheckbox
+          name="use_basic_cleaners"
+          label="Use basic cleaners"
+          handleChange={handleChange}
+        />
+      </div>
+
+      <div className="flex gap-2">
+        <label className="text-sm">Tokenizer:</label>
+        {/* <input
+          type="text"
+          name="tokenizer"
+          value={tortoiseGenerationParams.tokenizer}
+          onChange={handleChange}
+          className="border border-gray-300 p-2 rounded"
+        /> */}
+          <FileInput
+            accept=".json"
+            callback={(tokenizer) => {
+              handleChange({
+                target: {
+                  name: "tokenizer",
+                  value: tokenizer,
+                },
+              } as React.ChangeEvent<HTMLInputElement>);
+            }}
+            hide_text={false}
+          />
+      </div>
+      <div className="flex flex-col space-y-2">
+        <button
+          className="border border-gray-300 p-2 rounded"
+          onClick={applyModelSettings}
+        >
+          {/* Apply Model Settings */}
+          {applyModelSettingsLoading ? "Applying..." : "Apply Model Settings"}
+        </button>
+      </div>
     </div>
   );
 };
@@ -512,7 +641,7 @@ const TortoiseInput = ({
               tortoiseGenerationParams={tortoiseGenerationParams}
               setTortoiseGenerationParams={setTortoiseGenerationParams}
               handleChange={handleChange}
-              lastSeed={data?.json_text?.seed}
+              lastSeed={Number(data?.seed) || -1}
             />
           </div>
           <div className="flex flex-col space-y-2 border border-gray-300 p-2 rounded">

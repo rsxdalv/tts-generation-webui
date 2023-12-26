@@ -332,6 +332,50 @@ async function tortoise_refresh_voices() {
   return result?.data[0].choices;
 }
 
+async function tortoise_open_models() {
+  const app = await getClient();
+
+  const result = (await app.predict("/tortoise_open_models")) as {};
+
+  return result;
+}
+
+async function tortoise_open_voices() {
+  const app = await getClient();
+
+  const result = (await app.predict("/tortoise_open_voices")) as {};
+
+  return result;
+}
+
+async function tortoise_apply_model_settings({
+  model, // string (Option from: ['Default']) in 'parameter_2488' Dropdown component
+  kv_cache, // boolean  in 'parameter_2493' Checkbox component
+  use_deepspeed, // boolean  in 'parameter_2494' Checkbox component
+  half, // boolean  in 'parameter_2495' Checkbox component
+  tokenizer, // string (Option from: ['quantifier_hubert_base_ls960.pth @ GitMylo/bark-voice-cloning', 'quantifier_hubert_base_ls960_14.pth @ GitMylo/bark-voice-cloning', 'quantifier_V1_hubert_base_ls960_23.pth @ GitMylo/bark-voice-cloning', 'polish-HuBERT-quantizer_8_epoch.pth @ Hobis/bark-voice-cloning-polish-HuBERT-quantizer', 'german-HuBERT-quantizer_14_epoch.pth @ CountFloyd/bark-voice-cloning-german-HuBERT-quantizer', 'es_tokenizer.pth @ Lancer1408/bark-es-tokenizer', 'portuguese-HuBERT-quantizer_24_epoch.pth @ MadVoyager/bark-voice-cloning-portuguese-HuBERT-quantizer']) in 'Tokenizer' Dropdown component
+  use_basic_cleaners, // boolean  in 'parameter_2497' Checkbox component
+}) {
+  const app = await getClient();
+  const tokenizer_file = await getFile(tokenizer);
+
+  const result = (await app.predict("/tortoise_apply_model_settings", [
+    model, // string (Option from: ['Default']) in 'parameter_2488' Dropdown component
+    kv_cache, // boolean  in 'parameter_2493' Checkbox component
+    use_deepspeed, // boolean  in 'parameter_2494' Checkbox component
+    half, // boolean  in 'parameter_2495' Checkbox component
+    // tokenizer, // string (Option from: ['quantifier_hubert_base_ls960.pth @ GitMylo/bark-voice-cloning', 'quantifier_hubert_base_ls960_14.pth @ GitMylo/bark-voice-cloning', 'quantifier_V1_hubert_base_ls960_23.pth @ GitMylo/bark-voice-cloning', 'polish-HuBERT-quantizer_8_epoch.pth @ Hobis/bark-voice-cloning-polish-HuBERT-quantizer', 'german-HuBERT-quantizer_14_epoch.pth @ CountFloyd/bark-voice-cloning-german-HuBERT-quantizer', 'es_tokenizer.pth @ Lancer1408/bark-es-tokenizer', 'portuguese-HuBERT-quantizer_24_epoch.pth @ MadVoyager/bark-voice-cloning-portuguese-HuBERT-quantizer']) in 'Tokenizer' Dropdown component
+    tokenizer_file, // blob in 'Tokenizer' File component
+    use_basic_cleaners, // boolean  in 'parameter_2497' Checkbox component
+  ])) as {
+    data: [
+      Object // Models dropdown
+    ];
+  };
+
+  return result?.data;
+}
+
 const endpoints = {
   demucs,
   musicgen,
@@ -346,4 +390,7 @@ const endpoints = {
   tortoise,
   tortoise_refresh_models,
   tortoise_refresh_voices,
+  tortoise_open_models,
+  tortoise_open_voices,
+  tortoise_apply_model_settings,
 };

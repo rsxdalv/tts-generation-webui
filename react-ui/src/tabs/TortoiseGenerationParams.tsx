@@ -18,8 +18,14 @@ export type TortoiseGenerationParams = {
   cond_free: boolean; // boolean  in 'Cond Free' Checkbox component
   cond_free_k: number; // number (numeric value between 0 and 10) in 'Cond Free K' Slider component
   diffusion_temperature: number; // number (numeric value between 0.0 and 1.0) in 'Temperature' Slider component
-  model: string; // string (Option from: ['Default']) in 'parameter_2488' Dropdown component
   generation_name: string; // string  in 'Generation Name' Textbox component
+
+  model: string; // string (Option from: ['Default']) in 'parameter_2488' Dropdown component
+  kv_cache: boolean; // boolean  in 'parameter_2493' Checkbox component
+  use_deepspeed: boolean; // boolean  in 'parameter_2494' Checkbox component
+  half: boolean; // boolean  in 'parameter_2495' Checkbox component
+  use_basic_cleaners: boolean; // boolean  in 'parameter_2497' Checkbox component
+  tokenizer: string; // string
 };
 
 export const initialState: TortoiseGenerationParams = {
@@ -46,6 +52,12 @@ export const initialState: TortoiseGenerationParams = {
   cvvp_amount: 0, // number (numeric value between 0.0 and 1.0) in 'CVVP Amount' Slider component
   split_prompt: true, // boolean  in 'Split prompt by lines' Checkbox component
   generation_name: "", // string  in 'Generation Name' Textbox component
+
+  kv_cache: false, // boolean  in 'parameter_2493' Checkbox component
+  use_deepspeed: false, // boolean  in 'parameter_2494' Checkbox component
+  half: false, // boolean  in 'parameter_2495' Checkbox component
+  use_basic_cleaners: false, // boolean  in 'parameter_2497' Checkbox component
+  tokenizer: "", // string
 };
 
 export const tortoiseGenerationId = "tortoise_generation-tab";

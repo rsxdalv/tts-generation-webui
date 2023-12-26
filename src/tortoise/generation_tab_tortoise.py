@@ -53,7 +53,9 @@ def tortoise_core_ui():
                         show_label=False,
                         container=False,
                     )
-                    gr_open_button_simple(TORTOISE_VOICE_DIR_ABS)
+                    gr_open_button_simple(
+                        TORTOISE_VOICE_DIR_ABS, api_name="tortoise_open_voices"
+                    )
                     gr_reload_button().click(
                         fn=lambda: gr.Dropdown.update(choices=get_voice_list()),
                         outputs=[voice],
