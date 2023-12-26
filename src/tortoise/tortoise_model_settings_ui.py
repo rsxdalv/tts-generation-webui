@@ -19,6 +19,7 @@ def tortoise_model_settings_ui_inner():
         gr_reload_button().click(
             fn=lambda: gr.Dropdown.update(choices=get_model_list()),
             outputs=[model],
+            api_name="tortoise_refresh_models",
         )
 
     with gr.Row():

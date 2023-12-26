@@ -302,6 +302,21 @@ async function tortoise({
   };
 }
 
+async function tortoise_refresh_models() {
+  const app = await getClient();
+
+  const result = (await app.predict("/tortoise_refresh_models")) as {
+    data: [
+      {
+        choices: string[];
+        __type__: "update";
+      }
+    ];
+  };
+
+  return result?.data[0].choices;
+}
+
 const endpoints = {
   demucs,
   musicgen,
@@ -314,4 +329,5 @@ const endpoints = {
   reload_old_generation_dropdown,
   bark_favorite,
   tortoise,
+  tortoise_refresh_models,
 };
