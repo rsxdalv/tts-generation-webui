@@ -325,7 +325,7 @@ const SplitPrompt = ({
   handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }) => {
   return (
-    <div>
+    <div className="flex items-center space-x-2">
       <label className="text-sm">Split prompt by lines:</label>
       <input
         type="checkbox"
