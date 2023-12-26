@@ -110,7 +110,43 @@ const BarkGenerationPage = () => {
     return result;
   };
 
-  const funcs = [useAsHistory, useAsHistoryPromptSemantic, useSeed, favorite];
+  const useParametersTest = (_url: string, data?: Result) => {
+    const {
+      prompt,
+      language,
+      speaker_id,
+      text_temp,
+      waveform_temp,
+      history_prompt,
+      history_prompt_npz,
+      semantic_prompt,
+      coarse_prompt,
+    } = data?.json_text!;
+    if (!prompt) return;
+    setBarkVoiceGenerationParams({
+      ...barkGenerationParams,
+      prompt,
+      languageRadio: language,
+      speakerIdRadio: speaker_id,
+      text_temp,
+      waveform_temp,
+      history_setting: history_prompt,
+      old_generation_dropdown: history_prompt_npz,
+      history_prompt_semantic_dropdown: semantic_prompt,
+      burn_in_prompt: coarse_prompt,
+      long_prompt_radio: "Short prompt (<15s)",
+      seed_input: data?.json_text?.seed ?? "-1",
+      useV2: data?.json_text?.history_prompt?.includes("v2") ?? true,
+    });
+  };
+
+  const funcs = [
+    useAsHistory,
+    useAsHistoryPromptSemantic,
+    useSeed,
+    favorite,
+    useParametersTest,
+  ];
 
   const handleChange = (
     event:

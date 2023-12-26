@@ -91,6 +91,49 @@ const TortoiseGenerationPage = () => {
     console.log(result);
   };
 
+  // const useParameters = (_url: string, data?: Result) => {
+  //   const {
+  //     prompt,
+  //     speaker,
+  //     preset,
+  //     cvvp_amount,
+  //     split_prompt,
+  //     samples,
+  //     diffusion_iterations,
+  //     temperature,
+  //     length_penalty,
+  //     repetition_penalty,
+  //     top_p,
+  //     max_mel_tokens,
+  //     cond_free,
+  //     cond_free_k,
+  //     diffusion_temperature,
+  //     model,
+  //     generation_name,
+  //   } = data?.metadata ?? {};
+  //   if (!prompt) return;
+  //   setTortoiseGenerationParams({
+  //     ...tortoiseGenerationParams,
+  //     prompt,
+  //     speaker,
+  //     preset,
+  //     cvvp_amount,
+  //     split_prompt,
+  //     samples,
+  //     diffusion_iterations,
+  //     temperature,
+  //     length_penalty,
+  //     repetition_penalty,
+  //     top_p,
+  //     max_mel_tokens,
+  //     cond_free,
+  //     cond_free_k,
+  //     diffusion_temperature,
+  //     model,
+  //     generation_name,
+  //   });
+  // }
+
   const funcs = [useSeed, favorite];
 
   const handleChange = (
