@@ -299,21 +299,23 @@ const CVVPAmount = ({
   handleChange,
 }: {
   tortoiseGenerationParams: TortoiseGenerationParams;
-  handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-}) => {
-  return (
-    <div>
-      <label className="text-sm">CVVP Amount:</label>
-      <input
-        type="number"
-        name="cvvp_amount"
-        value={tortoiseGenerationParams.cvvp_amount}
-        onChange={handleChange}
-        className="border border-gray-300 p-2 rounded"
-      />
-    </div>
-  );
-};
+  handleChange: (
+    event:
+      | React.ChangeEvent<HTMLInputElement>
+      | React.ChangeEvent<HTMLTextAreaElement>
+      | React.ChangeEvent<HTMLSelectElement>
+  ) => void;
+}) => (
+  <GenericSlider
+    tortoiseGenerationParams={tortoiseGenerationParams}
+    handleChange={handleChange}
+    label="CVVP Amount"
+    name="cvvp_amount"
+    min="0.0"
+    max="1.0"
+    step="0.01"
+  />
+);
 
 const SplitPrompt = ({
   tortoiseGenerationParams,
