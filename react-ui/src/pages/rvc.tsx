@@ -8,6 +8,20 @@ import { GradioFile } from "../types/GradioFile";
 
 type Result = {
   audio: GradioFile;
+  metadata: {
+    original_audio_path: string;
+    index_path: string;
+    model_path: string;
+    f0method: string;
+    f0up_key: string;
+    index_rate: number;
+    device: string;
+    is_half: boolean;
+    filter_radius: number;
+    resample_sr: number;
+    rms_mix_rate: number;
+    protect: number;
+  };
 };
 
 const initialHistory = []; // prevent infinite loop
@@ -22,7 +36,6 @@ const RvcGenerationPage = () => {
   );
   const [rvcGenerationParams, setRvcGenerationParams] =
     useLocalStorage<RVCParams>(RVCId, initialState);
-  // loading state
   const [loading, setLoading] = React.useState<boolean>(false);
 
   async function rvcGeneration() {
@@ -38,72 +51,63 @@ const RvcGenerationPage = () => {
     setLoading(false);
   }
 
-  const useSeed = (_url: string, data?: Result) => {
-    const seed = data?.seed;
-    if (!seed) return;
+  // const favorite = async (_url: string, data?: Result) => {
+  //   const history_bundle_name_data = data?.bundle_name;
+  //   if (!history_bundle_name_data) return;
+  //   const response = await fetch("/api/gradio/bark_favorite", {
+  //     method: "POST",
+  //     body: JSON.stringify({
+  //       history_bundle_name_data,
+  //     }),
+  //   });
+  //   const result = await response.json();
+  //   console.log(result);
+  // };
+
+  const useParameters = (_url: string, data?: Result) => {
+    const {
+      f0up_key: pitch_up_key,
+      original_audio_path: original_audio,
+      index_path: index,
+      f0method: pitch_collection_method,
+      model_path: model,
+      index_rate: search_feature_ratio,
+      device,
+      is_half: use_half_precision_model,
+      filter_radius: filter_radius_pitch,
+      resample_sr: resample_sample_rate_bug,
+      rms_mix_rate: voice_envelope_normalizaiton,
+      protect: protect_breath_sounds,
+    } = data?.metadata ?? {};
+
     setRvcGenerationParams({
       ...rvcGenerationParams,
-      seed: Number(seed),
+      pitch_up_key: pitch_up_key ?? rvcGenerationParams.pitch_up_key,
+      // original_audio,
+      index: index ?? rvcGenerationParams.index,
+      pitch_collection_method:
+        pitch_collection_method ?? rvcGenerationParams.pitch_collection_method,
+      model: model ?? rvcGenerationParams.model,
+      search_feature_ratio:
+        search_feature_ratio ?? rvcGenerationParams.search_feature_ratio,
+      device: device ?? rvcGenerationParams.device,
+      use_half_precision_model:
+        use_half_precision_model ??
+        rvcGenerationParams.use_half_precision_model,
+      filter_radius_pitch:
+        filter_radius_pitch ?? rvcGenerationParams.filter_radius_pitch,
+      resample_sample_rate_bug:
+        resample_sample_rate_bug ??
+        rvcGenerationParams.resample_sample_rate_bug,
+      voice_envelope_normalizaiton:
+        voice_envelope_normalizaiton ??
+        rvcGenerationParams.voice_envelope_normalizaiton,
+      protect_breath_sounds:
+        protect_breath_sounds ?? rvcGenerationParams.protect_breath_sounds,
     });
   };
 
-  const favorite = async (_url: string, data?: Result) => {
-    const history_bundle_name_data = data?.bundle_name;
-    if (!history_bundle_name_data) return;
-    const response = await fetch("/api/gradio/bark_favorite", {
-      method: "POST",
-      body: JSON.stringify({
-        history_bundle_name_data,
-      }),
-    });
-    const result = await response.json();
-    console.log(result);
-  };
-
-  // const useParameters = (_url: string, data?: Result) => {
-  //   const {
-  //     prompt,
-  //     speaker,
-  //     preset,
-  //     cvvp_amount,
-  //     split_prompt,
-  //     samples,
-  //     diffusion_iterations,
-  //     temperature,
-  //     length_penalty,
-  //     repetition_penalty,
-  //     top_p,
-  //     max_mel_tokens,
-  //     cond_free,
-  //     cond_free_k,
-  //     diffusion_temperature,
-  //     model,
-  //     generation_name,
-  //   } = data?.metadata ?? {};
-  //   if (!prompt) return;
-  //   setRvcGenerationParams({
-  //     ...rvcGenerationParams,
-  //     prompt,
-  //     speaker,
-  //     preset,
-  //     cvvp_amount,
-  //     split_prompt,
-  //     samples,
-  //     diffusion_iterations,
-  //     temperature,
-  //     length_penalty,
-  //     repetition_penalty,
-  //     top_p,
-  //     max_mel_tokens,
-  //     cond_free,
-  //     cond_free_k,
-  //     diffusion_temperature,
-  //     model,
-  //     generation_name,
-  //   });
-  // }
-
-  const funcs = [useSeed, favorite];
+  const funcs = [useParameters];
 
   const handleChange = (
     event:
@@ -420,7 +424,6 @@ const RvcInput = ({
     </div>
   );
 };
-
 
 const RVCParameters = ({
   rvcParams,

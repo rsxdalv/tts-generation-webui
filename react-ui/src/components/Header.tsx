@@ -16,6 +16,10 @@ const routes = [
     text: "Musicgen",
   },
   {
+    href: "/rvc",
+    text: "RVC",
+  },
+  {
     href: "/demucs",
     text: "Demucs",
   },

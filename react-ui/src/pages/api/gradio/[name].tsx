@@ -2,6 +2,7 @@ import { client } from "@gradio/client";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getFile } from "../../../backend-utils/getFile";
 import { GradioFile } from "../../../types/GradioFile";
+import { join } from "path";
 
 type Data = { data: any };
 
@@ -376,6 +377,107 @@ async function tortoise_apply_model_settings({
   return result?.data;
 }
 
+async function rvc({
+  pitch_up_key,
+  original_audio,
+  index,
+  pitch_collection_method,
+  model,
+  search_feature_ratio,
+  device,
+  use_half_precision_model,
+  filter_radius_pitch,
+  resample_sample_rate_bug,
+  voice_envelope_normalizaiton,
+  protect_breath_sounds,
+}) {
+  const original_audioBlob = await getFile(original_audio);
+  // const indexPath = getIndex(index);
+  // const modelPath = getModelPath(model);
+  const indexPath = index;
+  const modelPath = model;
+
+  const app = await getClient();
+  // const result = (await app.predict("/rvc", [
+  const result = (await app.predict("/rvc_api", [
+    pitch_up_key, // string  in 'Pitch Up key' Textbox component
+    original_audioBlob, // blob in 'Original Audio' Audio component
+    // indexBlob, // blob in 'Index' File component
+    indexPath, // blob in 'Index' File component
+    pitch_collection_method, // string (Option from: ['harvest', 'reaper', 'melodia']) in 'Pitch Collection Method' Radio component
+    // modelBlob, // blob in 'Model' File component
+    modelPath, // blob in 'Model' File component
+    search_feature_ratio, // number (numeric value between 0.0 and 1.0) in 'Search Feature Ratio' Slider component
+    device, // string (Option from: ['cuda:0', 'cpu', 'mps']) in 'Device' Dropdown component
+    use_half_precision_model, // boolean  in 'Use half precision model (Depends on GPU support)' Checkbox component
+    filter_radius_pitch, // number (numeric value between 0 and 10) in 'Filter Radius (Pitch)' Slider component
+    resample_sample_rate_bug, // number (numeric value between 0 and 48000) in 'Resample Sample-rate (Bug)' Slider component
+    voice_envelope_normalizaiton, // number (numeric value between 0.0 and 1.0) in 'Voice Envelope Normalizaiton' Slider component
+    protect_breath_sounds, // number (numeric value between 0.0 and 0.5) in 'Protect Breath Sounds' Slider component
+  ])) as {
+    data: [
+      GradioFile, // audio
+      Object // metadata
+    ];
+  };
+
+  const [audio, metadata] = result?.data;
+  return {
+    audio,
+    metadata,
+  };
+}
+
+async function rvc_model_reload() {
+  const app = await getClient();
+
+  const result = (await app.predict("/rvc_model_reload")) as {
+    data: [
+      {
+        choices: string[];
+        __type__: "update";
+      }
+    ];
+  };
+
+  return result?.data[0].choices;
+}
+
+async function rvc_index_reload() {
+  const app = await getClient();
+
+  const result = (await app.predict("/rvc_index_reload")) as {
+    data: [
+      {
+        choices: string[];
+        __type__: "update";
+      }
+    ];
+  };
+
+  return result?.data[0].choices;
+}
+
+// rvc_model_open
+
+async function rvc_model_open() {
+  const app = await getClient();
+
+  const result = (await app.predict("/rvc_model_open")) as {};
+
+  return result;
+}
+
+// rvc_index_open
+
+async function rvc_index_open() {
+  const app = await getClient();
+
+  const result = (await app.predict("/rvc_index_open")) as {};
+
+  return result;
+}
+
 const endpoints = {
   demucs,
   musicgen,
@@ -393,4 +495,9 @@ const endpoints = {
   tortoise_open_models,
   tortoise_open_voices,
   tortoise_apply_model_settings,
+  rvc,
+  rvc_model_reload,
+  rvc_index_reload,
+  rvc_model_open,
+  rvc_index_open,
 };
