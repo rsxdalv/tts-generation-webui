@@ -399,3 +399,8 @@ You can configure the interface through the "Settings" tab or, for advanced user
 | `_frontend`             | `true`            | Frontend.                                                                                       |
 
 
+
+
+
+https://github.com/gitmylo/bark-voice-cloning-HuBERT-quantizer
+https://github.com/suno-ai/bark
