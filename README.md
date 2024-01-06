@@ -259,6 +259,14 @@ Not exactly, the dependencies clash, especially between conda and python (and de
 
 * Potentially needed to install build tools (without Visual Studio): https://visualstudio.microsoft.com/visual-cpp-build-tools/
 
+### React UI
+
+* Install nodejs (if not already installed with conda)
+* Install react dependencies: `npm install`
+* Build react: `npm run build`
+* Run react: `npm start`
+* Also run the python server: `python server.py` or with `start_(platform)` script
+
 ## Docker Setup
 
 tts-generation-webui can also be ran inside of a Docker container. To get started, first build the Docker image while in the root directory:

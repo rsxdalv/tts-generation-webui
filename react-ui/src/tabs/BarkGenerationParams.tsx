@@ -11,7 +11,7 @@ const inputs = {
   text_temp: 0.7,
   waveform_temp: 0.7,
   long_prompt_radio: "Short prompt (<15s)",
-  long_prompt_history_radio: "Use old generation as history",
+  long_prompt_history_radio: "or Use old generation as history:",
   old_generation_dropdown:
     "voices\\2023-06-18_21-51-07__bark__continued_generation.npz",
   seed_input: "123",
@@ -41,12 +41,18 @@ export const initialState: BarkGenerationParams = {
 
 export const barkGenerationId = "bark_generation-tab";
 
-export const sendToBarkVoiceGeneration = (audio?: string) => {
-  if (!audio) return;
+export const sendToBarkAsVoice = (old_generation_dropdown?: string) => {
+  if (!old_generation_dropdown) return;
   updateLocalStorageWithFunction(
     barkGenerationId,
-    (vocosParams: BarkGenerationParams = initialState) =>
-      ({ ...vocosParams, audio } as BarkGenerationParams)
+    (
+      barkParams: BarkGenerationParams = initialState
+    ): BarkGenerationParams => ({
+      ...barkParams,
+      old_generation_dropdown,
+      history_prompt_semantic_dropdown: old_generation_dropdown,
+      history_setting: "or Use old generation as history:",
+    })
   );
   router.push("/bark");
 };

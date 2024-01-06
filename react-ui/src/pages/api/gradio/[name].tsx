@@ -478,6 +478,42 @@ async function rvc_index_open() {
   return result;
 }
 
+// delete_generation
+
+async function delete_generation({ history_bundle_name_data }) {
+  const app = await getClient();
+
+  const result = (await app.predict("/delete_generation", [
+    history_bundle_name_data,
+  ])) as {};
+
+  return result;
+}
+
+// save_to_voices
+
+async function save_to_voices({ history_npz }) {
+  const app = await getClient();
+
+  const result = (await app.predict("/save_to_voices", [history_npz])) as {
+    data: [
+      Object // save_button
+    ];
+  };
+
+  return result;
+}
+
+// open_folder
+
+async function open_folder({ folder }) {
+  const app = await getClient();
+
+  const result = (await app.predict("/open_folder", [folder])) as {};
+
+  return result;
+}
+
 const endpoints = {
   demucs,
   musicgen,
@@ -489,6 +525,7 @@ const endpoints = {
   bark,
   reload_old_generation_dropdown,
   bark_favorite,
+  delete_generation,
   tortoise,
   tortoise_refresh_models,
   tortoise_refresh_voices,
@@ -500,4 +537,6 @@ const endpoints = {
   rvc_index_reload,
   rvc_model_open,
   rvc_index_open,
+  save_to_voices,
+  open_folder,
 };

@@ -4,6 +4,10 @@ import { useRouter } from "next/router";
 
 const routes = [
   {
+    href: "/",
+    text: "Home",
+  },
+  {
     href: "/bark",
     text: "Bark",
   },
@@ -35,29 +39,44 @@ const routes = [
     href: "/bark_voice_generation",
     text: "Bark Voice Generation",
   },
+  {
+    href: "/history/outputs",
+    text: "History",
+  },
+  {
+    href: "/history/favorites",
+    text: "Favorites",
+  },
+  {
+    href: "/voices",
+    text: "Bark Voices",
+  },
   // {
-  //   href: "/",
-  //   text: "Voices",
+  //   href: "/history/collections",
+  //   text: "History Collections",
   // },
   {
     href: "/generations",
-    text: "Favorites",
+    text: "Generations View (Beta)",
   },
   // {
   //   href: "/voice-drafts",
   //   text: "Voice Tree",
   // },
-  // {
-  //   href: "https://echo.ps.ai/?utm_source=bark_speaker_directory",
-  //   text: "More Voices",
-  //   target: "_blank",
-  // },
+  {
+    href: "https://echo.ps.ai/?utm_source=bark_speaker_directory",
+    text: (
+      <span>
+        More Voices{" "}↗
+      </span>
+    ),
+    target: "_blank",
+  },
 ];
 
 export const Header = ({}) => {
-  // get route from next.js router
   const router = useRouter();
-  const route = router.pathname.replace("/", "");
+  const route = router.asPath.replace("/", "");
 
   return (
     <div className="flex flex-col items-center justify-center w-full p-8 bg-white rounded-lg shadow-lg">

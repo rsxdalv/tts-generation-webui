@@ -21,7 +21,7 @@ export default function Home({
       </Head>
       <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
         {generations.map((generation) => (
-          <CardGeneration key={generation.date} generation={generation} />
+          <CardGeneration key={generation.date} metadata={generation} />
         ))}
         <CardEmpty
           title="Add a new generation"

@@ -15,7 +15,9 @@ import { Vote } from "./Vote";
 import { MUIIcon } from "./mini/MUIIcon";
 import { GenerationRaw } from "../types/Generation";
 import { parseMetadataDate } from "./parseMetadataDate";
-import { Metadata } from "./Metadata";
+import { Metadata, Row } from "./Metadata";
+import { sendToBarkAsVoice } from "../tabs/BarkGenerationParams";
+import { NPZ } from "../types/npz";
 
 export const CardBig = ({
   voice: { name, audio, download, image, tags, language, author, gender },
@@ -65,12 +67,22 @@ export const CardBig = ({
 };
 
 export const CardGeneration = ({
-  generation: { prompt, language, history_hash, filename, date, ...rest },
+  metadata: {
+    prompt,
+    _type,
+    text,
+    language,
+    history_hash,
+    filename,
+    date,
+    ...rest
+  },
 }: {
-  generation: GenerationRaw;
+  metadata: GenerationRaw;
 }) => {
+  const promptText = prompt || text || "";
   // Detect if prompt is Japanese
-  const isJapanese = prompt.match(/[\u3040-\u309F\u30A0-\u30FF]/);
+  const isJapanese = promptText.match(/[\u3040-\u309F\u30A0-\u30FF]/);
   const maxLength = isJapanese ? 30 : 50;
   // const maxLength = 100000;
   return (
@@ -80,14 +92,14 @@ export const CardGeneration = ({
           <h1 className="text-2xl font-bold text-gray-900">
             <span
               className={
-                prompt.length > maxLength
+                promptText.length > maxLength
                   ? "text-xl font-bold text-gray-900"
                   : "text-2xl font-bold text-gray-900"
               }
             >
-              {prompt.length > maxLength
-                ? prompt.substring(0, maxLength) + "..."
-                : prompt}
+              {promptText.length > maxLength
+                ? promptText.substring(0, maxLength) + "..."
+                : promptText}
             </span>
           </h1>
         </div>
@@ -111,26 +123,131 @@ export const CardGeneration = ({
         >
           Generation info
         </a> */}
-        <Metadata
-          prompt={prompt}
-          language={language || "unknown"}
-          history_hash={history_hash}
-          {...rest}
-        />
+        <div>
+          <div className="flex flex-col">
+            <Row label="Type" value={_type} />
+          </div>
+        </div>
+        {_type === "tortoise" ? (
+          <div className="text-xs text-gray-500 flex flex-col w-full break-words">
+            {/* render everything as rows */}
+            <div className="flex flex-col">
+              <Row label="Prompt" value={prompt} />
+              <Row label="Language" value={language} />
+              <Row label="History Hash" value={history_hash} />
+              {Object.entries(rest).map(([key, value]) => (
+                <Row label={key} value={value} />
+              ))}
+            </div>
+          </div>
+        ) : (
+          <Metadata
+            prompt={prompt}
+            language={language || "unknown"}
+            history_hash={history_hash}
+            {...rest}
+          />
+        )}
       </div>
     </div>
   );
 };
 
-export const CardVoiceNpz = ({
-  generation: { prompt, language, history_hash, filename, date, ...rest },
+export const HistoryCard = ({
+  metadata: {
+    prompt,
+    _type,
+    text,
+    language,
+    history_hash,
+    filename,
+    date,
+    history_bundle_name_data,
+    api_filename,
+    ...rest
+  },
+  isFavorite,
 }: {
-  generation: GenerationRaw;
+  metadata: GenerationRaw;
+  isFavorite?: boolean;
 }) => {
+  const promptText = prompt || text || "";
   // Detect if prompt is Japanese
-  const isJapanese = prompt.match(/[\u3040-\u309F\u30A0-\u30FF]/);
+  const isJapanese = promptText.match(/[\u3040-\u309F\u30A0-\u30FF]/);
   const maxLength = isJapanese ? 30 : 50;
   // const maxLength = 100000;
+
+  const favorite = async (
+    _url: string,
+    data?: {
+      history_bundle_name_data?: string;
+    }
+  ) => {
+    const history_bundle_name_data = data?.history_bundle_name_data;
+    if (!history_bundle_name_data) return;
+    const response = await fetch("/api/gradio/bark_favorite", {
+      method: "POST",
+      body: JSON.stringify({
+        history_bundle_name_data,
+      }),
+    });
+    const result = await response.json();
+    return result;
+  };
+
+  const deleteFavorite = async (
+    _url: string,
+    data?: {
+      history_bundle_name_data?: string;
+    }
+  ) => {
+    const history_bundle_name_data = data?.history_bundle_name_data;
+    if (!history_bundle_name_data) return;
+    const response = await fetch("/api/gradio/delete_generation", {
+      method: "POST",
+      body: JSON.stringify({
+        history_bundle_name_data,
+      }),
+    });
+    const result = await response.json();
+    return result;
+  };
+
+  const addFavorite = () => {
+    favorite("", {
+      history_bundle_name_data,
+    });
+  };
+
+  const removeFavorite = () => {
+    deleteFavorite("", {
+      history_bundle_name_data,
+    });
+  };
+
+  const saveToVoices = () => {
+    fetch("/api/gradio/save_to_voices", {
+      method: "POST",
+      body: JSON.stringify({
+        history_npz: api_filename?.replace(".ogg", ".npz"),
+      }),
+    });
+  };
+
+  const openFolder = () => {
+    fetch("/api/gradio/open_folder", {
+      method: "POST",
+      body: JSON.stringify({
+        folder: history_bundle_name_data,
+      }),
+    });
+  };
+
+  const useAsVoice = () => {
+    const history_npz = api_filename?.replace(".ogg", ".npz");
+    sendToBarkAsVoice(history_npz);
+  };
+
   return (
     <div className="flex flex-col items-center justify-start w-full max-w-md py-4 px-6 bg-white rounded shadow-lg">
       <div className="flex flex-col space-y-4 w-full h-full justify-between">
@@ -138,17 +255,119 @@ export const CardVoiceNpz = ({
           <h1 className="text-2xl font-bold text-gray-900">
             <span
               className={
-                prompt.length > maxLength
+                promptText.length > maxLength
                   ? "text-xl font-bold text-gray-900"
                   : "text-2xl font-bold text-gray-900"
               }
             >
-              {prompt.length > maxLength
-                ? prompt.substring(0, maxLength) + "..."
-                : prompt}
+              {promptText.length > maxLength
+                ? promptText.substring(0, maxLength) + "..."
+                : promptText}
             </span>
           </h1>
         </div>
+        <div className="flex w-full justify-between items-center">
+          <AudioPlayer audio={filename} />
+          {isFavorite ? (
+            <button
+              className="w-9 h-9 text-xl ml-auto text-red-500 select-none hover:text-gray-900"
+              title="Remove from favorites"
+              onClick={removeFavorite}
+            >
+              <Heart />
+            </button>
+          ) : (
+            <>
+              {/* delete button */}
+              <button
+                className="w-9 h-9 text-xl ml-auto text-gray-900 select-none hover:text-red-500"
+                title="Delete"
+                onClick={removeFavorite}
+              >
+                <Trash />
+              </button>
+              <button
+                className="w-9 h-9 text-xl text-gray-900 select-none hover:text-red-500"
+                title="Add to favorites"
+                onClick={addFavorite}
+              >
+                <Heart />
+              </button>
+            </>
+          )}
+          <Download download={"/" + filename} />
+          <p className="text-gray-500 ml-2">{prettifyDate(date)}</p>
+        </div>
+        {_type === "bark" && (
+          <button
+            className="w-30 h-9 text-xl text-gray-900 select-none hover:text-red-500"
+            title="Save to voices"
+            onClick={saveToVoices}
+          >
+            Save to voices
+          </button>
+        )}
+        <button
+          className="w-30 h-9 text-xl text-gray-900 select-none hover:text-red-500"
+          title="Open folder"
+          onClick={openFolder}
+        >
+          Open folder
+        </button>
+        {_type === "bark" && (
+          <button
+            className="w-30 h-9 text-xl text-gray-900 select-none hover:text-red-500"
+            title="Use as voice"
+            onClick={useAsVoice}
+          >
+            Use as voice
+          </button>
+        )}
+        <p className="text-gray-500">{filename}</p>
+        <div>
+          <div className="flex flex-col">
+            <Row label="Type" value={_type} />
+          </div>
+        </div>
+        {_type === "tortoise" ? (
+          <div className="text-xs text-gray-500 flex flex-col w-full break-words">
+            {/* render everything as rows */}
+            <div className="flex flex-col">
+              <Row label="Prompt" value={prompt} />
+              <Row label="Language" value={language} />
+              <Row label="History Hash" value={history_hash} />
+              {Object.entries(rest).map(([key, value]) => (
+                <Row key={key} label={key} value={value} />
+              ))}
+            </div>
+          </div>
+        ) : (
+          <Metadata
+            prompt={prompt}
+            language={language || "unknown"}
+            history_hash={history_hash}
+            {...rest}
+          />
+        )}
+      </div>
+    </div>
+  );
+};
+
+export const CardVoiceNpz = ({
+  generation: { prompt, language, history_hash, filename, date, url, ...rest },
+}: {
+  generation: NPZ;
+}) => {
+  const image = url.replace(".npz", ".png");
+
+  const Extra = () => {
+    if (!prompt) return <></>;
+    const isJapanese = prompt.match(/[\u3040-\u309F\u30A0-\u30FF]/);
+    const maxLength = isJapanese ? 30 : 50;
+    // const maxLength = 100000;
+    return (
+      <div className="flex flex-col gap-y-2 w-full h-full justify-between">
         <div className="flex w-full justify-between">
           <p className="text-gray-500">{prettifyDate(date)}</p>
         </div>
@@ -159,6 +378,53 @@ export const CardVoiceNpz = ({
           {...rest}
         />
       </div>
+    );
+  };
+
+  const useAsVoice = () => {
+    const history_npz = filename;
+    sendToBarkAsVoice(history_npz);
+  };
+
+  const preview = filename.replace(".npz", ".wav");
+
+  const name = filename
+    .replace(".npz", "")
+    .replace("voices/", "")
+    // reformat date YYYY-MM-DD to YYYY/MM/DD
+    .replace(/(\d{4})-(\d{2})-(\d{2})/, "$1/$2/$3")
+    // reformat time HH-MM-SS to HH:MM:SS
+    .replace(/(\d{2})-(\d{2})-(\d{2})/, "$1:$2:$3")
+    .replaceAll("_", " ")
+    .replaceAll("-", " ");
+  return (
+    <div className="flex flex-col items-center justify-start w-full max-w-md py-4 px-6 bg-white rounded shadow-lg">
+      {image && (
+        <img
+          className="w-24 h-24 rounded select-none"
+          src={image}
+          width={96}
+          height={96}
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            target.onerror = null;
+            target.src =
+              "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=";
+          }}
+        />
+      )}
+      <p className="text-xl font-bold text-gray-900 w-full text-center">
+        {name}
+      </p>
+      <button
+        className="w-30 h-9 text-xl text-gray-900 select-none hover:text-red-500"
+        title="Use as voice"
+        onClick={useAsVoice}
+      >
+        Use ↗
+      </button>
+      {/* <AudioPlayer audio={preview} /> */}
+      <Extra />
     </div>
   );
 };
@@ -273,6 +539,7 @@ const Author = ({ author }: Pick<Voice, "author">) => {
 };
 
 const Heart = () => <>&#x2764;</>;
+const Trash = () => <>X</>;
 
 const SaveToFavorites = ({ download }: Pick<Voice, "download">) => {
   const [favorites, setFavorites] = useFavorites();
@@ -360,6 +627,7 @@ const Download = ({ download }: Pick<Voice, "download">) => (
     className="-mx-2 w-8 h-8 hover:opacity-50 flex items-center justify-center select-none"
     href={download}
     title="Download .npz file"
+    download
   >
     <img
       src={DownloadIcon.src}

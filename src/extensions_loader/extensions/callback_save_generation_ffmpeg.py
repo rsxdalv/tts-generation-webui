@@ -48,6 +48,8 @@ def callback_save_generation(
     metadata["prompt"] = double_escape_quotes(metadata["prompt"])
     metadata["prompt"] = double_escape_newlines(metadata["prompt"])
     def double_escape_backslash(prompt):
+        if prompt is None:
+            return None
         return prompt.replace("\\", "\\\\")
     metadata["history_prompt"] = double_escape_backslash(metadata["history_prompt"])
     metadata["history_prompt_npz"] = double_escape_backslash(metadata["history_prompt_npz"])
