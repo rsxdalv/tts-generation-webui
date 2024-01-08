@@ -6,6 +6,12 @@ import OtherIcon from "@material-design-icons/svg/filled/alt_route.svg";
 import PlayIcon from "@material-design-icons/svg/filled/play_arrow.svg";
 import PauseIcon from "@material-design-icons/svg/filled/pause.svg";
 import AddIcon from "@material-design-icons/svg/filled/add.svg";
+import RecordVoiceOverIcon from "@material-design-icons/svg/filled/record_voice_over.svg";
+import OpenFolderIcon from "@material-design-icons/svg/filled/folder_open.svg";
+import PlaylistAddIcon from "@material-design-icons/svg/filled/playlist_add.svg";
+import StarIcon from "@material-design-icons/svg/filled/star.svg";
+import StarIconOutlined from "@material-design-icons/svg/outlined/star.svg";
+import DeleteForeverIcon from "@material-design-icons/svg/filled/delete_forever.svg";
 import React, { useEffect, useRef, useState } from "react";
 import { Flag } from "./Flag";
 import { Voice } from "../types/Voice";
@@ -17,7 +23,25 @@ import { GenerationRaw } from "../types/Generation";
 import { parseMetadataDate } from "./parseMetadataDate";
 import { Metadata, Row } from "./Metadata";
 import { sendToBarkAsVoice } from "../tabs/BarkGenerationParams";
-import { NPZ } from "../types/npz";
+import { NPZ } from "../types/NPZ";
+
+const ActionButton = ({
+  icon,
+  alt,
+  onClick,
+}: {
+  icon: { src: string; width: number; height: number };
+  alt: string;
+  onClick: () => void;
+}) => (
+  <button
+    className="w-9 h-9 text-xl text-gray-900 select-none hover:opacity-70"
+    onClick={onClick}
+    title={alt}
+  >
+    <MUIIcon icon={icon} alt={alt} className="w-8 h-8 rounded" />
+  </button>
+);
 
 export const CardBig = ({
   voice: { name, audio, download, image, tags, language, author, gender },
@@ -171,7 +195,7 @@ export const HistoryCard = ({
   metadata: GenerationRaw;
   isFavorite?: boolean;
 }) => {
-  const promptText = prompt || text || "";
+  const promptText = prompt || text || "(No title)";
   // Detect if prompt is Japanese
   const isJapanese = promptText.match(/[\u3040-\u309F\u30A0-\u30FF]/);
   const maxLength = isJapanese ? 30 : 50;
@@ -248,9 +272,96 @@ export const HistoryCard = ({
     sendToBarkAsVoice(history_npz);
   };
 
+  const ActionRow = ({
+    isFavorite,
+    removeFavorite,
+    addFavorite,
+    saveToVoices,
+    openFolder,
+    useAsVoice,
+    filename,
+    _type,
+  }: {
+    isFavorite?: boolean;
+    removeFavorite: () => void;
+    addFavorite: () => void;
+    saveToVoices: () => void;
+    openFolder: () => void;
+    useAsVoice: () => void;
+    filename?: string;
+    _type?: string;
+  }) => {
+    return (
+      <div className="flex w-full justify-between">
+        {isFavorite ? (
+          <ActionButton
+            icon={StarIcon}
+            alt="Remove from favorites"
+            onClick={removeFavorite}
+          />
+        ) : (
+          <>
+            <ActionButton
+              icon={DeleteForeverIcon}
+              alt="Delete"
+              onClick={removeFavorite}
+            />
+            <ActionButton
+              icon={StarIconOutlined}
+              alt="Add to favorites"
+              onClick={addFavorite}
+            />
+          </>
+        )}
+        <Download download={"/" + filename} />
+        {_type === "bark" && (
+          <ActionButton
+            icon={PlaylistAddIcon}
+            alt="Save to voices"
+            onClick={saveToVoices}
+          />
+        )}
+        <ActionButton
+          icon={OpenFolderIcon}
+          alt="Open folder"
+          onClick={openFolder}
+        />
+        {_type === "bark" && (
+          <ActionButton
+            icon={RecordVoiceOverIcon}
+            alt="Use as voice"
+            onClick={useAsVoice}
+          />
+        )}
+      </div>
+    );
+  };
+
+  const MetadataBlock = ({
+    prompt,
+    language,
+    history_hash,
+    ...rest
+  }: Omit<GenerationRaw, "filename" | "date">) => {
+    return _type === "tortoise" ? (
+      <TortoiseMetadata
+        language={language || "unknown"}
+        history_hash={history_hash}
+        {...rest}
+      />
+    ) : (
+      <Metadata
+        prompt={prompt}
+        language={language || "unknown"}
+        history_hash={history_hash}
+        {...rest}
+      />
+    );
+  };
+
   return (
     <div className="flex flex-col items-center justify-start w-full max-w-md py-4 px-6 bg-white rounded shadow-lg">
-      <div className="flex flex-col space-y-4 w-full h-full justify-between">
+      <div className="flex flex-col space-y-4 w-full h-full">
         <div className="flex w-full">
           <h1 className="text-2xl font-bold text-gray-900">
             <span
@@ -268,87 +379,51 @@ export const HistoryCard = ({
         </div>
         <div className="flex w-full justify-between items-center">
           <AudioPlayer audio={filename} />
-          {isFavorite ? (
-            <button
-              className="w-9 h-9 text-xl ml-auto text-red-500 select-none hover:text-gray-900"
-              title="Remove from favorites"
-              onClick={removeFavorite}
-            >
-              <Heart />
-            </button>
-          ) : (
-            <>
-              {/* delete button */}
-              <button
-                className="w-9 h-9 text-xl ml-auto text-gray-900 select-none hover:text-red-500"
-                title="Delete"
-                onClick={removeFavorite}
-              >
-                <Trash />
-              </button>
-              <button
-                className="w-9 h-9 text-xl text-gray-900 select-none hover:text-red-500"
-                title="Add to favorites"
-                onClick={addFavorite}
-              >
-                <Heart />
-              </button>
-            </>
-          )}
-          <Download download={"/" + filename} />
-          <p className="text-gray-500 ml-2">{prettifyDate(date)}</p>
+          <p className="text-gray-500 ml-2">{prettifyDate(date, true)}</p>
         </div>
-        {_type === "bark" && (
-          <button
-            className="w-30 h-9 text-xl text-gray-900 select-none hover:text-red-500"
-            title="Save to voices"
-            onClick={saveToVoices}
-          >
-            Save to voices
-          </button>
-        )}
-        <button
-          className="w-30 h-9 text-xl text-gray-900 select-none hover:text-red-500"
-          title="Open folder"
-          onClick={openFolder}
-        >
-          Open folder
-        </button>
-        {_type === "bark" && (
-          <button
-            className="w-30 h-9 text-xl text-gray-900 select-none hover:text-red-500"
-            title="Use as voice"
-            onClick={useAsVoice}
-          >
-            Use as voice
-          </button>
-        )}
-        <p className="text-gray-500">{filename}</p>
-        <div>
-          <div className="flex flex-col">
-            <Row label="Type" value={_type} />
-          </div>
+        <ActionRow
+          isFavorite={isFavorite}
+          removeFavorite={removeFavorite}
+          addFavorite={addFavorite}
+          saveToVoices={saveToVoices}
+          openFolder={openFolder}
+          useAsVoice={useAsVoice}
+          filename={filename}
+          _type={_type}
+        />
+        <div className="flex flex-col text-gray-500">
+          <p className="text-gray-500 text-sm">{history_bundle_name_data}</p>
+          <Row label="Model" value={_type} />
         </div>
-        {_type === "tortoise" ? (
-          <div className="text-xs text-gray-500 flex flex-col w-full break-words">
-            {/* render everything as rows */}
-            <div className="flex flex-col">
-              <Row label="Prompt" value={prompt} />
-              <Row label="Language" value={language} />
-              <Row label="History Hash" value={history_hash} />
-              {Object.entries(rest).map(([key, value]) => (
-                <Row key={key} label={key} value={value} />
-              ))}
-            </div>
-          </div>
-        ) : (
-          <Metadata
-            prompt={prompt}
-            language={language || "unknown"}
-            history_hash={history_hash}
-            {...rest}
-          />
-        )}
+        <MetadataBlock
+          prompt={prompt}
+          language={language || "unknown"}
+          history_hash={history_hash}
+          {...rest}
+        />
+      </div>
+    </div>
+  );
+};
+
+const TortoiseMetadata = ({
+  language,
+  history_hash,
+  ...rest
+}: {
+  language: string;
+  history_hash: string;
+  [key: string]: any;
+}) => {
+  return (
+    <div className="text-xs text-gray-500 flex flex-col w-full break-words">
+      {/* render everything as rows */}
+      <div className="flex flex-col">
+        <Row label="Language" value={language} />
+        <Row label="History Hash" value={history_hash} />
+        {Object.entries(rest).map(([key, value]) => (
+          <Row key={key} label={key} value={value} />
+        ))}
       </div>
     </div>
   );
@@ -624,7 +699,7 @@ const AudioPlayer = ({ audio }: Pick<Voice, "audio">) => {
 
 const Download = ({ download }: Pick<Voice, "download">) => (
   <a
-    className="-mx-2 w-8 h-8 hover:opacity-50 flex items-center justify-center select-none"
+    className="w-8 h-8 hover:opacity-50 flex items-center justify-center select-none"
     href={download}
     title="Download .npz file"
     download
@@ -685,9 +760,7 @@ const Tags = ({ tags }: Pick<Voice, "tags">) => (
   </ul>
 );
 
-const parseMetadataLanguage = (language: string) => language.toLowerCase();
-
-const prettifyDate = (date: string) => {
+const prettifyDate = (date: string, showTime = false) => {
   const dateObj = parseMetadataDate(date);
   return (
     <time dateTime={date}>
@@ -696,8 +769,8 @@ const prettifyDate = (date: string) => {
         month: "long",
         day: "numeric",
 
-        // hour: "numeric",
-        // minute: "numeric",
+        hour: showTime ? "numeric" : undefined,
+        minute: showTime ? "numeric" : undefined,
       })}
     </time>
   );
