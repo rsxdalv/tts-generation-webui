@@ -7,14 +7,16 @@ class TortoiseOutputRow:
         audio: gr.Audio,
         image: gr.Image,
         save_button: gr.Button,
-        seed: gr.State,
-        bundle_name: gr.State,
+        seed: gr.Textbox,
+        bundle_name: gr.Textbox,
+        params: gr.JSON,
     ):
         self.audio: gr.Audio = audio
         self.image: gr.Image = image
         self.save_button: gr.Button = save_button
-        self.seed: gr.State = seed
-        self.bundle_name: gr.State = bundle_name
+        self.seed: gr.Textbox = seed
+        self.bundle_name: gr.Textbox = bundle_name
+        self.params: gr.JSON = params
 
     def to_list(self):
         return [
@@ -23,6 +25,7 @@ class TortoiseOutputRow:
             self.save_button,
             self.seed,
             self.bundle_name,
+            self.params,
         ]
 
     @staticmethod
@@ -33,6 +36,7 @@ class TortoiseOutputRow:
             save_button=components[2],
             seed=components[3],
             bundle_name=components[4],
+            params=components[5],
         )
 
     # def __iter__(self):
@@ -47,9 +51,11 @@ class TortoiseOutputUpdate:
         save_button,
         seed,
         bundle_name,
+        params,
     ):
         self.audio = audio
         self.image = image
         self.save_button = save_button
         self.seed = seed
         self.bundle_name = bundle_name
+        self.params = params

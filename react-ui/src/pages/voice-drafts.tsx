@@ -35,7 +35,7 @@ export default function Home({
               {generations.map((generation) => (
                 <CardGeneration
                   key={generations[0].history_hash}
-                  generation={generation}
+                  metadata={generation}
                 />
               ))}
             </SectionVoice>

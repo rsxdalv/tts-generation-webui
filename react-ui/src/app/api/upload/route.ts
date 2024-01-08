@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
 
   // With the file data in the buffer, you can do whatever you want with it.
   // For this, we'll just write it to the filesystem in a new location
-  const path = `./file-input-cache/${file.name}`;
+  const path = `./public/file-input-cache/${file.name}`;
   await writeFile(path, buffer);
   console.log(`open ${path} to see the uploaded file`);
 

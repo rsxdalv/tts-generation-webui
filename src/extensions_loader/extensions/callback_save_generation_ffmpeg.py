@@ -47,6 +47,12 @@ def callback_save_generation(
     input_data = audio_array.tobytes()
     metadata["prompt"] = double_escape_quotes(metadata["prompt"])
     metadata["prompt"] = double_escape_newlines(metadata["prompt"])
+    def double_escape_backslash(prompt):
+        if prompt is None:
+            return None
+        return prompt.replace("\\", "\\\\")
+    metadata["history_prompt"] = double_escape_backslash(metadata["history_prompt"])
+    metadata["history_prompt_npz"] = double_escape_backslash(metadata["history_prompt_npz"])
     metadata_str = json.dumps(metadata, ensure_ascii=False)
 
     pipe_input = ffmpeg.input("pipe:", format="f32le", ar=str(SAMPLE_RATE))

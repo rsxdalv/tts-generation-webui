@@ -119,7 +119,12 @@ def settings_tab_bark() -> None:
             ]
 
             for i in env_inputs:
-                i.change(fn=save_environment_variables, inputs=env_inputs)
+                i.change(fn=save_environment_variables, inputs=env_inputs,
+                         api_name="save_environment_variables_bark")
+
+            # refresh environment variables button
+
+
 
             inputs = [
                 text_use_gpu,
@@ -133,7 +138,8 @@ def settings_tab_bark() -> None:
             ]
 
             for i in inputs:
-                i.change(fn=save_config_bark, inputs=inputs, outputs=[save_beacon])
+                i.change(fn=save_config_bark, inputs=inputs, outputs=[save_beacon],
+                         api_name="save_config_bark")
 
             def sync_ui():
                 def checkbox_update_helper(key: str):
@@ -150,7 +156,8 @@ def settings_tab_bark() -> None:
                     gr.Checkbox.update(value=config["load_models_on_startup"]),
                 ]
 
-            settings_tab.select(fn=sync_ui, outputs=inputs)
+            settings_tab.select(fn=sync_ui, outputs=inputs,
+                                api_name="get_config_bark")
 
             def set_to_reload():
                 return gr.Button.update(value="Loading...", interactive=False)

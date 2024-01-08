@@ -15,10 +15,13 @@ def tortoise_model_settings_ui_inner():
             show_label=False,
             container=False,
         )
-        gr_open_button_simple(TORTOISE_LOCAL_MODELS_DIR)
+        gr_open_button_simple(
+            TORTOISE_LOCAL_MODELS_DIR, api_name="tortoise_open_models"
+        )
         gr_reload_button().click(
             fn=lambda: gr.Dropdown.update(choices=get_model_list()),
             outputs=[model],
+            api_name="tortoise_refresh_models",
         )
 
     with gr.Row():
@@ -39,6 +42,7 @@ def tortoise_model_settings_ui_inner():
         fn=switch_model,
         inputs=[model, kv_cache, use_deepspeed, half, tokenizer, use_basic_cleaners],
         outputs=[model],
+        api_name="tortoise_apply_model_settings",
     )
 
     model.select(

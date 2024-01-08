@@ -495,9 +495,7 @@ def generation_tab_bark():
             def unload_models():
                 model_manager.unload_models()
                 return {
-                    unload_models_button: gr.Button.update(
-                        value="Unloaded"
-                    ),
+                    unload_models_button: gr.Button.update(value="Unloaded"),
                 }
 
             unload_models_button.click(
@@ -702,7 +700,7 @@ def generation_tab_bark():
                 fn=generate_multi(count, output_components),
                 inputs=inputs,
                 outputs=all_outputs_flat,
-                # api_name=f"bark_{count}",
+                # api_name=f"bark_{count}", # gradio literally can't support this
             )
             return button
 
@@ -720,6 +718,7 @@ def generation_tab_bark():
             fn=generate_multi(1, output_components),
             inputs=inputs,
             outputs=all_outputs_flat,
+            api_name="bark",  # toggle
         )
 
         set_old_seed_button.click(
@@ -774,6 +773,7 @@ def old_generation_dropdown_ui(label):
     reload_old_generation_dropdown.click(
         fn=lambda: gr.Dropdown.update(choices=get_npz_files()),
         outputs=old_generation_dropdown,
+        api_name=f"reload_old_generation_dropdown{ '' if label == 'Audio Voice' else '_semantic'}",
     )
 
     return (
@@ -863,15 +863,22 @@ def create_components(
             send_to_vocos_button = gr.Button("Vocos", size="sm")
             continue_button = gr.Button("Use as history", size="sm")
             continue_semantic_button = gr.Button("Use as semantic history", size="sm")
-        npz = gr.State()  # type: ignore
+        npz = gr.Textbox(
+            visible=False,
+        )
         seed = gr.State()  # type: ignore
-        json_text = gr.State()  # type: ignore
-        history_bundle_name_data = gr.State()  # type: ignore
+        json_text = gr.JSON(
+            visible=False,
+        )
+        history_bundle_name_data = gr.Textbox(
+            visible=False,
+        )
 
         save_button.click(
             fn=save_to_favorites,
             inputs=[history_bundle_name_data],
             outputs=[save_button],
+            api_name=f"bark_favorite{ '_' + str(index) if index > 0 else ''}",
         )
 
         reuse_seed_button.click(

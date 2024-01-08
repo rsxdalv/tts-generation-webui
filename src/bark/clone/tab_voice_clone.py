@@ -207,6 +207,7 @@ def tab_voice_clone(register_use_as_history_button):
                 load_tokenizer,
                 inputs=[tokenizer_dropdown, use_gpu_checkbox],
                 outputs=[tokenizer_dropdown],
+                api_name="bark_voice_tokenizer_load",
             )
 
         with gr.Column():
@@ -229,8 +230,10 @@ def tab_voice_clone(register_use_as_history_button):
         generate_voice_button.click(
             fn=generate_voice,
             inputs=[file_input, use_gpu_checkbox],
+            # inputs=[file_input, use_gpu_checkbox, tokenizer_dropdown],
             outputs=[voice_file_name, audio_preview],
             preprocess=True,
+            api_name="bark_voice_generate",
         )
 
         register_use_as_history_button(

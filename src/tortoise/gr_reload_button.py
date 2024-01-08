@@ -19,7 +19,8 @@ def gr_open_button(**kwargs):
     return gr_icon_button(value="folder_open", **kwargs)
 
 
-def gr_open_button_simple(dirname="", **kwargs):
+def gr_open_button_simple(dirname="", api_name=None, **kwargs):
     return gr_open_button(**kwargs).click(
         fn=lambda: open_folder(dirname),
+        api_name=api_name,
     )

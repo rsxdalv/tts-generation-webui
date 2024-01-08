@@ -3,6 +3,7 @@ import gradio as gr
 
 import json
 import shutil
+from src.history_tab.delete_generation import delete_generation
 from src.history_tab.collections_directories_atom import (
     collections_directories_atom,
     get_collections,
@@ -78,14 +79,16 @@ def history_content(
         create_collection_ui(collections_directories_atom)
 
     with gr.Accordion("Gallery Selector (Click to Open)", open=False):
-        history_list_as_gallery = gr.Gallery(value=[], columns=8, object_fit="contain", height="auto")
+        history_list_as_gallery = gr.Gallery(
+            value=[], columns=8, object_fit="contain", height="auto"
+        )
     with gr.Row():
         with gr.Column():
             with gr.Row():
                 button_output = gr.Button(
                     value=f"Open {show_collections and 'collection' or directory} folder"
                 )
-            button_output.click(lambda x: open_folder(x), inputs=[directory_dropdown])
+            button_output.click(lambda x: open_folder(x), inputs=[directory_dropdown], api_name="open_folder")
 
             datatypes = ["date", "str", "str", "str"]
             # headers = ["Date and Time", directory.capitalize(), "When", "Filename"]
@@ -104,7 +107,7 @@ def history_content(
 
         with gr.Column():
             history_bundle_name = gr.Markdown(visible=True)
-            history_bundle_name_data = gr.State()  # type: ignore
+            history_bundle_name_data = gr.Textbox(visible=False)
             history_audio = gr.Audio(visible=True, type="filepath", show_label=False)
             history_image = gr.Image(show_label=False)
             history_json = gr.JSON()
@@ -142,7 +145,8 @@ def history_content(
                 )
 
                 save_to_voices.click(
-                    fn=save_to_voices_cb, inputs=history_npz, outputs=save_to_voices
+                    fn=save_to_voices_cb, inputs=history_npz, outputs=save_to_voices,
+                    api_name="save_to_voices"
                 )
 
             save_to_collection_ui(
@@ -218,6 +222,15 @@ def history_content(
         inputs=[history_bundle_name_data, directory_dropdown],
         outputs=[history_list, history_list_as_gallery],
     )
+    # API ONLY
+    gr.Button(
+        label="Delete (API ONLY)",
+        visible=False,
+    ).click(
+        fn=delete_generation,
+        inputs=[history_bundle_name_data],
+        api_name="delete_generation",
+    )
     history_tab.select(
         fn=update_history_tab,
         inputs=[directory_dropdown],
@@ -234,7 +247,7 @@ def history_content(
 def save_to_collection_ui(
     directory: str,
     directories: list[str],
-    history_bundle_name_data: gr.State,
+    history_bundle_name_data: gr.Textbox,
     directories_state: gr.JSON,
 ):
     with gr.Row():

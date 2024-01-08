@@ -38,5 +38,5 @@ next-env.d.ts
 .vscode
 
 # upload cache
-/file-input-cache/
+/public/file-input-cache/
 

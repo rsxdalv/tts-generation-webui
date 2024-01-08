@@ -53,10 +53,13 @@ def tortoise_core_ui():
                         show_label=False,
                         container=False,
                     )
-                    gr_open_button_simple(TORTOISE_VOICE_DIR_ABS)
+                    gr_open_button_simple(
+                        TORTOISE_VOICE_DIR_ABS, api_name="tortoise_open_voices"
+                    )
                     gr_reload_button().click(
                         fn=lambda: gr.Dropdown.update(choices=get_voice_list()),
                         outputs=[voice],
+                        api_name="tortoise_refresh_voices",
                     )
             with gr.Box():
                 gr.Markdown("Preset")
@@ -179,6 +182,7 @@ def generate_button(text, count, variant, inputs, output_rows, total_columns):
             fn=gen,
             inputs=inputs,
             outputs=get_output_list(count),
+            api_name=f"generate_tortoise_{count}",
         )
     )
 

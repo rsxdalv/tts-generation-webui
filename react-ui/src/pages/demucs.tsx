@@ -1,81 +1,73 @@
-import React, { useState } from "react";
+import React from "react";
 import { Template } from "../components/Template";
-import FileInput from "../components/FileInput";
-import { AudioPlayer } from "../components/MemoizedWaveSurferPlayer";
+import useLocalStorage from "../hooks/useLocalStorage";
+import { AudioInput, AudioOutput } from "../components/AudioComponents";
+import Head from "next/head";
+import { DemucsParams, demucsId, initialState } from "../tabs/DemucsParams";
+import { GradioFile } from "../types/GradioFile";
 
-type AudioOutput = {
-  name: string;
-  data: string;
-  size?: number;
-  is_file?: boolean;
-  orig_name?: string;
+type TypedGradioFile = GradioFile & {
   type_name?: string;
 };
 
-function addTypeNameToAudioOutput(audioOutput: AudioOutput, typeName: string) {
-  return { ...audioOutput, type_name: typeName };
-}
+const typeNames = ["drums", "bass", "other", "vocals"];
 
-function addTypeNamesToAudioOutputs(
-  audioOutputs: AudioOutput[],
+const addTypeNamesToAudioOutputs = (
+  audioOutputs: TypedGradioFile[],
   typeNames: string[]
-) {
-  return audioOutputs.map((audioOutput, index) =>
-    addTypeNameToAudioOutput(audioOutput, typeNames[index])
+) =>
+  audioOutputs.map((audioOutput, index) => ({
+    ...audioOutput,
+    type_name: typeNames[index],
+  }));
+
+const DemucsPage = () => {
+  const [data, setData] = useLocalStorage<TypedGradioFile[] | null>(
+    "demucsOutput",
+    null
   );
-}
-
-type MusicgenParams = {
-  file: string | null;
-};
-
-const GradioPage = () => {
-  const [data, setData] = useState<AudioOutput[] | null>(null);
-  const [melody, setMelody] = useState<string | undefined>();
-
-  const [musicgenParams, setMusicgenParams] = useState<MusicgenParams>({
-    file: null,
-  });
+  const [demucsParams, setDemucsParams] = useLocalStorage<DemucsParams>(
+    demucsId,
+    initialState
+  );
 
   async function demucs() {
-    const response = await fetch("/api/demucs_musicgen", {
+    const response = await fetch("/api/gradio/demucs", {
       method: "POST",
-      body: JSON.stringify(musicgenParams),
+      body: JSON.stringify(demucsParams),
     });
 
     const result = await response.json();
-    setData(result?.data);
+    setData(result);
   }
 
-  const typeNames = ["drums", "bass", "other", "vocals"];
   const sampleWithTypeNames =
     data && addTypeNamesToAudioOutputs(data, typeNames);
 
+  const useAsInput = (audio?: string) => {
+    if (!audio) return;
+    setDemucsParams({
+      ...demucsParams,
+      file: audio,
+    });
+  };
+
   return (
     <Template>
-      <div className="p-4">
-        <div>
-          <label className="text-sm">Input file:</label>
-          <FileInput
-            callback={(file: File | undefined) => {
-              const melody = file?.name || null;
-              setMelody(file && URL.createObjectURL(file));
-              setMusicgenParams({
-                ...musicgenParams,
-                file: melody,
+      <Head>
+        <title>Demucs - TTS Generation Webui</title>
+      </Head>
+      <div className="flex space-x-4">
+        <div className="flex flex-col space-y-2">
+          <AudioInput
+            url={demucsParams?.file}
+            callback={(file) => {
+              setDemucsParams({
+                ...demucsParams,
+                file,
               });
             }}
-          />
-          {/* Preview melody */}
-          <AudioPlayer
-            height={100}
-            waveColor="#ffa500"
-            progressColor="#d59520"
-            url={melody}
-            volume={0.4}
-            barWidth={2}
-            barGap={1}
-            barRadius={2}
+            filter={["sendToDemucs"]}
           />
 
           <button
@@ -84,26 +76,20 @@ const GradioPage = () => {
           >
             Split with Demucs
           </button>
-          {typeNames.map((typeName, index) => {
+        </div>
+        <div className="flex flex-col space-y-4">
+          {typeNames.map((typeName) => {
             const audioOutput = sampleWithTypeNames?.find(
               (item) => item.type_name === typeName
             );
             return (
-              <div key={index}>
-                <p>{typeName}</p>
-                {audioOutput && (
-                  <AudioPlayer
-                    height={100}
-                    waveColor="#ffa500"
-                    progressColor="#d59520"
-                    url={audioOutput.data}
-                    volume={0.4}
-                    barWidth={2}
-                    barGap={1}
-                    barRadius={2}
-                  />
-                )}
-              </div>
+              <AudioOutput
+                key={typeName}
+                audioOutput={audioOutput}
+                label={typeName[0].toUpperCase() + typeName.slice(1)}
+                funcs={[useAsInput]}
+                filter={["sendToDemucs"]}
+              />
             );
           })}
         </div>
@@ -112,4 +98,4 @@ const GradioPage = () => {
   );
 };
 
-export default GradioPage;
+export default DemucsPage;

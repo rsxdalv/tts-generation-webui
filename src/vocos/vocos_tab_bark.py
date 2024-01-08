@@ -79,6 +79,7 @@ def vocos_tab_bark():
             fn=get_audio,
             inputs=[npz_file],
             outputs=[current, output],
+            api_name="encodec_decode",
         )
 
         def vocos_predict(npz_file_obj: tempfile._TemporaryFileWrapper):
@@ -96,6 +97,7 @@ def vocos_tab_bark():
             fn=vocos_predict,
             inputs=[npz_file],
             outputs=output,
+            api_name="vocos_npz",
         )
 
 

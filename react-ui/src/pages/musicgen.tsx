@@ -1,8 +1,14 @@
-import React, { useState } from "react";
+import React from "react";
 import { Template } from "../components/Template";
 import Head from "next/head";
-import FileInput from "../components/FileInput";
-import { AudioPlayer } from "../components/MemoizedWaveSurferPlayer";
+import useLocalStorage from "../hooks/useLocalStorage";
+import { AudioInput, AudioOutput } from "../components/AudioComponents";
+import {
+  MusicgenParams,
+  initialMusicgenParams,
+  musicgenId,
+} from "../tabs/MusicgenParams";
+import { GradioFile } from "../types/GradioFile";
 
 type AudioOutput = {
   name: string;
@@ -13,31 +19,29 @@ type AudioOutput = {
   type_name?: string;
 };
 
-const musicgenParams0: MusicgenParams = {
-  // text: "",
-  text: "lofi hip hop beats to relax/study to",
-  melody: null,
-  model: "Small",
-  duration: 1,
-  topk: 250,
-  topp: 0,
-  temperature: 1.0,
-  cfg_coef: 3.0,
-  seed: -1,
-  use_multi_band_diffusion: false,
-};
-
-type MusicgenParams = {
-  text: string;
-  melody: string | null;
-  model: string;
-  duration: number;
-  topk: number;
-  topp: number;
-  temperature: number;
-  cfg_coef: number;
-  seed: number;
-  use_multi_band_diffusion: boolean;
+type Result = {
+  audio: GradioFile;
+  history_bundle_name_data: string;
+  json: {
+    _version: string;
+    _hash_version: string;
+    _type: string;
+    _audiocraft_version: string;
+    models: {};
+    prompt: string;
+    hash: string;
+    date: string;
+    melody?: any;
+    text: string;
+    model: string;
+    duration: number;
+    topk: number;
+    topp: number;
+    temperature: number;
+    cfg_coef: number;
+    seed: string;
+    use_multi_band_diffusion: boolean;
+  };
 };
 
 const modelNameMapping = {
@@ -48,15 +52,20 @@ const modelNameMapping = {
   Audiogen: "facebook/audiogen-medium",
 };
 
+const initialHistory = []; // prevent infinite loop
 const MusicgenPage = () => {
-  const [musicgenData, setMusicgenData] = useState<AudioOutput[] | null>(null);
-  const [historyData, setHistoryData] = useState<AudioOutput[]>([]);
-  const [lastSeed, setLastSeed] = useState<number>(-1);
-  const [image, setImage] = useState<string>("");
-  const [audioUrl, setAudioUrl] = useState<string>("");
-  const [musicgenParams, setMusicgenParams] =
-    useState<MusicgenParams>(musicgenParams0);
-  const [melody, setMelody] = useState<string | undefined>();
+  const [data, setData] = useLocalStorage<Result | null>(
+    "musicgenGenerationOutput",
+    null
+  );
+  const [historyData, setHistoryData] = useLocalStorage<Result[]>(
+    "musicgenHistory",
+    initialHistory
+  );
+  const [musicgenParams, setMusicgenParams] = useLocalStorage<MusicgenParams>(
+    musicgenId,
+    initialMusicgenParams
+  );
 
   async function musicgen() {
     const body = JSON.stringify({
@@ -64,48 +73,23 @@ const MusicgenPage = () => {
       melody: musicgenParams.model === "Melody" ? musicgenParams.melody : null,
       model: modelNameMapping[musicgenParams.model],
     });
-    console.log(body);
-    return;
-    const response = await fetch("/api/demucs_musicgen", {
+    const response = await fetch("/api/gradio/musicgen", {
       method: "POST",
       body,
     });
 
-    const result = await response.json();
-    const data = result?.data;
-    const [generated_audio, , image, , json] = data;
-    console.log(generated_audio, image, json);
-    const { seed } = json;
-    setMusicgenData(result?.data);
-    setHistoryData((x) => [result?.data[0], ...x]);
-    setLastSeed(seed);
-    setImage(image);
-    setAudioUrl(generated_audio.data);
+    const result: Result = await response.json();
+    setData(result);
+    setHistoryData((x) => [result, ...x]);
   }
 
-  const handleChange = async (
+  const handleChange = (
     event:
       | React.ChangeEvent<HTMLInputElement>
       | React.ChangeEvent<HTMLTextAreaElement>
       | React.ChangeEvent<HTMLSelectElement>
   ) => {
     const { name, value, type } = event.target;
-
-    if (name === "melody") {
-      if (!(event.target instanceof HTMLInputElement)) return;
-      const file = event.target.files?.[0];
-      console.log(file);
-      const reader = new FileReader();
-      reader.readAsDataURL(file!);
-      console.log(reader);
-      console.log(reader.result);
-      setMusicgenParams({
-        ...musicgenParams,
-        [name]: reader.result,
-      });
-      return;
-    }
-
     setMusicgenParams({
       ...musicgenParams,
       [name]:
@@ -117,10 +101,56 @@ const MusicgenPage = () => {
     });
   };
 
+  const useAsMelody = (melody?: string, metadata?: Result) => {
+    if (!melody) return;
+    setMusicgenParams({
+      ...musicgenParams,
+      melody,
+    });
+  };
+
+  const favorite = async (_url: string, data?: Result) => {
+    const history_bundle_name_data = data?.history_bundle_name_data;
+    if (!history_bundle_name_data) return;
+    const response = await fetch("/api/gradio/bark_favorite", {
+      method: "POST",
+      body: JSON.stringify({
+        history_bundle_name_data,
+      }),
+    });
+    const result = await response.json();
+    return result;
+  };
+
+  const useSeed = (_url: string, data?: Result) => {
+    const seed = data?.json.seed;
+    if (!seed) return;
+    setMusicgenParams({
+      ...musicgenParams,
+      seed: Number(seed),
+    });
+  };
+
+  const useParameters = (_url: string, data?: Result) => {
+    const params = data?.json;
+    if (!params) return;
+    setMusicgenParams({
+      ...musicgenParams,
+      ...params,
+      seed: Number(params.seed),
+      model:
+        Object.keys(modelNameMapping).find(
+          (key) => modelNameMapping[key] === params.model
+        ) || "Small",
+    });
+  };
+
+  const funcs = [useAsMelody, favorite, useSeed, useParameters];
+
   return (
     <Template>
       <Head>
-        <title>TTS Generation Webui - Musicgen</title>
+        <title>Musicgen - TTS Generation Webui</title>
       </Head>
       <div className="p-4">
         <div className="my-4">
@@ -159,28 +189,16 @@ const MusicgenPage = () => {
                   )}
                 </div>
               </div>
-
-              <label className="text-sm">Melody:</label>
-              <FileInput
-                callback={(file: File | undefined) => {
-                  const melody = file?.name || null;
-                  setMelody(file && URL.createObjectURL(file));
+              <AudioInput
+                url={musicgenParams.melody}
+                label="Melody"
+                callback={(file) => {
                   setMusicgenParams({
                     ...musicgenParams,
-                    melody,
+                    melody: file,
                   });
                 }}
-              />
-              {/* Preview melody */}
-              <AudioPlayer
-                height={100}
-                waveColor="#ffa500"
-                progressColor="#d59520"
-                url={melody}
-                volume={0.4}
-                barWidth={2}
-                barGap={1}
-                barRadius={2}
+                filter={["sendToMusicgen"]}
               />
             </div>
 
@@ -266,7 +284,7 @@ const MusicgenPage = () => {
                 onClick={() =>
                   setMusicgenParams({
                     ...musicgenParams,
-                    seed: lastSeed,
+                    seed: Number(data?.json.seed) || -1,
                   })
                 }
               >
@@ -297,55 +315,44 @@ const MusicgenPage = () => {
         </div>
 
         <div className="my-4 flex flex-col space-y-2">
-          <div>
-            <label className="text-sm">Output:</label>
-            <AudioPlayer
-              height={100}
-              waveColor="#ffa500"
-              progressColor="#d59520"
-              url={audioUrl}
-              volume={0.4}
-              barWidth={2}
-              barGap={1}
-              barRadius={2}
-            />
-          </div>
           <button
             className="border border-gray-300 p-2 rounded"
             onClick={musicgen}
           >
             Generate
           </button>
+          <AudioOutput
+            audioOutput={data?.audio}
+            label="Musicgen Output"
+            funcs={funcs}
+            metadata={data}
+            filter={["sendToMusicgen"]}
+          />
         </div>
 
-        {/* History */}
-        <div className="my-4">
+        <div className="flex flex-col space-y-2 border border-gray-300 p-2 rounded">
+          <label className="text-sm">History:</label>
+          {/* Clear history */}
+          <button
+            className="border border-gray-300 p-2 rounded"
+            onClick={() => {
+              setHistoryData([]);
+            }}
+          >
+            Clear History
+          </button>
           <div className="flex flex-col space-y-2">
-            <label className="text-sm">History:</label>
-            <div className="flex flex-col space-y-2">
-              {historyData &&
-                historyData.map((item, index) => (
-                  // <div key={index}>
-                  //   <audio src={item.data} controls></audio>
-                  // </div>
-                  <AudioPlayer
-                    height={100}
-                    waveColor="#ffa500"
-                    progressColor="#d59520"
-                    url={item.data}
-                    volume={0.4}
-                    // // Set a bar width
-                    // barWidth: 2,
-                    // // Optionally, specify the spacing between bars
-                    // barGap: 1,
-                    // // And the bar radius
-                    // barRadius: 2,
-                    barWidth={2}
-                    barGap={1}
-                    barRadius={2}
-                  />
-                ))}
-            </div>
+            {historyData &&
+              historyData.map((item, index) => (
+                <AudioOutput
+                  key={index}
+                  audioOutput={item.audio}
+                  metadata={item}
+                  label={item.history_bundle_name_data}
+                  funcs={funcs}
+                  filter={["sendToMusicgen"]}
+                />
+              ))}
           </div>
         </div>
       </div>

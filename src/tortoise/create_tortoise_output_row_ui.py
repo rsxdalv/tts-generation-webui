@@ -32,8 +32,15 @@ def create_tortoise_output_row_ui(index):
                 )
             )
             save_button = gr.Button("Save to favorites", visible=False)
-        seed = gr.State()  # type: ignore
-        bundle_name = gr.State()  # type: ignore
+        seed = gr.Textbox(
+            visible=False,
+        )
+        bundle_name = gr.Textbox(
+            visible=False,
+        )
+        params = gr.JSON(
+            visible=False,
+        )
 
         save_button.click(
             fn=save_to_favorites,
@@ -42,7 +49,7 @@ def create_tortoise_output_row_ui(index):
         )
 
         return (
-            TortoiseOutputRow(audio, image, save_button, seed, bundle_name).to_list(),
+            TortoiseOutputRow(audio, image, save_button, seed, bundle_name, params).to_list(),
             col,
             seed,
         )

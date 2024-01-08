@@ -78,6 +78,67 @@ def run_rvc(
     )
 
 
+def run_rvc_api(
+    f0up_key: str,
+    original_audio_path: str,
+    # index_path: str,
+    index_path_api: str,
+    f0method: str,
+    # model_path: str,
+    model_path_api: str,
+    index_rate: float,
+    device: str,
+    is_half: bool,
+    filter_radius: int,
+    resample_sr: int,
+    rms_mix_rate: float,
+    protect: float,
+):
+    infer_batch_rvc.set_params_temp(
+        _device=device,
+        _is_half=is_half,
+        _filter_radius=filter_radius,
+        _resample_sr=resample_sr,
+        _rms_mix_rate=rms_mix_rate,
+        _protect=protect,
+    )
+
+    from rvc_beta.infer_batch_rvc import config
+
+    if device == "cpu":  # Workaround for "slow_conv2d_cpu" not implemented for 'Half'
+        config.is_half = is_half
+
+    if infer_batch_rvc.hubert_model is None:
+        get_and_load_hubert()
+
+    opt_path = "./outputs-rvc/"
+
+    index_path = get_rvc_local_path(index_path_api, "index")
+    model_path = get_rvc_local_path(model_path_api, "pth")
+
+    return infer_rvc(
+        f0method=f0method,
+        f0up_key=f0up_key,
+        input_path=original_audio_path,
+        index_path=index_path,
+        index_rate=index_rate,
+        model_path=model_path,
+        opt_path=opt_path,
+    ), {
+        "original_audio_path": original_audio_path,
+        "index_path": index_path_api,
+        "model_path": model_path_api,
+        "f0method": f0method,
+        "f0up_key": f0up_key,
+        "index_rate": index_rate,
+        "device": device,
+        "is_half": is_half,
+        "filter_radius": filter_radius,
+        "resample_sr": resample_sr,
+        "rms_mix_rate": rms_mix_rate,
+        "protect": protect,
+    }
+
 RVC_LOCAL_MODELS_DIR = get_path_from_root("data", "models", "rvc", "checkpoints")
 
 
@@ -122,12 +183,15 @@ def rvc_ui_model_or_index_path_ui(label: str):
                 show_label=False,
                 container=False,
             )
-            gr_open_button_simple(RVC_LOCAL_MODELS_DIR)
+            gr_open_button_simple(
+                RVC_LOCAL_MODELS_DIR, api_name=f"rvc_{label.lower()}_open"
+            )
             gr_reload_button().click(
                 lambda: file_path_dropdown.update(
                     choices=get_list_fn(),
                 ),
                 outputs=[file_path_dropdown],
+                api_name=f"rvc_{label.lower()}_reload",
             )
     gr.Markdown(
         """
@@ -162,10 +226,11 @@ def rvc_ui_model_or_index_path_ui(label: str):
         inputs=[file_path_file],
         outputs=[file_path, file_path_dropdown],
     )
+
     file_path_dropdown.change(
         lambda model: [
             file_path.update(
-                value=os.path.join(RVC_LOCAL_MODELS_DIR, f"{model}{extension}")
+                value=get_rvc_local_path(model, file_type)
             ),
             file_path_file.update(value=None),
         ]
@@ -179,6 +244,8 @@ def rvc_ui_model_or_index_path_ui(label: str):
     )
     return file_path
 
+def get_rvc_local_path(path: str, file_type: str):
+    return os.path.join(RVC_LOCAL_MODELS_DIR, f"{path}.{file_type}")
 
 def rvc_ui():
     gr.Markdown("# RVC Beta Demo")
@@ -200,10 +267,18 @@ def rvc_ui():
                     value="harvest",
                 )
                 index_rate = gr.Slider(
-                    minimum=0.0, maximum=1.0, step=0.01, value=0.66, label="Search Feature Ratio"
+                    minimum=0.0,
+                    maximum=1.0,
+                    step=0.01,
+                    value=0.66,
+                    label="Search Feature Ratio",
                 )
                 filter_radius = gr.Slider(
-                    minimum=0, maximum=10, step=1, value=3, label="Filter Radius (Pitch)"
+                    minimum=0,
+                    maximum=10,
+                    step=1,
+                    value=3,
+                    label="Filter Radius (Pitch)",
                 )
             with gr.Row():
                 resample_sr = gr.Slider(
@@ -214,10 +289,18 @@ def rvc_ui():
                     label="Resample Sample-rate (Bug)",
                 )
                 rms_mix_rate = gr.Slider(
-                    minimum=0.0, maximum=1.0, step=0.01, value=1, label="Voice Envelope Normalizaiton"
+                    minimum=0.0,
+                    maximum=1.0,
+                    step=0.01,
+                    value=1,
+                    label="Voice Envelope Normalizaiton",
                 )
                 protect = gr.Slider(
-                    minimum=0.0, maximum=0.5, step=0.01, value=0.33, label="Protect Breath Sounds"
+                    minimum=0.0,
+                    maximum=0.5,
+                    step=0.01,
+                    value=0.33,
+                    label="Protect Breath Sounds",
                 )
             with gr.Group():
                 gr.Markdown("### Hubert")
@@ -263,6 +346,50 @@ def rvc_ui():
                 protect,
             ],
             outputs=result,
+            api_name="rvc",
+        )
+
+        model_path_api = gr.Textbox(
+            label="Model Path",
+            value="",
+            visible=False,
+        )
+
+        index_path_api = gr.Textbox(
+            label="Index Path",
+            value="",
+            visible=False,
+        )
+
+        metadata = gr.JSON(
+            label="Metadata",
+            visible=False,
+        )
+
+        gr.Button(
+            visible=False,
+            label="Convert (API)",
+        ).click(
+            run_rvc_api,
+            inputs=[
+                f0up_key,
+                original_audio,
+                index_path_api,
+                f0method,
+                model_path_api,
+                index_rate,
+                device,
+                is_half,
+                filter_radius,
+                resample_sr,
+                rms_mix_rate,
+                protect,
+            ],
+            outputs=[
+                result,
+                metadata,
+            ],
+            api_name="rvc_api",
         )
 
     return original_audio

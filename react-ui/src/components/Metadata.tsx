@@ -4,7 +4,7 @@ import React from "react";
 import { MUIIcon } from "./mini/MUIIcon";
 import { GenerationRaw } from "../types/Generation";
 
-const Row = ({
+export const Row = ({
   label,
   value,
 }: {

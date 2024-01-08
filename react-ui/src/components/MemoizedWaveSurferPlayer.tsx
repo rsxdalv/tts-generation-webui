@@ -59,7 +59,10 @@ const WaveSurferPlayerRaw = (props) => {
 // memoize the player component
 export const MemoizedWaveSurferPlayer = React.memo(WaveSurferPlayerRaw);
 export const AudioPlayer = (
-  props: Omit<WaveSurferOptions, "container"> & { volume: number }
+  props: Omit<WaveSurferOptions, "container"> & {
+    volume: number;
+    // sendAudioTo: (audio: string | undefined) => void;
+  }
 ) => {
   const [plugins, setPlugins] = useState<any[]>([]);
   useEffect(() => {
@@ -67,9 +70,5 @@ export const AudioPlayer = (
     setPlugins([timeline_plugin]);
   }, []);
 
-  return (
-    <div className="">
-      <MemoizedWaveSurferPlayer {...props} plugins={plugins} />
-    </div>
-  );
+  return <MemoizedWaveSurferPlayer {...props} plugins={plugins} />;
 };
