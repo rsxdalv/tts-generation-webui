@@ -514,6 +514,99 @@ async function open_folder({ folder }) {
   return result;
 }
 
+// save_environment_variables_bark
+
+async function save_environment_variables_bark({
+  use_small_models,
+  enable_mps,
+  offload_gpu_models_to_cpu,
+}) {
+  const app = await getClient();
+
+  const result = (await app.predict("/save_environment_variables_bark", [
+    use_small_models, // boolean  in 'Use small models' Checkbox component
+    enable_mps, // boolean  in 'Enable MPS' Checkbox component
+    offload_gpu_models_to_cpu, // boolean  in 'Offload GPU models to CPU' Checkbox component
+  ])) as {
+    data: [];
+  };
+
+  return result?.data;
+}
+
+// save_config_bark
+
+async function save_config_bark({
+  text_generation_use_gpu,
+  text_generation_use_small_model,
+  coarse_to_fine_inference_use_gpu,
+  coarse_to_fine_inference_use_small_model,
+  fine_tuning_use_gpu,
+  fine_tuning_use_small_model,
+  use_gpu_codec,
+  load_models_on_startup,
+}) {
+  const app = await getClient();
+
+  const result = (await app.predict("/save_config_bark", [
+    text_generation_use_gpu, // boolean  in 'Use GPU' Checkbox component
+    text_generation_use_small_model, // boolean  in 'Use small model' Checkbox component
+    coarse_to_fine_inference_use_gpu, // boolean  in 'Use GPU' Checkbox component
+    coarse_to_fine_inference_use_small_model, // boolean  in 'Use small model' Checkbox component
+    fine_tuning_use_gpu, // boolean  in 'Use GPU' Checkbox component
+    fine_tuning_use_small_model, // boolean  in 'Use small model' Checkbox component
+    use_gpu_codec, // boolean  in 'Use GPU for codec' Checkbox component
+    load_models_on_startup, // boolean  in 'Load Bark models on startup' Checkbox component
+  ])) as {
+    data: [
+      string // string representing output in 'value_1541' Markdown component
+    ];
+  };
+
+  return result?.data[0];
+}
+
+// get_config_bark
+
+async function get_config_bark() {
+  const app = await getClient();
+
+  const result = (await app.predict("/get_config_bark", [])) as {
+    data: [
+      { value: boolean }, // boolean representing output in 'Use GPU' Checkbox component
+      { value: boolean }, // boolean representing output in 'Use small model' Checkbox component
+      { value: boolean }, // boolean representing output in 'Use GPU' Checkbox component
+      { value: boolean }, // boolean representing output in 'Use small model' Checkbox component
+      { value: boolean }, // boolean representing output in 'Use GPU' Checkbox component
+      { value: boolean }, // boolean representing output in 'Use small model' Checkbox component
+      { value: boolean }, // boolean representing output in 'Use GPU for codec' Checkbox component
+      { value: boolean } // boolean representing output in 'Load Bark models on startup' Checkbox component
+    ];
+  };
+
+  const [
+    { value: text_generation_use_gpu },
+    { value: text_generation_use_small_model },
+    { value: coarse_to_fine_inference_use_gpu },
+    { value: coarse_to_fine_inference_use_small_model },
+    { value: fine_tuning_use_gpu },
+    { value: fine_tuning_use_small_model },
+    { value: use_gpu_codec },
+    { value: load_models_on_startup },
+  ] = result?.data;
+
+  return {
+    text_generation_use_gpu,
+    text_generation_use_small_model,
+    coarse_to_fine_inference_use_gpu,
+    coarse_to_fine_inference_use_small_model,
+    fine_tuning_use_gpu,
+    fine_tuning_use_small_model,
+    use_gpu_codec,
+    load_models_on_startup,
+  };
+}
+
 const endpoints = {
   demucs,
   musicgen,
@@ -539,4 +632,8 @@ const endpoints = {
   rvc_index_open,
   save_to_voices,
   open_folder,
+
+  save_environment_variables_bark,
+  save_config_bark,
+  get_config_bark,
 };

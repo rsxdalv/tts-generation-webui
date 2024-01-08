@@ -51,6 +51,10 @@ const routes = [
     href: "/voices",
     text: "Bark Voices",
   },
+  {
+    href: "/bark_settings",
+    text: "Bark Settings",
+  },
   // {
   //   href: "/history/collections",
   //   text: "History Collections",
