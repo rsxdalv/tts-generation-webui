@@ -40,6 +40,14 @@ https://rsxdalv.github.io/bark-speaker-directory/
 https://github.com/rsxdalv/tts-generation-webui/discussions/186#discussioncomment-7291274
 
 ## Changelog
+Jan 9:
+* React UI
+  * Fix 404 handler for Wavesurfer
+  * Group Bark tabs together
+
+Jan 8:
+* Release React UI
+
 Oct 26:
 * Improve model selection UX for Musicgen
 

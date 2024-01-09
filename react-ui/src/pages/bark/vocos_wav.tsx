@@ -1,10 +1,10 @@
 import React from "react";
-import { Template } from "../components/Template";
-import useLocalStorage from "../hooks/useLocalStorage";
-import { AudioInput, AudioOutput } from "../components/AudioComponents";
+import { Template } from "../../components/Template";
+import useLocalStorage from "../../hooks/useLocalStorage";
+import { AudioInput, AudioOutput } from "../../components/AudioComponents";
 import Head from "next/head";
-import { VocosParams, vocosId, initialState } from "../tabs/VocosParams";
-import { GradioFile } from "../types/GradioFile";
+import { VocosParams, vocosId, initialState } from "../../tabs/VocosParams";
+import { GradioFile } from "../../types/GradioFile";
 
 type TypedGradioFile = GradioFile & {
   type_name?: string;
@@ -50,7 +50,7 @@ const VocosPage = () => {
       <Head>
         <title>Vocos - TTS Generation Webui</title>
       </Head>
-      <div className="flex space-x-4">
+      <div className="flex space-x-4 p-4">
         <div className="flex flex-col space-y-2">
           <AudioInput
             url={vocosParams?.audio}
