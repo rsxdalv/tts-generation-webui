@@ -17,9 +17,10 @@ Google Colab demo: [![Open In Colab](https://colab.research.google.com/assets/co
 
 ## Screenshots
 
-|      ![musicgen](./screenshots/v2/musicgen.png)       |    ![rvc](./screenshots/v2/rvc.png)     | ![history](./screenshots/v2/history.jpg) |
-| :---------------------------------------------------: | :---------------------------------------------------: | :--------------------------------------: |
-| ![Screenshot 1](<./screenshots/screenshot%20(1).png>) | ![Screenshot 5](<./screenshots/screenshot%20(5).png>) | ![cloning](./screenshots/v2/cloning.png) |
+|  ![react](./screenshots/v2/react.png)  | ![musicgen](./screenshots/v2/musicgen.png) | ![rvc](./screenshots/v2/rvc.png) |
+| :-----------------------------------------: | :-----------------------------------------: | :-------------------------------: |
+| ![history](./screenshots/v2/history.jpg) | ![Screenshot 1](<./screenshots/screenshot%20(1).png>) | ![Screenshot 5](<./screenshots/screenshot%20(5).png>) |
+
 
 ## Examples
 
