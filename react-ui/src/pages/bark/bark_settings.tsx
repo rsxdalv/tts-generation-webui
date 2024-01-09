@@ -1,12 +1,12 @@
 import React from "react";
-import { Template } from "../components/Template";
+import { Template } from "../../components/Template";
 import Head from "next/head";
-import useLocalStorage from "../hooks/useLocalStorage";
+import useLocalStorage from "../../hooks/useLocalStorage";
 import {
   BarkSettingsParams,
   initialBarkSettingsParams,
   barkSettingsId,
-} from "../tabs/BarkSettingsParams";
+} from "../../tabs/BarkSettingsParams";
 
 type Result = string;
 

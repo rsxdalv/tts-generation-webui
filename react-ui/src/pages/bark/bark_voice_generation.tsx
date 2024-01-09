@@ -1,14 +1,14 @@
 import React from "react";
-import { Template } from "../components/Template";
-import useLocalStorage from "../hooks/useLocalStorage";
-import { AudioInput, AudioOutput } from "../components/AudioComponents";
+import { Template } from "../../components/Template";
+import useLocalStorage from "../../hooks/useLocalStorage";
+import { AudioInput, AudioOutput } from "../../components/AudioComponents";
 import Head from "next/head";
 import {
   BarkVoiceGenerationParams,
   barkVoiceGenerationId,
   initialState,
-} from "../tabs/BarkVoiceGenerationParams";
-import { GradioFile } from "../types/GradioFile";
+} from "../../tabs/BarkVoiceGenerationParams";
+import { GradioFile } from "../../types/GradioFile";
 
 type Result = {
   filename: string;

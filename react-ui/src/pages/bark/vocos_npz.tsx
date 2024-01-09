@@ -1,15 +1,15 @@
 import React from "react";
-import { Template } from "../components/Template";
-import useLocalStorage from "../hooks/useLocalStorage";
-import { AudioInput, AudioOutput } from "../components/AudioComponents";
+import { Template } from "../../components/Template";
+import useLocalStorage from "../../hooks/useLocalStorage";
+import { AudioInput, AudioOutput } from "../../components/AudioComponents";
 import Head from "next/head";
 import {
   VocosParamsNPZ,
   vocosIdNPZ,
   initialState,
-} from "../tabs/VocosParamsNPZ";
-import { GradioFile } from "../types/GradioFile";
-import FileInput from "../components/FileInput";
+} from "../../tabs/VocosParamsNPZ";
+import { GradioFile } from "../../types/GradioFile";
+import FileInput from "../../components/FileInput";
 
 const VocosPageNPZ = () => {
   const [data, setData] = useLocalStorage<GradioFile[] | null>(
@@ -50,7 +50,7 @@ const VocosPageNPZ = () => {
       <Head>
         <title>Vocos - TTS Generation Webui</title>
       </Head>
-      <div className="flex space-x-4">
+      <div className="flex space-x-4 p-4">
         <div className="flex flex-col space-y-2">
           <FileInput
             accept=".npz"

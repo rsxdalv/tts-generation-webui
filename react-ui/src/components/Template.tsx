@@ -9,7 +9,7 @@ export const Template = ({ children }: { children: React.ReactNode }) => (
     <LocalVotesProvider>
       <VotesProvider>
         <main
-          className={`flex min-h-screen flex-col items-center justify-between p-12 gap-y-4 ${inter.className}`}
+          className={`flex min-h-screen flex-col items-center justify-start p-12 gap-y-2 ${inter.className}`}
         >
           <Header />
           {children}

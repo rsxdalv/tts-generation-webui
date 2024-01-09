@@ -1,11 +1,11 @@
 import { Inter } from "next/font/google";
 import React from "react";
 
-import { getNpzDataSimpleVoices } from "../data/getVoicesData";
-import { Template } from "../components/Template";
+import { getNpzDataSimpleVoices } from "../../data/getVoicesData";
+import { Template } from "../../components/Template";
 import Head from "next/head";
-import { NPZ } from "../types/npz";
-import { CardVoiceNpz } from "../components/CardBig";
+import { NPZ } from "../../types/npz";
+import { CardVoiceNpz } from "../../components/CardBig";
 
 export const inter = Inter({ subsets: ["latin"] });
 
