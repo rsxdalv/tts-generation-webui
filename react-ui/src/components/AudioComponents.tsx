@@ -137,7 +137,8 @@ const DownloadButton = ({ url }: { url?: string }) => {
         .then((blob) => {
           const blobURL = URL.createObjectURL(blob);
           setDownloadURL(blobURL);
-        });
+        })
+        .catch((e) => console.log("=== Error downloading", e));
     };
     download(url);
   }, [url]);
