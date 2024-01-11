@@ -92,10 +92,10 @@ const routes: Route[] = [
   //   href: "/history/collections",
   //   text: "History Collections",
   // },
-  {
-    href: "/generations",
-    text: "Generations View (Beta)",
-  },
+  // {
+  //   href: "/generations",
+  //   text: "Generations View (Beta)",
+  // },
   // {
   //   href: "/voice-drafts",
   //   text: "Voice Tree",

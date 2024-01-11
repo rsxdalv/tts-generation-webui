@@ -41,6 +41,9 @@ https://rsxdalv.github.io/bark-speaker-directory/
 https://github.com/rsxdalv/tts-generation-webui/discussions/186#discussioncomment-7291274
 
 ## Changelog
+Jan 11:
+* React UI: Make the build work without any errors
+
 Jan 9:
 * React UI
   * Fix 404 handler for Wavesurfer

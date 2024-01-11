@@ -32,7 +32,7 @@ const BarkSettingsPage = () => {
       }
     };
     fetchData();
-  }, []);
+  }, [setBarkSettingsParams]);
 
   const handleChange = async ( 
     event:
