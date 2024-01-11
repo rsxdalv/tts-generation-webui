@@ -33,7 +33,8 @@ export default function Home({
 }
 
 export const getStaticProps = async () => {
-  const generations: GenerationRaw[] = await getOggData();
+  // const generations: GenerationRaw[] = await getOggData();
+  const generations: GenerationRaw[] = [];
   return {
     props: {
       generations: generations,

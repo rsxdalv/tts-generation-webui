@@ -23,7 +23,7 @@ import { GenerationRaw } from "../types/Generation";
 import { parseMetadataDate } from "./parseMetadataDate";
 import { Metadata, Row } from "./Metadata";
 import { sendToBarkAsVoice } from "../tabs/BarkGenerationParams";
-import { NPZ } from "../types/NPZ";
+import { NPZ, NPZOptional } from "../types/NPZ";
 
 const ActionButton = ({
   icon,
@@ -73,6 +73,7 @@ export const CardBig = ({
             src={image}
             width={96}
             height={96}
+            alt="voice"
           />
           <Tags tags={tags} />
         </div>
@@ -160,7 +161,7 @@ export const CardGeneration = ({
               <Row label="Language" value={language} />
               <Row label="History Hash" value={history_hash} />
               {Object.entries(rest).map(([key, value]) => (
-                <Row label={key} value={value} />
+                <Row key={key} label={key} value={value} />
               ))}
             </div>
           </div>
@@ -429,29 +430,24 @@ const TortoiseMetadata = ({
   );
 };
 
-export const CardVoiceNpz = ({
-  generation: { prompt, language, history_hash, filename, date, url, ...rest },
-}: {
-  generation: NPZ;
-}) => {
+type FullNPZ = NPZ & NPZOptional;
+
+function isFullNPZ(generation: NPZ): generation is FullNPZ {
+  return (generation as FullNPZ).prompt !== undefined;
+}
+
+export const CardVoiceNpz = ({ generation }: { generation: NPZ }) => {
+  const { filename, date, url } = generation;
   const image = url.replace(".npz", ".png");
 
   const Extra = () => {
-    if (!prompt) return <></>;
-    const isJapanese = prompt.match(/[\u3040-\u309F\u30A0-\u30FF]/);
-    const maxLength = isJapanese ? 30 : 50;
-    // const maxLength = 100000;
+    if (!isFullNPZ(generation)) return <></>;
     return (
       <div className="flex flex-col gap-y-2 w-full h-full justify-between">
         <div className="flex w-full justify-between">
-          <p className="text-gray-500">{prettifyDate(date)}</p>
+          <p className="text-gray-500">{prettifyDate(date!)}</p>
         </div>
-        <Metadata
-          prompt={prompt}
-          language={language || "unknown"}
-          history_hash={history_hash}
-          {...rest}
-        />
+        <Metadata {...generation} />
       </div>
     );
   };
@@ -480,6 +476,7 @@ export const CardVoiceNpz = ({
           src={image}
           width={96}
           height={96}
+          alt="voice"
           onError={(e) => {
             const target = e.target as HTMLImageElement;
             target.onerror = null;
@@ -522,6 +519,7 @@ export const SectionVoice = ({
   children: React.ReactNode;
 }) => {
   // Detect if prompt is Japanese
+  if (!prompt) return <></>;
   const isJapanese = prompt.match(/[\u3040-\u309F\u30A0-\u30FF]/);
   const maxLength = isJapanese ? 30 : 50;
   const promptText =
@@ -671,7 +669,8 @@ const AudioPlayer = ({ audio }: Pick<Voice, "audio">) => {
     return () => {
       audio.removeEventListener("ended", handleEnded);
     };
-  }, [audioRef.current]);
+  // }, [audioRef.current]);
+  }, []); // because it's a ref, it doesn't need to be in the dependency array
 
   return (
     <div className="flex items-center">
@@ -742,6 +741,7 @@ const Gender = ({ gender }: Pick<Voice, "gender">) => {
         src={iconData.src}
         width={iconData.width}
         height={iconData.height}
+        alt="gender"
       />
     </button>
   );

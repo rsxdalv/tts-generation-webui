@@ -12,11 +12,11 @@ import { GradioFile } from "../../types/GradioFile";
 import FileInput from "../../components/FileInput";
 
 const VocosPageNPZ = () => {
-  const [data, setData] = useLocalStorage<GradioFile[] | null>(
+  const [data, setData] = useLocalStorage<GradioFile | null>(
     "vocosOutputNpz",
     null
   );
-  const [dataEncodec, setDataEncodec] = useLocalStorage<GradioFile[] | null>(
+  const [dataEncodec, setDataEncodec] = useLocalStorage<GradioFile | null>(
     "vocosOutputNpzEncodec",
     null
   );
@@ -77,8 +77,10 @@ const VocosPageNPZ = () => {
           </button>
         </div>
         <div className="flex flex-col space-y-4">
-          <AudioOutput audioOutput={data} label="Vocos Output" />
-          <AudioOutput audioOutput={dataEncodec} label="Encodec Output" />
+          {data && <AudioOutput audioOutput={data} label="Vocos Output" />}
+          {dataEncodec && (
+            <AudioOutput audioOutput={dataEncodec} label="Encodec Output" />
+          )}
         </div>
       </div>
     </Template>

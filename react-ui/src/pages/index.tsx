@@ -25,7 +25,7 @@ export default function Home({ voices }: { voices: Voice[] }) {
         </p>
         <p className="text-xl">
           You can also listen to some of the voices that have been generated
-          using the "Favorites" button.
+          using the &quot;Favorites&quot; button.
         </p>
       </div>
     </Template>

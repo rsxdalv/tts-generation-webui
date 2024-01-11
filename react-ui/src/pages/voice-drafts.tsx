@@ -2,7 +2,6 @@ import { Inter } from "next/font/google";
 import React from "react";
 
 import { CardEmpty, CardGeneration, SectionVoice } from "../components/CardBig";
-import { Voice } from "../types/Voice";
 import { getNpzData, getOggData } from "../data/getVoicesData";
 import { GenerationRaw } from "../types/Generation";
 import { Template } from "../components/Template";
@@ -50,8 +49,10 @@ export default function Home({
 }
 
 export const getStaticProps = async () => {
-  const generations: GenerationRaw[] = await getOggData();
-  const npzData = await getNpzData();
+  // const generations: GenerationRaw[] = await getOggData();
+  const generations: GenerationRaw[] = [];
+  // const npzData = await getNpzData();
+  const npzData = [];
   return {
     props: {
       generations: generations,

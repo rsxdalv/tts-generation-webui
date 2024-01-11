@@ -1,5 +1,5 @@
 import React from "react";
-import { GradioFile } from "./api/demucs_musicgen";
+import { GradioFile } from "../types/GradioFile";
 
 export const GradioFileInfo = ({ audioOutput }: { audioOutput: GradioFile; }) => (
   <div className="border border-gray-300 p-2 rounded">

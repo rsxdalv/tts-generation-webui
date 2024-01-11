@@ -6,12 +6,8 @@ import Head from "next/head";
 import { VocosParams, vocosId, initialState } from "../../tabs/VocosParams";
 import { GradioFile } from "../../types/GradioFile";
 
-type TypedGradioFile = GradioFile & {
-  type_name?: string;
-};
-
 const VocosPage = () => {
-  const [data, setData] = useLocalStorage<TypedGradioFile[] | null>(
+  const [data, setData] = useLocalStorage<GradioFile | null>(
     "vocosOutput",
     null
   );
@@ -93,12 +89,14 @@ const VocosPage = () => {
           </button>
         </div>
         <div className="flex flex-col space-y-4">
-          <AudioOutput
-            audioOutput={data}
-            label="Vocos Output"
-            funcs={[useAsInput]}
-            filter={["sendToVocos"]}
-          />
+          {data && (
+            <AudioOutput
+              audioOutput={data}
+              label="Vocos Output"
+              funcs={[useAsInput]}
+              filter={["sendToVocos"]}
+            />
+          )}
         </div>
       </div>
     </Template>

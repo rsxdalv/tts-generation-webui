@@ -4,7 +4,7 @@ import Timeline from "wavesurfer.js/dist/plugins/timeline";
 import { WaveSurferOptions } from "wavesurfer.js";
 
 const WaveSurferPlayerRaw = (props) => {
-  const containerRef = useRef();
+  const containerRef = useRef<HTMLDivElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const wavesurfer = useWavesurfer(containerRef, props);
@@ -36,7 +36,7 @@ const WaveSurferPlayerRaw = (props) => {
     return () => {
       subscriptions.forEach((unsub) => unsub());
     };
-  }, [wavesurfer]);
+  }, [wavesurfer]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // const { volume } = props;
   // useEffect(() => {
