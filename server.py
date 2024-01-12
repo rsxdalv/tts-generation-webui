@@ -35,7 +35,7 @@ with gr.Blocks(
     title="TTS Generation WebUI",
     analytics_enabled=False,  # it broke too many times
 ) as demo:
-    gr.Markdown("# TTS Generation WebUI (Bark, MusicGen + AudioGen, Tortoise, RVC)")
+    gr.Markdown("# TTS Generation WebUI (Bark, MusicGen + AudioGen, Tortoise, RVC) [NEW React UI (Beta)](http://localhost:3000)")
     with Joutai.singleton.tabs:
         from src.tortoise.generation_tab_tortoise import generation_tab_tortoise
         from src.settings_tab_gradio import settings_tab_gradio
@@ -156,5 +156,8 @@ def start_server():
     ).launch(**gradio_interface_options)
 
 
+
 if __name__ == "__main__":
+    import subprocess
+    subprocess.Popen("npm start --prefix react-ui", shell=True)
     start_server()
