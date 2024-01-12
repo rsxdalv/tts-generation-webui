@@ -88,7 +88,11 @@ def history_content(
                 button_output = gr.Button(
                     value=f"Open {show_collections and 'collection' or directory} folder"
                 )
-            button_output.click(lambda x: open_folder(x), inputs=[directory_dropdown], api_name="open_folder")
+            button_output.click(
+                lambda x: open_folder(x),
+                inputs=[directory_dropdown],
+                api_name=directory == "favorites" and "open_folder" or None,
+            )
 
             datatypes = ["date", "str", "str", "str"]
             # headers = ["Date and Time", directory.capitalize(), "When", "Filename"]
@@ -145,8 +149,10 @@ def history_content(
                 )
 
                 save_to_voices.click(
-                    fn=save_to_voices_cb, inputs=history_npz, outputs=save_to_voices,
-                    api_name="save_to_voices"
+                    fn=save_to_voices_cb,
+                    inputs=history_npz,
+                    outputs=save_to_voices,
+                    api_name=directory == "favorites" and "save_to_voices" or None,
                 )
 
             save_to_collection_ui(
@@ -229,7 +235,7 @@ def history_content(
     ).click(
         fn=delete_generation,
         inputs=[history_bundle_name_data],
-        api_name="delete_generation",
+        api_name=directory == "favorites" and "delete_generation" or None,
     )
     history_tab.select(
         fn=update_history_tab,
