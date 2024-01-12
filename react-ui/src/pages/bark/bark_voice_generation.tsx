@@ -148,7 +148,7 @@ const BarkVoiceGenerationPage = () => {
           <AudioOutput
             audioOutput={data?.preview}
             label="Encodec audio preview"
-            funcs={[useAsInput]}
+            funcs={{ useAsInput }}
             filter={["sendToBarkVoiceGeneration"]}
           />
         </div>

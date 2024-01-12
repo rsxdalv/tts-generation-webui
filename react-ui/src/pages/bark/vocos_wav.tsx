@@ -93,7 +93,7 @@ const VocosPage = () => {
             <AudioOutput
               audioOutput={data}
               label="Vocos Output"
-              funcs={[useAsInput]}
+              funcs={{ useAsInput }}
               filter={["sendToVocos"]}
             />
           )}

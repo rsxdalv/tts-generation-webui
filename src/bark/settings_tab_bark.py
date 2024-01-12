@@ -93,10 +93,11 @@ def settings_tab_bark() -> None:
                 environment_suno_offload_cpu,
             ):
                 from bark import generation
+
                 generation.USE_SMALL_MODELS = environment_suno_use_small_models
                 generation.GLOBAL_ENABLE_MPS = environment_suno_enable_mps
                 generation.OFFLOAD_CPU = environment_suno_offload_cpu
-                
+
                 os.environ["SUNO_USE_SMALL_MODELS"] = str(
                     environment_suno_use_small_models
                 )
@@ -119,12 +120,15 @@ def settings_tab_bark() -> None:
             ]
 
             for i in env_inputs:
-                i.change(fn=save_environment_variables, inputs=env_inputs,
-                         api_name="save_environment_variables_bark")
+                i.change(
+                    fn=save_environment_variables,
+                    inputs=env_inputs,
+                    api_name=i == env_inputs[0]
+                    and "save_environment_variables_bark"
+                    or None,
+                )
 
             # refresh environment variables button
-
-
 
             inputs = [
                 text_use_gpu,
@@ -138,8 +142,12 @@ def settings_tab_bark() -> None:
             ]
 
             for i in inputs:
-                i.change(fn=save_config_bark, inputs=inputs, outputs=[save_beacon],
-                         api_name="save_config_bark")
+                i.change(
+                    fn=save_config_bark,
+                    inputs=inputs,
+                    outputs=[save_beacon],
+                    api_name=i == inputs[0] and "save_config_bark" or None,
+                )
 
             def sync_ui():
                 def checkbox_update_helper(key: str):
@@ -156,8 +164,7 @@ def settings_tab_bark() -> None:
                     gr.Checkbox.update(value=config["load_models_on_startup"]),
                 ]
 
-            settings_tab.select(fn=sync_ui, outputs=inputs,
-                                api_name="get_config_bark")
+            settings_tab.select(fn=sync_ui, outputs=inputs, api_name="get_config_bark")
 
             def set_to_reload():
                 return gr.Button.update(value="Loading...", interactive=False)

@@ -145,7 +145,14 @@ const MusicgenPage = () => {
     });
   };
 
-  const funcs = [useAsMelody, favorite, useSeed, useParameters];
+  // const funcs = [useAsMelody, favorite, useSeed, useParameters];
+  const funcs = {
+    // prevent minification
+    useAsMelody,
+    favorite,
+    useSeed,
+    useParameters,
+  }
 
   return (
     <Template>

@@ -140,13 +140,13 @@ const BarkGenerationPage = () => {
     });
   };
 
-  const funcs = [
+  const funcs = {
     useAsHistory,
     useAsHistoryPromptSemantic,
     useSeed,
     favorite,
     useParametersTest,
-  ];
+  };
 
   const handleChange = (
     event:
