@@ -17,7 +17,7 @@ export const AudioInput = ({
   metadata,
 }: {
   callback: (melody?: string) => void;
-  funcs?: Array<(audio: string | undefined | any) => void>;
+  funcs?: Record<string, (audio: string | undefined | any) => void>;
   url?: string;
   label?: string;
   filter?: string[];
@@ -38,13 +38,13 @@ export const AudioInput = ({
 export const AudioOutput = ({
   audioOutput,
   label,
-  funcs: sendAudioTo,
+  funcs,
   filter,
   metadata,
 }: {
   audioOutput?: GradioFile;
   label: string;
-  funcs?: Array<(audio: string | undefined | any) => void>;
+  funcs?: Record<string, (audio: string | undefined | any) => void>;
   filter?: string[];
   metadata?: any;
 }) => {
@@ -54,7 +54,7 @@ export const AudioOutput = ({
       {audioOutput && (
         <AudioPlayerHelper
           url={audioOutput.data}
-          funcs={sendAudioTo}
+          funcs={funcs}
           filter={filter}
           metadata={metadata}
         />
@@ -78,7 +78,8 @@ const AudioPlayerHelper = (
     filter?: string[];
     // sendAudioTo?: Array<(audio: string | undefined) => void>;
     metadata?: any;
-    funcs?: Array<(metadata: string | any) => void>;
+    // funcs?: Array<(metadata: string | any) => void>;
+    funcs?: Record<string, (audio: string | undefined | any) => void>;
   }
 ) => {
   const { filter: outputFilters, funcs, url, volume, metadata } = props;
@@ -95,14 +96,17 @@ const AudioPlayerHelper = (
         url={url}
       />
       <div className="mt-2 flex flex-wrap gap-1">
-        {funcs?.map((func) => (
-          <FuncButton
-            key={func.name}
-            func={func}
-            url={url}
-            metadata={metadata}
-          />
-        ))}
+        {funcs &&
+          Object.entries(funcs).map(([funcName, func]) => (
+            <FuncButton
+              key={funcName}
+              name={funcName}
+              func={func}
+              url={url}
+              metadata={metadata}
+            />
+          ))}
+
         {listOfFuncs
           .filter((funcName) =>
             outputFilters ? !outputFilters.includes(funcName) : true
@@ -110,6 +114,7 @@ const AudioPlayerHelper = (
           .map((funcName) => (
             <FuncButton
               key={funcName}
+              name={funcName}
               func={sendToFuncs[funcName]}
               url={url}
               metadata={metadata}
@@ -156,10 +161,12 @@ const DownloadButton = ({ url }: { url?: string }) => {
 
 const FuncButton = ({
   func,
+  name,
   url,
   metadata,
 }: {
   func: (audio: string | undefined | any, metadata?: any) => void;
+  name: string;
   url: string | undefined | any;
   metadata?: any;
 }) => (
@@ -167,8 +174,6 @@ const FuncButton = ({
     className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-2 rounded text-sm"
     onClick={() => func(url, metadata)}
   >
-    {func.name
-      .replace(/([A-Z])/g, " $1")
-      .replace(/^./, (str) => str.toUpperCase())}
+    {name.replace(/([A-Z])/g, " $1").replace(/^./, (str) => str.toUpperCase())}
   </button>
 );

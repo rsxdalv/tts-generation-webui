@@ -107,7 +107,10 @@ const RvcGenerationPage = () => {
     });
   };
 
-  const funcs = [useParameters];
+  const funcs = {
+    // favorite,
+    useParameters,
+  };
 
   const handleChange = (
     event:

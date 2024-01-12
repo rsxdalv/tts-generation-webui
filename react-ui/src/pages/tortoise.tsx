@@ -135,7 +135,7 @@ const TortoiseGenerationPage = () => {
   //   });
   // }
 
-  const funcs = [useSeed, favorite];
+  const funcs = { useSeed, favorite };
 
   const handleChange = (
     event:

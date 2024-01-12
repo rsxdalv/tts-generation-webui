@@ -87,7 +87,7 @@ const DemucsPage = () => {
                 key={typeName}
                 audioOutput={audioOutput}
                 label={typeName[0].toUpperCase() + typeName.slice(1)}
-                funcs={[useAsInput]}
+                funcs={{ useAsInput }}
                 filter={["sendToDemucs"]}
               />
             );
