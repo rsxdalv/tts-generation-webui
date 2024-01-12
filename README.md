@@ -44,6 +44,7 @@ https://github.com/rsxdalv/tts-generation-webui/discussions/186#discussioncommen
 Jan 12:
 * React UI: Fix names for audio actions
 * Gradio: Fix multiple API warnings
+* Integration - React UI now is launched alongside Gradio, with a link to open it.
 
 Jan 11:
 * React UI: Make the build work without any errors
