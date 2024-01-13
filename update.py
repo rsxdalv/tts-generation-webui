@@ -35,6 +35,9 @@ def setup_node_modules():
         print("Installing node_modules...")
         do("cd react-ui && npm install")
         print("Successfully installed node_modules")
+        print("Building react-ui...")
+        do("cd react-ui && npm run build")
+        print("Successfully built react-ui")
     except Exception:
         print("Failed to install node_modules")
 
