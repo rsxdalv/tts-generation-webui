@@ -97,7 +97,11 @@ export const getNpzDataSimpleVoices = async () =>
 
 export const getDataFromJSON = async (collection = "outputs") => {
   const basePath = getWebuiPath(collection);
-  const dirs = fs.readdirSync(basePath);
+  const dirs = await fs.promises.readdir(basePath).catch((error) => {
+    console.error(error);
+    return [];
+  });
+
   const oggData = dirs.map(async (dirname) => {
     const coreFilename = path.join(dirname, dirname + ".ogg");
     const jsonFilename = path.join(basePath, dirname, dirname + ".json");

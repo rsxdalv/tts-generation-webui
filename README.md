@@ -41,6 +41,9 @@ https://rsxdalv.github.io/bark-speaker-directory/
 https://github.com/rsxdalv/tts-generation-webui/discussions/186#discussioncomment-7291274
 
 ## Changelog
+Jan 14:
+* React UI: Fix missing directory errors
+
 Jan 13:
 * React UI: Fix missing npm build step from automatic install
 
