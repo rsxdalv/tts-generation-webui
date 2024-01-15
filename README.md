@@ -48,6 +48,7 @@ Jan 15:
 * Supress Triton warnings
 * Gradio-Bark: Fix "Use last generation as history" behavior, empty selection no longer errors
 * Improve extensions loader display
+* Upgrade transformers to 4.36.1 from 4.31.0
 
 Jan 14:
 * React UI: Fix missing directory errors
