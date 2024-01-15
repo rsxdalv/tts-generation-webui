@@ -107,6 +107,7 @@ def history_content(
                 max_cols=len(datatypes),
                 datatype=datatypes,
                 headers=headers,
+                height=800,
             )
 
         with gr.Column():

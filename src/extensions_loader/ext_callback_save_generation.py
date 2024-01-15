@@ -18,6 +18,7 @@ extension_files = os.listdir(extensions_folder)
 for file_name in extension_files:
     if file_name.endswith(".py"):
         module_name = file_name[:-3]
+        print("  ", end="")
         try:
             spec = importlib.util.spec_from_file_location(
                 module_name, os.path.join(extensions_folder, file_name)
@@ -48,8 +49,9 @@ for file_name in extension_files:
                 f"Module {module_name} does not contain the function 'callback_save_generation'"
             )
 
-# print(f"Loaded {len(callbacks_save_generation)} extensions.")
+print("  ", end="")
 print(f"Loaded {len(callbacks_save_generation)} callback_save_generation extensions.")
+print("  ", end="")
 print(
     f"Loaded {len(callbacks_save_generation_musicgen)} callback_save_generation_musicgen extensions."
 )

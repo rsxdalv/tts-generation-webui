@@ -143,7 +143,7 @@ with gr.Blocks(
 
 
 def print_pretty_options(options):
-    print("Gradio interface options:")
+    print(" Gradio interface options:")
     max_key_length = max(len(key) for key in options.keys())
     for key, value in options.items():
         if key == "auth" and value is not None:
