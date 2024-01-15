@@ -7,5 +7,6 @@ soundfile==0.12.1; sys_platform == 'win32' # torchaudio
 # sox # torchaudio for linux
 suno-bark @ git+https://github.com/rsxdalv/bark@0d91823ead3d87c317f12d01d325fca9408c669e#egg=suno-bark # MIT License
 vocos==0.0.2 # MIT License
-tortoise @ git+https://github.com/rsxdalv/tortoise-tts@518e73b64516c6d81bb325df22104a91128963c5#egg=tortoise # Apache 2.0
+tortoise-tts @ git+https://github.com/rsxdalv/tortoise-tts@e4711433b12bcd1086840649e1830ad5c3fa1a76#egg=tortoise-tts # Apache 2.0
 beartype>=0.16.1
+transformers==4.36.1 

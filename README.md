@@ -1,4 +1,4 @@
-# TTS Generation WebUI (Bark, MusicGen + AudioGen, Tortoise, RVC, Vocos, Demucs)
+# TTS Generation WebUI (Bark, MusicGen + AudioGen, Tortoise, RVC, Vocos, Demucs, SeamlessM4T)
 
 ## One click installers
 
@@ -48,6 +48,8 @@ Jan 15:
 * Supress Triton warnings
 * Gradio-Bark: Fix "Use last generation as history" behavior, empty selection no longer errors
 * Improve extensions loader display
+* Upgrade transformers to 4.36.1 from 4.31.0
+* Add SeamlessM4T Demo
 
 Jan 14:
 * React UI: Fix missing directory errors
