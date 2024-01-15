@@ -12,6 +12,10 @@ warnings.filterwarnings(
     "ignore",
     message="Trying to convert audio automatically from float32 to 16-bit int format.",
 )
+warnings.filterwarnings(
+    "ignore",
+    message="Trying to convert audio automatically from int32 to 16-bit int format.",
+)
 
 import logging
 
@@ -111,6 +115,18 @@ with gr.Blocks(
 
             demucs_tab_error(e)
             print("Failed to load demucs demo")
+            print(e)
+
+        try:
+            from src.seamlessM4T.seamless_tab import seamless_tab
+
+            seamless_tab()
+
+        except Exception as e:
+            with gr.Tab("SeamlessM4Tv2Model (!)", id="seamless"):
+                gr.Markdown("""Failed to load SeamlessM4Tv2Model demo. Please check your configuration.""")
+                gr.Markdown(f"""Error: {e}""")
+            print("Failed to load seamless demo")
             print(e)
 
         vocos_tabs()
