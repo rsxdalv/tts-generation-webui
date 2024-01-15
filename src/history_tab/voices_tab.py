@@ -54,6 +54,7 @@ def voices_tab(register_use_as_history_button, directory="voices"):
                 col_count=len(datatypes),
                 max_cols=len(datatypes),
                 headers=headers,
+                height=800,
                 #  elem_classes="file-list"
             )
         with gr.Column():

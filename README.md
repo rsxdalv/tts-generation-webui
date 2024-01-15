@@ -40,7 +40,15 @@ https://rsxdalv.github.io/bark-speaker-directory/
 ## Info about managing models, caches and system space for AI projects
 https://github.com/rsxdalv/tts-generation-webui/discussions/186#discussioncomment-7291274
 
-## Changelog
+## Changelo
+Jan 15:
+* Upgraded Gradio to 3.48.0
+  * Several visual bugs have appeared, if they are critical, please report them or downgrade gradio.
+  * Gradio: Suppress useless warnings
+* Supress Triton warnings
+* Gradio-Bark: Fix "Use last generation as history" behavior, empty selection no longer errors
+* Improve extensions loader display
+
 Jan 14:
 * React UI: Fix missing directory errors
 
@@ -50,7 +58,7 @@ Jan 13:
 Jan 12:
 * React UI: Fix names for audio actions
 * Gradio: Fix multiple API warnings
-* Integration - React UI now is launched alongside Gradio, with a link to open it.
+* Integration - React UI now is launched alongside Gradio, with a link to open it
 
 Jan 11:
 * React UI: Make the build work without any errors

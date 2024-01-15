@@ -298,22 +298,13 @@ def generate_multi(count, outputs_ref):
         if prompt is None or prompt == "":
             raise ValueError("Prompt is empty")
 
-        print(
-            "gen",
-            "old_generation_filename",
-            old_generation_filename,
-            "semantic",
-            history_prompt_semantic,
-        )
-        if history_prompt_semantic == "":
-            history_prompt_semantic = None
-        if history_prompt_semantic is not None:
-            history_prompt_semantic = load_npz(history_prompt_semantic)
-
         if history_setting == HistorySettings.NPZ_FILE:
-            if old_generation_filename is None:
-                raise ValueError("old_generation_filename is None")
-            history_prompt = load_npz(old_generation_filename)
+            history_prompt_semantic = (
+                load_npz(history_prompt_semantic) if history_prompt_semantic else None
+            )
+            history_prompt = (
+                load_npz(old_generation_filename) if old_generation_filename else None
+            )
 
         _original_history_prompt = history_prompt
 
@@ -481,8 +472,8 @@ def generation_tab_bark():
     with gr.Tab(label="Generation (Bark)", id="generation_bark"):
         with gr.Row():
             history_setting = gr.Radio(
-                HistorySettings.choices,
-                value="Empty history",
+                HistorySettings.choices, # type: ignore
+                value=HistorySettings.EMPTY,
                 type="value",
                 label="History Prompt (voice) setting:",
             )
@@ -519,19 +510,17 @@ def generation_tab_bark():
             outputs=[column],  # type: ignore
         )
 
-        with gr.Row():
-            (
-                history_prompt_semantic_dropdown,
-                copy_history_prompt_semantic_button,
-                reload_history_prompt_semantic_dropdown,
-            ) = old_generation_dropdown_ui("Semantic Voice (Optional)")
+        (
+            history_prompt_semantic_dropdown,
+            copy_history_prompt_semantic_button,
+            reload_history_prompt_semantic_dropdown,
+        ) = old_generation_dropdown_ui("Semantic Voice (Optional)")
 
-        with gr.Row():
-            (
-                old_generation_dropdown,
-                copy_old_generation_button,
-                reload_old_generation_dropdown,
-            ) = old_generation_dropdown_ui("Audio Voice")
+        (
+            old_generation_dropdown,
+            copy_old_generation_button,
+            reload_old_generation_dropdown,
+        ) = old_generation_dropdown_ui("Audio Voice")
 
         history_setting.change(
             fn=lambda choice: [
@@ -564,14 +553,14 @@ def generation_tab_bark():
         with gr.Row():
             with gr.Column():
                 long_prompt_radio = gr.Radio(
-                    PromptSplitSettings.choices,
+                    PromptSplitSettings.choices, # type: ignore
                     type="value",
                     label="Prompt type",
                     value=PromptSplitSettings.NONE,
                     show_label=False,
                 )
                 long_prompt_history_radio = gr.Radio(
-                    LongPromptHistorySettings.choices,
+                    LongPromptHistorySettings.choices, # type: ignore
                     type="value",
                     label="For each subsequent generation:",
                     value=LongPromptHistorySettings.CONTINUE,
@@ -741,40 +730,42 @@ def generation_tab_bark():
 
 
 def old_generation_dropdown_ui(label):
-    old_generation_dropdown = gr.Dropdown(
-        label=label,
-        choices=get_npz_files(),
-        type="value",
-        value=None,
-        allow_custom_value=True,
-        visible=False,
-        container=False,
-    )
-    copy_old_generation_button = gr.Button(
-        "save",
-        visible=False,
-        elem_classes="btn-sm material-symbols-outlined",
-        size="sm",
-    )
-    copy_old_generation_button.click(
-        fn=lambda x: [
-            shutil.copy(x, os.path.join("voices", os.path.basename(x))),
-        ],
-        inputs=[old_generation_dropdown],
-    )
+    with gr.Row():
+        old_generation_dropdown = gr.Dropdown(
+            label=label,
+            choices=get_npz_files(), # type: ignore
+            type="value",
+            value=None,
+            allow_custom_value=True,
+            visible=False,
+            # container=False,
+            show_label=True,
+        )
+        copy_old_generation_button = gr.Button(
+            "save",
+            visible=False,
+            elem_classes="btn-sm material-symbols-outlined",
+            size="sm",
+        )
+        copy_old_generation_button.click(
+            fn=lambda x: [
+                shutil.copy(x, os.path.join("voices", os.path.basename(x))),
+            ],
+            inputs=[old_generation_dropdown],
+        )
 
-    reload_old_generation_dropdown = gr.Button(
-        "refresh",
-        visible=False,
-        elem_classes=ICON_ELEM_CLASS,
-        size="sm",
-    )
+        reload_old_generation_dropdown = gr.Button(
+            "refresh",
+            visible=False,
+            elem_classes=ICON_ELEM_CLASS,
+            size="sm",
+        )
 
-    reload_old_generation_dropdown.click(
-        fn=lambda: gr.Dropdown.update(choices=get_npz_files()),
-        outputs=old_generation_dropdown,
-        api_name=f"reload_old_generation_dropdown{ '' if label == 'Audio Voice' else '_semantic'}",
-    )
+        reload_old_generation_dropdown.click(
+            fn=lambda: gr.Dropdown.update(choices=get_npz_files()), # type: ignore
+            outputs=old_generation_dropdown,
+            api_name=f"reload_old_generation_dropdown{ '' if label == 'Audio Voice' else '_semantic'}",
+        )
 
     return (
         old_generation_dropdown,
@@ -798,7 +789,7 @@ def setup_bark_voice_prompt_ui():
 
         speaker_ids = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
         speakerIdRadio = gr.Radio(
-            speaker_ids, type="value", label="Speaker ID", value="0"
+            speaker_ids, type="value", label="Speaker ID", value="0" # type: ignore
         )
 
         voice_inputs = [useV2, languageRadio, speakerIdRadio]

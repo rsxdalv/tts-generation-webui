@@ -12,4 +12,8 @@ bark_css = """
     height: 150px;
     min-height: 150px;
 }
+.tts-image > button {
+    width: 100%;
+    height: 100%;   
+}
 """
