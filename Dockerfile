@@ -25,7 +25,8 @@ WORKDIR /app/tts-generation-webui
 
 # Install all requirements
 RUN pip3 install -r requirements.txt
-RUN pip3 install -r requirements_audiocraft.txt
+RUN pip3 install -r requirements_audiocraft_only.txt --no-deps
+RUN pip3 install -r requirements_audiocraft_deps.txt
 RUN pip3 install -r requirements_bark_hubert_quantizer.txt
 RUN pip3 install -r requirements_rvc.txt
 
