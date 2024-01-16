@@ -28,7 +28,9 @@ def callback_save_generation_musicgen(
     metadata["prompt"] = double_escape_newlines(metadata["prompt"])
     metadata_str = json.dumps(metadata, ensure_ascii=False)
 
-    pipe_input = ffmpeg.input("pipe:", format="f32le", ar=str(SAMPLE_RATE))
+    channels = audio_array.shape[1] if len(audio_array.shape) > 1 else 1
+    pipe_input = ffmpeg.input("pipe:", format="f32le", ar=str(SAMPLE_RATE), ac=channels)
+    # TODO: test with Tempfile
     metadata_filename = files.get("ogg") + ".ffmetadata.ini"  # type: ignore
     with open(metadata_filename, "w", encoding="utf-8") as f:
         f.write(

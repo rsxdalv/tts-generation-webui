@@ -221,7 +221,7 @@ async function reload_old_generation_dropdown() {
     ];
   };
 
-  return result?.data[0].choices;
+  return result?.data[0].choices.map(x => x[0]);
 }
 
 async function bark_favorite({ history_bundle_name_data }) {
@@ -315,7 +315,7 @@ async function tortoise_refresh_models() {
     ];
   };
 
-  return result?.data[0].choices;
+  return result?.data[0].choices.map(x => x[0])
 }
 
 async function tortoise_refresh_voices() {
@@ -330,7 +330,7 @@ async function tortoise_refresh_voices() {
     ];
   };
 
-  return result?.data[0].choices;
+  return result?.data[0].choices.map(x => x[0])
 }
 
 async function tortoise_open_models() {
@@ -440,7 +440,7 @@ async function rvc_model_reload() {
     ];
   };
 
-  return result?.data[0].choices;
+  return result?.data[0].choices.map(x => x[0]);
 }
 
 async function rvc_index_reload() {
@@ -455,7 +455,7 @@ async function rvc_index_reload() {
     ];
   };
 
-  return result?.data[0].choices;
+  return result?.data[0].choices.map(x => x[0]);
 }
 
 // rvc_model_open
@@ -607,9 +607,91 @@ async function get_config_bark() {
   };
 }
 
+async function magnet({
+  model,
+  text,
+  seed,
+  use_sampling,
+  top_k,
+  top_p,
+  temperature,
+  max_cfg_coef,
+  min_cfg_coef,
+  decoding_steps_1,
+  decoding_steps_2,
+  decoding_steps_3,
+  decoding_steps_4,
+  span_arrangement,
+}) {
+  const app = await getClient();
+
+  const result = (await app.predict("/magnet", [
+    model,
+    text,
+    seed,
+    use_sampling,
+    top_k,
+    top_p,
+    temperature,
+    max_cfg_coef,
+    min_cfg_coef,
+    decoding_steps_1,
+    decoding_steps_2,
+    decoding_steps_3,
+    decoding_steps_4,
+    span_arrangement,
+  ])) as {
+    data: [
+      GradioFile, // output
+      string, // history_bundle_name_data
+      string, // image
+      null, // seed_cache
+      Object // result_json
+    ];
+  };
+
+  const [audio, history_bundle_name_data, , , json] = result?.data;
+  return {
+    audio,
+    history_bundle_name_data,
+    json,
+  };
+}
+
+// magnet_get_models
+
+async function magnet_get_models() {
+  const app = await getClient();
+
+  const result = (await app.predict("/magnet_get_models")) as {
+    data: [
+      {
+        choices: string[];
+        __type__: "update";
+      }
+    ];
+  };
+
+  return result?.data[0].choices.map(x => x[0]);
+}
+
+// magnet_open_model_dir
+
+async function magnet_open_model_dir() {
+  const app = await getClient();
+
+  const result = (await app.predict("/magnet_open_model_dir")) as {};
+
+  return result;
+}
+
 const endpoints = {
   demucs,
   musicgen,
+  magnet,
+  magnet_get_models,
+  magnet_open_model_dir,
+
   vocos_wav,
   vocos_npz,
   encodec_decode,
@@ -619,12 +701,14 @@ const endpoints = {
   reload_old_generation_dropdown,
   bark_favorite,
   delete_generation,
+
   tortoise,
   tortoise_refresh_models,
   tortoise_refresh_voices,
   tortoise_open_models,
   tortoise_open_voices,
   tortoise_apply_model_settings,
+
   rvc,
   rvc_model_reload,
   rvc_index_reload,

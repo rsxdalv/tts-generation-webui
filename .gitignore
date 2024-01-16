@@ -14,7 +14,7 @@ config.json
 /voices-tortoise/
 
 # Ignore model checkpoints
-/data
+/data/models
 
 # Ignore temporary files
 temp/

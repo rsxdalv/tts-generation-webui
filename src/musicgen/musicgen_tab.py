@@ -27,8 +27,6 @@ from typing import Optional
 from importlib.metadata import version
 
 AUDIOCRAFT_VERSION = version("audiocraft")
-FB_MUSICGEN_MELODY = "facebook/musicgen-melody"
-
 
 class MusicGenGeneration(TypedDict):
     model: str
@@ -88,6 +86,9 @@ def save_generation(
     base_filename = create_base_filename(title, "outputs", model="musicgen", date=date)
 
     filename, filename_png, filename_json, filename_npz = get_filenames(base_filename)
+    stereo = audio_array.shape[0] == 2
+    if stereo:
+        audio_array = np.transpose(audio_array)
     write_wav(filename, SAMPLE_RATE, audio_array)
     plot = save_waveform_plot(audio_array, filename_png)
 
@@ -139,7 +140,7 @@ def generate(params: MusicGenGeneration, melody_in: Optional[Tuple[int, np.ndarr
     model = params["model"]
     text = params["text"]
     # due to JSON serialization limitations
-    params["melody"] = None if model != FB_MUSICGEN_MELODY else melody_in
+    params["melody"] = None if "melody" not in model else melody_in
     melody = params["melody"]
 
     global MODEL
@@ -166,7 +167,7 @@ def generate(params: MusicGenGeneration, melody_in: Optional[Tuple[int, np.ndarr
     params["seed"] = parse_or_set_seed(params["seed"], 0)
     # generator = torch.Generator(device=MODEL.device).manual_seed(params["seed"])
     log_generation_musicgen(params)
-    if model == FB_MUSICGEN_MELODY and melody is not None:
+    if "melody" in model and melody is not None:
         sr, melody = melody[0], torch.from_numpy(melody[1]).to(
             MODEL.device
         ).float().t().unsqueeze(0)
@@ -223,7 +224,7 @@ def generate(params: MusicGenGeneration, melody_in: Optional[Tuple[int, np.ndarr
     )
 
     return [
-        (MODEL.sample_rate, output),
+        (MODEL.sample_rate, output.transpose()),
         os.path.dirname(filename),
         plot,
         params["seed"],
@@ -258,16 +259,17 @@ def generation_tab_musicgen():
                 )
                 model = gr.Radio(
                     [
-                        FB_MUSICGEN_MELODY,
-                        # "musicgen-melody",
+                        "facebook/musicgen-melody",
                         "facebook/musicgen-medium",
-                        # "musicgen-medium",
                         "facebook/musicgen-small",
-                        # "musicgen-small",
                         "facebook/musicgen-large",
-                        # "musicgen-large",
                         "facebook/audiogen-medium",
-                        # "audiogen-medium",
+                        "facebook/musicgen-melody-large",
+                        "facebook/musicgen-stereo-small",
+                        "facebook/musicgen-stereo-medium",
+                        "facebook/musicgen-stereo-melody",
+                        "facebook/musicgen-stereo-large",
+                        "facebook/musicgen-stereo-melody-large",
                     ],
                     label="Model",
                     value="facebook/musicgen-small",

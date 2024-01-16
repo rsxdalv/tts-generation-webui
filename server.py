@@ -129,6 +129,18 @@ with gr.Blocks(
             print("Failed to load seamless demo")
             print(e)
 
+        try:
+            from src.magnet.magnet_tab import generation_tab_magnet
+
+            generation_tab_magnet()
+
+        except Exception as e:
+            with gr.Tab("MAGNeT (!)", id="magnet"):
+                gr.Markdown("""Failed to load MAGNeT demo. Please check your configuration.""")
+                gr.Markdown(f"""Error: {e}""")
+            print("Failed to load magnet demo")
+            print(e)
+
         vocos_tabs()
         generation_tab_tortoise()
 
