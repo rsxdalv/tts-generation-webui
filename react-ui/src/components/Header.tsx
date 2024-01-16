@@ -70,7 +70,11 @@ const routes: Route[] = [
   },
   {
     href: "/musicgen",
-    text: "Musicgen",
+    text: "MusicGen",
+  },
+  {
+    href: "/magnet",
+    text: "MAGNeT",
   },
   {
     href: "/demucs",

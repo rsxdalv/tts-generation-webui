@@ -26,6 +26,7 @@ from importlib.metadata import version
 from audiocraft.models.magnet import MAGNeT
 
 from src.utils.get_path_from_root import get_path_from_root
+from src.tortoise.gr_reload_button import gr_open_button_simple, gr_reload_button
 
 AUDIOCRAFT_VERSION = version("audiocraft")
 
@@ -284,7 +285,14 @@ def generation_tab_magnet():
                     label="Model",
                     value=initial_params["model"],
                 )
-                refresh_models = gr.Button("Refresh models", variant="secondary")
+                gr_reload_button().click(
+                    fn=lambda: gr.Radio.update(choices=get_models()), # type: ignore
+                    outputs=[model],
+                    api_name="magnet_get_models",
+                )
+                gr_open_button_simple(
+                    MAGNET_LOCAL_MODELS_DIR, api_name="magnet_open_model_dir"
+                )
                 submit = gr.Button("Generate", variant="primary")
             with gr.Column():
                 with gr.Row():
@@ -380,12 +388,6 @@ def generation_tab_magnet():
         fn=lambda x: gr.Number.update(value=x),
         inputs=seed_cache,
         outputs=seed,
-    )
-
-    refresh_models.click(
-        fn=lambda: gr.Radio.update(choices=get_models()),  # type: ignore
-        outputs=[model],
-        api_name="magnet_get_models",
     )
 
     submit.click(
