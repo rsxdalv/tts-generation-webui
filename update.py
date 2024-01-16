@@ -44,7 +44,8 @@ def setup_node_modules():
 
 def main():
     print("Updating dependencies...")
-    try_install("requirements_audiocraft.txt", "musicgen, audiocraft")
+    try_install("requirements_audiocraft_only.txt --no-deps", "musicgen, audiocraft 1/2")
+    try_install("requirements_audiocraft_deps.txt", "musicgen, audiocraft 2/2")
     try_install(
         "requirements_bark_hubert_quantizer.txt",
         "Bark Voice Clone, bark-hubert-quantizer",

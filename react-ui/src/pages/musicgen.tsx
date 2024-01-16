@@ -44,12 +44,133 @@ type Result = {
   };
 };
 
-const modelNameMapping = {
-  Melody: "facebook/musicgen-melody",
-  Medium: "facebook/musicgen-medium",
-  Small: "facebook/musicgen-small",
-  Large: "facebook/musicgen-large",
-  Audiogen: "facebook/audiogen-medium",
+const modelMap = {
+  Small: { size: "small", stereo: true, melody: false },
+  Medium: { size: "medium", stereo: true, melody: true },
+  Large: { size: "large", stereo: true, melody: true },
+  Audiogen: { size: "audiogen", stereo: false, melody: false },
+};
+
+const modelToType = {
+  "facebook/musicgen-small": "Small",
+  "facebook/musicgen-medium": "Medium",
+  "facebook/musicgen-large": "Large",
+  "facebook/audiogen-medium": "Audiogen",
+
+  "facebook/musicgen-melody": "Medium",
+  "facebook/musicgen-melody-large": "Large",
+
+  "facebook/musicgen-stereo-small": "Small",
+  "facebook/musicgen-stereo-medium": "Medium",
+  "facebook/musicgen-stereo-large": "Large",
+
+  "facebook/musicgen-stereo-melody": "Medium",
+  "facebook/musicgen-stereo-melody-large": "Large",
+};
+
+const computeModel = (type: string, stereo: boolean, melody: boolean) => {
+  const lowerType = type.toLowerCase();
+  const largeSuffix = type === "Large" ? "-large" : "";
+  const stereoPrefix = stereo ? "-stereo" : "";
+
+  return type === "Audiogen"
+    ? `facebook/audiogen-medium`
+    : melody && type !== "Small"
+    ? `facebook/musicgen${stereoPrefix}-melody${largeSuffix}`
+    : `facebook/musicgen${stereoPrefix}-${lowerType}`;
+};
+
+const getType = (model: string) => {
+  return modelToType[model] || "Small";
+};
+
+const decomputeModel = (
+  model: string
+): { type: string; stereo: boolean; melody: boolean } => {
+  const type = getType(model);
+  const stereo = model.includes("stereo");
+  const melody = model.includes("melody");
+  return { type, stereo, melody };
+};
+
+const ModelSelector = ({
+  musicgenParams,
+  setMusicgenParams,
+}: {
+  musicgenParams: MusicgenParams;
+  setMusicgenParams: React.Dispatch<React.SetStateAction<MusicgenParams>>;
+}) => {
+  const {
+    type: modelType,
+    stereo,
+    melody,
+  } = decomputeModel(musicgenParams.model);
+
+  const { stereo: stereoAvailable, melody: melodyAvailable } =
+    modelMap[modelType];
+
+  return (
+    <div className="flex flex-col border border-gray-300 p-2 rounded text-md">
+      <div className="text-md">Model:</div>
+      <div className="flex gap-2">
+        <label className="text-md">Size:</label>
+        <div className="flex gap-x-2">
+          {["Small", "Medium", "Large", "Audiogen"].map((model) => (
+            <div key={model} className="flex items-center">
+              <input
+                type="radio"
+                name="size"
+                id={model}
+                value={model}
+                checked={modelType === model}
+                onChange={(event) => {
+                  const newModel = event.target.value;
+                  setMusicgenParams({
+                    ...musicgenParams,
+                    model: computeModel(newModel, stereo, melody),
+                  });
+                }}
+                className="border border-gray-300 p-2 rounded"
+              />
+              <label className="ml-1 select-none" htmlFor={model}>
+                {model}
+              </label>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="flex gap-2">
+        <label className="text-md">Stereo:</label>
+        <input
+          type="checkbox"
+          name="stereo"
+          checked={stereo}
+          onChange={() => {
+            setMusicgenParams({
+              ...musicgenParams,
+              model: computeModel(modelType, !stereo, melody),
+            });
+          }}
+          className="border border-gray-300 p-2 rounded"
+          disabled={!stereoAvailable}
+        />
+        <label className="text-md">Use Melody:</label>
+        <input
+          type="checkbox"
+          name="melody"
+          checked={melody}
+          onChange={() => {
+            setMusicgenParams({
+              ...musicgenParams,
+              model: computeModel(modelType, stereo, !melody),
+            });
+          }}
+          className="border border-gray-300 p-2 rounded"
+          disabled={!melodyAvailable}
+        />
+      </div>
+    </div>
+  );
 };
 
 const initialHistory = []; // prevent infinite loop
@@ -70,8 +191,10 @@ const MusicgenPage = () => {
   async function musicgen() {
     const body = JSON.stringify({
       ...musicgenParams,
-      melody: musicgenParams.model === "Melody" ? musicgenParams.melody : null,
-      model: modelNameMapping[musicgenParams.model],
+      melody: musicgenParams.model.includes("melody")
+        ? musicgenParams.melody
+        : null,
+      model: musicgenParams.model,
     });
     const response = await fetch("/api/gradio/musicgen", {
       method: "POST",
@@ -138,21 +261,16 @@ const MusicgenPage = () => {
       ...musicgenParams,
       ...params,
       seed: Number(params.seed),
-      model:
-        Object.keys(modelNameMapping).find(
-          (key) => modelNameMapping[key] === params.model
-        ) || "Small",
+      model: params.model || "facebook/musicgen-small",
     });
   };
 
-  // const funcs = [useAsMelody, favorite, useSeed, useParameters];
   const funcs = {
-    // prevent minification
     useAsMelody,
     favorite,
     useSeed,
     useParameters,
-  }
+  };
 
   return (
     <Template>
@@ -161,8 +279,8 @@ const MusicgenPage = () => {
       </Head>
       <div className="p-4">
         <div className="my-4">
-          <div className="flex space-x-6 w-full">
-            <div className="flex flex-col space-y-2">
+          <div className="flex gap-x-6 w-full justify-center">
+            <div className="flex flex-col gap-y-2 w-1/2">
               <label className="text-sm">Text:</label>
               <textarea
                 name="text"
@@ -173,29 +291,10 @@ const MusicgenPage = () => {
                 rows={3}
               />
 
-              <div className="space-y-2">
-                <label className="text-sm">Model:</label>
-                <div className="flex flex-row space-x-2">
-                  {["Melody", "Small", "Medium", "Large", "Audiogen"].map(
-                    (model) => (
-                      <div key={model} className="flex items-center">
-                        <input
-                          type="radio"
-                          name="model"
-                          id={model}
-                          value={model}
-                          checked={musicgenParams.model === model}
-                          onChange={handleChange}
-                          className="border border-gray-300 p-2 rounded"
-                        />
-                        <label className="ml-1" htmlFor={model}>
-                          {model}
-                        </label>
-                      </div>
-                    )
-                  )}
-                </div>
-              </div>
+              <ModelSelector
+                musicgenParams={musicgenParams}
+                setMusicgenParams={setMusicgenParams}
+              />
               <AudioInput
                 url={musicgenParams.melody}
                 label="Melody"
@@ -209,7 +308,7 @@ const MusicgenPage = () => {
               />
             </div>
 
-            <div className="flex flex-col space-y-2">
+            <div className="flex flex-col gap-y-2">
               <label className="text-sm">
                 Duration: {musicgenParams.duration}s{" "}
                 {musicgenParams.duration > 30 && "(spliced)"}
@@ -298,7 +397,7 @@ const MusicgenPage = () => {
                 Restore Last Seed
               </button>
 
-              <div className="flex space-x-2 items-center">
+              <div className="flex gap-x-2 items-center">
                 <label className="text-sm">
                   Use{" "}
                   <a
@@ -321,7 +420,7 @@ const MusicgenPage = () => {
           </div>
         </div>
 
-        <div className="my-4 flex flex-col space-y-2">
+        <div className="my-4 flex flex-col gap-y-2">
           <button
             className="border border-gray-300 p-2 rounded"
             onClick={musicgen}
@@ -337,7 +436,7 @@ const MusicgenPage = () => {
           />
         </div>
 
-        <div className="flex flex-col space-y-2 border border-gray-300 p-2 rounded">
+        <div className="flex flex-col gap-y-2 border border-gray-300 p-2 rounded">
           <label className="text-sm">History:</label>
           {/* Clear history */}
           <button
@@ -348,18 +447,20 @@ const MusicgenPage = () => {
           >
             Clear History
           </button>
-          <div className="flex flex-col space-y-2">
+          <div className="flex flex-col gap-y-2">
             {historyData &&
-              historyData.map((item, index) => (
-                <AudioOutput
-                  key={index}
-                  audioOutput={item.audio}
-                  metadata={item}
-                  label={item.history_bundle_name_data}
-                  funcs={funcs}
-                  filter={["sendToMusicgen"]}
-                />
-              ))}
+              historyData
+                .slice(1, 6)
+                .map((item, index) => (
+                  <AudioOutput
+                    key={index}
+                    audioOutput={item.audio}
+                    metadata={item}
+                    label={item.history_bundle_name_data}
+                    funcs={funcs}
+                    filter={["sendToMusicgen"]}
+                  />
+                ))}
           </div>
         </div>
       </div>
