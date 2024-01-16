@@ -193,28 +193,14 @@ def seamless_ui():
             source_language = gr.Dropdown(
                 choices=text_source_languages, # type: ignore
                 label="Source Language",
-                default="eng",
+                value="English",
                 type="value",
-                allow_multiple=False,
-                allow_nan=False,
-                allow_empty=False,
-                allow_duplicate=False,
-                allow_update=False,
-                order=None,
-                live=False,
             )
             target_language = gr.Dropdown(
                 choices=speech_target_languages, # type: ignore
                 label="Target Language",
-                default="cmn",
+                value="Mandarin Chinese",
                 type="value",
-                allow_multiple=False,
-                allow_nan=False,
-                allow_empty=False,
-                allow_duplicate=False,
-                allow_update=False,
-                order=None,
-                live=False,
             )
             button = gr.Button("Translate")
 
@@ -234,5 +220,5 @@ def seamless_ui():
     )
 
 def seamless_tab():
-    with gr.Tab("SeamlessM4Tv2Model Demo", id="seamless"):
+    with gr.Tab("Seamless M4Tv2 Demo", id="seamless"):
         seamless_ui()

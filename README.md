@@ -40,7 +40,11 @@ https://rsxdalv.github.io/bark-speaker-directory/
 ## Info about managing models, caches and system space for AI projects
 https://github.com/rsxdalv/tts-generation-webui/discussions/186#discussioncomment-7291274
 
-## Changelo
+## Changelog
+Jan 16:
+* Upgrade MusicGen, adding support for stereo and large melody models
+* Add MAGNeT
+
 Jan 15:
 * Upgraded Gradio to 3.48.0
   * Several visual bugs have appeared, if they are critical, please report them or downgrade gradio.
