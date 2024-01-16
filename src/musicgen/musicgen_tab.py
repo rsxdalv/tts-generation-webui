@@ -27,8 +27,6 @@ from typing import Optional
 from importlib.metadata import version
 
 AUDIOCRAFT_VERSION = version("audiocraft")
-FB_MUSICGEN_MELODY = "facebook/musicgen-melody"
-
 
 class MusicGenGeneration(TypedDict):
     model: str
@@ -142,7 +140,7 @@ def generate(params: MusicGenGeneration, melody_in: Optional[Tuple[int, np.ndarr
     model = params["model"]
     text = params["text"]
     # due to JSON serialization limitations
-    params["melody"] = None if model != FB_MUSICGEN_MELODY else melody_in
+    params["melody"] = None if "melody" not in model else melody_in
     melody = params["melody"]
 
     global MODEL
@@ -261,7 +259,7 @@ def generation_tab_musicgen():
                 )
                 model = gr.Radio(
                     [
-                        FB_MUSICGEN_MELODY,
+                        "facebook/musicgen-melody",
                         "facebook/musicgen-medium",
                         "facebook/musicgen-small",
                         "facebook/musicgen-large",
