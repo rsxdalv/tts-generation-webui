@@ -41,6 +41,9 @@ https://rsxdalv.github.io/bark-speaker-directory/
 https://github.com/rsxdalv/tts-generation-webui/discussions/186#discussioncomment-7291274
 
 ## Changelog
+Jan 21:
+* Add CPU/M1 torch auto-repair script with each update. To disable, edit check_cuda.py and change FORCE_NO_REPAIR = True
+
 Jan 16:
 * Upgrade MusicGen, adding support for stereo and large melody models
 * Add MAGNeT
@@ -394,6 +397,21 @@ Most notably:
 - AudioGen: CC BY-NC 4.0
 
 
+## Compatibility / Errors
+
+Audiocraft is currently only compatible with Linux and Windows. MacOS support still has not arrived, although it might be possible to install manually.
+
+### Torch being reinstalled
+
+Due to the python package manager (pip) limitations, torch can get reinstalled several times. This is a wide ranging issue of pip and torch.
+
+### Red messages in console
+These messages:
+```
+---- requires ----, but you have ---- which is incompatible.
+```
+Are completely normal. It's both a limitation of pip and because this Web UI combines a lot of different AI projects together. Since the projects are not always compatible with each other, they will complain about the other projects being installed. This is normal and expected. And in the end, despite the warnings/errors the projects will work together.
+It's not clear if this situation will ever be resolvable, but that is the hope.
 
 ## Configuration Guide
 
