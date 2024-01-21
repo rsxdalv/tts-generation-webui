@@ -3,8 +3,8 @@ import gradio as gr
 from scipy.io import wavfile
 import torch
 import tempfile
-from rvc_beta import infer_batch_rvc
-from rvc_beta.infer_batch_rvc import vc_single, get_vc
+from rvc import infer_batch_rvc
+from rvc.infer_batch_rvc import vc_single, get_vc
 from src.rvc_tab.get_and_load_hubert import get_and_load_hubert
 from src.Joutai import Joutai
 from src.history_tab.open_folder import open_folder
@@ -189,7 +189,7 @@ def rvc_ui_model_or_index_path_ui(label: str):
         with gr.Row():
             file_path_dropdown = gr.Dropdown(
                 label=label,
-                choices=get_list_fn(),
+                choices=get_list_fn(),  # type: ignore
                 show_label=False,
                 container=False,
             )
@@ -198,7 +198,7 @@ def rvc_ui_model_or_index_path_ui(label: str):
             )
             gr_reload_button().click(
                 lambda: file_path_dropdown.update(
-                    choices=get_list_fn(),
+                    choices=get_list_fn(),  # type: ignore
                 ),
                 outputs=[file_path_dropdown],
                 api_name=f"rvc_{label.lower()}_reload",
