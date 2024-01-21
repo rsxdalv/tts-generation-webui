@@ -13,6 +13,10 @@ import glob
 from src.tortoise.gr_reload_button import gr_reload_button, gr_open_button_simple
 from src.utils.date import get_date_string
 
+from rvc_pkg import tools
+from rvc_pkg.tools import infer_batch_rvc
+
+
 
 def inject_hubert(hubert_model: torch.nn.Module):
     infer_batch_rvc.hubert_model = hubert_model
