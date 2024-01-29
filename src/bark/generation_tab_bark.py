@@ -133,7 +133,7 @@ def save_generation(
     filename, filename_png, filename_json, filename_npz = get_filenames(base_filename)
     save_wav(audio_array, filename)
     plot = save_waveform_plot(audio_array, filename_png)
-    filename_ogg = filename.replace(".wav", ".ogg")
+    filename_flac = filename.replace(".wav", ".flac")
 
     # Generate metadata for the audio file
     language = SUPPORTED_LANGS[language][0] if use_voice else None
@@ -165,7 +165,7 @@ def save_generation(
             "wav": filename,
             "png": filename_png,
             "npz": filename_npz,
-            "ogg": filename_ogg,
+            "flac": filename_flac,
         },
         metadata,
     )
@@ -199,7 +199,7 @@ def save_long_generation(
     filename, filename_png, filename_json, filename_npz = get_filenames(base_filename)
     write_wav(filename, SAMPLE_RATE, audio_array)
     plot = save_waveform_plot(audio_array, filename_png)
-    filename_ogg = filename.replace(".wav", ".ogg")
+    filename_flac = filename.replace(".wav", ".flac")
 
     # Generate metadata for the audio file
     language = SUPPORTED_LANGS[language][0]
@@ -230,7 +230,7 @@ def save_long_generation(
             "wav": filename,
             "png": filename_png,
             "npz": filename_npz,
-            "ogg": filename_ogg,
+            "flac": filename_flac,
         },
         metadata,
     )

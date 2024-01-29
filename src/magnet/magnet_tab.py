@@ -130,13 +130,13 @@ def save_generation(
     if tokens is not None:
         save_npz_musicgen(filename_npz, tokens, metadata)
 
-    filename_ogg = filename.replace(".wav", ".ogg")
+    filename_flac = filename.replace(".wav", ".flac")
     ext_callback_save_generation_musicgen(
         audio_array=audio_array,
         files={
             "wav": filename,
             "png": filename_png,
-            "ogg": filename_ogg,
+            "flac": filename_flac,
         },
         metadata=metadata,
         SAMPLE_RATE=SAMPLE_RATE,

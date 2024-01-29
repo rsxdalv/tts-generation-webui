@@ -108,6 +108,6 @@ if __name__ == "__main__":
             "fine_prompt": np.array([1, 2, 3]),
         },
         audio_array=np.array([1, 2, 3]),
-        files={"ogg": "sample.ogg"},
+        files={"flac": "sample.flac"},
         metadata={"extension": "test"},
     )

@@ -39,11 +39,11 @@ def callback_save_generation(
     metadata: Dict[str, Any],
 ) -> None:
     check_ffmpeg()
-    print("Saving generation to", files.get("ogg"))
+    print("Saving generation to", files.get("flac"))
 
     attach_generation_meta(full_generation, "semantic_prompt", metadata)
     attach_generation_meta(full_generation, "coarse_prompt", metadata)
-    filename = files.get("ogg")
+    filename = files.get("flac")
     input_data = audio_array.tobytes()
     metadata["prompt"] = double_escape_quotes(metadata["prompt"])
     metadata["prompt"] = double_escape_newlines(metadata["prompt"])
@@ -56,7 +56,7 @@ def callback_save_generation(
     metadata_str = json.dumps(metadata, ensure_ascii=False)
 
     pipe_input = ffmpeg.input("pipe:", format="f32le", ar=str(SAMPLE_RATE))
-    metadata_filename = files.get("ogg") + ".ffmetadata.ini"  # type: ignore
+    metadata_filename = files.get("flac") + ".ffmetadata.ini"  # type: ignore
     with open(metadata_filename, "w", encoding="utf-8") as f:
         f.write(
             f""";FFMETADATA1
@@ -71,7 +71,7 @@ comment={metadata_str}
             pipe_input,
             metadata_input,
             filename,
-            format="ogg",
+            format="flac",
             map_metadata=f"1",
             loglevel="error",
         )
@@ -99,9 +99,9 @@ comment={metadata_str}
     # print(p.returncode)
     # Show if success
     if p.returncode == 0:
-        print("Saved generation to", files.get("ogg"))
+        print("Saved generation to", files.get("flac"))
     else:
-        print("Failed to save generation to", files.get("ogg"))
+        print("Failed to save generation to", files.get("flac"))
         print("ffmpeg args:", args)
         print(output_data[0])
         # print(output_data[1])
@@ -156,7 +156,7 @@ if __name__ == "__main__":
     }
 
     callback_save_generation(
-        full_generation, audio_array, {"ogg": args_output}, metadata
+        full_generation, audio_array, {"flac": args_output}, metadata
     )
 
     b = ffmpeg.probe(args_output)
