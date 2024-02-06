@@ -20,9 +20,9 @@ def callback_save_generation_musicgen(
     SAMPLE_RATE: int,
 ) -> None:
     check_ffmpeg()
-    print("Saving generation to", files.get("flac"))
+    print("Saving generation to", files.get("ogg"))
 
-    filename = files.get("flac")
+    filename = files.get("ogg")
     input_data = audio_array.tobytes()
     metadata["prompt"] = double_escape_quotes(metadata["prompt"])
     metadata["prompt"] = double_escape_newlines(metadata["prompt"])
@@ -31,7 +31,7 @@ def callback_save_generation_musicgen(
     channels = audio_array.shape[1] if len(audio_array.shape) > 1 else 1
     pipe_input = ffmpeg.input("pipe:", format="f32le", ar=str(SAMPLE_RATE), ac=channels)
     # TODO: test with Tempfile
-    metadata_filename = files.get("flac") + ".ffmetadata.ini"  # type: ignore
+    metadata_filename = files.get("ogg") + ".ffmetadata.ini"  # type: ignore
     with open(metadata_filename, "w", encoding="utf-8") as f:
         f.write(
             f""";FFMETADATA1
@@ -46,7 +46,7 @@ comment={metadata_str}
             pipe_input,
             metadata_input,
             filename,
-            format="flac",
+            format="ogg",
             map_metadata=f"1",
             loglevel="error",
         )
@@ -74,9 +74,9 @@ comment={metadata_str}
     # print(p.returncode)
     # Show if success
     if p.returncode == 0:
-        print("Saved generation to", files.get("flac"))
+        print("Saved generation to", files.get("ogg"))
     else:
-        print("Failed to save generation to", files.get("flac"))
+        print("Failed to save generation to", files.get("ogg"))
         print("ffmpeg args:", args)
         print(output_data[0])
         # print(output_data[1])
@@ -119,7 +119,7 @@ if __name__ == "__main__":
     }
 
     callback_save_generation_musicgen(
-        audio_array, {"flac": args_output}, metadata, SAMPLE_RATE=48000
+        audio_array, {"ogg": args_output}, metadata, SAMPLE_RATE=22050
     )
 
     b = ffmpeg.probe(args_output)
