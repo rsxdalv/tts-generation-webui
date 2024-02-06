@@ -41,6 +41,9 @@ https://rsxdalv.github.io/bark-speaker-directory/
 https://github.com/rsxdalv/tts-generation-webui/discussions/186#discussioncomment-7291274
 
 ## Changelog
+Feb 6:
+* Add FLAC file generation extension by https://github.com/JoaCHIP
+
 Jan 21:
 * Add CPU/M1 torch auto-repair script with each update. To disable, edit check_cuda.py and change FORCE_NO_REPAIR = True
 
