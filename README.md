@@ -41,6 +41,10 @@ https://rsxdalv.github.io/bark-speaker-directory/
 https://github.com/rsxdalv/tts-generation-webui/discussions/186#discussioncomment-7291274
 
 ## Changelog
+Feb 8:
+* Fix MultiBandDiffusion for MusicGen's stereo models, thank you https://github.com/mykeehu
+* Fix Node.js installation steps on Google Colab, code by https://github.com/miaohf
+
 Feb 6:
 * Add FLAC file generation extension by https://github.com/JoaCHIP
 
