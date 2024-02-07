@@ -3,6 +3,7 @@ import gradio as gr
 from audiocraft.models.musicgen import MusicGen
 from audiocraft.models.audiogen import AudioGen
 from audiocraft.models.encodec import InterleaveStereoCompressionModel
+from einops import rearrange
 from typing import Optional, Tuple, TypedDict
 import numpy as np
 import os
