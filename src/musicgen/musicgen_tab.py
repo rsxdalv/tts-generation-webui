@@ -207,8 +207,14 @@ def generate(params: MusicGenGeneration, melody_in: Optional[Tuple[int, np.ndarr
             from audiocraft.models.multibanddiffusion import MultiBandDiffusion
 
             mbd = MultiBandDiffusion.get_mbd_musicgen()
-            wav_diffusion = mbd.tokens_to_wav(tokens)
-            output = wav_diffusion.detach().cpu().numpy().squeeze()
+            if isinstance(MODEL.compression_model, InterleaveStereoCompressionModel):
+                left, right = MODEL.compression_model.get_left_right_codes(tokens)
+                tokens = torch.cat([left, right])
+            outputs_diffusion = mbd.tokens_to_wav(tokens)
+            if isinstance(MODEL.compression_model, InterleaveStereoCompressionModel):
+                assert outputs_diffusion.shape[1] == 1  # output is mono
+                outputs_diffusion = rearrange(outputs_diffusion, '(s b) c t -> b (s c) t', s=2)
+            output = outputs_diffusion.detach().cpu().numpy().squeeze()
         else:
             print("NOTICE: Multi-band diffusion is not supported for AudioGen")
             params["use_multi_band_diffusion"] = False
