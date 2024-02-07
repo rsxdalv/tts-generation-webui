@@ -31,7 +31,7 @@ def callback_save_generation_musicgen(
     channels = audio_array.shape[1] if len(audio_array.shape) > 1 else 1
     pipe_input = ffmpeg.input("pipe:", format="f32le", ar=str(SAMPLE_RATE), ac=channels)
     # TODO: test with Tempfile
-    metadata_filename = files.get("flac") + ".ffmetadata.ini"  # type: ignore
+    metadata_filename = filename + ".ffmetadata.ini"  # type: ignore
     with open(metadata_filename, "w", encoding="utf-8") as f:
         f.write(
             f""";FFMETADATA1
@@ -74,9 +74,9 @@ comment={metadata_str}
     # print(p.returncode)
     # Show if success
     if p.returncode == 0:
-        print("Saved generation to", files.get("flac"))
+        print("Saved generation to", filename)
     else:
-        print("Failed to save generation to", files.get("flac"))
+        print("Failed to save generation to", filename)
         print("ffmpeg args:", args)
         print(output_data[0])
         # print(output_data[1])
