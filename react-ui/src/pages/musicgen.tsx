@@ -405,7 +405,7 @@ const MusicgenPage = () => {
                     href="https://huggingface.co/facebook/multiband-diffusion"
                     target="_blank"
                   >
-                    Multi Band Diffusion:
+                    Multi Band Diffusion (High VRAM Usage):
                   </a>
                 </label>
                 <input

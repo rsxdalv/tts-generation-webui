@@ -323,7 +323,7 @@ def generation_tab_musicgen():
                         step=0.1,
                     )
                 use_multi_band_diffusion = gr.Checkbox(
-                    label="Use Multi-Band Diffusion",
+                    label="Use Multi-Band Diffusion (High VRAM Usage)",
                     value=False,
                 )
                 seed, set_old_seed_button, _ = setup_seed_ui_musicgen()
