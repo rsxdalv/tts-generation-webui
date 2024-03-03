@@ -41,6 +41,10 @@ https://rsxdalv.github.io/bark-speaker-directory/
 https://github.com/rsxdalv/tts-generation-webui/discussions/186#discussioncomment-7291274
 
 ## Changelog
+Mar 3:
+* Add MMS demo as a notebook
+* Add MultiBandDiffusion high VRAM disclaimer
+
 Feb 21:
 * Fix Docker container builds and bug with Docker-Audiocraft
 
