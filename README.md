@@ -43,6 +43,7 @@ https://github.com/rsxdalv/tts-generation-webui/discussions/186#discussioncommen
 ## Changelog
 Mar 3:
 * Add MMS demo as a notebook
+* Add MultiBandDiffusion high VRAM disclaimer
 
 Feb 21:
 * Fix Docker container builds and bug with Docker-Audiocraft
