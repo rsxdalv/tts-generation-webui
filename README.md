@@ -41,6 +41,9 @@ https://rsxdalv.github.io/bark-speaker-directory/
 https://github.com/rsxdalv/tts-generation-webui/discussions/186#discussioncomment-7291274
 
 ## Changelog
+Mar 5:
+* Add Batching to React UI MusicGen (#281), thanks to https://github.com/Aamir3d for requesting this and providing feedback
+
 Mar 3:
 * Add MMS demo as a notebook
 * Add MultiBandDiffusion high VRAM disclaimer
