@@ -69,12 +69,17 @@ export default function useLocalStorage<T>(
 
   const setValue: Dispatch<SetStateAction<T>> = (value) => {
     // Allow value to be a function so we have the same API as useState
-    const valueToStore = value instanceof Function ? value(storedValue) : value;
+    // const valueToStore = value instanceof Function ? value(storedValue) : value;
 
-    // update local storage
-    setLocalValue(valueToStore);
-    // Save state
-    setStoredValue(valueToStore);
+    // // update local storage
+    // setLocalValue(valueToStore);
+    // // Save state
+    // setStoredValue(valueToStore);
+    setStoredValue(x => {
+      const newValue = value instanceof Function ? value(x) : value;
+      setLocalValue(newValue);
+      return newValue;
+    });
   };
 
   // watch localStorage changes

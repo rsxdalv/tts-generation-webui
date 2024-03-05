@@ -21,7 +21,7 @@ export const initialMusicgenParams: MusicgenParams = {
   text: "lofi hip hop beats to relax/study to",
   melody: undefined,
   // melody: "https://www.mfiles.co.uk/mp3-downloads/gs-cd-track2.mp3",
-  model: "Small",
+  model: "facebook/musicgen-small",
   duration: 1,
   topk: 250,
   topp: 0,
