@@ -173,6 +173,11 @@ const ModelSelector = ({
   );
 };
 
+const initialMusicgenHyperParams = {
+  iterations: 1,
+  splitByLines: false,
+};
+
 const initialHistory = []; // prevent infinite loop
 const MusicgenPage = () => {
   const [data, setData] = useLocalStorage<Result | null>(
@@ -187,23 +192,57 @@ const MusicgenPage = () => {
     musicgenId,
     initialMusicgenParams
   );
+  // hyperparameters
+  const [musicgenHyperParams, setMusicgenHyperParams] = useLocalStorage<
+    typeof initialMusicgenHyperParams
+  >("musicgenHyperParams", initialMusicgenHyperParams);
+  const [showLast, setShowLast] = useLocalStorage<number>(
+    "musicgenShowLast",
+    10
+  );
+  const interrupted = React.useRef(false);
+
+  const [progress, setProgress] = React.useState(0);
+  const [progressMax, setProgressMax] = React.useState(0);
 
   async function musicgen() {
-    const body = JSON.stringify({
-      ...musicgenParams,
-      melody: musicgenParams.model.includes("melody")
-        ? musicgenParams.melody
-        : null,
-      model: musicgenParams.model,
-    });
-    const response = await fetch("/api/gradio/musicgen", {
-      method: "POST",
-      body,
-    });
+    interrupted.current = false;
+    const texts = musicgenHyperParams.splitByLines
+      ? musicgenParams.text.split("\n")
+      : [musicgenParams.text];
 
-    const result: Result = await response.json();
-    setData(result);
-    setHistoryData((x) => [result, ...x]);
+    const incrementNonRandomSeed = (seed: number, iteration: number) => {
+      return seed === -1 ? -1 : seed + iteration;
+    };
+
+    const musicgenIteration = async (text, iteration: number) => {
+      const result = await musicgenGenerate({
+        ...musicgenParams,
+        text,
+        seed: incrementNonRandomSeed(musicgenParams.seed, iteration),
+      });
+      setData(result);
+      setHistoryData((x) => [result, ...x]);
+    };
+
+    setProgress(0);
+    setProgressMax(texts.length * musicgenHyperParams.iterations);
+    for (
+      let iteration = 0;
+      iteration < musicgenHyperParams.iterations;
+      iteration++
+    ) {
+      for (const text of texts) {
+        if (interrupted.current) {
+          return;
+        }
+        await musicgenIteration(text, iteration);
+        setProgress((x) => x + 1);
+      }
+    }
+    interrupted.current = false;
+    setProgress(0);
+    setProgressMax(0);
   }
 
   const handleChange = (
@@ -271,6 +310,8 @@ const MusicgenPage = () => {
     useSeed,
     useParameters,
   };
+
+  const interrupt = () => (interrupted.current = true);
 
   return (
     <Template>
@@ -416,6 +457,24 @@ const MusicgenPage = () => {
                   className="border border-gray-300 p-2 rounded"
                 />
               </div>
+
+              <HyperParameters
+                params={musicgenHyperParams}
+                setParams={setMusicgenHyperParams}
+                progress={progress}
+                progressMax={progressMax}
+                interrupted={interrupted}
+                interrupt={interrupt}
+              />
+              <button
+                className="border border-gray-300 p-2 rounded"
+                onClick={() => {
+                  setMusicgenParams(initialMusicgenParams);
+                  setMusicgenHyperParams(initialMusicgenHyperParams);
+                }}
+              >
+                Reset Parameters
+              </button>
             </div>
           </div>
         </div>
@@ -438,19 +497,32 @@ const MusicgenPage = () => {
 
         <div className="flex flex-col gap-y-2 border border-gray-300 p-2 rounded">
           <label className="text-sm">History:</label>
-          {/* Clear history */}
-          <button
-            className="border border-gray-300 p-2 rounded"
-            onClick={() => {
-              setHistoryData([]);
-            }}
-          >
-            Clear History
-          </button>
+          <div className="flex gap-x-2 items-center">
+            <button
+              className="border border-gray-300 p-2 px-40 rounded"
+              onClick={() => {
+                setHistoryData([]);
+              }}
+            >
+              Clear History
+            </button>
+            <div className="flex gap-x-2 items-center">
+              <label className="text-sm">Show Last X entries:</label>
+              <input
+                type="number"
+                value={showLast}
+                onChange={(event) => setShowLast(Number(event.target.value))}
+                className="border border-gray-300 p-2 rounded"
+                min="0"
+                max="100"
+                step="1"
+              />
+            </div>
+          </div>
           <div className="flex flex-col gap-y-2">
             {historyData &&
               historyData
-                .slice(1, 6)
+                .slice(1, showLast + 1)
                 .map((item, index) => (
                   <AudioOutput
                     key={index}
@@ -469,3 +541,96 @@ const MusicgenPage = () => {
 };
 
 export default MusicgenPage;
+
+async function musicgenGenerate(musicgenParams: MusicgenParams) {
+  const body = JSON.stringify({
+    ...musicgenParams,
+    melody: musicgenParams.model.includes("melody")
+      ? musicgenParams.melody
+      : null,
+    model: musicgenParams.model,
+  });
+  const response = await fetch("/api/gradio/musicgen", {
+    method: "POST",
+    body,
+  });
+
+  return (await response.json()) as Result;
+}
+
+const HyperParameters = ({
+  params: musicgenHyperParams,
+  setParams: setMusicgenHyperParams,
+  progress,
+  progressMax,
+  interrupted,
+  interrupt,
+}: {
+  params: typeof initialMusicgenHyperParams;
+  setParams: React.Dispatch<
+    React.SetStateAction<typeof initialMusicgenHyperParams>
+  >;
+  progress: number;
+  progressMax: number;
+  interrupted: React.MutableRefObject<boolean>;
+  interrupt: () => void;
+}) => (
+  <div className="flex flex-col gap-y-2 border border-gray-300 p-2 rounded">
+    <label className="text-sm">Hyperparameters:</label>
+    <div className="flex gap-x-2 items-center">
+      <label className="text-sm">Iterations:</label>
+      <input
+        type="number"
+        name="iterations"
+        value={musicgenHyperParams.iterations}
+        onChange={(event) => {
+          setMusicgenHyperParams({
+            ...musicgenHyperParams,
+            iterations: Number(event.target.value),
+          });
+        }}
+        className="border border-gray-300 p-2 rounded"
+        min="1"
+        max="10"
+        step="1"
+      />
+    </div>
+    <div className="flex gap-x-2 items-center">
+      <div className="text-sm">Each line as a separate prompt:</div>
+      <input
+        type="checkbox"
+        name="splitByLines"
+        checked={musicgenHyperParams.splitByLines}
+        onChange={(event) => {
+          setMusicgenHyperParams({
+            ...musicgenHyperParams,
+            splitByLines: event.target.checked,
+          });
+        }}
+        className="border border-gray-300 p-2 rounded"
+      />
+    </div>
+    <Progress progress={progress} progressMax={progressMax} />
+    <button className="border border-gray-300 p-2 rounded" onClick={interrupt}>
+      {interrupted.current ? "Interrupted..." : "Interrupt"}
+    </button>
+  </div>
+);
+
+const Progress = ({
+  progress,
+  progressMax,
+}: {
+  progress: number;
+  progressMax: number;
+}) => (
+  <div className="flex gap-x-2 items-center">
+    <label className="text-sm">Progress:</label>
+    <progress
+      value={progress}
+      max={progressMax}
+      className="[&::-webkit-progress-bar]:rounded [&::-webkit-progress-value]:rounded   [&::-webkit-progress-bar]:bg-slate-300 [&::-webkit-progress-value]:bg-orange-400 [&::-moz-progress-bar]:bg-orange-400 [&::-webkit-progress-value]:transition-all [&::-webkit-progress-value]:duration-200"
+    />
+    {progress}/{progressMax}
+  </div>
+);
