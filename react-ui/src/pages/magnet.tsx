@@ -9,6 +9,15 @@ import {
   magnetId,
 } from "../tabs/MagnetParams";
 import { GradioFile } from "../types/GradioFile";
+import { HyperParameters } from "../components/HyperParameters";
+import {
+  extractTexts,
+  getMax,
+  incrementNonRandomSeed,
+  initialHyperParams,
+} from "../data/hyperParamsUtils";
+import { useInterrupt } from "../hooks/useInterrupt";
+import { manageProgress } from "../components/Progress";
 
 type AudioOutput = {
   name: string;
@@ -343,18 +352,63 @@ const MagnetPage = () => {
     magnetId,
     initialMagnetParams
   );
+  const [hyperParams, setHyperParams] = useLocalStorage<
+    typeof initialHyperParams
+  >("magnetHyperParams", initialHyperParams);
+  const [showLast, setShowLast] = useLocalStorage<number>(
+    "magnetShowLast",
+    10
+  );
 
-  async function magnet() {
-    const body = JSON.stringify({ ...magnetParams });
-    const response = await fetch("/api/gradio/magnet", {
-      method: "POST",
-      body,
-    });
+  const { interrupted, resetInterrupt, interrupt } = useInterrupt();
+  const [progress, setProgress] = React.useState({ current: 0, max: 0 });
 
-    const result: Result = await response.json();
-    setData(result);
-    setHistoryData((x) => [result, ...x]);
+  function magnetWithProgress() {
+    const texts = extractTexts(magnetParams.text, hyperParams);
+    const { iterations } = hyperParams;
+
+    return manageProgress(
+      ({ incrementProgress }) =>
+        magnetConsumer(
+          magnetGenerator(texts, iterations, magnetParams),
+          incrementProgress
+        ),
+      getMax(texts, iterations),
+      setProgress
+    );
   }
+
+  async function* magnetGenerator(
+    texts: string[],
+    iterations: number,
+    magnetParams: MagnetParams
+  ) {
+    for (let iteration = 0; iteration < iterations; iteration++) {
+      for (const text of texts) {
+        if (interrupted.current) {
+          return;
+        }
+        yield magnetGenerate({
+          ...magnetParams,
+          text,
+          seed: incrementNonRandomSeed(magnetParams.seed, iteration),
+        });
+      }
+    }
+  }
+
+  async function magnetConsumer(
+    generator: AsyncGenerator<Result, void, unknown>,
+    callback: (result: Result) => void
+  ) {
+    for await (const result of generator) {
+      setData(result);
+      setHistoryData((x) => [result, ...x]);
+      callback(result);
+    }
+  }
+
+  const magnet = resetInterrupt(magnetWithProgress);
 
   const handleChange = (
     event:
@@ -416,13 +470,13 @@ const MagnetPage = () => {
     useSeed,
     useParameters,
   };
-
+  const clearHistory = () => setHistoryData([]);
   return (
     <Template>
       <Head>
         <title>Magnet - TTS Generation Webui</title>
       </Head>
-      <div className="p-4 flex w-full flex-col">
+      <div className="gap-y-4 p-4 flex w-full flex-col">
         <MagnetInputs
           magnetParams={magnetParams}
           handleChange={handleChange}
@@ -430,7 +484,16 @@ const MagnetPage = () => {
           data={data}
         />
 
-        <div className="my-4 flex flex-col gap-y-2">
+        <HyperParameters
+          params={hyperParams}
+          setParams={setHyperParams}
+          interrupt={interrupt}
+          isInterrupted={interrupted.current}
+          progress={progress.current}
+          progressMax={progress.max}
+        />
+
+        <div className="flex flex-col gap-y-2">
           <button
             className="border border-gray-300 p-2 rounded"
             onClick={magnet}
@@ -448,19 +511,30 @@ const MagnetPage = () => {
 
         <div className="flex flex-col gap-y-2 border border-gray-300 p-2 rounded">
           <label className="text-sm">History:</label>
-          {/* Clear history */}
-          <button
-            className="border border-gray-300 p-2 rounded"
-            onClick={() => {
-              setHistoryData([]);
-            }}
-          >
-            Clear History
-          </button>
+          <div className="flex gap-x-2 items-center">
+            <button
+              className="border border-gray-300 p-2 px-40 rounded"
+              onClick={clearHistory}
+            >
+              Clear History
+            </button>
+            <div className="flex gap-x-2 items-center">
+              <label className="text-sm">Show Last X entries:</label>
+              <input
+                type="number"
+                value={showLast}
+                onChange={(event) => setShowLast(Number(event.target.value))}
+                className="border border-gray-300 p-2 rounded"
+                min="0"
+                max="100"
+                step="1"
+              />
+            </div>
+          </div>
           <div className="flex flex-col gap-y-2">
             {historyData &&
               historyData
-                .slice(1, 6)
+                .slice(1, showLast + 1)
                 .map((item, index) => (
                   <AudioOutput
                     key={index}
@@ -468,7 +542,7 @@ const MagnetPage = () => {
                     metadata={item}
                     label={item.history_bundle_name_data}
                     funcs={funcs}
-                    filter={["sendToMagnet"]}
+                    filter={["sendToMusicgen"]}
                   />
                 ))}
           </div>
@@ -677,3 +751,13 @@ const MagnetInputs = ({
     </div>
   );
 };
+
+async function magnetGenerate(magnetParams: MagnetParams) {
+  const body = JSON.stringify({ ...magnetParams });
+  const response = await fetch("/api/gradio/magnet", {
+    method: "POST",
+    body,
+  });
+
+  return (await response.json()) as Result;
+}
