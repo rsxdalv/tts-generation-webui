@@ -494,35 +494,33 @@ const Voice = ({
       | React.ChangeEvent<HTMLTextAreaElement>
       | React.ChangeEvent<HTMLSelectElement>
   ) => void;
-}) => {
-  return (
-    <div className="flex flex-col gap-2 border border-gray-300 p-2 rounded">
-      <h2 className="text-md">Voice:</h2>
-      <Language
-        barkGenerationParams={barkGenerationParams}
-        handleChange={handleChange}
-      />
-      <SpeakerID
-        barkGenerationParams={barkGenerationParams}
-        handleChange={handleChange}
-      />
-      <UseV2
-        barkGenerationParams={barkGenerationParams}
-        handleChange={handleChange}
-      />
-      {/* Display selected voice info */}
-      <div className="flex flex-col space-y-2">
-        <div className="border border-gray-300 p-2 rounded">
-          {generate_choice_string(
-            barkGenerationParams.useV2,
-            barkGenerationParams.languageRadio,
-            barkGenerationParams.speakerIdRadio
-          )}
-        </div>
+}) => (
+  <div className="flex flex-col gap-2 border border-gray-300 p-2 rounded">
+    <h2 className="text-md">Voice:</h2>
+    <Language
+      barkGenerationParams={barkGenerationParams}
+      handleChange={handleChange}
+    />
+    <SpeakerID
+      barkGenerationParams={barkGenerationParams}
+      handleChange={handleChange}
+    />
+    <UseV2
+      barkGenerationParams={barkGenerationParams}
+      handleChange={handleChange}
+    />
+    {/* Display selected voice info */}
+    <div className="flex flex-col space-y-2">
+      <div className="border border-gray-300 p-2 rounded">
+        {generate_choice_string(
+          barkGenerationParams.useV2,
+          barkGenerationParams.languageRadio,
+          barkGenerationParams.speakerIdRadio
+        )}
       </div>
     </div>
-  );
-};
+  </div>
+);
 
 const HistoryPromptVoiceSetting = ({
   barkGenerationParams,
@@ -535,35 +533,33 @@ const HistoryPromptVoiceSetting = ({
       | React.ChangeEvent<HTMLTextAreaElement>
       | React.ChangeEvent<HTMLSelectElement>
   ) => void;
-}) => {
-  return (
-    <div className="flex flex-col space-y-2 border border-gray-300 p-2 rounded">
-      <label className="text-sm">History Prompt (voice) setting:</label>
-      <div className="flex flex-row space-x-2">
-        {[
-          "Empty history",
-          "or Use a voice:",
-          "or Use old generation as history:",
-        ].map((model) => (
-          <div key={model} className="flex items-center">
-            <input
-              type="radio"
-              name="history_setting"
-              id={model}
-              value={model}
-              checked={barkGenerationParams.history_setting === model}
-              onChange={handleChange}
-              className="border border-gray-300 p-2 rounded"
-            />
-            <label className="ml-1" htmlFor={model}>
-              {model}
-            </label>
-          </div>
-        ))}
-      </div>
+}) => (
+  <div className="flex flex-col space-y-2 border border-gray-300 p-2 rounded">
+    <label className="text-sm">History Prompt (voice) setting:</label>
+    <div className="flex flex-row space-x-2">
+      {[
+        "Empty history",
+        "or Use a voice:",
+        "or Use old generation as history:",
+      ].map((model) => (
+        <div key={model} className="flex items-center">
+          <input
+            type="radio"
+            name="history_setting"
+            id={model}
+            value={model}
+            checked={barkGenerationParams.history_setting === model}
+            onChange={handleChange}
+            className="border border-gray-300 p-2 rounded"
+          />
+          <label className="ml-1" htmlFor={model}>
+            {model}
+          </label>
+        </div>
+      ))}
     </div>
-  );
-};
+  </div>
+);
 
 const PromptType = ({
   barkGenerationParams,
@@ -576,31 +572,45 @@ const PromptType = ({
       | React.ChangeEvent<HTMLTextAreaElement>
       | React.ChangeEvent<HTMLSelectElement>
   ) => void;
-}) => {
-  return (
-    <div>
-      <label className="text-sm">Prompt type:</label>
-      <div className="flex flex-row space-x-2">
-        {["Short prompt (<15s)", "Split prompt by lines"].map((promptType) => (
-          <div key={promptType} className="flex items-center">
-            <input
-              type="radio"
-              name="long_prompt_radio"
-              id={promptType}
-              value={promptType}
-              checked={barkGenerationParams.long_prompt_radio === promptType}
-              onChange={handleChange}
-              className="border border-gray-300 p-2 rounded"
-            />
-            <label className="ml-1" htmlFor={promptType}>
-              {promptType}
-            </label>
-          </div>
-        ))}
-      </div>
+}) => (
+  <div>
+    <label className="text-sm">Prompt type:</label>
+    <div className="flex flex-row space-x-2">
+      {["Short prompt (<15s)", "Split prompt by lines"].map((promptType) => (
+        <div key={promptType} className="flex items-center">
+          <input
+            type="radio"
+            name="long_prompt_radio"
+            id={promptType}
+            value={promptType}
+            checked={barkGenerationParams.long_prompt_radio === promptType}
+            onChange={handleChange}
+            className="border border-gray-300 p-2 rounded"
+          />
+          <label className="ml-1" htmlFor={promptType}>
+            {promptType}
+          </label>
+        </div>
+      ))}
     </div>
-  );
-};
+  </div>
+);
+
+const BARK_VOICE_LANGUAGES = [
+  "English",
+  "German",
+  "Spanish",
+  "French",
+  "Hindi",
+  "Italian",
+  "Japanese",
+  "Korean",
+  "Polish",
+  "Portuguese",
+  "Russian",
+  "Turkish",
+  "Chinese",
+];
 
 const Language = ({
   barkGenerationParams,
@@ -608,45 +618,29 @@ const Language = ({
 }: {
   barkGenerationParams: BarkGenerationParams;
   handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-}) => {
-  return (
-    <>
-      <label className="text-sm">Language:</label>
-      <div className="flex flex-row gap-x-2 flex-wrap">
-        {[
-          "English",
-          "German",
-          "Spanish",
-          "French",
-          "Hindi",
-          "Italian",
-          "Japanese",
-          "Korean",
-          "Polish",
-          "Portuguese",
-          "Russian",
-          "Turkish",
-          "Chinese",
-        ].map((model) => (
-          <div key={model} className="flex items-center">
-            <input
-              type="radio"
-              name="languageRadio"
-              id={model}
-              value={model}
-              checked={barkGenerationParams.languageRadio === model}
-              onChange={handleChange}
-              className="border border-gray-300 p-2 rounded"
-            />
-            <label className="ml-1" htmlFor={model}>
-              {model}
-            </label>
-          </div>
-        ))}
-      </div>
-    </>
-  );
-};
+}) => (
+  <>
+    <label className="text-sm">Language:</label>
+    <div className="flex flex-row gap-x-2 flex-wrap">
+      {BARK_VOICE_LANGUAGES.map((model) => (
+        <div key={model} className="flex items-center">
+          <input
+            type="radio"
+            name="languageRadio"
+            id={model}
+            value={model}
+            checked={barkGenerationParams.languageRadio === model}
+            onChange={handleChange}
+            className="border border-gray-300 p-2 rounded"
+          />
+          <label className="ml-1" htmlFor={model}>
+            {model}
+          </label>
+        </div>
+      ))}
+    </div>
+  </>
+);
 
 const GenericPrompt = ({
   barkGenerationParams,
@@ -658,21 +652,19 @@ const GenericPrompt = ({
   handleChange: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
   label: string;
   name: string;
-}) => {
-  return (
-    <div className="flex flex-col space-y-2">
-      <label className="text-sm">{label}:</label>
-      <textarea
-        name={name}
-        value={barkGenerationParams[name]}
-        onChange={handleChange}
-        className="border border-gray-300 p-2 rounded resize-none"
-        placeholder="Enter text here..."
-        rows={3}
-      />
-    </div>
-  );
-};
+}) => (
+  <div className="flex flex-col space-y-2">
+    <label className="text-sm">{label}:</label>
+    <textarea
+      name={name}
+      value={barkGenerationParams[name]}
+      onChange={handleChange}
+      className="border border-gray-300 p-2 rounded resize-none"
+      placeholder="Enter text here..."
+      rows={3}
+    />
+  </div>
+);
 
 const BurnInPrompt = ({
   barkGenerationParams,
@@ -680,16 +672,14 @@ const BurnInPrompt = ({
 }: {
   barkGenerationParams: BarkGenerationParams;
   handleChange: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
-}) => {
-  return (
-    <GenericPrompt
-      barkGenerationParams={barkGenerationParams}
-      handleChange={handleChange}
-      label="Burn In Prompt (Optional)"
-      name="burn_in_prompt"
-    />
-  );
-};
+}) => (
+  <GenericPrompt
+    barkGenerationParams={barkGenerationParams}
+    handleChange={handleChange}
+    label="Burn In Prompt (Optional)"
+    name="burn_in_prompt"
+  />
+);
 
 const Prompt = ({
   barkGenerationParams,
@@ -702,16 +692,14 @@ const Prompt = ({
       | React.ChangeEvent<HTMLTextAreaElement>
       | React.ChangeEvent<HTMLSelectElement>
   ) => void;
-}) => {
-  return (
-    <GenericPrompt
-      barkGenerationParams={barkGenerationParams}
-      handleChange={handleChange}
-      label="Prompt"
-      name="prompt"
-    />
-  );
-};
+}) => (
+  <GenericPrompt
+    barkGenerationParams={barkGenerationParams}
+    handleChange={handleChange}
+    label="Prompt"
+    name="prompt"
+  />
+);
 
 const GenericTemp = ({
   barkGenerationParams,
@@ -723,25 +711,23 @@ const GenericTemp = ({
   handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   label: string;
   name: string;
-}) => {
-  return (
-    <div className="flex flex-col border border-gray-300 p-2 rounded">
-      <label className="text-sm">
-        {label}: {barkGenerationParams[name]}
-      </label>
-      <input
-        type="range"
-        name={name}
-        value={barkGenerationParams[name]}
-        onChange={handleChange}
-        className="border border-gray-300 py-2 rounded"
-        min="0"
-        max="1.2"
-        step="0.01"
-      />
-    </div>
-  );
-};
+}) => (
+  <div className="flex flex-col border border-gray-300 p-2 rounded">
+    <label className="text-sm">
+      {label}: {barkGenerationParams[name]}
+    </label>
+    <input
+      type="range"
+      name={name}
+      value={barkGenerationParams[name]}
+      onChange={handleChange}
+      className="border border-gray-300 py-2 rounded"
+      min="0"
+      max="1.2"
+      step="0.01"
+    />
+  </div>
+);
 
 const TextTemp = ({
   barkGenerationParams,
