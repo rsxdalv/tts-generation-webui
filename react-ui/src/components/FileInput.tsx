@@ -1,4 +1,26 @@
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent } from "react";
+
+const uploadFile = async (file?: File) => {
+  if (!file) return;
+
+  try {
+    const data = new FormData();
+    data.set("file", file);
+
+    const res = await fetch("/api/upload", {
+      method: "POST",
+      body: data,
+    });
+    // handle the error
+    if (!res.ok) throw new Error(await res.text());
+  } catch (e: any) {
+    // Handle errors here
+    console.error(e);
+  }
+};
+
+const parseFileEvent = (e: ChangeEvent<HTMLInputElement>) =>
+  e.target.files?.[0];
 
 export default function FileInput({
   callback,
@@ -9,28 +31,6 @@ export default function FileInput({
   accept?: string;
   hide_text?: boolean;
 }) {
-  const parseFileEvent = (e: ChangeEvent<HTMLInputElement>) =>
-    e.target.files?.[0];
-
-  const uploadFile = async (file?: File) => {
-    if (!file) return;
-
-    try {
-      const data = new FormData();
-      data.set("file", file);
-
-      const res = await fetch("/api/upload", {
-        method: "POST",
-        body: data,
-      });
-      // handle the error
-      if (!res.ok) throw new Error(await res.text());
-    } catch (e: any) {
-      // Handle errors here
-      console.error(e);
-    }
-  };
-
   return (
     <div>
       <input

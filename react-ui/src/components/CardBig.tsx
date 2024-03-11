@@ -24,6 +24,8 @@ import { parseMetadataDate } from "./parseMetadataDate";
 import { Metadata, Row } from "./Metadata";
 import { sendToBarkAsVoice } from "../tabs/BarkGenerationParams";
 import { NPZ, NPZOptional } from "../types/NPZ";
+import { barkFavorite } from "../functions/barkFavorite";
+import { saveToVoices } from "../functions/saveToVoices";
 
 const ActionButton = ({
   icon,
@@ -201,24 +203,9 @@ export const HistoryCard = ({
   const isJapanese = promptText.match(/[\u3040-\u309F\u30A0-\u30FF]/);
   const maxLength = isJapanese ? 30 : 50;
   // const maxLength = 100000;
+  const absoluteFilename = "/" + filename;
 
-  const favorite = async (
-    _url: string,
-    data?: {
-      history_bundle_name_data?: string;
-    }
-  ) => {
-    const history_bundle_name_data = data?.history_bundle_name_data;
-    if (!history_bundle_name_data) return;
-    const response = await fetch("/api/gradio/bark_favorite", {
-      method: "POST",
-      body: JSON.stringify({
-        history_bundle_name_data,
-      }),
-    });
-    const result = await response.json();
-    return result;
-  };
+  const favorite = barkFavorite;
 
   const deleteFavorite = async (
     _url: string,
@@ -234,30 +221,18 @@ export const HistoryCard = ({
         history_bundle_name_data,
       }),
     });
-    const result = await response.json();
-    return result;
+    return await response.json();
   };
 
-  const addFavorite = () => {
+  const addFavorite = () =>
     favorite("", {
       history_bundle_name_data,
     });
-  };
 
-  const removeFavorite = () => {
+  const removeFavorite = () =>
     deleteFavorite("", {
       history_bundle_name_data,
     });
-  };
-
-  const saveToVoices = () => {
-    fetch("/api/gradio/save_to_voices", {
-      method: "POST",
-      body: JSON.stringify({
-        history_npz: api_filename?.replace(".ogg", ".npz"),
-      }),
-    });
-  };
 
   const openFolder = () => {
     fetch("/api/gradio/open_folder", {
@@ -286,18 +261,23 @@ export const HistoryCard = ({
     isFavorite?: boolean;
     removeFavorite: () => void;
     addFavorite: () => void;
-    saveToVoices: () => void;
+    saveToVoices: (api_filename?: string) => void;
     openFolder: () => void;
     useAsVoice: () => void;
-    filename?: string;
+    filename: string;
     _type?: string;
   }) => {
     return (
       <div className="flex w-full justify-between">
         {isFavorite ? (
+          // <ActionButton
+          //   icon={StarIcon}
+          //   alt="Remove from favorites"
+          //   onClick={removeFavorite}
+          //   />
           <ActionButton
-            icon={StarIcon}
-            alt="Remove from favorites"
+            icon={DeleteForeverIcon}
+            alt="Delete from favorites"
             onClick={removeFavorite}
           />
         ) : (
@@ -314,12 +294,12 @@ export const HistoryCard = ({
             />
           </>
         )}
-        <Download download={"/" + filename} />
+        <Download download={filename} />
         {_type === "bark" && (
           <ActionButton
             icon={PlaylistAddIcon}
             alt="Save to voices"
-            onClick={saveToVoices}
+            onClick={() => saveToVoices(api_filename)}
           />
         )}
         <ActionButton
@@ -379,7 +359,7 @@ export const HistoryCard = ({
           </h1>
         </div>
         <div className="flex w-full justify-between items-center">
-          <AudioPlayer audio={filename} />
+          <AudioPlayer audio={absoluteFilename} />
           <p className="text-gray-500 ml-2">{prettifyDate(date, true)}</p>
         </div>
         <ActionRow
@@ -389,7 +369,7 @@ export const HistoryCard = ({
           saveToVoices={saveToVoices}
           openFolder={openFolder}
           useAsVoice={useAsVoice}
-          filename={filename}
+          filename={absoluteFilename}
           _type={_type}
         />
         <div className="flex flex-col text-gray-500">
@@ -438,7 +418,7 @@ function isFullNPZ(generation: NPZ): generation is FullNPZ {
 
 export const CardVoiceNpz = ({ generation }: { generation: NPZ }) => {
   const { filename, date, url } = generation;
-  const image = url.replace(".npz", ".png");
+  const image = "/" + url.replace(".npz", ".png");
 
   const Extra = () => {
     if (!isFullNPZ(generation)) return <></>;
@@ -669,7 +649,7 @@ const AudioPlayer = ({ audio }: Pick<Voice, "audio">) => {
     return () => {
       audio.removeEventListener("ended", handleEnded);
     };
-  // }, [audioRef.current]);
+    // }, [audioRef.current]);
   }, []); // because it's a ref, it doesn't need to be in the dependency array
 
   return (

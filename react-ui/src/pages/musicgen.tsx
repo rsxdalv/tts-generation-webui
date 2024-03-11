@@ -12,7 +12,6 @@ import { GradioFile } from "../types/GradioFile";
 import { HyperParameters } from "../components/HyperParameters";
 import { useInterrupt } from "../hooks/useInterrupt";
 import {
-  hyperParamsUtils,
   initialHyperParams,
   extractTexts,
   getMax,

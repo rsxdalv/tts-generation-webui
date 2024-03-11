@@ -5,6 +5,8 @@ import { parseMetadataDate } from "../components/parseMetadataDate";
 import * as AdmZip from "adm-zip";
 import { parseNpy } from "./npz-parsing";
 import { npyToUtf8 } from "./npyToUtf8";
+import { getWebuiURL } from "./getWebuiURL";
+import { baseUrlPath } from "./baseUrlPath";
 
 const __next__base__dirname = __dirname.split(".next")[0];
 const basePath = path.join(__next__base__dirname, "public");
@@ -18,8 +20,6 @@ const getOgg = () => fs.readdirSync(oggPath);
 const npzPath = path.join(basePath, "voice-drafts");
 const npzPathWebui = getWebuiPath("voices");
 const getNpzs = (dir: string = npzPath) => fs.readdirSync(dir);
-
-const baseUrlPath = "";
 
 export const getOggData = async (collection = "favorites") => {
   const ogg = getOgg();
@@ -127,12 +127,6 @@ export const getDataFromJSON = async (collection = "outputs") => {
   });
   return oggDataParsed;
 };
-
-const getWebuiURL = (...args: string[]) =>
-  path
-    .join(baseUrlPath, "api", "webui-generations", ...args)
-    .split(path.sep)
-    .join("/");
 
 const generateResult = (
   result: any,

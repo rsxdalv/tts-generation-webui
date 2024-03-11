@@ -1,0 +1,15 @@
+export const BARK_LANGUAGE_TO_CODE = {
+  English: "en",
+  Chinese: "zh",
+  French: "fr",
+  German: "de",
+  Hindi: "hi",
+  Italian: "it",
+  Japanese: "ja",
+  Korean: "ko",
+  Polish: "pl",
+  Portuguese: "pt",
+  Russian: "ru",
+  Spanish: "es",
+  Turkish: "tr",
+};
