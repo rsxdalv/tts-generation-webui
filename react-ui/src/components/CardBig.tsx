@@ -202,6 +202,7 @@ export const HistoryCard = ({
   const isJapanese = promptText.match(/[\u3040-\u309F\u30A0-\u30FF]/);
   const maxLength = isJapanese ? 30 : 50;
   // const maxLength = 100000;
+  const absoluteFilename = "/" + filename;
 
   const favorite = barkFavorite;
 
@@ -271,7 +272,7 @@ export const HistoryCard = ({
     saveToVoices: () => void;
     openFolder: () => void;
     useAsVoice: () => void;
-    filename?: string;
+    filename: string;
     _type?: string;
   }) => {
     return (
@@ -296,7 +297,7 @@ export const HistoryCard = ({
             />
           </>
         )}
-        <Download download={"/" + filename} />
+        <Download download={filename} />
         {_type === "bark" && (
           <ActionButton
             icon={PlaylistAddIcon}
@@ -361,7 +362,7 @@ export const HistoryCard = ({
           </h1>
         </div>
         <div className="flex w-full justify-between items-center">
-          <AudioPlayer audio={filename} />
+          <AudioPlayer audio={absoluteFilename} />
           <p className="text-gray-500 ml-2">{prettifyDate(date, true)}</p>
         </div>
         <ActionRow
@@ -371,7 +372,7 @@ export const HistoryCard = ({
           saveToVoices={saveToVoices}
           openFolder={openFolder}
           useAsVoice={useAsVoice}
-          filename={filename}
+          filename={absoluteFilename}
           _type={_type}
         />
         <div className="flex flex-col text-gray-500">
