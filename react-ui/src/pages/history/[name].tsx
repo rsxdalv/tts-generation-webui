@@ -19,7 +19,7 @@ export default function Home({ outputs, isFavorites = false }: Props) {
     <Template>
       <Head>
         <title>
-          {isFavorites ? "Favorites" : "History"} - TTS Generation Webui
+          {`${isFavorites ? "Favorites" : "History"} - TTS Generation Webui`}
         </title>
       </Head>
       <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">

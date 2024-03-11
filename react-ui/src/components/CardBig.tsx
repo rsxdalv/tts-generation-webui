@@ -219,21 +219,18 @@ export const HistoryCard = ({
         history_bundle_name_data,
       }),
     });
-    const result = await response.json();
-    return result;
+    return await response.json();
   };
 
-  const addFavorite = () => {
+  const addFavorite = () =>
     favorite("", {
       history_bundle_name_data,
     });
-  };
 
-  const removeFavorite = () => {
+  const removeFavorite = () =>
     deleteFavorite("", {
       history_bundle_name_data,
     });
-  };
 
   const saveToVoices = () => {
     fetch("/api/gradio/save_to_voices", {
