@@ -278,9 +278,14 @@ export const HistoryCard = ({
     return (
       <div className="flex w-full justify-between">
         {isFavorite ? (
+          // <ActionButton
+          //   icon={StarIcon}
+          //   alt="Remove from favorites"
+          //   onClick={removeFavorite}
+          //   />
           <ActionButton
-            icon={StarIcon}
-            alt="Remove from favorites"
+            icon={DeleteForeverIcon}
+            alt="Delete from favorites"
             onClick={removeFavorite}
           />
         ) : (
