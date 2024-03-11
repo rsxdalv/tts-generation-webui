@@ -41,6 +41,12 @@ https://rsxdalv.github.io/bark-speaker-directory/
 https://github.com/rsxdalv/tts-generation-webui/discussions/186#discussioncomment-7291274
 
 ## Changelog
+Mar 11:
+* Add Play as Audio and Save to Voices to bark (#286)
+* Change UX to show that files are deleted from favorites
+* Fix images for bark voices not showing
+* Fix audio playback in favorites
+
 Mar 10:
 * Add Batching to React UI Magnet (#283)
 * Add audio to audio translation to SeamlessM4T (#284)
