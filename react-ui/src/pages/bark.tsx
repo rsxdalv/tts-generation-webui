@@ -219,7 +219,7 @@ function Inputs({
           )}
           {barkGenerationParams.history_setting ===
             "or Use old generation as history:" && (
-            <div className="flex flex-col border border-gray-300 p-2 rounded">
+            <div className="flex flex-col border border-gray-300 p-2 rounded space-y-2">
               <OldGeneration
                 barkGenerationParams={barkGenerationParams}
                 handleChange={handleChange}
@@ -232,7 +232,6 @@ function Inputs({
           )}
         </div>
         <div className="space-y-2 w-1/2">
-          {/* {PromptType({ barkGenerationParams, handleChange })} */}
           <div className="flex flex-col space-y-2 border border-gray-300 p-2 rounded">
             <PromptType
               barkGenerationParams={barkGenerationParams}
@@ -361,7 +360,7 @@ const Seed = ({
 };
 
 // generic old generation dropdown for both OldGeneration and HistoryPromptSemantic
-const OldGenerationDropdown = ({
+const NPZVoiceDropdown = ({
   barkGenerationParams,
   handleChange,
   name,
@@ -374,23 +373,16 @@ const OldGenerationDropdown = ({
 }) => {
   const [options, setOptions] = React.useState<string[]>([]);
 
-  React.useEffect(() => {
-    (async () => {
-      const response = await fetch(
-        "/api/gradio/reload_old_generation_dropdown",
-        {
-          method: "POST",
-        }
-      );
+  const refreshOptions = async () => {
+    const result = await reloadOldGenerationDropdown();
+    setOptions(result);
+  };
 
-      const result = await response.json();
-      setOptions(result);
-    })();
-  }, []);
+  React.useEffect(() => void refreshOptions(), []);
 
   const selected = barkGenerationParams?.[name];
   return (
-    <div>
+    <div className="flex flex-col space-y-2">
       <label className="text-sm">{label}:</label>
       <select
         name={name}
@@ -399,34 +391,38 @@ const OldGenerationDropdown = ({
         value={selected}
         onChange={handleChange}
       >
+        {selected && <option value={selected}>{selected}</option>}
         {options
-          // concat to ensure selected is at the top and present
           .filter((option) => option !== selected)
-          .concat(selected)
-          .map((bandwidth) => (
-            <option key={bandwidth} value={bandwidth}>
-              {bandwidth}
+          .map((npzFile) => (
+            <option key={npzFile} value={npzFile}>
+              {npzFile}
             </option>
           ))}
       </select>
-      <button
-        className="border border-gray-300 p-2 rounded"
-        onClick={() => {
-          (async () => {
-            const response = await fetch(
-              "/api/gradio/reload_old_generation_dropdown",
-              {
-                method: "POST",
-              }
-            );
-
-            const result = await response.json();
-            setOptions(result);
-          })();
-        }}
-      >
-        Refresh
-      </button>
+      <div className="flex flex-row space-x-2">
+        <button
+          className="border border-gray-300 p-2 rounded"
+          onClick={refreshOptions}
+        >
+          Refresh
+        </button>
+        <button
+          className="border border-gray-300 p-2 rounded"
+          onClick={() => handleChange({ target: { name, value: "" } } as any)}
+        >
+          Clear
+        </button>
+        <button
+          className="border border-gray-300 p-2 rounded"
+          onClick={() => {
+            const url = `/api/gradio/download_npz?npz=${selected}`;
+            window.open(url, "_blank");
+          }}
+        >
+          Download
+        </button>
+      </div>
     </div>
   );
 };
@@ -438,7 +434,7 @@ const OldGeneration = ({
   barkGenerationParams: BarkGenerationParams;
   handleChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
 }) => (
-  <OldGenerationDropdown
+  <NPZVoiceDropdown
     barkGenerationParams={barkGenerationParams}
     handleChange={handleChange}
     name="old_generation_dropdown"
@@ -453,7 +449,7 @@ const HistoryPromptSemantic = ({
   barkGenerationParams: BarkGenerationParams;
   handleChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
 }) => (
-  <OldGenerationDropdown
+  <NPZVoiceDropdown
     barkGenerationParams={barkGenerationParams}
     handleChange={handleChange}
     name="history_prompt_semantic_dropdown"
@@ -651,3 +647,11 @@ const WaveformTemp = ({
     name="waveform_temp"
   />
 );
+
+async function reloadOldGenerationDropdown() {
+  const response = await fetch("/api/gradio/reload_old_generation_dropdown", {
+    method: "POST",
+  });
+
+  return await response.json();
+}

@@ -1,6 +1,9 @@
-import { BarkResult } from "../tabs/BarkResult";
-
-export const barkFavorite = async (_url: string, data?: BarkResult) => {
+export const barkFavorite = async (
+  _url: string,
+  data?: {
+    history_bundle_name_data?: string;
+  }
+) => {
   const history_bundle_name_data = data?.history_bundle_name_data;
   if (!history_bundle_name_data) return;
 

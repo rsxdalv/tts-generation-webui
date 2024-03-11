@@ -24,6 +24,7 @@ import { parseMetadataDate } from "./parseMetadataDate";
 import { Metadata, Row } from "./Metadata";
 import { sendToBarkAsVoice } from "../tabs/BarkGenerationParams";
 import { NPZ, NPZOptional } from "../types/NPZ";
+import { barkFavorite } from "../functions/barkFavorite";
 
 const ActionButton = ({
   icon,
@@ -202,23 +203,7 @@ export const HistoryCard = ({
   const maxLength = isJapanese ? 30 : 50;
   // const maxLength = 100000;
 
-  const favorite = async (
-    _url: string,
-    data?: {
-      history_bundle_name_data?: string;
-    }
-  ) => {
-    const history_bundle_name_data = data?.history_bundle_name_data;
-    if (!history_bundle_name_data) return;
-    const response = await fetch("/api/gradio/bark_favorite", {
-      method: "POST",
-      body: JSON.stringify({
-        history_bundle_name_data,
-      }),
-    });
-    const result = await response.json();
-    return result;
-  };
+  const favorite = barkFavorite;
 
   const deleteFavorite = async (
     _url: string,
@@ -669,7 +654,7 @@ const AudioPlayer = ({ audio }: Pick<Voice, "audio">) => {
     return () => {
       audio.removeEventListener("ended", handleEnded);
     };
-  // }, [audioRef.current]);
+    // }, [audioRef.current]);
   }, []); // because it's a ref, it doesn't need to be in the dependency array
 
   return (
