@@ -11,6 +11,9 @@ import {
 import { BarkResult } from "../tabs/BarkResult";
 import { barkFavorite } from "../functions/barkFavorite";
 import { BarkVoice } from "../components/BarkVoice";
+import { getWebuiURL } from "../data/getWebuiURL";
+import { encodecDecode } from "../functions/encodecDecode";
+import { saveToVoices } from "../functions/saveToVoices";
 
 const initialHistory = []; // prevent infinite loop
 const BarkGenerationPage = () => {
@@ -381,6 +384,7 @@ const NPZVoiceDropdown = ({
   React.useEffect(() => void refreshOptions(), []);
 
   const selected = barkGenerationParams?.[name];
+
   return (
     <div className="flex flex-col space-y-2">
       <label className="text-sm">{label}:</label>
@@ -415,12 +419,27 @@ const NPZVoiceDropdown = ({
         </button>
         <button
           className="border border-gray-300 p-2 rounded"
-          onClick={() => {
-            const url = `/api/gradio/download_npz?npz=${selected}`;
-            window.open(url, "_blank");
-          }}
+          onClick={() => window.open(getWebuiURL(selected), "_blank")}
         >
           Download
+        </button>
+        <button
+          className="border border-gray-300 p-2 rounded"
+          onClick={async () => {
+            const url = getWebuiURL(selected);
+            const urlWithHost = `${window.location.origin}/${url}`;
+            const x = await encodecDecode({ npz_file: urlWithHost });
+            const audio = new Audio(x.data);
+            audio.play();
+          }}
+        >
+          Play as Audio
+        </button>
+        <button
+          className="border border-gray-300 p-2 rounded"
+          onClick={() => saveToVoices(selected)}
+        >
+          Save to Voices
         </button>
       </div>
     </div>

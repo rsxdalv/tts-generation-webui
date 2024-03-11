@@ -25,6 +25,7 @@ import { Metadata, Row } from "./Metadata";
 import { sendToBarkAsVoice } from "../tabs/BarkGenerationParams";
 import { NPZ, NPZOptional } from "../types/NPZ";
 import { barkFavorite } from "../functions/barkFavorite";
+import { saveToVoices } from "../functions/saveToVoices";
 
 const ActionButton = ({
   icon,
@@ -233,15 +234,6 @@ export const HistoryCard = ({
       history_bundle_name_data,
     });
 
-  const saveToVoices = () => {
-    fetch("/api/gradio/save_to_voices", {
-      method: "POST",
-      body: JSON.stringify({
-        history_npz: api_filename?.replace(".ogg", ".npz"),
-      }),
-    });
-  };
-
   const openFolder = () => {
     fetch("/api/gradio/open_folder", {
       method: "POST",
@@ -269,7 +261,7 @@ export const HistoryCard = ({
     isFavorite?: boolean;
     removeFavorite: () => void;
     addFavorite: () => void;
-    saveToVoices: () => void;
+    saveToVoices: (api_filename: string) => void;
     openFolder: () => void;
     useAsVoice: () => void;
     filename: string;
@@ -307,7 +299,7 @@ export const HistoryCard = ({
           <ActionButton
             icon={PlaylistAddIcon}
             alt="Save to voices"
-            onClick={saveToVoices}
+            onClick={() => saveToVoices(api_filename)}
           />
         )}
         <ActionButton
