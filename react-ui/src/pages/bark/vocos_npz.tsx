@@ -1,15 +1,16 @@
 import React from "react";
 import { Template } from "../../components/Template";
 import useLocalStorage from "../../hooks/useLocalStorage";
-import { AudioInput, AudioOutput } from "../../components/AudioComponents";
+import { AudioOutput } from "../../components/AudioComponents";
 import Head from "next/head";
 import {
-  VocosParamsNPZ,
+  EncodecParamsNPZ,
   vocosIdNPZ,
   initialState,
 } from "../../tabs/VocosParamsNPZ";
 import { GradioFile } from "../../types/GradioFile";
 import FileInput from "../../components/FileInput";
+import { encodecDecode } from "../../functions/encodecDecode";
 
 const VocosPageNPZ = () => {
   const [data, setData] = useLocalStorage<GradioFile | null>(
@@ -20,7 +21,7 @@ const VocosPageNPZ = () => {
     "vocosOutputNpzEncodec",
     null
   );
-  const [vocosParams, setVocosParams] = useLocalStorage<VocosParamsNPZ>(
+  const [vocosParams, setVocosParams] = useLocalStorage<EncodecParamsNPZ>(
     vocosIdNPZ,
     initialState
   );
@@ -35,13 +36,8 @@ const VocosPageNPZ = () => {
     setData(result);
   }
 
-  async function encodec_decode() {
-    const response = await fetch("/api/gradio/encodec_decode", {
-      method: "POST",
-      body: JSON.stringify(vocosParams),
-    });
-
-    const result = await response.json();
+  async function decodeWithEncodec() {
+    const result = await encodecDecode(vocosParams);
     setDataEncodec(result);
   }
 
@@ -71,7 +67,7 @@ const VocosPageNPZ = () => {
           </button>
           <button
             className="border border-gray-300 p-2 rounded"
-            onClick={encodec_decode}
+            onClick={decodeWithEncodec}
           >
             Decode with Encodec
           </button>

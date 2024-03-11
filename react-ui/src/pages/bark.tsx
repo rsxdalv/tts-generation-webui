@@ -1,67 +1,25 @@
 import React from "react";
 import { Template } from "../components/Template";
 import useLocalStorage from "../hooks/useLocalStorage";
-import { AudioInput, AudioOutput } from "../components/AudioComponents";
+import { AudioOutput } from "../components/AudioComponents";
 import Head from "next/head";
 import {
   BarkGenerationParams,
   barkGenerationId,
   initialState,
 } from "../tabs/BarkGenerationParams";
-import { GradioFile } from "../types/GradioFile";
-
-type Result = {
-  audio: GradioFile;
-  image: string;
-  save_button: Object;
-  continue_button: Object;
-  buttons_row: Object;
-  npz: string;
-  seed: null;
-  json_text: {
-    _version: string;
-    _hash_version: string;
-    _type: string;
-    is_big_semantic_model: boolean;
-    is_big_coarse_model: boolean;
-    is_big_fine_model: boolean;
-    prompt: string;
-    language: string;
-    speaker_id: string;
-    hash: string;
-    history_prompt: string;
-    history_prompt_npz: string;
-    history_hash: string;
-    text_temp: number;
-    waveform_temp: number;
-    date: string;
-    seed: string;
-    semantic_prompt: string;
-    coarse_prompt: string;
-  };
-  history_bundle_name_data: string;
-};
-
-const favorite = async (_url: string, data?: Result) => {
-  const history_bundle_name_data = data?.history_bundle_name_data;
-  if (!history_bundle_name_data) return;
-  const response = await fetch("/api/gradio/bark_favorite", {
-    method: "POST",
-    body: JSON.stringify({
-      history_bundle_name_data,
-    }),
-  });
-  const result = await response.json();
-  return result;
-};
+import { BARK_VOICE_TO_TRAIT } from "../data/BARK_VOICE_TO_TRAIT";
+import { BARK_LANGUAGE_TO_CODE } from "../data/BARK_LANGUAGE_TO_CODE";
+import { BarkResult } from "../tabs/BarkResult";
+import { barkFavorite } from "../functions/barkFavorite";
 
 const initialHistory = []; // prevent infinite loop
 const BarkGenerationPage = () => {
-  const [historyData, setHistoryData] = useLocalStorage<Result[]>(
+  const [historyData, setHistoryData] = useLocalStorage<BarkResult[]>(
     "barkGenerationHistory",
     initialHistory
   );
-  const [data, setData] = useLocalStorage<Result | null>(
+  const [data, setData] = useLocalStorage<BarkResult | null>(
     "barkGenerationOutput",
     null
   );
@@ -83,7 +41,7 @@ const BarkGenerationPage = () => {
     setLoading(false);
   }
 
-  const useAsHistory = (_url: string, data?: Result) => {
+  const useAsHistory = (_url: string, data?: BarkResult) => {
     const npz = data?.npz;
     if (!npz) return;
     setBarkVoiceGenerationParams({
@@ -92,7 +50,7 @@ const BarkGenerationPage = () => {
     });
   };
 
-  const useAsHistoryPromptSemantic = (_url: string, data?: Result) => {
+  const useAsHistoryPromptSemantic = (_url: string, data?: BarkResult) => {
     const npz = data?.npz;
     if (!npz) return;
     setBarkVoiceGenerationParams({
@@ -101,7 +59,7 @@ const BarkGenerationPage = () => {
     });
   };
 
-  const useSeed = (_url: string, data?: Result) => {
+  const useSeed = (_url: string, data?: BarkResult) => {
     const seed_input = data?.json_text?.seed;
     if (!seed_input) return;
     setBarkVoiceGenerationParams({
@@ -110,7 +68,7 @@ const BarkGenerationPage = () => {
     });
   };
 
-  const useParametersTest = (_url: string, data?: Result) => {
+  const useParametersTest = (_url: string, data?: BarkResult) => {
     const {
       prompt,
       language,
@@ -144,7 +102,7 @@ const BarkGenerationPage = () => {
     useAsHistory,
     useAsHistoryPromptSemantic,
     useSeed,
-    favorite,
+    favorite: barkFavorite,
     useParametersTest,
   };
 
@@ -241,7 +199,7 @@ function Inputs({
       | React.ChangeEvent<HTMLTextAreaElement>
       | React.ChangeEvent<HTMLSelectElement>
   ) => void;
-  data: Result | null;
+  data: BarkResult | null;
 }) {
   return (
     <div className="flex flex-col space-y-2">
@@ -351,10 +309,6 @@ const ForEachSubsequentGeneration = ({
       </div>
     </div>
   );
-};
-
-const randomSeed = () => {
-  return Math.floor(Math.random() * 2 ** 32);
 };
 
 const Seed = ({
@@ -484,16 +438,14 @@ const OldGeneration = ({
 }: {
   barkGenerationParams: BarkGenerationParams;
   handleChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
-}) => {
-  return (
-    <OldGenerationDropdown
-      barkGenerationParams={barkGenerationParams}
-      handleChange={handleChange}
-      name="old_generation_dropdown"
-      label="Old generation"
-    />
-  );
-};
+}) => (
+  <OldGenerationDropdown
+    barkGenerationParams={barkGenerationParams}
+    handleChange={handleChange}
+    name="old_generation_dropdown"
+    label="Old generation"
+  />
+);
 
 const HistoryPromptSemantic = ({
   barkGenerationParams,
@@ -501,175 +453,25 @@ const HistoryPromptSemantic = ({
 }: {
   barkGenerationParams: BarkGenerationParams;
   handleChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
-}) => {
-  return (
-    <OldGenerationDropdown
-      barkGenerationParams={barkGenerationParams}
-      handleChange={handleChange}
-      name="history_prompt_semantic_dropdown"
-      label="History prompt semantic"
-    />
-  );
-};
+}) => (
+  <OldGenerationDropdown
+    barkGenerationParams={barkGenerationParams}
+    handleChange={handleChange}
+    name="history_prompt_semantic_dropdown"
+    label="History prompt semantic"
+  />
+);
 
 const create_voice_string = (
   language: string,
   speaker_id: string,
   use_v2: boolean
 ) => {
-  const language_to_code = {
-    English: "en",
-    Chinese: "zh",
-    French: "fr",
-    German: "de",
-    Hindi: "hi",
-    Italian: "it",
-    Japanese: "ja",
-    Korean: "ko",
-    Polish: "pl",
-    Portuguese: "pt",
-    Russian: "ru",
-    Spanish: "es",
-    Turkish: "tr",
-  };
-  let history_prompt = `${language_to_code[language]}_speaker_${speaker_id}`;
+  let history_prompt = `${BARK_LANGUAGE_TO_CODE[language]}_speaker_${speaker_id}`;
   if (use_v2) {
     history_prompt = `v2/${history_prompt}`;
   }
   return history_prompt;
-};
-
-const voice_to_trait = {
-  "v2/en_speaker_0": "Male",
-  "v2/en_speaker_1": "Male",
-  "v2/en_speaker_2": "Male",
-  "v2/en_speaker_3": "Male",
-  "v2/en_speaker_4": "Male",
-  "v2/en_speaker_5": "Male",
-  "v2/en_speaker_6": "Male",
-  "v2/en_speaker_7": "Male",
-  "v2/en_speaker_8": "Male",
-  "v2/en_speaker_9": "Female",
-  "v2/zh_speaker_0": "Male",
-  "v2/zh_speaker_1": "Male",
-  "v2/zh_speaker_2": "Male",
-  "v2/zh_speaker_3": "Male",
-  "v2/zh_speaker_4": "Female",
-  "v2/zh_speaker_5": "Male",
-  "v2/zh_speaker_6": "Female",
-  "v2/zh_speaker_7": "Female",
-  "v2/zh_speaker_8": "Male",
-  "v2/zh_speaker_9": "Female",
-  "v2/fr_speaker_0": "Male",
-  "v2/fr_speaker_1": "Female",
-  "v2/fr_speaker_2": "Female",
-  "v2/fr_speaker_3": "Male",
-  "v2/fr_speaker_4": "Male",
-  "v2/fr_speaker_5": "Female",
-  "v2/fr_speaker_6": "Male",
-  "v2/fr_speaker_7": "Male",
-  "v2/fr_speaker_8": "Male",
-  "v2/fr_speaker_9": "Male",
-  "v2/de_speaker_0": "Male",
-  "v2/de_speaker_1": "Male",
-  "v2/de_speaker_2": "Male",
-  "v2/de_speaker_3": "Female",
-  "v2/de_speaker_4": "Male",
-  "v2/de_speaker_5": "Male",
-  "v2/de_speaker_6": "Male",
-  "v2/de_speaker_7": "Male",
-  "v2/de_speaker_8": "Female",
-  "v2/de_speaker_9": "Male",
-  "v2/hi_speaker_0": "Female",
-  "v2/hi_speaker_1": "Female",
-  "v2/hi_speaker_2": "Male",
-  "v2/hi_speaker_3": "Female",
-  "v2/hi_speaker_4": "Female",
-  "v2/hi_speaker_5": "Male",
-  "v2/hi_speaker_6": "Male",
-  "v2/hi_speaker_7": "Male",
-  "v2/hi_speaker_8": "Male",
-  "v2/hi_speaker_9": "Female",
-  "v2/it_speaker_0": "Male",
-  "v2/it_speaker_1": "Male",
-  "v2/it_speaker_2": "Female",
-  "v2/it_speaker_3": "Male",
-  "v2/it_speaker_4": "Male",
-  "v2/it_speaker_5": "Male",
-  "v2/it_speaker_6": "Male",
-  "v2/it_speaker_7": "Female",
-  "v2/it_speaker_8": "Male",
-  "v2/it_speaker_9": "Female",
-  "v2/ja_speaker_0": "Female",
-  "v2/ja_speaker_1": "Female",
-  "v2/ja_speaker_2": "Male",
-  "v2/ja_speaker_3": "Female",
-  "v2/ja_speaker_4": "Female",
-  "v2/ja_speaker_5": "Female",
-  "v2/ja_speaker_6": "Male",
-  "v2/ja_speaker_7": "Female",
-  "v2/ja_speaker_8": "Female",
-  "v2/ja_speaker_9": "Female",
-  "v2/ko_speaker_0": "Female",
-  "v2/ko_speaker_1": "Male",
-  "v2/ko_speaker_2": "Male",
-  "v2/ko_speaker_3": "Male",
-  "v2/ko_speaker_4": "Male",
-  "v2/ko_speaker_5": "Male",
-  "v2/ko_speaker_6": "Male",
-  "v2/ko_speaker_7": "Male",
-  "v2/ko_speaker_8": "Male",
-  "v2/ko_speaker_9": "Male",
-  "v2/pl_speaker_0": "Male",
-  "v2/pl_speaker_1": "Male",
-  "v2/pl_speaker_2": "Male",
-  "v2/pl_speaker_3": "Male",
-  "v2/pl_speaker_4": "Female",
-  "v2/pl_speaker_5": "Male",
-  "v2/pl_speaker_6": "Female",
-  "v2/pl_speaker_7": "Male",
-  "v2/pl_speaker_8": "Male",
-  "v2/pl_speaker_9": "Female",
-  "v2/pt_speaker_0": "Male",
-  "v2/pt_speaker_1": "Male",
-  "v2/pt_speaker_2": "Male",
-  "v2/pt_speaker_3": "Male",
-  "v2/pt_speaker_4": "Male",
-  "v2/pt_speaker_5": "Male",
-  "v2/pt_speaker_6": "Male",
-  "v2/pt_speaker_7": "Male",
-  "v2/pt_speaker_8": "Male",
-  "v2/pt_speaker_9": "Male",
-  "v2/ru_speaker_0": "Male",
-  "v2/ru_speaker_1": "Male",
-  "v2/ru_speaker_2": "Male",
-  "v2/ru_speaker_3": "Male",
-  "v2/ru_speaker_4": "Male",
-  "v2/ru_speaker_5": "Female",
-  "v2/ru_speaker_6": "Female",
-  "v2/ru_speaker_7": "Male",
-  "v2/ru_speaker_8": "Male",
-  "v2/ru_speaker_9": "Female",
-  "v2/es_speaker_0": "Male",
-  "v2/es_speaker_1": "Male",
-  "v2/es_speaker_2": "Male",
-  "v2/es_speaker_3": "Male",
-  "v2/es_speaker_4": "Male",
-  "v2/es_speaker_5": "Male",
-  "v2/es_speaker_6": "Male",
-  "v2/es_speaker_7": "Male",
-  "v2/es_speaker_8": "Female",
-  "v2/es_speaker_9": "Female",
-  "v2/tr_speaker_0": "Male",
-  "v2/tr_speaker_1": "Male",
-  "v2/tr_speaker_2": "Male",
-  "v2/tr_speaker_3": "Male",
-  "v2/tr_speaker_4": "Female",
-  "v2/tr_speaker_5": "Female",
-  "v2/tr_speaker_6": "Male",
-  "v2/tr_speaker_7": "Male",
-  "v2/tr_speaker_8": "Male",
-  "v2/tr_speaker_9": "Male",
 };
 
 const generate_choice_string = (
@@ -678,7 +480,7 @@ const generate_choice_string = (
   speaker_id: string
 ) => {
   const history_prompt = create_voice_string(language, speaker_id, use_v2);
-  return `Chosen voice: ${history_prompt}, gender: ${voice_to_trait[history_prompt]}`;
+  return `Chosen voice: ${history_prompt}, gender: ${BARK_VOICE_TO_TRAIT[history_prompt]}`;
 };
 
 const Voice = ({
@@ -947,16 +749,14 @@ const TextTemp = ({
 }: {
   barkGenerationParams: BarkGenerationParams;
   handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-}) => {
-  return (
-    <GenericTemp
-      barkGenerationParams={barkGenerationParams}
-      handleChange={handleChange}
-      label="Text temperature"
-      name="text_temp"
-    />
-  );
-};
+}) => (
+  <GenericTemp
+    barkGenerationParams={barkGenerationParams}
+    handleChange={handleChange}
+    label="Text temperature"
+    name="text_temp"
+  />
+);
 
 const WaveformTemp = ({
   barkGenerationParams,
@@ -964,16 +764,14 @@ const WaveformTemp = ({
 }: {
   barkGenerationParams: BarkGenerationParams;
   handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-}) => {
-  return (
-    <GenericTemp
-      barkGenerationParams={barkGenerationParams}
-      handleChange={handleChange}
-      label="Waveform temperature"
-      name="waveform_temp"
-    />
-  );
-};
+}) => (
+  <GenericTemp
+    barkGenerationParams={barkGenerationParams}
+    handleChange={handleChange}
+    label="Waveform temperature"
+    name="waveform_temp"
+  />
+);
 
 const UseV2 = ({
   barkGenerationParams,
@@ -981,50 +779,47 @@ const UseV2 = ({
 }: {
   barkGenerationParams: BarkGenerationParams;
   handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-}) => {
-  return (
-    <div className="flex items-center space-x-2">
-      <label className="text-sm">Use V2:</label>
-      <input
-        type="checkbox"
-        name="useV2"
-        id="useV2"
-        checked={barkGenerationParams.useV2}
-        onChange={handleChange}
-        className="border border-gray-300 p-2 rounded"
-      />
-    </div>
-  );
-};
+}) => (
+  <div className="flex items-center space-x-2">
+    <label className="text-sm">Use V2:</label>
+    <input
+      type="checkbox"
+      name="useV2"
+      id="useV2"
+      checked={barkGenerationParams.useV2}
+      onChange={handleChange}
+      className="border border-gray-300 p-2 rounded"
+    />
+  </div>
+);
 
+const SPEAKER_IDS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
 const SpeakerID = ({
   barkGenerationParams,
   handleChange,
 }: {
   barkGenerationParams: BarkGenerationParams;
   handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-}) => {
-  return (
-    <>
-      <label className="text-sm">Speaker ID:</label>
-      <div className="flex flex-row space-x-2">
-        {["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"].map((model) => (
-          <div key={model} className="flex items-center">
-            <input
-              type="radio"
-              name="speakerIdRadio"
-              id={model}
-              value={model}
-              checked={barkGenerationParams.speakerIdRadio === model}
-              onChange={handleChange}
-              className="border border-gray-300 p-2 rounded"
-            />
-            <label className="ml-1" htmlFor={model}>
-              {model}
-            </label>
-          </div>
-        ))}
-      </div>
-    </>
-  );
-};
+}) => (
+  <>
+    <label className="text-sm">Speaker ID:</label>
+    <div className="flex flex-row space-x-2">
+      {SPEAKER_IDS.map((model) => (
+        <div key={model} className="flex items-center">
+          <input
+            type="radio"
+            name="speakerIdRadio"
+            id={model}
+            value={model}
+            checked={barkGenerationParams.speakerIdRadio === model}
+            onChange={handleChange}
+            className="border border-gray-300 p-2 rounded"
+          />
+          <label className="ml-1" htmlFor={model}>
+            {model}
+          </label>
+        </div>
+      ))}
+    </div>
+  </>
+);
