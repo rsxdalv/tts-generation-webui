@@ -261,7 +261,7 @@ export const HistoryCard = ({
     isFavorite?: boolean;
     removeFavorite: () => void;
     addFavorite: () => void;
-    saveToVoices: (api_filename: string) => void;
+    saveToVoices: (api_filename?: string) => void;
     openFolder: () => void;
     useAsVoice: () => void;
     filename: string;
