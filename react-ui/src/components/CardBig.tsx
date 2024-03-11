@@ -426,7 +426,7 @@ function isFullNPZ(generation: NPZ): generation is FullNPZ {
 
 export const CardVoiceNpz = ({ generation }: { generation: NPZ }) => {
   const { filename, date, url } = generation;
-  const image = url.replace(".npz", ".png");
+  const image = "/" + url.replace(".npz", ".png");
 
   const Extra = () => {
     if (!isFullNPZ(generation)) return <></>;
