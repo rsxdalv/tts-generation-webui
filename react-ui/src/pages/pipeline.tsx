@@ -28,15 +28,22 @@ import { MagnetInputs } from "../components/MagnetInputs";
 import { useMusicgenParams, useMusicgenResult } from "../tabs/MusicgenParams";
 import { generateWithMusicgen } from "../functions/generateWithMusicgen";
 import { MusicgenInputs } from "../components/MusicgenInputs";
+import { VocosWavInputs } from "../components/VocosWavInputs";
+import { useVocosParams } from "../tabs/VocosParams";
+import { applyVocosWav } from "../functions/applyVocosWav";
+import { EncodecParamsNPZ } from "../tabs/VocosParamsNPZ";
+import { applyVocosNPZ } from "../functions/applyVocosNPZ";
+import { BarkResult } from "../tabs/BarkResult";
+import { getWebuiURLWithHost } from "../data/getWebuiURL";
 
 interface PipelineParams {
   generation: string;
-  refinement: string;
+  postprocess: string;
 }
 
 const initialState: PipelineParams = {
   generation: "bark",
-  refinement: "demucs",
+  postprocess: "demucs",
 };
 
 const pipelineId = "pipeline";
@@ -64,6 +71,7 @@ const PipelinePage = () => {
 
   const [rvcGenerationParams, setRvcGenerationParams] =
     useRVCGenerationParams();
+  const [vocosParams, setVocosParams] = useVocosParams();
 
   const [status, setStatus] = React.useState("idle");
 
@@ -93,23 +101,38 @@ const PipelinePage = () => {
       }
     }
 
-    async function postProcessAudio(audio: GradioFile) {
-      if (pipelineParams.refinement === "none") {
+    async function postProcessAudio(audio: GradioFile, npz_file?: string) {
+      if (pipelineParams.postprocess === "none") {
         setOutput([audio]);
-      } else if (pipelineParams.refinement === "demucs") {
+      } else if (pipelineParams.postprocess === "demucs") {
         setOutput([audio]);
         const demucsParams: DemucsParams = {
           file: audio.data,
         };
         const result2 = await splitWithDemucs(demucsParams);
         setOutput([audio, ...result2]);
-      } else if (pipelineParams.refinement === "rvc") {
+      } else if (pipelineParams.postprocess === "rvc") {
         setOutput([audio]);
         const result3 = await applyRVC({
           ...rvcGenerationParams,
           original_audio: audio.data,
         });
         setOutput([audio, result3.audio]);
+      } else if (pipelineParams.postprocess === "vocos wav") {
+        setOutput([audio]);
+        const result4 = await applyVocosWav({
+          ...vocosParams,
+          audio: audio.data,
+        });
+        setOutput([audio, result4]);
+      } else if (pipelineParams.postprocess === "vocos npz (bark only)") {
+        setOutput([audio]);
+        if (!npz_file) return;
+        const vocosParamsNPZ: EncodecParamsNPZ = {
+          npz_file: getWebuiURLWithHost(npz_file),
+        };
+        const result5 = await applyVocosNPZ(vocosParamsNPZ);
+        setOutput([audio, result5]);
       }
     }
 
@@ -117,7 +140,12 @@ const PipelinePage = () => {
     const result = await getResult();
     if (!result) return;
     setStatus("postprocessing");
-    await postProcessAudio(result.audio);
+    await postProcessAudio(
+      result.audio,
+      pipelineParams.generation === "bark"
+        ? (result as BarkResult).npz
+        : undefined
+    );
     setStatus("idle");
   }
 
@@ -134,7 +162,7 @@ const PipelinePage = () => {
           <p>
             This pipeline takes an audio file as input and runs it through a
             generation model to generate a representation of the audio. This
-            representation is then refined by a refinement model to generate a
+            representation is then refined by a postprocess model to generate a
             new audio file.
           </p>
           <div className="flex flex-col gap-y-2 border border-gray-300 p-2 rounded mb-4">
@@ -188,28 +216,36 @@ const PipelinePage = () => {
             />
           )}
           <div className="flex flex-col gap-y-2 border border-gray-300 p-2 rounded mb-4">
-            <label>Choose a refinement model:</label>
-            {["none", "rvc", "demucs"].map((model) => (
-              <div key={model} className="flex items-center gap-x-2">
-                <input
-                  type="radio"
-                  name="refinement"
-                  id={model}
-                  value={model}
-                  checked={pipelineParams.refinement === model}
-                  onChange={() =>
-                    setPipelineParams((x) => ({ ...x, refinement: model }))
-                  }
-                />
-                <label htmlFor={model}>{model}</label>
-              </div>
-            ))}
+            <label>Choose a postprocessing model:</label>
+            {["none", "rvc", "demucs", "vocos wav", "vocos npz (bark only)"].map(
+              (model) => (
+                <div key={model} className="flex items-center gap-x-2">
+                  <input
+                    type="radio"
+                    name="postprocess"
+                    id={model}
+                    value={model}
+                    checked={pipelineParams.postprocess === model}
+                    onChange={() =>
+                      setPipelineParams((x) => ({ ...x, postprocess: model }))
+                    }
+                  />
+                  <label htmlFor={model}>{model}</label>
+                </div>
+              )
+            )}
           </div>
-          {pipelineParams.refinement === "rvc" && (
+          {pipelineParams.postprocess === "rvc" && (
             <RVCInputs
               rvcParams={rvcGenerationParams}
               handleChange={parseFormChange(setRvcGenerationParams)}
               hideAudioInput
+            />
+          )}
+          {pipelineParams.postprocess === "vocos wav" && (
+            <VocosWavInputs
+              vocosParams={vocosParams}
+              handleChange={parseFormChange(setVocosParams)}
             />
           )}
           <button
