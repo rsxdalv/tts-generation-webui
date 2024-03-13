@@ -2,6 +2,7 @@ import useLocalStorage, {
   updateLocalStorageWithFunction,
 } from "../hooks/useLocalStorage";
 import router from "next/router";
+import { BarkResult } from "./BarkResult";
 
 const inputs = {
   burn_in_prompt: "Howdy!",
@@ -59,8 +60,8 @@ export const sendToBarkAsVoice = (old_generation_dropdown?: string) => {
   router.push("/bark");
 };
 
-export const useBarkGenerationParams = () => {
-  const [barkGenerationParams, setBarkVoiceGenerationParams] =
-    useLocalStorage<BarkGenerationParams>(barkGenerationId, initialState);
-  return [barkGenerationParams, setBarkVoiceGenerationParams] as const;
-};
+export const useBarkGenerationParams = () =>
+  useLocalStorage<BarkGenerationParams>(barkGenerationId, initialState);
+
+export const useBarkResult = () =>
+  useLocalStorage<BarkResult | null>(barkGenerationId + ".output", null);

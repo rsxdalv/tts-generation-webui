@@ -3,10 +3,13 @@ import { Template } from "../components/Template";
 import useLocalStorage from "../hooks/useLocalStorage";
 import { AudioInput, AudioOutput } from "../components/AudioComponents";
 import Head from "next/head";
-import { useTortoiseGenerationParams } from "../tabs/TortoiseGenerationParams";
+import {
+  useTortoiseGenerationParams,
+  useTortoiseResult,
+} from "../tabs/TortoiseGenerationParams";
 import { TortoiseInput } from "../components/TortoiseInput";
 import { TortoiseResult } from "../tabs/TortoiseResult";
-import { generateWithTortoise } from "./generateWithTortoise";
+import { generateWithTortoise } from "../functions/generateWithTortoise";
 import { barkFavorite } from "../functions/barkFavorite";
 import { parseFormChange } from "./parseFormChange";
 
@@ -16,10 +19,7 @@ const TortoiseGenerationPage = () => {
     "tortoiseGenerationHistory",
     initialHistory
   );
-  const [data, setData] = useLocalStorage<TortoiseResult | null>(
-    "tortoiseGenerationOutput",
-    null
-  );
+  const [tortoiseResult, setTortoiseResult] = useTortoiseResult();
   const [tortoiseGenerationParams, setTortoiseGenerationParams] =
     useTortoiseGenerationParams();
   // loading state
@@ -28,7 +28,7 @@ const TortoiseGenerationPage = () => {
   async function tortoiseGeneration() {
     setLoading(true);
     const result = await generateWithTortoise(tortoiseGenerationParams);
-    setData(result);
+    setTortoiseResult(result);
     setHistoryData((historyData) => [result, ...historyData]);
     setLoading(false);
   }
@@ -104,7 +104,7 @@ const TortoiseGenerationPage = () => {
           tortoiseGenerationParams={tortoiseGenerationParams}
           setTortoiseGenerationParams={setTortoiseGenerationParams}
           handleChange={handleChange}
-          data={data}
+          data={tortoiseResult}
         />
         <div className="flex flex-col space-y-4">
           <button
@@ -114,10 +114,10 @@ const TortoiseGenerationPage = () => {
             {loading ? "Generating..." : "Generate"}
           </button>
           <AudioOutput
-            audioOutput={data?.audio}
+            audioOutput={tortoiseResult?.audio}
             label="Tortoise Output"
             funcs={funcs}
-            metadata={data}
+            metadata={tortoiseResult}
             filter={["sendToTortoise", "sendToTortoiseVoiceGeneration"]}
           />
         </div>

@@ -5,6 +5,7 @@ import { RVCParams } from "../tabs/RVCParams";
 export const RVCInputs = ({
   rvcParams,
   handleChange,
+  hideAudioInput,
 }: {
   rvcParams: RVCParams;
   handleChange: (
@@ -13,25 +14,28 @@ export const RVCInputs = ({
       | React.ChangeEvent<HTMLTextAreaElement>
       | React.ChangeEvent<HTMLSelectElement>
   ) => void;
+  hideAudioInput?: boolean;
 }) => {
   return (
     <div className="flex flex-col space-y-2 border border-gray-300 p-2 rounded">
       <label className="text-sm">RVC Parameters:</label>
       <Model rvcParams={rvcParams} handleChange={handleChange} />
       <Index rvcParams={rvcParams} handleChange={handleChange} />
-      <AudioInput
-        callback={(original_audio?: string) => {
-          handleChange({
-            target: {
-              name: "original_audio",
-              value: original_audio,
-            },
-          } as React.ChangeEvent<HTMLInputElement>);
-        }}
-        label="Original Audio"
-        filter={["sendToRvc"]}
-        url={rvcParams?.original_audio}
-      />
+      {!hideAudioInput && (
+        <AudioInput
+          callback={(original_audio?: string) => {
+            handleChange({
+              target: {
+                name: "original_audio",
+                value: original_audio,
+              },
+            } as React.ChangeEvent<HTMLInputElement>);
+          }}
+          label="Original Audio"
+          filter={["sendToRvc"]}
+          url={rvcParams?.original_audio}
+        />
+      )}
       <div className="grid grid-cols-2 gap-2">
         <div className="flex flex-col space-y-2">
           <div className="flex gap-2">

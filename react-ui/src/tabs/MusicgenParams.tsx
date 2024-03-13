@@ -1,5 +1,8 @@
-import { updateLocalStorageWithFunction } from "../hooks/useLocalStorage";
+import useLocalStorage, {
+  updateLocalStorageWithFunction,
+} from "../hooks/useLocalStorage";
 import router from "next/router";
+import { GradioFile } from "../types/GradioFile";
 
 export const musicgenId = "musicgenParams";
 
@@ -31,6 +34,31 @@ export const initialMusicgenParams: MusicgenParams = {
   use_multi_band_diffusion: false,
 };
 
+export type MusicgenResult = {
+  audio: GradioFile;
+  history_bundle_name_data: string;
+  json: {
+    _version: string;
+    _hash_version: string;
+    _type: string;
+    _audiocraft_version: string;
+    models: {};
+    prompt: string;
+    hash: string;
+    date: string;
+    melody?: any;
+    text: string;
+    model: string;
+    duration: number;
+    topk: number;
+    topp: number;
+    temperature: number;
+    cfg_coef: number;
+    seed: string;
+    use_multi_band_diffusion: boolean;
+  };
+};
+
 export const sendToMusicgen = (melody?: string) => {
   if (!melody) return;
   updateLocalStorageWithFunction(
@@ -40,3 +68,9 @@ export const sendToMusicgen = (melody?: string) => {
   );
   router.push("/musicgen");
 };
+
+export const useMusicgenParams = () =>
+  useLocalStorage<MusicgenParams>(musicgenId, initialMusicgenParams);
+
+export const useMusicgenResult = () =>
+  useLocalStorage<MusicgenResult | null>(musicgenId + ".output", null);

@@ -7,7 +7,10 @@ import { BarkResult } from "../tabs/BarkResult";
 import { BarkInputs } from "../components/BarkInputs";
 import { getBarkFuncs } from "../data/getBarkFuncs";
 import { barkGenerate } from "../functions/barkGenerate";
-import { useBarkGenerationParams } from "../tabs/BarkGenerationParams";
+import {
+  useBarkGenerationParams,
+  useBarkResult,
+} from "../tabs/BarkGenerationParams";
 import { parseFormChange } from "./parseFormChange";
 
 const initialHistory = []; // prevent infinite loop
@@ -16,10 +19,7 @@ const BarkGenerationPage = () => {
     "barkGenerationHistory",
     initialHistory
   );
-  const [barkResult, setBarkResult] = useLocalStorage<BarkResult | null>(
-    "barkGenerationOutput",
-    null
-  );
+  const [barkResult, setBarkResult] = useBarkResult();
   const [barkGenerationParams, setBarkVoiceGenerationParams] =
     useBarkGenerationParams();
   const [loading, setLoading] = React.useState<boolean>(false);

@@ -2,6 +2,7 @@ import useLocalStorage, {
   updateLocalStorageWithFunction,
 } from "../hooks/useLocalStorage";
 import router from "next/router";
+import { TortoiseResult } from "./TortoiseResult";
 
 export type TortoiseGenerationParams = {
   prompt: string; // string  in 'Prompt' Textbox component
@@ -76,3 +77,6 @@ export const sendToBarkVoiceGeneration = (audio?: string) => {
 
 export const useTortoiseGenerationParams = () =>
   useLocalStorage<TortoiseGenerationParams>(tortoiseGenerationId, initialState);
+
+export const useTortoiseResult = () =>
+  useLocalStorage<TortoiseResult | null>(tortoiseGenerationId + ".output", null);

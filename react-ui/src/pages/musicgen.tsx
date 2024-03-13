@@ -5,10 +5,12 @@ import useLocalStorage from "../hooks/useLocalStorage";
 import { AudioInput, AudioOutput } from "../components/AudioComponents";
 import {
   MusicgenParams,
+  MusicgenResult,
   initialMusicgenParams,
   musicgenId,
+  useMusicgenParams,
+  useMusicgenResult,
 } from "../tabs/MusicgenParams";
-import { GradioFile } from "../types/GradioFile";
 import { HyperParameters } from "../components/HyperParameters";
 import { useInterrupt } from "../hooks/useInterrupt";
 import {
@@ -20,40 +22,7 @@ import {
 import { manageProgress } from "../components/Progress";
 import { parseFormChange } from "./parseFormChange";
 import { barkFavorite } from "../functions/barkFavorite";
-
-type AudioOutput = {
-  name: string;
-  data: string;
-  size?: number;
-  is_file?: boolean;
-  orig_name?: string;
-  type_name?: string;
-};
-
-type Result = {
-  audio: GradioFile;
-  history_bundle_name_data: string;
-  json: {
-    _version: string;
-    _hash_version: string;
-    _type: string;
-    _audiocraft_version: string;
-    models: {};
-    prompt: string;
-    hash: string;
-    date: string;
-    melody?: any;
-    text: string;
-    model: string;
-    duration: number;
-    topk: number;
-    topp: number;
-    temperature: number;
-    cfg_coef: number;
-    seed: string;
-    use_multi_band_diffusion: boolean;
-  };
-};
+import { generateWithMusicgen } from "../functions/generateWithMusicgen";
 
 const modelMap = {
   Small: { size: "small", stereo: true, melody: false },
@@ -186,18 +155,12 @@ const ModelSelector = ({
 
 const initialHistory = []; // prevent infinite loop
 const MusicgenPage = () => {
-  const [data, setData] = useLocalStorage<Result | null>(
-    "musicgenGenerationOutput",
-    null
-  );
-  const [historyData, setHistoryData] = useLocalStorage<Result[]>(
+  const [musicgenResult, setMusicgenResult] = useMusicgenResult();
+  const [historyData, setHistoryData] = useLocalStorage<MusicgenResult[]>(
     "musicgenHistory",
     initialHistory
   );
-  const [musicgenParams, setMusicgenParams] = useLocalStorage<MusicgenParams>(
-    musicgenId,
-    initialMusicgenParams
-  );
+  const [musicgenParams, setMusicgenParams] = useMusicgenParams();
   const [musicgenHyperParams, setMusicgenHyperParams] = useLocalStorage<
     typeof initialHyperParams
   >("musicgenHyperParams", initialHyperParams);
@@ -234,7 +197,7 @@ const MusicgenPage = () => {
         if (interrupted.current) {
           return;
         }
-        yield musicgenGenerate({
+        yield generateWithMusicgen({
           ...musicgenParams,
           text,
           seed: incrementNonRandomSeed(musicgenParams.seed, iteration),
@@ -244,11 +207,11 @@ const MusicgenPage = () => {
   }
 
   async function musicgenConsumer(
-    generator: AsyncGenerator<Result, void, unknown>,
-    callback: (result: Result) => void
+    generator: AsyncGenerator<MusicgenResult, void, unknown>,
+    callback: (result: MusicgenResult) => void
   ) {
     for await (const result of generator) {
-      setData(result);
+      setMusicgenResult(result);
       setHistoryData((x) => [result, ...x]);
       callback(result);
     }
@@ -257,7 +220,7 @@ const MusicgenPage = () => {
   const musicgen = resetInterrupt(musicgenWithProgress);
   const handleChange = parseFormChange(setMusicgenParams);
 
-  const useAsMelody = (melody?: string, metadata?: Result) => {
+  const useAsMelody = (melody?: string, metadata?: MusicgenResult) => {
     if (!melody) return;
     setMusicgenParams({
       ...musicgenParams,
@@ -265,7 +228,7 @@ const MusicgenPage = () => {
     });
   };
 
-  const useSeed = (_url: string, data?: Result) => {
+  const useSeed = (_url: string, data?: MusicgenResult) => {
     const seed = data?.json.seed;
     if (!seed) return;
     setMusicgenParams({
@@ -274,7 +237,7 @@ const MusicgenPage = () => {
     });
   };
 
-  const useParameters = (_url: string, data?: Result) => {
+  const useParameters = (_url: string, data?: MusicgenResult) => {
     const params = data?.json;
     if (!params) return;
     setMusicgenParams({
@@ -411,7 +374,7 @@ const MusicgenPage = () => {
                 onClick={() =>
                   setMusicgenParams({
                     ...musicgenParams,
-                    seed: Number(data?.json.seed) || -1,
+                    seed: Number(musicgenResult?.json.seed) || -1,
                   })
                 }
               >
@@ -467,10 +430,10 @@ const MusicgenPage = () => {
             Generate
           </button>
           <AudioOutput
-            audioOutput={data?.audio}
+            audioOutput={musicgenResult?.audio}
             label="Musicgen Output"
             funcs={funcs}
-            metadata={data}
+            metadata={musicgenResult}
             filter={["sendToMusicgen"]}
           />
         </div>
@@ -519,19 +482,3 @@ const MusicgenPage = () => {
 };
 
 export default MusicgenPage;
-
-async function musicgenGenerate(musicgenParams: MusicgenParams) {
-  const body = JSON.stringify({
-    ...musicgenParams,
-    melody: musicgenParams.model.includes("melody")
-      ? musicgenParams.melody
-      : null,
-    model: musicgenParams.model,
-  });
-  const response = await fetch("/api/gradio/musicgen", {
-    method: "POST",
-    body,
-  });
-
-  return (await response.json()) as Result;
-}

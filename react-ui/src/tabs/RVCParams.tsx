@@ -45,8 +45,5 @@ export const sendToRVCGeneration = (audio?: string) => {
   router.push("/bark");
 };
 
-export const useRVCGenerationParams = () => {
-  const [rvcGenerationParams, setRvcGenerationParams] =
-    useLocalStorage<RVCParams>(RVCId, initialState);
-  return [rvcGenerationParams, setRvcGenerationParams] as const;
-};
+export const useRVCGenerationParams = () =>
+  useLocalStorage<RVCParams>(RVCId, initialState);
