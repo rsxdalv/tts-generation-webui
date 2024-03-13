@@ -10,6 +10,9 @@ import { barkGenerate } from "../functions/barkGenerate";
 import { BarkInputs } from "../components/BarkInputs";
 import { useBarkGenerationParams } from "../tabs/BarkGenerationParams";
 import { BarkResult } from "../tabs/BarkResult";
+import { RVCInputs } from "../components/RVCInputs";
+import { useRVCGenerationParams } from "../tabs/RVCParams";
+import { applyRVC } from "../functions/applyRVC";
 
 interface PipelineParams {
   foundation: string;
@@ -37,10 +40,11 @@ const PipelinePage = () => {
     initialState
   );
 
-  console.log("pipelineParams", pipelineParams);
-
   const [barkGenerationParams, setBarkVoiceGenerationParams] =
     useBarkGenerationParams();
+
+  const [rvcGenerationParams, setRvcGenerationParams] =
+    useRVCGenerationParams();
 
   async function pipeline() {
     if (pipelineParams.foundation === "bark") {
@@ -54,6 +58,13 @@ const PipelinePage = () => {
         };
         const result2 = await splitWithDemucs(demucsParams);
         setData(result2);
+      }
+      if (pipelineParams.refinement === "rvc") {
+        const result3 = await applyRVC({
+          ...rvcGenerationParams,
+          original_audio: result.audio.data,
+        });
+        setData([result3.audio]);
       }
     }
   }
@@ -119,8 +130,7 @@ const PipelinePage = () => {
           )}
           <div className="flex flex-col space-y-2 border border-gray-300 p-2 rounded">
             <label>Choose a refinement model:</label>
-            {/* {["rvc", "demucs"].map((model) => ( */}
-            {["demucs"].map((model) => (
+            {["rvc", "demucs"].map((model) => (
               <div key={model} className="flex items-center space-x-2">
                 <input
                   type="radio"
@@ -137,12 +147,28 @@ const PipelinePage = () => {
             ))}
           </div>
           {/* if rvc */}
-          {/* {pipelineParams.refinement === "rvc" && (
-            <RVCParameters
+          {pipelineParams.refinement === "rvc" && (
+            <RVCInputs
               rvcParams={rvcGenerationParams}
-              handleChange={handleChange}
+              handleChange={(
+                event:
+                  | React.ChangeEvent<HTMLInputElement>
+                  | React.ChangeEvent<HTMLTextAreaElement>
+                  | React.ChangeEvent<HTMLSelectElement>
+              ) => {
+                const { name, value, type } = event.target;
+                setRvcGenerationParams({
+                  ...rvcGenerationParams,
+                  [name]:
+                    type === "number" || type === "range"
+                      ? Number(value)
+                      : type === "checkbox"
+                      ? (event.target as HTMLInputElement).checked // type assertion
+                      : value,
+                });
+              }}
             />
-          )} */}
+          )}
           <button
             className="border border-gray-300 p-2 rounded"
             onClick={pipeline}

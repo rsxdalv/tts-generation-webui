@@ -1,4 +1,6 @@
-import { updateLocalStorageWithFunction } from "../hooks/useLocalStorage";
+import useLocalStorage, {
+  updateLocalStorageWithFunction,
+} from "../hooks/useLocalStorage";
 import router from "next/router";
 
 export type RVCParams = {
@@ -41,4 +43,10 @@ export const sendToRVCGeneration = (audio?: string) => {
       ({ ...vocosParams, audio } as RVCParams)
   );
   router.push("/bark");
+};
+
+export const useRVCGenerationParams = () => {
+  const [rvcGenerationParams, setRvcGenerationParams] =
+    useLocalStorage<RVCParams>(RVCId, initialState);
+  return [rvcGenerationParams, setRvcGenerationParams] as const;
 };
