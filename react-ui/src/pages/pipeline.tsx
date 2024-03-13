@@ -92,13 +92,13 @@ const PipelinePage = () => {
           file: audio.data,
         };
         const result2 = await splitWithDemucs(demucsParams);
-        setOutput(result2);
+        setOutput([audio, ...result2]);
       } else if (pipelineParams.refinement === "rvc") {
         const result3 = await applyRVC({
           ...rvcGenerationParams,
           original_audio: audio.data,
         });
-        setOutput([result3.audio]);
+        setOutput([audio, result3.audio]);
       }
     }
   }
@@ -207,7 +207,11 @@ const PipelinePage = () => {
               <AudioOutput
                 key={index}
                 audioOutput={item}
-                label={item.name}
+                label={
+                  index === 0
+                    ? "Generated Audio"
+                    : `Post-processed ${index}/${output.length - 1}`
+                }
                 funcs={{}}
                 metadata={item}
                 filter={["sendToPipeline"]}
