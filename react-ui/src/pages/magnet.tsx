@@ -18,7 +18,7 @@ import {
 } from "../data/hyperParamsUtils";
 import { useInterrupt } from "../hooks/useInterrupt";
 import { manageProgress } from "../components/Progress";
-import { parseFormChange } from "./parseFormChange";
+import { parseFormChange } from "../data/parseFormChange";
 import { barkFavorite } from "../functions/barkFavorite";
 
 type AudioOutput = {

@@ -11,7 +11,7 @@ import {
   useBarkGenerationParams,
   useBarkResult,
 } from "../tabs/BarkGenerationParams";
-import { parseFormChange } from "./parseFormChange";
+import { parseFormChange } from "../data/parseFormChange";
 
 const initialHistory = []; // prevent infinite loop
 const BarkGenerationPage = () => {

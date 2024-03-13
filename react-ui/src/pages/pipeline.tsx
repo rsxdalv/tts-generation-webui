@@ -21,7 +21,7 @@ import {
   useTortoiseGenerationParams,
   useTortoiseResult,
 } from "../tabs/TortoiseGenerationParams";
-import { parseFormChange } from "./parseFormChange";
+import { parseFormChange } from "../data/parseFormChange";
 
 interface PipelineParams {
   generation: string;

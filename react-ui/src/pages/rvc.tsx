@@ -7,7 +7,7 @@ import { useRVCGenerationParams } from "../tabs/RVCParams";
 import { RVCInputs } from "../components/RVCInputs";
 import { applyRVC } from "../functions/applyRVC";
 import { RVCResult } from "../tabs/RVCResult";
-import { parseFormChange } from "./parseFormChange";
+import { parseFormChange } from "../data/parseFormChange";
 
 const initialHistory = []; // prevent infinite loop
 const RvcGenerationPage = () => {

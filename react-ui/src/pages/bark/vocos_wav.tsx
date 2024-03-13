@@ -5,7 +5,7 @@ import { AudioInput, AudioOutput } from "../../components/AudioComponents";
 import Head from "next/head";
 import { VocosParams, vocosId, initialState } from "../../tabs/VocosParams";
 import { GradioFile } from "../../types/GradioFile";
-import { parseFormChange } from "../parseFormChange";
+import { parseFormChange } from "../../data/parseFormChange";
 
 const VocosPage = () => {
   const [data, setData] = useLocalStorage<GradioFile | null>(

@@ -11,7 +11,7 @@ import { TortoiseInput } from "../components/TortoiseInput";
 import { TortoiseResult } from "../tabs/TortoiseResult";
 import { generateWithTortoise } from "../functions/generateWithTortoise";
 import { barkFavorite } from "../functions/barkFavorite";
-import { parseFormChange } from "./parseFormChange";
+import { parseFormChange } from "../data/parseFormChange";
 
 const initialHistory = []; // prevent infinite loop
 const TortoiseGenerationPage = () => {

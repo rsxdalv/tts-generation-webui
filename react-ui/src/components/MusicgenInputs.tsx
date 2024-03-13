@@ -1,11 +1,11 @@
 import React from "react";
-import { AudioInput } from "../components/AudioComponents";
+import { AudioInput } from "./AudioComponents";
 import {
   MusicgenParams,
   MusicgenResult,
   initialMusicgenParams,
 } from "../tabs/MusicgenParams";
-import { ModelSelector } from "./musicgen";
+import { MusicgenModelSelector } from "./MusicgenModelSelector";
 
 export const MusicgenInputs = ({
   musicgenParams,
@@ -35,7 +35,7 @@ export const MusicgenInputs = ({
         rows={3}
       />
 
-      <ModelSelector
+      <MusicgenModelSelector
         musicgenParams={musicgenParams}
         setMusicgenParams={setMusicgenParams}
       />
