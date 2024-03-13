@@ -6,7 +6,7 @@ import Head from "next/head";
 import { BarkResult } from "../tabs/BarkResult";
 import { BarkInputs } from "../components/BarkInputs";
 import { getBarkFuncs } from "../data/getBarkFuncs";
-import { barkGenerate } from "../functions/barkGenerate";
+import { generateWithBark } from "../functions/generateWithBark";
 import {
   useBarkGenerationParams,
   useBarkResult,
@@ -26,7 +26,7 @@ const BarkGenerationPage = () => {
 
   async function bark() {
     setLoading(true);
-    const result = await barkGenerate(barkGenerationParams);
+    const result = await generateWithBark(barkGenerationParams);
     setBarkResult(result);
     setHistoryData((historyData) => [result, ...historyData]);
     setLoading(false);

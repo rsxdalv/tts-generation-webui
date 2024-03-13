@@ -6,7 +6,7 @@ import Head from "next/head";
 import { GradioFile } from "../types/GradioFile";
 import { DemucsParams } from "../tabs/DemucsParams";
 import { splitWithDemucs } from "../functions/splitWithDemucs";
-import { barkGenerate } from "../functions/barkGenerate";
+import { generateWithBark } from "../functions/generateWithBark";
 import { BarkInputs } from "../components/BarkInputs";
 import {
   useBarkGenerationParams,
@@ -65,35 +65,46 @@ const PipelinePage = () => {
   const [rvcGenerationParams, setRvcGenerationParams] =
     useRVCGenerationParams();
 
+  const [status, setStatus] = React.useState("idle");
+
   async function pipeline() {
-    if (pipelineParams.generation === "bark") {
-      const result = await barkGenerate(barkGenerationParams);
-      setBarkResult(result);
-      await postProcessAudio(result.audio);
-    } else if (pipelineParams.generation === "tortoise") {
-      const result = await generateWithTortoise(tortoiseGenerationParams);
-      setTortoiseResult(result);
-      await postProcessAudio(result.audio);
-    } else if (pipelineParams.generation === "musicgen") {
-      const result = await generateWithMusicgen(musicgenParams);
-      setMusicgenResult(result);
-      await postProcessAudio(result.audio);
-    } else if (pipelineParams.generation === "magnet") {
-      const result = await generateWithMagnet(magnetParams);
-      setMagnetResult(result);
-      await postProcessAudio(result.audio);
+    async function getResult() {
+      switch (pipelineParams.generation) {
+        case "bark": {
+          const result = await generateWithBark(barkGenerationParams);
+          setBarkResult(result);
+          return result;
+        }
+        case "tortoise": {
+          const result = await generateWithTortoise(tortoiseGenerationParams);
+          setTortoiseResult(result);
+          return result;
+        }
+        case "musicgen": {
+          const result = await generateWithMusicgen(musicgenParams);
+          setMusicgenResult(result);
+          return result;
+        }
+        case "magnet": {
+          const result = await generateWithMagnet(magnetParams);
+          setMagnetResult(result);
+          return result;
+        }
+      }
     }
 
     async function postProcessAudio(audio: GradioFile) {
       if (pipelineParams.refinement === "none") {
         setOutput([audio]);
       } else if (pipelineParams.refinement === "demucs") {
+        setOutput([audio]);
         const demucsParams: DemucsParams = {
           file: audio.data,
         };
         const result2 = await splitWithDemucs(demucsParams);
         setOutput([audio, ...result2]);
       } else if (pipelineParams.refinement === "rvc") {
+        setOutput([audio]);
         const result3 = await applyRVC({
           ...rvcGenerationParams,
           original_audio: audio.data,
@@ -101,6 +112,13 @@ const PipelinePage = () => {
         setOutput([audio, result3.audio]);
       }
     }
+
+    setStatus("generating");
+    const result = await getResult();
+    if (!result) return;
+    setStatus("postprocessing");
+    await postProcessAudio(result.audio);
+    setStatus("idle");
   }
 
   return (
@@ -198,7 +216,9 @@ const PipelinePage = () => {
             className="border border-gray-300 p-2 rounded"
             onClick={pipeline}
           >
-            Run Pipeline
+            {status === "generating" && "Generating..."}
+            {status === "postprocessing" && "Postprocessing..."}
+            {status === "idle" && "Run Pipeline"}
           </button>
         </div>
         <div className="flex flex-col gap-y-4">
