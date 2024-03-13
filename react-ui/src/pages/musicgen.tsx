@@ -2,11 +2,10 @@ import React from "react";
 import { Template } from "../components/Template";
 import Head from "next/head";
 import useLocalStorage from "../hooks/useLocalStorage";
-import { AudioInput, AudioOutput } from "../components/AudioComponents";
+import { AudioOutput } from "../components/AudioComponents";
 import {
   MusicgenParams,
   MusicgenResult,
-  initialMusicgenParams,
   musicgenId,
   useMusicgenParams,
   useMusicgenResult,
@@ -23,6 +22,7 @@ import { manageProgress } from "../components/Progress";
 import { parseFormChange } from "./parseFormChange";
 import { barkFavorite } from "../functions/barkFavorite";
 import { generateWithMusicgen } from "../functions/generateWithMusicgen";
+import { MusicgenInputs } from "./MusicgenInputs";
 
 const modelMap = {
   Small: { size: "small", stereo: true, melody: false },
@@ -73,7 +73,7 @@ const decomputeModel = (
   return { type, stereo, melody };
 };
 
-const ModelSelector = ({
+export const ModelSelector = ({
   musicgenParams,
   setMusicgenParams,
 }: {
@@ -261,168 +261,24 @@ const MusicgenPage = () => {
       <Head>
         <title>Musicgen - TTS Generation Webui</title>
       </Head>
-      <div className="p-4">
-        <div className="my-4">
-          <div className="flex gap-x-6 w-full justify-center">
-            <div className="flex flex-col gap-y-2 w-1/2">
-              <label className="text-sm">Text:</label>
-              <textarea
-                name="text"
-                value={musicgenParams.text}
-                onChange={handleChange}
-                className="border border-gray-300 p-2 rounded"
-                placeholder="Enter text here..."
-                rows={3}
-              />
+      <div className="p-4 flex flex-col gap-y-4">
+        <MusicgenInputs
+          musicgenParams={musicgenParams}
+          handleChange={handleChange}
+          setMusicgenParams={setMusicgenParams}
+          musicgenResult={musicgenResult}
+        />
 
-              <ModelSelector
-                musicgenParams={musicgenParams}
-                setMusicgenParams={setMusicgenParams}
-              />
-              <AudioInput
-                url={musicgenParams.melody}
-                label="Melody"
-                callback={(file) => {
-                  setMusicgenParams({
-                    ...musicgenParams,
-                    melody: file,
-                  });
-                }}
-                filter={["sendToMusicgen"]}
-              />
-            </div>
+        <HyperParameters
+          params={musicgenHyperParams}
+          setParams={setMusicgenHyperParams}
+          progress={progress.current}
+          progressMax={progress.max}
+          isInterrupted={interrupted.current}
+          interrupt={interrupt}
+        />
 
-            <div className="flex flex-col gap-y-2">
-              <label className="text-sm">
-                Duration: {musicgenParams.duration}s{" "}
-                {musicgenParams.duration > 30 && "(spliced)"}
-              </label>
-              <input
-                type="range"
-                name="duration"
-                value={musicgenParams.duration}
-                onChange={handleChange}
-                className="border border-gray-300 py-2 rounded"
-                min="0.5"
-                max="360"
-                step="0.5"
-              />
-
-              <label className="text-sm">Top-K:</label>
-              <input
-                type="number"
-                name="topk"
-                value={musicgenParams.topk}
-                onChange={handleChange}
-                className="border border-gray-300 p-2 rounded"
-                min="0"
-                max="250"
-                step="1"
-              />
-
-              <label className="text-sm">Top-P: {musicgenParams.topp}</label>
-              <input
-                type="range"
-                name="topp"
-                value={musicgenParams.topp}
-                onChange={handleChange}
-                className="border border-gray-300 py-2 rounded"
-                min="0"
-                max="1.5"
-                step="0.01"
-              />
-
-              <label className="text-sm">
-                Temperature: {musicgenParams.temperature}
-              </label>
-              <input
-                type="range"
-                name="temperature"
-                value={musicgenParams.temperature}
-                onChange={handleChange}
-                className="border border-gray-300 py-2 rounded"
-                min="0"
-                max="1.5"
-                step="0.01"
-              />
-
-              <label className="text-sm">
-                Classifier Free Guidance Coefficient:{" "}
-                {musicgenParams.cfg_coef.toFixed(1)}
-              </label>
-              <input
-                type="range"
-                name="cfg_coef"
-                value={musicgenParams.cfg_coef}
-                onChange={handleChange}
-                className="border border-gray-300 py-2 rounded"
-                min="0"
-                max="10"
-                step="0.1"
-              />
-
-              <label className="text-sm">Seed:</label>
-              <input
-                type="number"
-                name="seed"
-                value={musicgenParams.seed}
-                onChange={handleChange}
-                className="border border-gray-300 p-2 rounded"
-              />
-              <button
-                className="border border-gray-300 p-2 rounded"
-                onClick={() =>
-                  setMusicgenParams({
-                    ...musicgenParams,
-                    seed: Number(musicgenResult?.json.seed) || -1,
-                  })
-                }
-              >
-                Restore Last Seed
-              </button>
-
-              <div className="flex gap-x-2 items-center">
-                <label className="text-sm">
-                  Use{" "}
-                  <a
-                    className="underline"
-                    href="https://huggingface.co/facebook/multiband-diffusion"
-                    target="_blank"
-                  >
-                    Multi Band Diffusion (High VRAM Usage):
-                  </a>
-                </label>
-                <input
-                  type="checkbox"
-                  name="use_multi_band_diffusion"
-                  checked={musicgenParams.use_multi_band_diffusion}
-                  onChange={handleChange}
-                  className="border border-gray-300 p-2 rounded"
-                />
-              </div>
-
-              <HyperParameters
-                params={musicgenHyperParams}
-                setParams={setMusicgenHyperParams}
-                progress={progress.current}
-                progressMax={progress.max}
-                isInterrupted={interrupted.current}
-                interrupt={interrupt}
-              />
-              <button
-                className="border border-gray-300 p-2 rounded"
-                onClick={() => {
-                  setMusicgenParams(initialMusicgenParams);
-                  setMusicgenHyperParams(initialHyperParams);
-                }}
-              >
-                Reset Parameters
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div className="my-4 flex flex-col gap-y-2">
+        <div className="flex flex-col gap-y-2">
           <button
             className="border border-gray-300 p-2 rounded"
             onClick={musicgen}
@@ -438,47 +294,77 @@ const MusicgenPage = () => {
           />
         </div>
 
-        <div className="flex flex-col gap-y-2 border border-gray-300 p-2 rounded">
-          <label className="text-sm">History:</label>
-          <div className="flex gap-x-2 items-center">
-            <button
-              className="border border-gray-300 p-2 px-40 rounded"
-              onClick={clearHistory}
-            >
-              Clear History
-            </button>
-            <div className="flex gap-x-2 items-center">
-              <label className="text-sm">Show Last X entries:</label>
-              <input
-                type="number"
-                value={showLast}
-                onChange={(event) => setShowLast(Number(event.target.value))}
-                className="border border-gray-300 p-2 rounded"
-                min="0"
-                max="100"
-                step="1"
-              />
-            </div>
-          </div>
-          <div className="flex flex-col gap-y-2">
-            {historyData &&
-              historyData
-                .slice(1, showLast + 1)
-                .map((item, index) => (
-                  <AudioOutput
-                    key={index}
-                    audioOutput={item.audio}
-                    metadata={item}
-                    label={item.history_bundle_name_data}
-                    funcs={funcs}
-                    filter={["sendToMusicgen"]}
-                  />
-                ))}
-          </div>
-        </div>
+        <MusicgenHistory
+          clearHistory={clearHistory}
+          showLast={showLast}
+          setShowLast={setShowLast}
+          historyData={historyData}
+          funcs={funcs}
+        />
       </div>
     </Template>
   );
 };
 
 export default MusicgenPage;
+
+const MusicgenHistory = ({
+  clearHistory,
+  showLast,
+  setShowLast,
+  historyData,
+  funcs,
+}: {
+  clearHistory: () => void;
+  showLast: number;
+  setShowLast: React.Dispatch<React.SetStateAction<number>>;
+  historyData: MusicgenResult[];
+  funcs: {
+    useAsMelody: (melody?: string, metadata?: MusicgenResult) => void;
+    favorite: (
+      _url: string,
+      data?: { history_bundle_name_data?: string | undefined } | undefined
+    ) => Promise<any>;
+    useSeed: (_url: string, data?: MusicgenResult) => void;
+    useParameters: (_url: string, data?: MusicgenResult) => void;
+  };
+}) => (
+  <div className="flex flex-col gap-y-2 border border-gray-300 p-2 rounded">
+    <label className="text-sm">History:</label>
+    <div className="flex gap-x-2 items-center">
+      <button
+        className="border border-gray-300 p-2 px-40 rounded"
+        onClick={clearHistory}
+      >
+        Clear History
+      </button>
+      <div className="flex gap-x-2 items-center">
+        <label className="text-sm">Show Last X entries:</label>
+        <input
+          type="number"
+          value={showLast}
+          onChange={(event) => setShowLast(Number(event.target.value))}
+          className="border border-gray-300 p-2 rounded"
+          min="0"
+          max="100"
+          step="1"
+        />
+      </div>
+    </div>
+    <div className="flex flex-col gap-y-2">
+      {historyData &&
+        historyData
+          .slice(1, showLast + 1)
+          .map((item, index) => (
+            <AudioOutput
+              key={index}
+              audioOutput={item.audio}
+              metadata={item}
+              label={item.history_bundle_name_data}
+              funcs={funcs}
+              filter={["sendToMusicgen"]}
+            />
+          ))}
+    </div>
+  </div>
+);
