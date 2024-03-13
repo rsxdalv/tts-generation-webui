@@ -15,6 +15,10 @@ const routes: Route[] = [
     text: "Home",
   },
   {
+    href: "/pipeline",
+    text: "Pipeline (Experimental!)",
+  },
+  {
     href: "/bark",
     text: "Bark",
     subroutes: [

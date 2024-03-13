@@ -5,6 +5,7 @@ import { AudioInput, AudioOutput } from "../components/AudioComponents";
 import Head from "next/head";
 import { DemucsParams, demucsId, initialState } from "../tabs/DemucsParams";
 import { GradioFile } from "../types/GradioFile";
+import { splitWithDemucs } from "../functions/splitWithDemucs";
 
 type TypedGradioFile = GradioFile & {
   type_name?: string;
@@ -32,13 +33,7 @@ const DemucsPage = () => {
   );
 
   async function demucs() {
-    const response = await fetch("/api/gradio/demucs", {
-      method: "POST",
-      body: JSON.stringify(demucsParams),
-    });
-
-    const result = await response.json();
-    setData(result);
+    setData(await splitWithDemucs(demucsParams));
   }
 
   const sampleWithTypeNames =

@@ -1,4 +1,6 @@
-import { updateLocalStorageWithFunction } from "../hooks/useLocalStorage";
+import useLocalStorage, {
+  updateLocalStorageWithFunction,
+} from "../hooks/useLocalStorage";
 import router from "next/router";
 
 const inputs = {
@@ -55,4 +57,10 @@ export const sendToBarkAsVoice = (old_generation_dropdown?: string) => {
     })
   );
   router.push("/bark");
+};
+
+export const useBarkGenerationParams = () => {
+  const [barkGenerationParams, setBarkVoiceGenerationParams] =
+    useLocalStorage<BarkGenerationParams>(barkGenerationId, initialState);
+  return [barkGenerationParams, setBarkVoiceGenerationParams] as const;
 };

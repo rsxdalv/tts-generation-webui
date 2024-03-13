@@ -3,14 +3,11 @@ import { Template } from "../components/Template";
 import useLocalStorage from "../hooks/useLocalStorage";
 import { AudioOutput } from "../components/AudioComponents";
 import Head from "next/head";
-import {
-  BarkGenerationParams,
-  barkGenerationId,
-  initialState,
-} from "../tabs/BarkGenerationParams";
 import { BarkResult } from "../tabs/BarkResult";
 import { BarkInputs } from "../components/BarkInputs";
 import { getBarkFuncs } from "../data/getBarkFuncs";
+import { barkGenerate } from "../functions/barkGenerate";
+import { useBarkGenerationParams } from "../tabs/BarkGenerationParams";
 
 const initialHistory = []; // prevent infinite loop
 const BarkGenerationPage = () => {
@@ -18,18 +15,18 @@ const BarkGenerationPage = () => {
     "barkGenerationHistory",
     initialHistory
   );
-  const [data, setData] = useLocalStorage<BarkResult | null>(
+  const [barkResult, setBarkResult] = useLocalStorage<BarkResult | null>(
     "barkGenerationOutput",
     null
   );
   const [barkGenerationParams, setBarkVoiceGenerationParams] =
-    useLocalStorage<BarkGenerationParams>(barkGenerationId, initialState);
+    useBarkGenerationParams();
   const [loading, setLoading] = React.useState<boolean>(false);
 
   async function bark() {
     setLoading(true);
     const result = await barkGenerate(barkGenerationParams);
-    setData(result);
+    setBarkResult(result);
     setHistoryData((historyData) => [result, ...historyData]);
     setLoading(false);
   }
@@ -67,7 +64,7 @@ const BarkGenerationPage = () => {
           barkGenerationParams={barkGenerationParams}
           setBarkVoiceGenerationParams={setBarkVoiceGenerationParams}
           handleChange={handleChange}
-          data={data}
+          data={barkResult}
         />
         <div className="flex flex-col space-y-4">
           <button
@@ -77,10 +74,10 @@ const BarkGenerationPage = () => {
             {loading ? "Generating..." : "Generate"}
           </button>
           <AudioOutput
-            audioOutput={data?.audio}
+            audioOutput={barkResult?.audio}
             label="Bark Output"
             funcs={funcs}
-            metadata={data}
+            metadata={barkResult}
             filter={["sendToBark", "sendToBarkVoiceGeneration"]}
           />
         </div>
@@ -115,12 +112,3 @@ const BarkGenerationPage = () => {
 };
 
 export default BarkGenerationPage;
-
-async function barkGenerate(barkGenerationParams: BarkGenerationParams) {
-  const response = await fetch("/api/gradio/bark", {
-    method: "POST",
-    body: JSON.stringify(barkGenerationParams),
-  });
-
-  return await response.json();
-}
