@@ -8,6 +8,7 @@ import { BarkInputs } from "../components/BarkInputs";
 import { getBarkFuncs } from "../data/getBarkFuncs";
 import { barkGenerate } from "../functions/barkGenerate";
 import { useBarkGenerationParams } from "../tabs/BarkGenerationParams";
+import { parseFormChange } from "./parseFormChange";
 
 const initialHistory = []; // prevent infinite loop
 const BarkGenerationPage = () => {
@@ -36,23 +37,7 @@ const BarkGenerationPage = () => {
     barkGenerationParams
   );
 
-  const handleChange = (
-    event:
-      | React.ChangeEvent<HTMLInputElement>
-      | React.ChangeEvent<HTMLTextAreaElement>
-      | React.ChangeEvent<HTMLSelectElement>
-  ) => {
-    const { name, value, type } = event.target;
-    setBarkVoiceGenerationParams({
-      ...barkGenerationParams,
-      [name]:
-        type === "number" || type === "range"
-          ? Number(value)
-          : type === "checkbox"
-          ? (event.target as HTMLInputElement).checked // type assertion
-          : value,
-    });
-  };
+  const handleChange = parseFormChange(setBarkVoiceGenerationParams);
 
   return (
     <Template>

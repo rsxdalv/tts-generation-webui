@@ -7,6 +7,7 @@ import { useRVCGenerationParams } from "../tabs/RVCParams";
 import { RVCInputs } from "../components/RVCInputs";
 import { applyRVC } from "../functions/applyRVC";
 import { RVCResult } from "../tabs/RVCResult";
+import { parseFormChange } from "./parseFormChange";
 
 const initialHistory = []; // prevent infinite loop
 const RvcGenerationPage = () => {
@@ -90,23 +91,7 @@ const RvcGenerationPage = () => {
     useParameters,
   };
 
-  const handleChange = (
-    event:
-      | React.ChangeEvent<HTMLInputElement>
-      | React.ChangeEvent<HTMLTextAreaElement>
-      | React.ChangeEvent<HTMLSelectElement>
-  ) => {
-    const { name, value, type } = event.target;
-    setRvcGenerationParams({
-      ...rvcGenerationParams,
-      [name]:
-        type === "number" || type === "range"
-          ? Number(value)
-          : type === "checkbox"
-          ? (event.target as HTMLInputElement).checked // type assertion
-          : value,
-    });
-  };
+  const handleChange = parseFormChange(setRvcGenerationParams);
 
   return (
     <Template>

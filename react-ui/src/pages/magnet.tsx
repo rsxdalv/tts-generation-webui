@@ -18,6 +18,8 @@ import {
 } from "../data/hyperParamsUtils";
 import { useInterrupt } from "../hooks/useInterrupt";
 import { manageProgress } from "../components/Progress";
+import { parseFormChange } from "./parseFormChange";
+import { barkFavorite } from "../functions/barkFavorite";
 
 type AudioOutput = {
   name: string;
@@ -355,10 +357,7 @@ const MagnetPage = () => {
   const [hyperParams, setHyperParams] = useLocalStorage<
     typeof initialHyperParams
   >("magnetHyperParams", initialHyperParams);
-  const [showLast, setShowLast] = useLocalStorage<number>(
-    "magnetShowLast",
-    10
-  );
+  const [showLast, setShowLast] = useLocalStorage<number>("magnetShowLast", 10);
 
   const { interrupted, resetInterrupt, interrupt } = useInterrupt();
   const [progress, setProgress] = React.useState({ current: 0, max: 0 });
@@ -409,37 +408,7 @@ const MagnetPage = () => {
   }
 
   const magnet = resetInterrupt(magnetWithProgress);
-
-  const handleChange = (
-    event:
-      | React.ChangeEvent<HTMLInputElement>
-      | React.ChangeEvent<HTMLTextAreaElement>
-      | React.ChangeEvent<HTMLSelectElement>
-  ) => {
-    const { name, value, type } = event.target;
-    setMagnetParams({
-      ...magnetParams,
-      [name]:
-        type === "number" || type === "range"
-          ? Number(value)
-          : type === "checkbox"
-          ? (event.target as HTMLInputElement).checked // type assertion
-          : value,
-    });
-  };
-
-  const favorite = async (_url: string, data?: Result) => {
-    const history_bundle_name_data = data?.history_bundle_name_data;
-    if (!history_bundle_name_data) return;
-    const response = await fetch("/api/gradio/bark_favorite", {
-      method: "POST",
-      body: JSON.stringify({
-        history_bundle_name_data,
-      }),
-    });
-    const result = await response.json();
-    return result;
-  };
+  const handleChange = parseFormChange(setMagnetParams);
 
   const useSeed = (_url: string, data?: Result) => {
     const seed = data?.json.seed;
@@ -466,7 +435,7 @@ const MagnetPage = () => {
   };
 
   const funcs = {
-    favorite,
+    favorite: barkFavorite,
     useSeed,
     useParameters,
   };

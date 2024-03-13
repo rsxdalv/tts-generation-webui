@@ -5,6 +5,7 @@ import { AudioInput, AudioOutput } from "../../components/AudioComponents";
 import Head from "next/head";
 import { VocosParams, vocosId, initialState } from "../../tabs/VocosParams";
 import { GradioFile } from "../../types/GradioFile";
+import { parseFormChange } from "../parseFormChange";
 
 const VocosPage = () => {
   const [data, setData] = useLocalStorage<GradioFile | null>(
@@ -34,12 +35,7 @@ const VocosPage = () => {
     });
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setVocosParams({
-      ...vocosParams,
-      bandwidth: e.target.value,
-    });
-  };
+  const handleChange = parseFormChange(setVocosParams);
 
   return (
     <Template>
@@ -66,7 +62,7 @@ const VocosPage = () => {
                 <div key={bandwidth} className="flex items-center">
                   <input
                     type="radio"
-                    name="model"
+                    name="bandwidth"
                     id={bandwidth}
                     value={bandwidth}
                     checked={vocosParams.bandwidth === bandwidth}

@@ -18,6 +18,8 @@ import {
   incrementNonRandomSeed,
 } from "../data/hyperParamsUtils";
 import { manageProgress } from "../components/Progress";
+import { parseFormChange } from "./parseFormChange";
+import { barkFavorite } from "../functions/barkFavorite";
 
 type AudioOutput = {
   name: string;
@@ -253,24 +255,7 @@ const MusicgenPage = () => {
   }
 
   const musicgen = resetInterrupt(musicgenWithProgress);
-
-  const handleChange = (
-    event:
-      | React.ChangeEvent<HTMLInputElement>
-      | React.ChangeEvent<HTMLTextAreaElement>
-      | React.ChangeEvent<HTMLSelectElement>
-  ) => {
-    const { name, value, type } = event.target;
-    setMusicgenParams({
-      ...musicgenParams,
-      [name]:
-        type === "number" || type === "range"
-          ? Number(value)
-          : type === "checkbox"
-          ? (event.target as HTMLInputElement).checked // type assertion
-          : value,
-    });
-  };
+  const handleChange = parseFormChange(setMusicgenParams);
 
   const useAsMelody = (melody?: string, metadata?: Result) => {
     if (!melody) return;
@@ -278,19 +263,6 @@ const MusicgenPage = () => {
       ...musicgenParams,
       melody,
     });
-  };
-
-  const favorite = async (_url: string, data?: Result) => {
-    const history_bundle_name_data = data?.history_bundle_name_data;
-    if (!history_bundle_name_data) return;
-    const response = await fetch("/api/gradio/bark_favorite", {
-      method: "POST",
-      body: JSON.stringify({
-        history_bundle_name_data,
-      }),
-    });
-    const result = await response.json();
-    return result;
   };
 
   const useSeed = (_url: string, data?: Result) => {
@@ -315,7 +287,7 @@ const MusicgenPage = () => {
 
   const funcs = {
     useAsMelody,
-    favorite,
+    favorite: barkFavorite,
     useSeed,
     useParameters,
   };

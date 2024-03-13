@@ -13,14 +13,18 @@ import { BarkResult } from "../tabs/BarkResult";
 import { RVCInputs } from "../components/RVCInputs";
 import { useRVCGenerationParams } from "../tabs/RVCParams";
 import { applyRVC } from "../functions/applyRVC";
+import { TortoiseInput } from "../components/TortoiseInput";
+import { generateWithTortoise } from "./generateWithTortoise";
+import { useTortoiseGenerationParams } from "../tabs/TortoiseGenerationParams";
+import { parseFormChange } from "./parseFormChange";
 
 interface PipelineParams {
-  foundation: string;
+  generation: string;
   refinement: string;
 }
 
 const initialState: PipelineParams = {
-  foundation: "bark",
+  generation: "bark",
   refinement: "demucs",
 };
 
@@ -46,14 +50,38 @@ const PipelinePage = () => {
   const [rvcGenerationParams, setRvcGenerationParams] =
     useRVCGenerationParams();
 
+  const [tortoiseGenerationParams, setTortoiseGenerationParams] =
+    useTortoiseGenerationParams();
+
   async function pipeline() {
-    if (pipelineParams.foundation === "bark") {
+    if (pipelineParams.generation === "bark") {
       const result = await barkGenerate(barkGenerationParams);
       setBarkResult(result);
+      if (pipelineParams.refinement === "none") {
+        setData([result.audio]);
+      }
       if (pipelineParams.refinement === "demucs") {
         const demucsParams: DemucsParams = {
-          // file: pipelineParams.file,
-          // file: "???",
+          file: result.audio.data,
+        };
+        const result2 = await splitWithDemucs(demucsParams);
+        setData(result2);
+      }
+      if (pipelineParams.refinement === "rvc") {
+        const result3 = await applyRVC({
+          ...rvcGenerationParams,
+          original_audio: result.audio.data,
+        });
+        setData([result3.audio]);
+      }
+    }
+    if (pipelineParams.generation === "tortoise") {
+      const result = await generateWithTortoise(tortoiseGenerationParams);
+      if (pipelineParams.refinement === "none") {
+        setData([result.audio]);
+      }
+      if (pipelineParams.refinement === "demucs") {
+        const demucsParams: DemucsParams = {
           file: result.audio.data,
         };
         const result2 = await splitWithDemucs(demucsParams);
@@ -81,56 +109,48 @@ const PipelinePage = () => {
           </h1>
           <p>
             This pipeline takes an audio file as input and runs it through a
-            foundation model to generate a representation of the audio. This
+            generation model to generate a representation of the audio. This
             representation is then refined by a refinement model to generate a
             new audio file.
           </p>
           <div className="flex flex-col space-y-2 border border-gray-300 p-2 rounded">
-            <label>Choose a foundation model:</label>
-            {/* {["bark", "tortoise"].map((model) => ( */}
-            {["bark"].map((model) => (
+            <label>Choose a generation model:</label>
+            {["bark", "tortoise"].map((model) => (
               <div key={model} className="flex items-center space-x-2">
                 <input
                   type="radio"
-                  name="foundation"
+                  name="generation"
                   id={model}
                   value={model}
-                  checked={pipelineParams.foundation === model}
+                  checked={pipelineParams.generation === model}
                   onChange={() =>
-                    setPipelineParams((x) => ({ ...x, foundation: model }))
+                    setPipelineParams((x) => ({ ...x, generation: model }))
                   }
                 />
                 <label htmlFor={model}>{model}</label>
               </div>
             ))}
           </div>
-          {pipelineParams.foundation === "bark" && (
+          {pipelineParams.generation === "bark" && (
             <BarkInputs
               barkGenerationParams={barkGenerationParams}
               setBarkVoiceGenerationParams={setBarkVoiceGenerationParams}
-              handleChange={(
-                event:
-                  | React.ChangeEvent<HTMLInputElement>
-                  | React.ChangeEvent<HTMLTextAreaElement>
-                  | React.ChangeEvent<HTMLSelectElement>
-              ) => {
-                const { name, value, type } = event.target;
-                setBarkVoiceGenerationParams({
-                  ...barkGenerationParams,
-                  [name]:
-                    type === "number" || type === "range"
-                      ? Number(value)
-                      : type === "checkbox"
-                      ? (event.target as HTMLInputElement).checked // type assertion
-                      : value,
-                });
-              }}
+              handleChange={parseFormChange(setBarkVoiceGenerationParams)}
+              data={null}
+            />
+          )}
+          {/* if tortoise */}
+          {pipelineParams.generation === "tortoise" && (
+            <TortoiseInput
+              tortoiseGenerationParams={tortoiseGenerationParams}
+              setTortoiseGenerationParams={setTortoiseGenerationParams}
+              handleChange={parseFormChange(setTortoiseGenerationParams)}
               data={null}
             />
           )}
           <div className="flex flex-col space-y-2 border border-gray-300 p-2 rounded">
             <label>Choose a refinement model:</label>
-            {["rvc", "demucs"].map((model) => (
+            {["none", "rvc", "demucs"].map((model) => (
               <div key={model} className="flex items-center space-x-2">
                 <input
                   type="radio"
@@ -150,23 +170,7 @@ const PipelinePage = () => {
           {pipelineParams.refinement === "rvc" && (
             <RVCInputs
               rvcParams={rvcGenerationParams}
-              handleChange={(
-                event:
-                  | React.ChangeEvent<HTMLInputElement>
-                  | React.ChangeEvent<HTMLTextAreaElement>
-                  | React.ChangeEvent<HTMLSelectElement>
-              ) => {
-                const { name, value, type } = event.target;
-                setRvcGenerationParams({
-                  ...rvcGenerationParams,
-                  [name]:
-                    type === "number" || type === "range"
-                      ? Number(value)
-                      : type === "checkbox"
-                      ? (event.target as HTMLInputElement).checked // type assertion
-                      : value,
-                });
-              }}
+              handleChange={parseFormChange(setRvcGenerationParams)}
             />
           )}
           <button

@@ -205,8 +205,6 @@ export const HistoryCard = ({
   // const maxLength = 100000;
   const absoluteFilename = "/" + filename;
 
-  const favorite = barkFavorite;
-
   const deleteFavorite = async (
     _url: string,
     data?: {
@@ -225,7 +223,7 @@ export const HistoryCard = ({
   };
 
   const addFavorite = () =>
-    favorite("", {
+    barkFavorite("", {
       history_bundle_name_data,
     });
 
