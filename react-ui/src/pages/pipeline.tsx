@@ -22,6 +22,9 @@ import {
   useTortoiseResult,
 } from "../tabs/TortoiseGenerationParams";
 import { parseFormChange } from "../data/parseFormChange";
+import { useMagnetParams, useMagnetResult } from "../tabs/MagnetParams";
+import { generateWithMagnet } from "../functions/generateWithMagnet";
+import { MagnetInputs } from "../components/MagnetInputs";
 
 interface PipelineParams {
   generation: string;
@@ -53,6 +56,9 @@ const PipelinePage = () => {
     useTortoiseGenerationParams();
   const [tortoiseResult, setTortoiseResult] = useTortoiseResult();
 
+  const [magnetParams, setMagnetParams] = useMagnetParams();
+  const [magnetResult, setMagnetResult] = useMagnetResult();
+
   const [rvcGenerationParams, setRvcGenerationParams] =
     useRVCGenerationParams();
 
@@ -64,6 +70,10 @@ const PipelinePage = () => {
     } else if (pipelineParams.generation === "tortoise") {
       const result = await generateWithTortoise(tortoiseGenerationParams);
       setTortoiseResult(result);
+      await postProcessAudio(result.audio);
+    } else if (pipelineParams.generation === "magnet") {
+      const result = await generateWithMagnet(magnetParams);
+      setMagnetResult(result);
       await postProcessAudio(result.audio);
     }
 
@@ -142,9 +152,12 @@ const PipelinePage = () => {
             </div>
           )}
           {pipelineParams.generation === "magnet" && (
-            <div>
-              <label>Magnet Generation</label>
-            </div>
+            <MagnetInputs
+              magnetParams={magnetParams}
+              setMagnetParams={setMagnetParams}
+              handleChange={parseFormChange(setMagnetParams)}
+              data={magnetResult}
+            />
           )}
           <div className="flex flex-col gap-y-2 border border-gray-300 p-2 rounded mb-4">
             <label>Choose a refinement model:</label>
