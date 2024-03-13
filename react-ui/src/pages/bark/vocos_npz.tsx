@@ -4,42 +4,25 @@ import useLocalStorage from "../../hooks/useLocalStorage";
 import { AudioOutput } from "../../components/AudioComponents";
 import Head from "next/head";
 import {
-  EncodecParamsNPZ,
-  vocosIdNPZ,
-  initialState,
+  useVocosParamsNPZ,
+  useVocosResultsNPZ,
 } from "../../tabs/VocosParamsNPZ";
 import { GradioFile } from "../../types/GradioFile";
 import FileInput from "../../components/FileInput";
 import { encodecDecode } from "../../functions/encodecDecode";
+import { applyVocosNPZ } from "../../functions/applyVocosNPZ";
 
 const VocosPageNPZ = () => {
-  const [data, setData] = useLocalStorage<GradioFile | null>(
-    "vocosOutputNpz",
-    null
-  );
   const [dataEncodec, setDataEncodec] = useLocalStorage<GradioFile | null>(
     "vocosOutputNpzEncodec",
     null
   );
-  const [vocosParams, setVocosParams] = useLocalStorage<EncodecParamsNPZ>(
-    vocosIdNPZ,
-    initialState
-  );
+  const [vocosResult, setVocosResult] = useVocosResultsNPZ();
+  const [vocosParamsNPZ, setVocosParamsNPZ] = useVocosParamsNPZ();
 
-  async function vocos() {
-    const response = await fetch("/api/gradio/vocos_npz", {
-      method: "POST",
-      body: JSON.stringify(vocosParams),
-    });
-
-    const result = await response.json();
-    setData(result);
-  }
-
-  async function decodeWithEncodec() {
-    const result = await encodecDecode(vocosParams);
-    setDataEncodec(result);
-  }
+  const vocos = async () => setVocosResult(await applyVocosNPZ(vocosParamsNPZ));
+  const decodeWithEncodec = async () =>
+    setDataEncodec(await encodecDecode(vocosParamsNPZ));
 
   return (
     <Template>
@@ -51,8 +34,8 @@ const VocosPageNPZ = () => {
           <FileInput
             accept=".npz"
             callback={(npz_file) => {
-              setVocosParams({
-                ...vocosParams,
+              setVocosParamsNPZ({
+                ...vocosParamsNPZ,
                 npz_file,
               });
             }}
@@ -73,7 +56,9 @@ const VocosPageNPZ = () => {
           </button>
         </div>
         <div className="flex flex-col space-y-4">
-          {data && <AudioOutput audioOutput={data} label="Vocos Output" />}
+          {vocosResult && (
+            <AudioOutput audioOutput={vocosResult} label="Vocos Output" />
+          )}
           {dataEncodec && (
             <AudioOutput audioOutput={dataEncodec} label="Encodec Output" />
           )}

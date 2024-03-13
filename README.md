@@ -41,6 +41,10 @@ https://rsxdalv.github.io/bark-speaker-directory/
 https://github.com/rsxdalv/tts-generation-webui/discussions/186#discussioncomment-7291274
 
 ## Changelog
+Mar 13:
+* Add Experimental Pipeline (Bark / Tortoise / MusicGen / AudioGen / MAGNeT -> RVC / Demucs / Vocos) (#287)
+* Fix RVC bug with model reloading on each generation. For short inputs that results in a visible speedup.
+
 Mar 11:
 * Add Play as Audio and Save to Voices to bark (#286)
 * Change UX to show that files are deleted from favorites

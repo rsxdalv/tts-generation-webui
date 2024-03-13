@@ -1,12 +1,15 @@
 import React from "react";
 import { BarkGenerationParams } from "../tabs/BarkGenerationParams";
-import { getWebuiURL } from "../data/getWebuiURL";
+import { getWebuiURL, getWebuiURLWithHost } from "../data/getWebuiURL";
 import { encodecDecode } from "../functions/encodecDecode";
 import { saveToVoices } from "../functions/saveToVoices";
 
 // generic old generation dropdown for both OldGeneration and HistoryPromptSemantic
 const NPZVoiceDropdown = ({
-  barkGenerationParams, handleChange, name, label,
+  barkGenerationParams,
+  handleChange,
+  name,
+  label,
 }: {
   barkGenerationParams: BarkGenerationParams;
   handleChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
@@ -65,8 +68,7 @@ const NPZVoiceDropdown = ({
         <button
           className="border border-gray-300 p-2 rounded"
           onClick={async () => {
-            const url = getWebuiURL(selected);
-            const urlWithHost = `${window.location.origin}/${url}`;
+            const urlWithHost = getWebuiURLWithHost(selected);
             const x = await encodecDecode({ npz_file: urlWithHost });
             const audio = new Audio(x.data);
             audio.play();
@@ -85,7 +87,8 @@ const NPZVoiceDropdown = ({
   );
 };
 export const OldGeneration = ({
-  barkGenerationParams, handleChange,
+  barkGenerationParams,
+  handleChange,
 }: {
   barkGenerationParams: BarkGenerationParams;
   handleChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
@@ -94,10 +97,12 @@ export const OldGeneration = ({
     barkGenerationParams={barkGenerationParams}
     handleChange={handleChange}
     name="old_generation_dropdown"
-    label="Old generation" />
+    label="Old generation"
+  />
 );
 export const HistoryPromptSemantic = ({
-  barkGenerationParams, handleChange,
+  barkGenerationParams,
+  handleChange,
 }: {
   barkGenerationParams: BarkGenerationParams;
   handleChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
@@ -106,7 +111,8 @@ export const HistoryPromptSemantic = ({
     barkGenerationParams={barkGenerationParams}
     handleChange={handleChange}
     name="history_prompt_semantic_dropdown"
-    label="History prompt semantic" />
+    label="History prompt semantic"
+  />
 );
 
 async function reloadOldGenerationDropdown() {

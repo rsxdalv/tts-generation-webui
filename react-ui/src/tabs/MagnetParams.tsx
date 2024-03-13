@@ -1,5 +1,8 @@
-import { updateLocalStorageWithFunction } from "../hooks/useLocalStorage";
+import useLocalStorage, {
+  updateLocalStorageWithFunction,
+} from "../hooks/useLocalStorage";
 import router from "next/router";
+import { GradioFile } from "../types/GradioFile";
 
 export const magnetId = "magnetParams";
 
@@ -37,6 +40,32 @@ export const initialMagnetParams: MagnetParams = {
   span_arrangement: "nonoverlap",
 };
 
+export type MagnetResult = {
+  audio: GradioFile;
+  history_bundle_name_data: string;
+  json: {
+    _version: string;
+    _hash_version: string;
+    _type: string;
+    _audiocraft_version: string;
+    models: {};
+    prompt: string;
+    hash: string;
+    date: string;
+    model: string;
+    text: string;
+    seed: string;
+    use_sampling: boolean;
+    top_k: number;
+    top_p: number;
+    temperature: number;
+    max_cfg_coef: number;
+    min_cfg_coef: number;
+    decoding_steps: number[];
+    span_arrangement: string;
+  };
+};
+
 export const sendToMagnet = (melody?: string) => {
   if (!melody) return;
   updateLocalStorageWithFunction(
@@ -46,3 +75,9 @@ export const sendToMagnet = (melody?: string) => {
   );
   router.push("/magnet");
 };
+
+export const useMagnetParams = () =>
+  useLocalStorage<MagnetParams>(magnetId, initialMagnetParams);
+
+export const useMagnetResult = () =>
+  useLocalStorage<MagnetResult | null>(magnetId + ".output", null);

@@ -3,14 +3,15 @@ import { Template } from "../components/Template";
 import useLocalStorage from "../hooks/useLocalStorage";
 import { AudioOutput } from "../components/AudioComponents";
 import Head from "next/head";
-import {
-  BarkGenerationParams,
-  barkGenerationId,
-  initialState,
-} from "../tabs/BarkGenerationParams";
 import { BarkResult } from "../tabs/BarkResult";
 import { BarkInputs } from "../components/BarkInputs";
 import { getBarkFuncs } from "../data/getBarkFuncs";
+import { generateWithBark } from "../functions/generateWithBark";
+import {
+  useBarkGenerationParams,
+  useBarkResult,
+} from "../tabs/BarkGenerationParams";
+import { parseFormChange } from "../data/parseFormChange";
 
 const initialHistory = []; // prevent infinite loop
 const BarkGenerationPage = () => {
@@ -18,18 +19,15 @@ const BarkGenerationPage = () => {
     "barkGenerationHistory",
     initialHistory
   );
-  const [data, setData] = useLocalStorage<BarkResult | null>(
-    "barkGenerationOutput",
-    null
-  );
+  const [barkResult, setBarkResult] = useBarkResult();
   const [barkGenerationParams, setBarkVoiceGenerationParams] =
-    useLocalStorage<BarkGenerationParams>(barkGenerationId, initialState);
+    useBarkGenerationParams();
   const [loading, setLoading] = React.useState<boolean>(false);
 
   async function bark() {
     setLoading(true);
-    const result = await barkGenerate(barkGenerationParams);
-    setData(result);
+    const result = await generateWithBark(barkGenerationParams);
+    setBarkResult(result);
     setHistoryData((historyData) => [result, ...historyData]);
     setLoading(false);
   }
@@ -39,23 +37,7 @@ const BarkGenerationPage = () => {
     barkGenerationParams
   );
 
-  const handleChange = (
-    event:
-      | React.ChangeEvent<HTMLInputElement>
-      | React.ChangeEvent<HTMLTextAreaElement>
-      | React.ChangeEvent<HTMLSelectElement>
-  ) => {
-    const { name, value, type } = event.target;
-    setBarkVoiceGenerationParams({
-      ...barkGenerationParams,
-      [name]:
-        type === "number" || type === "range"
-          ? Number(value)
-          : type === "checkbox"
-          ? (event.target as HTMLInputElement).checked // type assertion
-          : value,
-    });
-  };
+  const handleChange = parseFormChange(setBarkVoiceGenerationParams);
 
   return (
     <Template>
@@ -67,7 +49,7 @@ const BarkGenerationPage = () => {
           barkGenerationParams={barkGenerationParams}
           setBarkVoiceGenerationParams={setBarkVoiceGenerationParams}
           handleChange={handleChange}
-          data={data}
+          data={barkResult}
         />
         <div className="flex flex-col space-y-4">
           <button
@@ -77,10 +59,10 @@ const BarkGenerationPage = () => {
             {loading ? "Generating..." : "Generate"}
           </button>
           <AudioOutput
-            audioOutput={data?.audio}
+            audioOutput={barkResult?.audio}
             label="Bark Output"
             funcs={funcs}
-            metadata={data}
+            metadata={barkResult}
             filter={["sendToBark", "sendToBarkVoiceGeneration"]}
           />
         </div>
@@ -115,12 +97,3 @@ const BarkGenerationPage = () => {
 };
 
 export default BarkGenerationPage;
-
-async function barkGenerate(barkGenerationParams: BarkGenerationParams) {
-  const response = await fetch("/api/gradio/bark", {
-    method: "POST",
-    body: JSON.stringify(barkGenerationParams),
-  });
-
-  return await response.json();
-}

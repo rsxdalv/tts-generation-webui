@@ -1,29 +1,19 @@
 import React from "react";
 import { Template } from "../../components/Template";
-import useLocalStorage from "../../hooks/useLocalStorage";
 import { AudioInput, AudioOutput } from "../../components/AudioComponents";
 import Head from "next/head";
-import { VocosParams, vocosId, initialState } from "../../tabs/VocosParams";
-import { GradioFile } from "../../types/GradioFile";
+import { useVocosResults, useVocosParams } from "../../tabs/VocosParams";
+import { parseFormChange } from "../../data/parseFormChange";
+import { applyVocosWav } from "../../functions/applyVocosWav";
+import { VocosWavInputs } from "../../components/VocosWavInputs";
 
 const VocosPage = () => {
-  const [data, setData] = useLocalStorage<GradioFile | null>(
-    "vocosOutput",
-    null
-  );
-  const [vocosParams, setVocosParams] = useLocalStorage<VocosParams>(
-    vocosId,
-    initialState
-  );
+  const [vocosResult, setVocosResult] = useVocosResults();
+  const [vocosParams, setVocosParams] = useVocosParams();
 
   async function vocos() {
-    const response = await fetch("/api/gradio/vocos_wav", {
-      method: "POST",
-      body: JSON.stringify(vocosParams),
-    });
-
-    const result = await response.json();
-    setData(result);
+    const result = await applyVocosWav(vocosParams);
+    setVocosResult(result);
   }
 
   const useAsInput = (audio?: string) => {
@@ -34,12 +24,7 @@ const VocosPage = () => {
     });
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setVocosParams({
-      ...vocosParams,
-      bandwidth: e.target.value,
-    });
-  };
+  const handleChange = parseFormChange(setVocosParams);
 
   return (
     <Template>
@@ -59,27 +44,10 @@ const VocosPage = () => {
             filter={["sendToVocos"]}
           />
 
-          <div className="space-y-2">
-            <label className="text-sm">Bandwidth in kbps:</label>
-            <div className="flex flex-row space-x-2">
-              {["1.5", "3.0", "6.0", "12.0"].map((bandwidth) => (
-                <div key={bandwidth} className="flex items-center">
-                  <input
-                    type="radio"
-                    name="model"
-                    id={bandwidth}
-                    value={bandwidth}
-                    checked={vocosParams.bandwidth === bandwidth}
-                    onChange={handleChange}
-                    className="border border-gray-300 p-2 rounded"
-                  />
-                  <label className="ml-1" htmlFor={bandwidth}>
-                    {bandwidth}
-                  </label>
-                </div>
-              ))}
-            </div>
-          </div>
+          <VocosWavInputs
+            vocosParams={vocosParams}
+            handleChange={handleChange}
+          />
 
           <button
             className="border border-gray-300 p-2 rounded"
@@ -89,9 +57,9 @@ const VocosPage = () => {
           </button>
         </div>
         <div className="flex flex-col space-y-4">
-          {data && (
+          {vocosResult && (
             <AudioOutput
-              audioOutput={data}
+              audioOutput={vocosResult}
               label="Vocos Output"
               funcs={{ useAsInput }}
               filter={["sendToVocos"]}

@@ -18,6 +18,9 @@ def inject_hubert(hubert_model: torch.nn.Module):
     infer_batch_rvc.hubert_model = hubert_model
 
 
+last_model_path = None
+
+
 def infer_rvc(
     f0up_key,
     input_path,
@@ -27,12 +30,18 @@ def infer_rvc(
     model_path,
     index_rate,
 ):
+    global last_model_path
     date = get_date_string()
-    get_vc(model_path)
+    if last_model_path != model_path:
+        get_vc(model_path)
+        last_model_path = model_path
     wav_opt = vc_single(0, input_path, f0up_key, None, f0method, index_path, index_rate)
     out_path = os.path.join(opt_path, f"{os.path.basename(input_path)}_{date}.wav")
     wavfile.write(out_path, infer_batch_rvc.tgt_sr, wav_opt)
+    # maybe return (infer_batch_rvc.tgt_sr, wav_opt) instead of writing to file
     return out_path
+
+
 
 
 def run_rvc(
@@ -139,6 +148,7 @@ def run_rvc_api(
         "protect": protect,
     }
 
+
 RVC_LOCAL_MODELS_DIR = get_path_from_root("data", "models", "rvc", "checkpoints")
 
 
@@ -214,38 +224,42 @@ def rvc_ui_model_or_index_path_ui(label: str):
         visible=False,
     )
     file_path_file.change(
-        lambda file: [
-            file_path.update(value=file.name),
-            file_path_dropdown.update(value=None),
-        ]
-        if file is not None
-        else [
-            file_path.update(),
-            file_path_dropdown.update(),
-        ],
+        lambda file: (
+            [
+                file_path.update(value=file.name),
+                file_path_dropdown.update(value=None),
+            ]
+            if file is not None
+            else [
+                file_path.update(),
+                file_path_dropdown.update(),
+            ]
+        ),
         inputs=[file_path_file],
         outputs=[file_path, file_path_dropdown],
     )
 
     file_path_dropdown.change(
-        lambda model: [
-            file_path.update(
-                value=get_rvc_local_path(model, file_type)
-            ),
-            file_path_file.update(value=None),
-        ]
-        if model is not None
-        else [
-            file_path.update(),
-            file_path_file.update(),
-        ],
+        lambda model: (
+            [
+                file_path.update(value=get_rvc_local_path(model, file_type)),
+                file_path_file.update(value=None),
+            ]
+            if model is not None
+            else [
+                file_path.update(),
+                file_path_file.update(),
+            ]
+        ),
         inputs=[file_path_dropdown],
         outputs=[file_path, file_path_file],
     )
     return file_path
 
+
 def get_rvc_local_path(path: str, file_type: str):
     return os.path.join(RVC_LOCAL_MODELS_DIR, f"{path}.{file_type}")
+
 
 def rvc_ui():
     gr.Markdown("# RVC Beta Demo")
