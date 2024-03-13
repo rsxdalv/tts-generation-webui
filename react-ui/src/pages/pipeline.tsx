@@ -25,6 +25,9 @@ import { parseFormChange } from "../data/parseFormChange";
 import { useMagnetParams, useMagnetResult } from "../tabs/MagnetParams";
 import { generateWithMagnet } from "../functions/generateWithMagnet";
 import { MagnetInputs } from "../components/MagnetInputs";
+import { useMusicgenParams, useMusicgenResult } from "../tabs/MusicgenParams";
+import { generateWithMusicgen } from "../functions/generateWithMusicgen";
+import { MusicgenInputs } from "../components/MusicgenInputs";
 
 interface PipelineParams {
   generation: string;
@@ -51,11 +54,11 @@ const PipelinePage = () => {
   const [barkGenerationParams, setBarkVoiceGenerationParams] =
     useBarkGenerationParams();
   const [barkResult, setBarkResult] = useBarkResult();
-
   const [tortoiseGenerationParams, setTortoiseGenerationParams] =
     useTortoiseGenerationParams();
   const [tortoiseResult, setTortoiseResult] = useTortoiseResult();
-
+  const [musicgenParams, setMusicgenParams] = useMusicgenParams();
+  const [musicgenResult, setMusicgenResult] = useMusicgenResult();
   const [magnetParams, setMagnetParams] = useMagnetParams();
   const [magnetResult, setMagnetResult] = useMagnetResult();
 
@@ -70,6 +73,10 @@ const PipelinePage = () => {
     } else if (pipelineParams.generation === "tortoise") {
       const result = await generateWithTortoise(tortoiseGenerationParams);
       setTortoiseResult(result);
+      await postProcessAudio(result.audio);
+    } else if (pipelineParams.generation === "musicgen") {
+      const result = await generateWithMusicgen(musicgenParams);
+      setMusicgenResult(result);
       await postProcessAudio(result.audio);
     } else if (pipelineParams.generation === "magnet") {
       const result = await generateWithMagnet(magnetParams);
@@ -147,9 +154,12 @@ const PipelinePage = () => {
             />
           )}
           {pipelineParams.generation === "musicgen" && (
-            <div>
-              <label>Music Generation</label>
-            </div>
+            <MusicgenInputs
+              musicgenParams={musicgenParams}
+              handleChange={parseFormChange(setMusicgenParams)}
+              setMusicgenParams={setMusicgenParams}
+              musicgenResult={musicgenResult}
+            />
           )}
           {pipelineParams.generation === "magnet" && (
             <MagnetInputs
