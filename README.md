@@ -9,6 +9,9 @@
 Google Colab demo: [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rsxdalv/tts-generation-webui/blob/main/notebooks/google_collab.ipynb)
 
 
+*Note: Not all models support all platforms. For example, MusicGen and AudioGen are not supported on MacOS as of yet.*
+
+
 ## Videos
 
 |                  **How To Use TTS Voice Generation Web UI With AI Voice Cloning Technology (Bark AI Tutorial)**                  |                  **TTS Generation WebUI - A Tool for Text to Speech and Voice Cloning**                             |                       **Text to speech and voice cloning - TTS Generation WebUI**                                |
