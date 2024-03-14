@@ -41,6 +41,9 @@ https://rsxdalv.github.io/bark-speaker-directory/
 https://github.com/rsxdalv/tts-generation-webui/discussions/186#discussioncomment-7291274
 
 ## Changelog
+Mar 14:
+* StyleTTS2 Demo Notebook
+
 Mar 13:
 * Add Experimental Pipeline (Bark / Tortoise / MusicGen / AudioGen / MAGNeT -> RVC / Demucs / Vocos) (#287)
 * Fix RVC bug with model reloading on each generation. For short inputs that results in a visible speedup.

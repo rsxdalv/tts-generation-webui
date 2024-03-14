@@ -71,6 +71,7 @@ def main():
     try_install("requirements_rvc.txt", "RVC")
     # hydracore fix because of fairseq
     do("pip install hydra-core==1.3.2")
+    try_install("requirements_styletts2.txt", "StyleTTS")
 
     if is_node_installed():
         setup_node_modules()

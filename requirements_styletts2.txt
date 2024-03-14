@@ -1,0 +1,2 @@
+torch==2.0.0 # BSD 3-Clause - ensures torch is not reinstalled
+styletts2 @ git+https://github.com/rsxdalv/StyleTTS2@cc36a19610df42123230237a73e798d4fdd3dcb8#egg=styletts2 # MIT License
