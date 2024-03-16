@@ -44,6 +44,9 @@ https://rsxdalv.github.io/bark-speaker-directory/
 https://github.com/rsxdalv/tts-generation-webui/discussions/186#discussioncomment-7291274
 
 ## Changelog
+Mar 16:
+* Upgrade vocos to 0.1.0
+
 Mar 14:
 * StyleTTS2 Demo Notebook
 
