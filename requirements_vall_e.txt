@@ -1,0 +1,1 @@
+valle-x @ git+https://github.com/rsxdalv/VALL-E-X@f423d779e2015c11526f037de48210576820ed3a#egg=valle-x # MIT License
