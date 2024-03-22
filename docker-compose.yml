@@ -5,6 +5,8 @@ services:
     restart: unless-stopped
     ports:
       - "7860:7860"
+      # include React UI
+      - "3000:3000"
     container_name: tts-generation-webui
     deploy:
         resources:

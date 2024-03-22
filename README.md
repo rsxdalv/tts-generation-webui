@@ -9,6 +9,9 @@
 Google Colab demo: [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rsxdalv/tts-generation-webui/blob/main/notebooks/google_collab.ipynb)
 
 
+*Note: Not all models support all platforms. For example, MusicGen and AudioGen are not supported on MacOS as of yet.*
+
+
 ## Videos
 
 |                  **How To Use TTS Voice Generation Web UI With AI Voice Cloning Technology (Bark AI Tutorial)**                  |                  **TTS Generation WebUI - A Tool for Text to Speech and Voice Cloning**                             |                       **Text to speech and voice cloning - TTS Generation WebUI**                                |
@@ -41,6 +44,14 @@ https://rsxdalv.github.io/bark-speaker-directory/
 https://github.com/rsxdalv/tts-generation-webui/discussions/186#discussioncomment-7291274
 
 ## Changelog
+Mar 22:
+* Vall-E X demo via notebook (#292)
+* Add React UI to Docker image
+* Add install disclaimer
+
+Mar 16:
+* Upgrade vocos to 0.1.0
+
 Mar 14:
 * StyleTTS2 Demo Notebook
 
