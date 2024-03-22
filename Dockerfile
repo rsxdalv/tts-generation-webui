@@ -5,6 +5,17 @@ FROM nvidia/cuda:11.8.0-devel-ubuntu22.04 AS env_base
 RUN apt-get update && apt-get install --no-install-recommends -y \
     git vim nano build-essential python3-dev python3-venv python3-pip gcc g++ ffmpeg
 
+ENV NODE_VERSION=18.16.1
+RUN apt-get update && apt install -y curl
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+ENV NVM_DIR=/root/.nvm
+RUN . "$NVM_DIR/nvm.sh" && nvm install ${NODE_VERSION}
+RUN . "$NVM_DIR/nvm.sh" && nvm use v${NODE_VERSION}
+RUN . "$NVM_DIR/nvm.sh" && nvm alias default v${NODE_VERSION}
+ENV PATH="/root/.nvm/versions/node/v${NODE_VERSION}/bin/:${PATH}"
+RUN node --version
+RUN npm --version
+
 # Setup venv
 RUN pip3 install virtualenv
 RUN virtualenv /venv
