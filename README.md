@@ -44,6 +44,11 @@ https://rsxdalv.github.io/bark-speaker-directory/
 https://github.com/rsxdalv/tts-generation-webui/discussions/186#discussioncomment-7291274
 
 ## Changelog
+Mar 22:
+* Vall-E X demo via notebook (#292)
+* Add React UI to Docker image
+* Add install disclaimer
+
 Mar 16:
 * Upgrade vocos to 0.1.0
 
