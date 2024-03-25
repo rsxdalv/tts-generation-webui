@@ -114,10 +114,7 @@ def get_encodec_prompts(path_to_wav: str, use_gpu=True):
     coarse_prompt = fine_prompt[:2, :]
     return fine_prompt, coarse_prompt
 
-
-def save_cloned_voice(
-    full_generation: FullGeneration,
-):
+def save_cloned_voice(full_generation: FullGeneration):
     voice_name = f"voice_from_audio_{history_to_hash(full_generation)}"
     filename = f"voices/{voice_name}.npz"
     date = get_date_string()
