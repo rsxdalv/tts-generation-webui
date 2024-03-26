@@ -73,6 +73,7 @@ def main():
     do("pip install hydra-core==1.3.2")
     try_install("requirements_styletts2.txt", "StyleTTS")
     try_install("requirements_vall_e.txt", "Vall-E-X")
+    try_install("requirements_maha_tts.txt", "Maha TTS")
 
     if is_node_installed():
         setup_node_modules()

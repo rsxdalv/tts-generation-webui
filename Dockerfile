@@ -43,6 +43,7 @@ RUN pip3 install -r requirements_rvc.txt
 RUN pip3 install hydra-core==1.3.2
 RUN pip3 install -r requirements_styletts2.txt
 RUN pip3 install -r requirements_vall_e.txt
+RUN pip3 install -r requirements_maha_tts.txt
 
 # Add React webui (testing)
 RUN cd react-ui && npm install && npm run build
