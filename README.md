@@ -44,6 +44,9 @@ https://rsxdalv.github.io/bark-speaker-directory/
 https://github.com/rsxdalv/tts-generation-webui/discussions/186#discussioncomment-7291274
 
 ## Changelog
+Mar 26:
+* Add Maha TTS demo notebook
+
 Mar 22:
 * Vall-E X demo via notebook (#292)
 * Add React UI to Docker image
