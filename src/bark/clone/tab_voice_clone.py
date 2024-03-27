@@ -140,8 +140,29 @@ def tab_voice_clone(register_use_as_history_button):
                 """
             Unethical use of this technology is prohibited.
             This demo is based on https://github.com/gitmylo/bark-voice-cloning-HuBERT-quantizer repository.
+
+            Information from the original repository (https://github.com/gitmylo/bark-voice-cloning-HuBERT-quantizer?tab=readme-ov-file#voices-cloned-arent-very-convincing-why-are-other-peoples-cloned-voices-better-than-mine)
+
+            ## Voices cloned aren't very convincing, why are other people's cloned voices better than mine?
+            Make sure these things are **NOT** in your voice input: (in no particular order)
+            * Noise (You can use a noise remover before)
+            * Music (There are also music remover tools) (Unless you want music in the background)
+            * A cut-off at the end (This will cause it to try and continue on the generation)
+            * Under 1 second of training data (i personally suggest around 10 seconds for good potential, but i've had great results with 5 seconds as well.)
+
+            What makes for good prompt audio? (in no particular order)
+            * Clearly spoken
+            * No weird background noises
+            * Only one speaker
+            * Audio which ends after a sentence ends
+            * Regular/common voice (They usually have more success, it's still capable of cloning complex voices, but not as good at it)
+            * Around 10 seconds of data
+
             """
             )
+
+
+        with gr.Column():
             tokenizer_dropdown = gr.Dropdown(
                 label="Tokenizer",
                 choices=[
@@ -165,7 +186,6 @@ def tab_voice_clone(register_use_as_history_button):
                 source="upload",
                 interactive=True,
             )
-
             with gr.Row():
                 use_gpu_checkbox = gr.Checkbox(label="Use GPU", value=True)
                 clear_models_button = gr.Button(
@@ -207,8 +227,7 @@ def tab_voice_clone(register_use_as_history_button):
                 outputs=[tokenizer_dropdown],
                 api_name="bark_voice_tokenizer_load",
             )
-
-        with gr.Column():
+            
             gr.Markdown("Generated voice:")
             voice_file_name = gr.Textbox(
                 label="Voice file name", value="", interactive=False
