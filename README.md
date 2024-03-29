@@ -44,6 +44,12 @@ https://rsxdalv.github.io/bark-speaker-directory/
 https://github.com/rsxdalv/tts-generation-webui/discussions/186#discussioncomment-7291274
 
 ## Changelog
+Mar 28:
+* Add GPU Info tab
+
+Mar 27:
+* Add information about voice cloning to tab voice clone
+
 Mar 26:
 * Add Maha TTS demo notebook
 

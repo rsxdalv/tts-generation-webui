@@ -31,6 +31,7 @@ from src.config.config import config
 from src.css.css import full_css
 from src.Joutai import Joutai
 from src.history_tab.collections_directories_atom import collections_directories_atom
+from src.utils.gpu_info_tab import gpu_info_tab
 
 
 setup_or_recover.dummy()
@@ -52,6 +53,7 @@ gradio_interface_options = (
     if "gradio_interface_options" in config
     else default_config
 )
+
 
 with gr.Blocks(
     css=full_css,
@@ -167,6 +169,7 @@ with gr.Blocks(
             model_location_settings_tab()
 
         remixer_input = simple_remixer_tab()
+        gpu_info_tab()
     Joutai.singleton.tabs.render()
 
 
