@@ -1,7 +1,6 @@
 import os
 import gradio as gr
 import torch
-from rvc_beta import infer_batch_rvc
 from src.Joutai import Joutai
 from src.history_tab.open_folder import open_folder
 from src.utils.get_path_from_root import get_path_from_root
