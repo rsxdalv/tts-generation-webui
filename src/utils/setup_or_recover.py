@@ -18,6 +18,12 @@ def generate_env(
     model_location_hf_env_var2: str = "",
     model_location_th_home: str = "",
     model_location_th_xdg: str = "",
+    # data\models\rvc\checkpoints\Alina_Gray-20230627T032329Z-001\Alina_Gray.pth
+    rvc_weight_root: str = "data/models/rvc/checkpoints",
+    rvc_weight_uvr5_root: str = "data/models/rvc/uvr5_weights",
+    rvc_index_root: str = "data/models/rvc/checkpoints",
+    rvc_outside_index_root: str = "data/models/rvc/checkpoints",
+    rvc_rmvpe_root: str = "data/models/rvc/rmvpe",
 ):
     def get_suno_env(name):
         return os.environ.get(name, "").lower() in ("true", "1")
@@ -38,6 +44,17 @@ def generate_env(
     if not model_location_th_xdg:
         model_location_th_xdg = os.environ.get("XDG_CACHE_HOME", "")
 
+    if not rvc_weight_root:
+        rvc_weight_root = os.environ.get("weight_root", "")
+    if not rvc_weight_uvr5_root:
+        rvc_weight_uvr5_root = os.environ.get("weight_uvr5_root", "")
+    if not rvc_index_root:
+        rvc_index_root = os.environ.get("index_root", "")
+    if not rvc_outside_index_root:
+        rvc_outside_index_root = os.environ.get("outside_index_root", "")
+    if not rvc_rmvpe_root:
+        rvc_rmvpe_root = os.environ.get("rmvpe_root", "")
+
     env = "# This file gets updated automatically from the UI\n\n"
     env += env_entry(
         "SUNO_USE_SMALL_MODELS",
@@ -52,6 +69,8 @@ def generate_env(
     env += env_entry(
         "SUNO_OFFLOAD_CPU", environment_suno_offload_cpu, "Offload GPU models to CPU"
     )
+
+    env += "\n"
 
     env += env_entry(
         "HUGGINGFACE_HUB_CACHE",
@@ -80,6 +99,45 @@ def generate_env(
         "Default location for Torch Hub models (alternative)",
         null=not model_location_th_xdg,
     )
+
+    env += "\n"
+
+    env += env_entry(
+        "weight_root",
+        rvc_weight_root,
+        "Root directory for RVC model weights",
+        null=not rvc_weight_root,
+    )
+
+    env += env_entry(
+        "weight_uvr5_root",
+        rvc_weight_uvr5_root,
+        "Root directory for RVC model weights (UVR5)",
+        null=not rvc_weight_uvr5_root,
+    )
+
+    env += env_entry(
+        "index_root",
+        rvc_index_root,
+        "Root directory for RVC model indices",
+        null=not rvc_index_root,
+    )
+
+    env += env_entry(
+        "outside_index_root",
+        rvc_outside_index_root,
+        "Root directory for RVC model indices (outside)",
+        null=not rvc_outside_index_root,
+    )
+
+    env += env_entry(
+        "rmvpe_root",
+        rvc_rmvpe_root,
+        "Root directory for RVC model RMVPE",
+        null=not rvc_rmvpe_root,
+    )
+
+    env += "\n"
 
     return env
 

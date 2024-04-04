@@ -17,10 +17,29 @@ export const RVCInputs = ({
   hideAudioInput?: boolean;
 }) => {
   return (
-    <div className="flex flex-col space-y-2 border border-gray-300 p-2 rounded">
+    <div className="flex flex-col gap-y-2 border border-gray-300 p-2 rounded">
       <label className="text-sm">RVC Parameters:</label>
-      <Model rvcParams={rvcParams} handleChange={handleChange} />
-      <Index rvcParams={rvcParams} handleChange={handleChange} />
+      <div className="flex flex-col gap-y-2 border border-gray-300 p-2 rounded">
+        <label className="text-sm">Core:</label>
+        <Model rvcParams={rvcParams} handleChange={handleChange} />
+        <Index rvcParams={rvcParams} handleChange={handleChange} />
+        <div className="flex gap-2">
+          <label className="text-sm">Device:</label>
+          <select
+            name="device"
+            id="device"
+            className="border border-gray-300 p-2 rounded text-black w-full"
+            value={rvcParams?.device}
+            onChange={handleChange}
+          >
+            {["cuda:0", "cpu", "mps"].map((device) => (
+              <option key={device} value={device}>
+                {device}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
       {!hideAudioInput && (
         <AudioInput
           callback={(original_audio?: string) => {
@@ -37,65 +56,68 @@ export const RVCInputs = ({
         />
       )}
       <div className="grid grid-cols-2 gap-2">
-        <div className="flex flex-col space-y-2">
+        <div className="flex flex-col gap-y-2">
           <div className="flex gap-2">
-            <div className="flex flex-col">
-              <label className="text-sm">Pitch Up key:</label>
-              <input
-                type="text"
-                name="pitch_up_key"
-                value={rvcParams.pitch_up_key}
-                onChange={handleChange}
-                className="border border-gray-300 p-2 rounded"
+            <div className="flex flex-col gap-2">
+              <div className="flex flex-row gap-x-2">
+                <GenericSlider
+                  rvcParams={rvcParams}
+                  handleChange={handleChange}
+                  label="Pitch Up key"
+                  name="pitch_up_key"
+                  min="-24"
+                  max="24"
+                  step="1"
+                  className="w-full"
+                />
+                <input
+                  type="number"
+                  name="pitch_up_key"
+                  value={rvcParams.pitch_up_key}
+                  onChange={handleChange}
+                  className="border border-gray-300 p-2 rounded w-1/4"
+                />
+              </div>
+              {/* search feature ratio */}
+              <GenericSlider
+                rvcParams={rvcParams}
+                handleChange={handleChange}
+                label="Search Feature Ratio"
+                name="search_feature_ratio"
+                min="0.0"
+                max="1.0"
+                step="0.01"
               />
             </div>
             <div className="flex flex-col">
               <label className="text-sm">Pitch Collection Method:</label>
-              <select
-                name="pitch_collection_method"
-                id="pitch_collection_method"
-                className="border border-gray-300 p-2 rounded text-black w-full"
-                value={rvcParams?.pitch_collection_method}
-                onChange={handleChange}
-              >
-                {["harvest", "pm", "crepe"].map((pitch_collection_method) => (
-                  <option
+              {["harvest", "pm", "crepe", "rmvpe", "fcpe"].map(
+                (pitch_collection_method) => (
+                  <div
                     key={pitch_collection_method}
-                    value={pitch_collection_method}
+                    className="flex items-center"
                   >
-                    {pitch_collection_method}
-                  </option>
-                ))}
-              </select>
+                    <input
+                      type="radio"
+                      name="pitch_collection_method"
+                      id={pitch_collection_method}
+                      value={pitch_collection_method}
+                      checked={
+                        rvcParams.pitch_collection_method ===
+                        pitch_collection_method
+                      }
+                      onChange={handleChange}
+                      className="border border-gray-300 p-2 rounded"
+                    />
+                    <label className="ml-1" htmlFor={pitch_collection_method}>
+                      {pitch_collection_method}
+                    </label>
+                  </div>
+                )
+              )}
             </div>
-            {/* search feature ratio */}
-            <GenericSlider
-              rvcParams={rvcParams}
-              handleChange={handleChange}
-              label="Search Feature Ratio"
-              name="search_feature_ratio"
-              min="0.0"
-              max="1.0"
-              step="0.01"
-            />
           </div>
-          <div className="flex flex-col space-y-2">
-            <label className="text-sm">Device:</label>
-            <select
-              name="device"
-              id="device"
-              className="border border-gray-300 p-2 rounded text-black w-full"
-              value={rvcParams?.device}
-              onChange={handleChange}
-            >
-              {["cuda:0", "cpu", "mps"].map((device) => (
-                <option key={device} value={device}>
-                  {device}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="flex flex-col space-y-2">
+          <div className="flex flex-col gap-y-2">
             <GenericSlider
               rvcParams={rvcParams}
               handleChange={handleChange}
@@ -107,19 +129,19 @@ export const RVCInputs = ({
             />
           </div>
         </div>
-        <div className="flex flex-col space-y-2">
-          {/* <div className="flex flex-col space-y-2">
-              <GenericSlider
-                rvcParams={rvcParams}
-                handleChange={handleChange}
-                label="Resample Sample-rate (Bug)"
-                name="resample_sample_rate_bug"
-                min="0"
-                max="48000"
-                step="1"
-              />
-            </div> */}
-          <div className="flex flex-col space-y-2">
+        <div className="flex flex-col gap-y-2">
+          <div className="flex flex-col gap-y-2">
+            <GenericSlider
+              rvcParams={rvcParams}
+              handleChange={handleChange}
+              label="Resample Sample-rate"
+              name="resample_sample_rate"
+              min="0"
+              max="48000"
+              step="1"
+            />
+          </div>
+          <div className="flex flex-col gap-y-2">
             <GenericSlider
               rvcParams={rvcParams}
               handleChange={handleChange}
@@ -130,7 +152,7 @@ export const RVCInputs = ({
               step="0.01"
             />
           </div>
-          <div className="flex flex-col space-y-2">
+          <div className="flex flex-col gap-y-2">
             <GenericSlider
               rvcParams={rvcParams}
               handleChange={handleChange}
@@ -184,7 +206,7 @@ const Model = ({
 
   const selected = rvcGenerationParams?.model;
   return (
-    <div className="flex flex-col space-y-2">
+    <div className="flex flex-col gap-y-2">
       <div className="flex gap-2">
         <label className="text-sm">Model:</label>
         <select
@@ -259,7 +281,7 @@ const Index = ({
 
   const selected = rvcGenerationParams?.index;
   return (
-    <div className="flex flex-col space-y-2">
+    <div className="flex flex-col gap-y-2">
       <div className="flex gap-2">
         <label className="text-sm">Index:</label>
         <select
@@ -303,6 +325,7 @@ const GenericSlider = ({
   min,
   max,
   step,
+  className,
 }: {
   rvcParams: RVCParams;
   handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
@@ -311,9 +334,10 @@ const GenericSlider = ({
   min: string;
   max: string;
   step: string;
+  className?: string;
 }) => {
   return (
-    <div className="flex flex-col border border-gray-300 p-2 rounded">
+    <div className={`flex flex-col border border-gray-300 p-2 rounded ${className}`}>
       <label className="text-sm">
         {label}: {rvcGenerationParams[name]}
       </label>

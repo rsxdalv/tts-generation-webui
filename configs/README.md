@@ -1,0 +1,1 @@
+This is just a compatibility layer RVC, as it requires a configs directory that has to be at the project directory.

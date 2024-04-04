@@ -386,31 +386,24 @@ async function rvc({
   device,
   use_half_precision_model,
   filter_radius_pitch,
-  resample_sample_rate_bug,
+  resample_sample_rate,
   voice_envelope_normalizaiton,
   protect_breath_sounds,
 }) {
   const original_audioBlob = await getFile(original_audio);
-  // const indexPath = getIndex(index);
-  // const modelPath = getModelPath(model);
-  const indexPath = index;
-  const modelPath = model;
 
   const app = await getClient();
-  // const result = (await app.predict("/rvc", [
-  const result = (await app.predict("/rvc_api", [
+  const result = (await app.predict("/rvc", [
     pitch_up_key, // string  in 'Pitch Up key' Textbox component
     original_audioBlob, // blob in 'Original Audio' Audio component
-    // indexBlob, // blob in 'Index' File component
-    indexPath, // blob in 'Index' File component
+    index, // string in 'Index' Dropdown component
     pitch_collection_method, // string (Option from: ['harvest', 'reaper', 'melodia']) in 'Pitch Collection Method' Radio component
-    // modelBlob, // blob in 'Model' File component
-    modelPath, // blob in 'Model' File component
+    model, // string in 'Model' Dropdown component
     search_feature_ratio, // number (numeric value between 0.0 and 1.0) in 'Search Feature Ratio' Slider component
     device, // string (Option from: ['cuda:0', 'cpu', 'mps']) in 'Device' Dropdown component
     use_half_precision_model, // boolean  in 'Use half precision model (Depends on GPU support)' Checkbox component
     filter_radius_pitch, // number (numeric value between 0 and 10) in 'Filter Radius (Pitch)' Slider component
-    resample_sample_rate_bug, // number (numeric value between 0 and 48000) in 'Resample Sample-rate (Bug)' Slider component
+    resample_sample_rate, // number (numeric value between 0 and 48000) in 'Resample Sample-rate (Bug)' Slider component
     voice_envelope_normalizaiton, // number (numeric value between 0.0 and 1.0) in 'Voice Envelope Normalizaiton' Slider component
     protect_breath_sounds, // number (numeric value between 0.0 and 0.5) in 'Protect Breath Sounds' Slider component
   ])) as {
@@ -427,33 +420,28 @@ async function rvc({
   };
 }
 
+type RVCModelReloadResult = {
+  data: [
+    {
+      choices: string[];
+      __type__: "update";
+    }
+  ];
+};
+
 async function rvc_model_reload() {
   const app = await getClient();
-
-  const result = (await app.predict("/rvc_model_reload")) as {
-    data: [
-      {
-        choices: string[];
-        __type__: "update";
-      }
-    ];
-  };
-
+  const result = (await app.predict(
+    "/rvc_model_reload"
+  )) as RVCModelReloadResult;
   return result?.data[0].choices.map((x) => x[0]);
 }
 
 async function rvc_index_reload() {
   const app = await getClient();
-
-  const result = (await app.predict("/rvc_index_reload")) as {
-    data: [
-      {
-        choices: string[];
-        __type__: "update";
-      }
-    ];
-  };
-
+  const result = (await app.predict(
+    "/rvc_index_reload"
+  )) as RVCModelReloadResult;
   return result?.data[0].choices.map((x) => x[0]);
 }
 
