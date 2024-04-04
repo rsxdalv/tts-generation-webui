@@ -39,6 +39,16 @@ export const RVCInputs = ({
             ))}
           </select>
         </div>
+        <div className="flex gap-2">
+          <label className="text-sm">Use half precision model:</label>
+          <input
+            type="checkbox"
+            name="use_half_precision_model"
+            checked={rvcParams?.use_half_precision_model}
+            onChange={handleChange}
+            className="border border-gray-300 p-2 rounded"
+          />
+        </div>
       </div>
       {!hideAudioInput && (
         <AudioInput
@@ -337,7 +347,9 @@ const GenericSlider = ({
   className?: string;
 }) => {
   return (
-    <div className={`flex flex-col border border-gray-300 p-2 rounded ${className}`}>
+    <div
+      className={`flex flex-col border border-gray-300 p-2 rounded ${className}`}
+    >
       <label className="text-sm">
         {label}: {rvcGenerationParams[name]}
       </label>
