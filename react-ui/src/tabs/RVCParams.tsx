@@ -13,7 +13,7 @@ export type RVCParams = {
   device: string; // string (Option from: ['cuda:0', 'cpu', 'mps']) in 'Device' Dropdown component
   use_half_precision_model: boolean; // boolean  in 'Use half precision model (Depends on GPU support)' Checkbox component
   filter_radius_pitch: number; // number (numeric value between 0 and 10) in 'Filter Radius (Pitch)' Slider component
-  resample_sample_rate_bug: number; // number (numeric value between 0 and 48000) in 'Resample Sample-rate (Bug)' Slider component
+  resample_sample_rate: number; // number (numeric value between 0 and 48000) in 'Resample Sample-rate (Bug)' Slider component
   voice_envelope_normalizaiton: number; // number (numeric value between 0.0 and 1.0) in 'Voice Envelope Normalizaiton' Slider component
   protect_breath_sounds: number; // number (numeric value between 0.0 and 0.5) in 'Protect Breath Sounds' Slider component
 };
@@ -28,7 +28,7 @@ export const initialState: RVCParams = {
   device: "cuda:0", // string (Option from: ['cuda:0', 'cpu', 'mps']) in 'Device' Dropdown component
   use_half_precision_model: false, // boolean  in 'Use half precision model (Depends on GPU support)' Checkbox component
   filter_radius_pitch: 3, // number (numeric value between 0 and 10) in 'Filter Radius (Pitch)' Slider component
-  resample_sample_rate_bug: 0, // number (numeric value between 0 and 48000) in 'Resample Sample-rate (Bug)' Slider component
+  resample_sample_rate: 0, // number (numeric value between 0 and 48000) in 'Resample Sample-rate (Bug)' Slider component
   voice_envelope_normalizaiton: 1, // number (numeric value between 0.0 and 1.0) in 'Voice Envelope Normalizaiton' Slider component
   protect_breath_sounds: 0.33, // number (numeric value between 0.0 and 0.5) in 'Protect Breath Sounds' Slider component
 };

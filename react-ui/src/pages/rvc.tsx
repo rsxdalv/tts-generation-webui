@@ -54,7 +54,7 @@ const RvcGenerationPage = () => {
       device,
       is_half: use_half_precision_model,
       filter_radius: filter_radius_pitch,
-      resample_sr: resample_sample_rate_bug,
+      resample_sr: resample_sample_rate,
       rms_mix_rate: voice_envelope_normalizaiton,
       protect: protect_breath_sounds,
     } = data?.metadata ?? {};
@@ -75,9 +75,9 @@ const RvcGenerationPage = () => {
         rvcGenerationParams.use_half_precision_model,
       filter_radius_pitch:
         filter_radius_pitch ?? rvcGenerationParams.filter_radius_pitch,
-      resample_sample_rate_bug:
-        resample_sample_rate_bug ??
-        rvcGenerationParams.resample_sample_rate_bug,
+      resample_sample_rate:
+        resample_sample_rate ??
+        rvcGenerationParams.resample_sample_rate,
       voice_envelope_normalizaiton:
         voice_envelope_normalizaiton ??
         rvcGenerationParams.voice_envelope_normalizaiton,
@@ -108,7 +108,7 @@ const RvcGenerationPage = () => {
             className="border border-gray-300 p-2 rounded hover:bg-gray-100"
             onClick={rvcGeneration}
           >
-            {loading ? "Generating..." : "Generate"}
+            {loading ? "Converting..." : "Convert"}
           </button>
           <AudioOutput
             audioOutput={data?.audio}
