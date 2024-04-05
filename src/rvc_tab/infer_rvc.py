@@ -1,6 +1,7 @@
 import os
 import sys
 from dotenv import load_dotenv
+from src.rvc_tab.hide_argv import hide_argv
 
 os.environ.setdefault("weight_root", "data/models/rvc/checkpoints")
 os.environ.setdefault("weight_uvr5_root", "data/models/rvc/uvr5_weights")
@@ -19,15 +20,6 @@ from rvc_pkg.infer.modules.vc.modules import VC
 sys.path.remove(rvc_dir)
 
 from src.rvc_tab.get_and_load_hubert import get_and_load_hubert_new, download_rmvpe
-
-
-class hide_argv:
-    def __enter__(self):
-        self.argv = sys.argv
-        sys.argv = [""]
-
-    def __exit__(self, *args):
-        sys.argv = self.argv
 
 
 last_model_path = None

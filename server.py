@@ -109,6 +109,18 @@ with gr.Blocks(
             print(e)
 
         try:
+            from src.rvc_tab.uvr5_tab import uvr5_tab
+
+            uvr5_tab()
+        except Exception as e:
+            from src.rvc_tab.rvc_tab_error import rvc_tab_error
+
+            rvc_tab_error(e, name="UVR5")
+            print("Failed to load rvc demo")
+            print(e)
+
+
+        try:
             from src.demucs.demucs_tab import demucs_tab
 
             demucs_tab()
