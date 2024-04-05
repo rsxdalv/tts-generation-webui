@@ -47,6 +47,7 @@ https://github.com/rsxdalv/tts-generation-webui/discussions/186#discussioncommen
 Apr 5:
 * Fix RVC installation bug.
 * Add basic UVR5 demo tab.
+* Add Vall-E-X generation demo tab.
 
 Apr 4:
 * Upgrade RVC to include RVMPE and FCPE. Remove the direct file input for models and indexes due to file duplication. Improve React UI interface for RVC.

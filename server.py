@@ -119,7 +119,6 @@ with gr.Blocks(
             print("Failed to load rvc demo")
             print(e)
 
-
         try:
             from src.demucs.demucs_tab import demucs_tab
 
@@ -138,7 +137,9 @@ with gr.Blocks(
 
         except Exception as e:
             with gr.Tab("SeamlessM4Tv2Model (!)", id="seamless"):
-                gr.Markdown("""Failed to load SeamlessM4Tv2Model demo. Please check your configuration.""")
+                gr.Markdown(
+                    """Failed to load SeamlessM4Tv2Model demo. Please check your configuration."""
+                )
                 gr.Markdown(f"""Error: {e}""")
             print("Failed to load seamless demo")
             print(e)
@@ -150,9 +151,25 @@ with gr.Blocks(
 
         except Exception as e:
             with gr.Tab("MAGNeT (!)", id="magnet"):
-                gr.Markdown("""Failed to load MAGNeT demo. Please check your configuration.""")
+                gr.Markdown(
+                    """Failed to load MAGNeT demo. Please check your configuration."""
+                )
                 gr.Markdown(f"""Error: {e}""")
             print("Failed to load magnet demo")
+            print(e)
+
+        try:
+            from src.vall_e_x.vall_e_x_tab import valle_x_tab
+
+            valle_x_tab()
+
+        except Exception as e:
+            with gr.Tab("Valle-X (!)", id="vall_e_x"):
+                gr.Markdown(
+                    """Failed to load Valle-X demo. Please check your configuration."""
+                )
+                gr.Markdown(f"""Error: {e}""")
+            print("Failed to load vall-e-x demo")
             print(e)
 
         vocos_tabs()
