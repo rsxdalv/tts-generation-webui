@@ -48,6 +48,7 @@ Apr 6:
 * Add Vall-E-X generation demo tab.
 * Add MMS demo tab.
 * Add Maha TTS demo tab.
+* Add StyleTTS2 demo tab.
 
 Apr 5:
 * Fix RVC installation bug.

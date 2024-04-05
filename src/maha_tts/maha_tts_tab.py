@@ -113,17 +113,15 @@ def maha_tts_ui():
     )
 
     with gr.Row():
+        voices = get_voice_list()
         speaker_name = gr.Dropdown(
-            choices=get_voice_list(),  # type: ignore
+            choices=voices,  # type: ignore
             label="Speaker Name",
-            value="0",
+            value=voices[0] if voices else "None",
             type="value",
         )
 
-        open_voices_button = gr.Button(
-            value="Open voices folder",
-            type="secondary",
-        )
+        open_voices_button = gr.Button(value="Open voices folder")
 
         open_voices_button.click(
             lambda: open_folder("voices-tortoise"),

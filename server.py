@@ -200,6 +200,20 @@ with gr.Blocks(
             print("Failed to load maha_tts demo")
             print(e)
 
+        try:
+            from src.styletts2.styletts2_tab import style_tts2_tab
+
+            style_tts2_tab()
+
+        except Exception as e:
+            with gr.Tab("StyleTTS2 (!)", id="style_tts2"):
+                gr.Markdown(
+                    """Failed to load StyleTTS2 demo. Please check your configuration."""
+                )
+                gr.Markdown(f"""Error: {e}""")
+            print("Failed to load style_tts2 demo")
+            print(e)
+
         vocos_tabs()
         generation_tab_tortoise()
 
