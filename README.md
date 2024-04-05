@@ -44,6 +44,12 @@ https://rsxdalv.github.io/bark-speaker-directory/
 https://github.com/rsxdalv/tts-generation-webui/discussions/186#discussioncomment-7291274
 
 ## Changelog
+Apr 6:
+* Add Vall-E-X generation demo tab.
+* Add MMS demo tab.
+* Add Maha TTS demo tab.
+* Add StyleTTS2 demo tab.
+
 Apr 5:
 * Fix RVC installation bug.
 * Add basic UVR5 demo tab.

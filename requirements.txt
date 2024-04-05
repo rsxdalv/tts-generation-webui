@@ -10,3 +10,4 @@ vocos==0.1.0 # MIT License
 tortoise-tts @ git+https://github.com/rsxdalv/tortoise-tts@e4711433b12bcd1086840649e1830ad5c3fa1a76#egg=tortoise-tts # Apache 2.0
 beartype>=0.16.1
 transformers==4.36.1 
+iso639-lang==2.2.3
