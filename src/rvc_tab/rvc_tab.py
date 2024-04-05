@@ -1,17 +1,12 @@
 import os
 import gradio as gr
 import torch
-from rvc_beta import infer_batch_rvc
 from src.Joutai import Joutai
 from src.history_tab.open_folder import open_folder
 from src.utils.get_path_from_root import get_path_from_root
 import glob
 from src.tortoise.gr_reload_button import gr_reload_button, gr_open_button_simple
 from src.rvc_tab.infer_rvc import infer_rvc as infer_rvc
-
-
-def inject_hubert(hubert_model: torch.nn.Module):
-    infer_batch_rvc.hubert_model = hubert_model
 
 
 def run_rvc(
@@ -164,12 +159,6 @@ def rvc_ui():
                     is_half = gr.Checkbox(
                         label="Use half precision model (Depends on GPU support)",
                         value=False,
-                    )
-                    gr.Button(
-                        value="Clear Hubert (to reload on next generation)",
-                        variant="secondary",
-                    ).click(
-                        fn=lambda: inject_hubert(None)  # type: ignore
                     )
 
         with gr.Column():

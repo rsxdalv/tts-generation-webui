@@ -1,16 +1,6 @@
 from huggingface_hub import hf_hub_download
-from rvc_beta import infer_batch_rvc
 from fairseq import checkpoint_utils
 import os
-
-
-def get_and_load_hubert():
-    model = hf_hub_download(
-        repo_id="lj1995/VoiceConversionWebUI", filename="hubert_base.pt"
-    )
-    infer_batch_rvc.load_hubert(
-        hubert_model_path=model,
-    )
 
 
 def load_hubert_new(config, path="assets/hubert/hubert_base.pt"):
