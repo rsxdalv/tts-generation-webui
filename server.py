@@ -186,6 +186,20 @@ with gr.Blocks(
             print("Failed to load mms demo")
             print(e)
 
+        try:
+            from src.maha_tts.maha_tts_tab import maha_tts_tab
+
+            maha_tts_tab()
+
+        except Exception as e:
+            with gr.Tab("MahaTTS (!)", id="maha_tts"):
+                gr.Markdown(
+                    """Failed to load MahaTTS demo. Please check your configuration."""
+                )
+                gr.Markdown(f"""Error: {e}""")
+            print("Failed to load maha_tts demo")
+            print(e)
+
         vocos_tabs()
         generation_tab_tortoise()
 
