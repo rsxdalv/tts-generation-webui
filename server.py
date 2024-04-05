@@ -172,6 +172,20 @@ with gr.Blocks(
             print("Failed to load vall-e-x demo")
             print(e)
 
+        try:
+            from src.mms.mms_tab import mms_tab
+
+            mms_tab()
+
+        except Exception as e:
+            with gr.Tab("MMS (!)", id="mms"):
+                gr.Markdown(
+                    """Failed to load MMS demo. Please check your configuration."""
+                )
+                gr.Markdown(f"""Error: {e}""")
+            print("Failed to load mms demo")
+            print(e)
+
         vocos_tabs()
         generation_tab_tortoise()
 
