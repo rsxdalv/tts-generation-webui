@@ -29,7 +29,7 @@ export const initialState: RVCParams = {
   use_half_precision_model: false, // boolean  in 'Use half precision model (Depends on GPU support)' Checkbox component
   filter_radius_pitch: 3, // number (numeric value between 0 and 10) in 'Filter Radius (Pitch)' Slider component
   resample_sample_rate: 0, // number (numeric value between 0 and 48000) in 'Resample Sample-rate (Bug)' Slider component
-  voice_envelope_normalizaiton: 1, // number (numeric value between 0.0 and 1.0) in 'Voice Envelope Normalizaiton' Slider component
+  voice_envelope_normalizaiton: 0.5, // number (numeric value between 0.0 and 1.0) in 'Voice Envelope Normalizaiton' Slider component
   protect_breath_sounds: 0.33, // number (numeric value between 0.0 and 0.5) in 'Protect Breath Sounds' Slider component
 };
 

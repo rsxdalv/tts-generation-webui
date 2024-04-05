@@ -108,7 +108,7 @@ def rvc_ui():
                 with gr.Column():
                     index_path = rvc_ui_model_or_index_path_ui("Index")
             with gr.Row():
-                f0up_key = gr.Textbox(label="Pitch Up key", value="0")
+                f0up_key = gr.Textbox(label="Semitone shift", value="0")
                 f0method = gr.Radio(
                     ["harvest", "pm", "crepe", "rmvpe", "fcpe"],
                     label="Pitch Collection Method",
@@ -119,14 +119,14 @@ def rvc_ui():
                     maximum=1.0,
                     step=0.01,
                     value=0.66,
-                    label="Search Feature Ratio",
+                    label="Search Feature Ratio (accent strength)",
                 )
                 filter_radius = gr.Slider(
                     minimum=0,
                     maximum=10,
                     step=1,
                     value=3,
-                    label="Filter Radius (Pitch)",
+                    label="Filter Radius (Pitch median filtering)",
                 )
             with gr.Row():
                 resample_sr = gr.Slider(
@@ -134,14 +134,14 @@ def rvc_ui():
                     maximum=48000,
                     step=1,
                     value=0,
-                    label="Resample Sample-rate",
+                    label="Resample to:",
                 )
                 rms_mix_rate = gr.Slider(
                     minimum=0.0,
                     maximum=1.0,
                     step=0.01,
                     value=1,
-                    label="Voice Envelope Normalizaiton",
+                    label="Voice Envelope Normalizaiton (volume)",
                 )
                 protect = gr.Slider(
                     minimum=0.0,

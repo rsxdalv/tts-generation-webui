@@ -73,7 +73,7 @@ export const RVCInputs = ({
                 <GenericSlider
                   rvcParams={rvcParams}
                   handleChange={handleChange}
-                  label="Pitch Up key"
+                  label="Semitone shift"
                   name="pitch_up_key"
                   min="-24"
                   max="24"
@@ -92,7 +92,7 @@ export const RVCInputs = ({
               <GenericSlider
                 rvcParams={rvcParams}
                 handleChange={handleChange}
-                label="Search Feature Ratio"
+                label="Search Feature Ratio (accent strength)"
                 name="search_feature_ratio"
                 min="0.0"
                 max="1.0"
@@ -131,7 +131,7 @@ export const RVCInputs = ({
             <GenericSlider
               rvcParams={rvcParams}
               handleChange={handleChange}
-              label="Filter Radius (Pitch)"
+              label="Filter Radius (Pitch median filtering)"
               name="filter_radius_pitch"
               min="0"
               max="10"
@@ -144,7 +144,7 @@ export const RVCInputs = ({
             <GenericSlider
               rvcParams={rvcParams}
               handleChange={handleChange}
-              label="Resample Sample-rate"
+              label="Resample to:"
               name="resample_sample_rate"
               min="0"
               max="48000"
@@ -155,7 +155,7 @@ export const RVCInputs = ({
             <GenericSlider
               rvcParams={rvcParams}
               handleChange={handleChange}
-              label="Voice Envelope Normalizaiton"
+              label="Voice Envelope Normalizaiton (Volume scaling)"
               name="voice_envelope_normalizaiton"
               min="0.0"
               max="1.0"
