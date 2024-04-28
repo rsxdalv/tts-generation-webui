@@ -44,6 +44,9 @@ https://rsxdalv.github.io/bark-speaker-directory/
 https://github.com/rsxdalv/tts-generation-webui/discussions/186#discussioncomment-7291274
 
 ## Changelog
+Apr 28:
+* Add Maha TTS to React UI.
+
 Apr 6:
 * Add Vall-E-X generation demo tab.
 * Add MMS demo tab.

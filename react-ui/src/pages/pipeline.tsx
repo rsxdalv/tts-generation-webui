@@ -35,6 +35,9 @@ import { EncodecParamsNPZ } from "../tabs/VocosParamsNPZ";
 import { applyVocosNPZ } from "../functions/applyVocosNPZ";
 import { BarkResult } from "../tabs/BarkResult";
 import { getWebuiURLWithHost } from "../data/getWebuiURL";
+import { useMahaParams, useMahaResult } from "../tabs/MahaParams";
+import { generateWithMaha } from "../functions/generateWithMaha";
+import { MahaInputs } from "../components/MahaInputs";
 
 interface PipelineParams {
   generation: string;
@@ -47,6 +50,20 @@ const initialState: PipelineParams = {
 };
 
 const pipelineId = "pipeline";
+
+const GenerateButton = ({
+  status,
+  onClick,
+}: {
+  status: string;
+  onClick: () => void;
+}) => (
+  <button className="border border-gray-300 p-2 rounded" onClick={onClick}>
+    {status === "generating" && "Generating..."}
+    {status === "postprocessing" && "Postprocessing..."}
+    {status === "idle" && "Run Pipeline"}
+  </button>
+);
 
 const PipelinePage = () => {
   const [output, setOutput] = useLocalStorage<GradioFile[] | null>(
@@ -68,6 +85,8 @@ const PipelinePage = () => {
   const [musicgenResult, setMusicgenResult] = useMusicgenResult();
   const [magnetParams, setMagnetParams] = useMagnetParams();
   const [magnetResult, setMagnetResult] = useMagnetResult();
+  const [mahaParams, setMahaParams] = useMahaParams();
+  const [mahaResult, setMahaResult] = useMahaResult();
 
   const [rvcGenerationParams, setRvcGenerationParams] =
     useRVCGenerationParams();
@@ -96,6 +115,11 @@ const PipelinePage = () => {
         case "magnet": {
           const result = await generateWithMagnet(magnetParams);
           setMagnetResult(result);
+          return result;
+        }
+        case "maha": {
+          const result = await generateWithMaha(mahaParams);
+          setMahaResult(result);
           return result;
         }
       }
@@ -149,6 +173,101 @@ const PipelinePage = () => {
     setStatus("idle");
   }
 
+  const generationModels = ["bark", "tortoise", "musicgen", "magnet", "maha"];
+
+  const onChangeModel = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const model = event.target.value;
+    if (
+      model !== "bark" &&
+      pipelineParams.postprocess === "vocos npz (bark only)"
+    ) {
+      setPipelineParams((x) => ({ ...x, postprocess: "none" }));
+    }
+    setPipelineParams((x) => ({ ...x, generation: model }));
+  };
+
+  const PostProcessInputs = ({ model }: { model: string }) => {
+    switch (model) {
+      case "rvc":
+        return (
+          <RVCInputs
+            rvcParams={rvcGenerationParams}
+            handleChange={parseFormChange(setRvcGenerationParams)}
+            hideAudioInput
+          />
+        );
+      case "vocos wav":
+        return (
+          <VocosWavInputs
+            vocosParams={vocosParams}
+            handleChange={parseFormChange(setVocosParams)}
+          />
+        );
+      default:
+        return null;
+    }
+  };
+
+  const GenerationInputs = ({ model }: { model: string }) => {
+    switch (model) {
+      case "bark":
+        return (
+          <BarkInputs
+            barkGenerationParams={barkGenerationParams}
+            setBarkVoiceGenerationParams={setBarkVoiceGenerationParams}
+            handleChange={parseFormChange(setBarkVoiceGenerationParams)}
+            data={barkResult}
+          />
+        );
+      case "tortoise":
+        return (
+          <TortoiseInput
+            tortoiseGenerationParams={tortoiseGenerationParams}
+            setTortoiseGenerationParams={setTortoiseGenerationParams}
+            handleChange={parseFormChange(setTortoiseGenerationParams)}
+            data={tortoiseResult}
+          />
+        );
+      case "musicgen":
+        return (
+          <MusicgenInputs
+            musicgenParams={musicgenParams}
+            handleChange={parseFormChange(setMusicgenParams)}
+            setMusicgenParams={setMusicgenParams}
+            musicgenResult={musicgenResult}
+          />
+        );
+      case "magnet":
+        return (
+          <MagnetInputs
+            magnetParams={magnetParams}
+            setMagnetParams={setMagnetParams}
+            handleChange={parseFormChange(setMagnetParams)}
+            data={magnetResult}
+          />
+        );
+      case "maha":
+        return (
+          <MahaInputs
+            mahaParams={mahaParams}
+            handleChange={parseFormChange(setMahaParams)}
+            setMahaParams={setMahaParams}
+            data={mahaResult}
+          />
+        );
+      default:
+        return null;
+    }
+  };
+
+  const postProcessingModels = [
+    "none",
+    "rvc",
+    "demucs",
+    "vocos wav",
+    "vocos npz (bark only)",
+  ];
+
   return (
     <Template>
       <Head>
@@ -165,9 +284,9 @@ const PipelinePage = () => {
             representation is then refined by a postprocess model to generate a
             new audio file.
           </p>
-          <div className="flex flex-col gap-y-2 border border-gray-300 p-2 rounded mb-4">
+          <div className="flex flex-row gap-x-2 border border-gray-300 p-2 rounded mb-4">
             <label>Choose a generation model:</label>
-            {["bark", "tortoise", "musicgen", "magnet"].map((model) => (
+            {generationModels.map((model) => (
               <div key={model} className="flex items-center gap-x-2">
                 <input
                   type="radio"
@@ -175,87 +294,37 @@ const PipelinePage = () => {
                   id={model}
                   value={model}
                   checked={pipelineParams.generation === model}
+                  onChange={onChangeModel}
+                />
+                <label htmlFor={model}>{model}</label>
+              </div>
+            ))}
+          </div>
+          <GenerationInputs model={pipelineParams.generation} />
+          <div className="flex flex-row gap-x-2 border border-gray-300 p-2 rounded mb-4">
+            <label>Choose a postprocessing model:</label>
+            {postProcessingModels.map((model) => (
+              <div key={model} className="flex items-center gap-x-2">
+                <input
+                  type="radio"
+                  name="postprocess"
+                  id={model}
+                  value={model}
+                  checked={pipelineParams.postprocess === model}
                   onChange={() =>
-                    setPipelineParams((x) => ({ ...x, generation: model }))
+                    setPipelineParams((x) => ({ ...x, postprocess: model }))
+                  }
+                  disabled={
+                    model === "vocos npz (bark only)" &&
+                    pipelineParams.generation !== "bark"
                   }
                 />
                 <label htmlFor={model}>{model}</label>
               </div>
             ))}
           </div>
-          {pipelineParams.generation === "bark" && (
-            <BarkInputs
-              barkGenerationParams={barkGenerationParams}
-              setBarkVoiceGenerationParams={setBarkVoiceGenerationParams}
-              handleChange={parseFormChange(setBarkVoiceGenerationParams)}
-              data={barkResult}
-            />
-          )}
-          {pipelineParams.generation === "tortoise" && (
-            <TortoiseInput
-              tortoiseGenerationParams={tortoiseGenerationParams}
-              setTortoiseGenerationParams={setTortoiseGenerationParams}
-              handleChange={parseFormChange(setTortoiseGenerationParams)}
-              data={tortoiseResult}
-            />
-          )}
-          {pipelineParams.generation === "musicgen" && (
-            <MusicgenInputs
-              musicgenParams={musicgenParams}
-              handleChange={parseFormChange(setMusicgenParams)}
-              setMusicgenParams={setMusicgenParams}
-              musicgenResult={musicgenResult}
-            />
-          )}
-          {pipelineParams.generation === "magnet" && (
-            <MagnetInputs
-              magnetParams={magnetParams}
-              setMagnetParams={setMagnetParams}
-              handleChange={parseFormChange(setMagnetParams)}
-              data={magnetResult}
-            />
-          )}
-          <div className="flex flex-col gap-y-2 border border-gray-300 p-2 rounded mb-4">
-            <label>Choose a postprocessing model:</label>
-            {["none", "rvc", "demucs", "vocos wav", "vocos npz (bark only)"].map(
-              (model) => (
-                <div key={model} className="flex items-center gap-x-2">
-                  <input
-                    type="radio"
-                    name="postprocess"
-                    id={model}
-                    value={model}
-                    checked={pipelineParams.postprocess === model}
-                    onChange={() =>
-                      setPipelineParams((x) => ({ ...x, postprocess: model }))
-                    }
-                  />
-                  <label htmlFor={model}>{model}</label>
-                </div>
-              )
-            )}
-          </div>
-          {pipelineParams.postprocess === "rvc" && (
-            <RVCInputs
-              rvcParams={rvcGenerationParams}
-              handleChange={parseFormChange(setRvcGenerationParams)}
-              hideAudioInput
-            />
-          )}
-          {pipelineParams.postprocess === "vocos wav" && (
-            <VocosWavInputs
-              vocosParams={vocosParams}
-              handleChange={parseFormChange(setVocosParams)}
-            />
-          )}
-          <button
-            className="border border-gray-300 p-2 rounded"
-            onClick={pipeline}
-          >
-            {status === "generating" && "Generating..."}
-            {status === "postprocessing" && "Postprocessing..."}
-            {status === "idle" && "Run Pipeline"}
-          </button>
+          <PostProcessInputs model={pipelineParams.postprocess} />
+          <GenerateButton status={status} onClick={pipeline} />
         </div>
         <div className="flex flex-col gap-y-4">
           {output &&
