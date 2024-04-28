@@ -46,6 +46,7 @@ https://github.com/rsxdalv/tts-generation-webui/discussions/186#discussioncommen
 ## Changelog
 Apr 28:
 * Add Maha TTS to React UI.
+* Add GPU Info to React UI.
 
 Apr 6:
 * Add Vall-E-X generation demo tab.

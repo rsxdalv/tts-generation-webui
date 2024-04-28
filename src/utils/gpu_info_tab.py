@@ -10,8 +10,10 @@ def gpu_info_tab():
             fn=refresh_gpu_info, outputs=gpu_info, api_name="refresh_gpu_info"
         )
 
+        gpu_info_json = gr.JSON(get_gpu_info(), visible=False)
+
         gr.Button("API_GET_GPU_INFO", visible=False).click(
-            fn=get_gpu_info, api_name="get_gpu_info"
+            fn=get_gpu_info, outputs=[gpu_info_json], api_name="get_gpu_info"
         )
 
 
