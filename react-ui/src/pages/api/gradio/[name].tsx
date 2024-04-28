@@ -672,7 +672,53 @@ async function magnet_open_model_dir() {
   return result;
 }
 
+async function maha({
+  maha_tts_input,
+  model_language,
+  maha_tts_language,
+  speaker_name,
+  seed,
+  device,
+}) {
+  const app = await getClient();
+  const result = (await app.predict("/maha_tts", [
+    maha_tts_input, // string  in 'Input' Textbox component
+    model_language, // string (Option from: ['en', 'de', 'es', 'fr', 'it', 'nl', 'pl', 'pt', 'ru', 'tr', 'zh']) in 'Model language' Dropdown component
+    maha_tts_language, // string (Option from: ['en', 'de', 'es', 'fr', 'it', 'nl', 'pl', 'pt', 'ru', 'tr', 'zh']) in 'TTS language' Dropdown component
+    speaker_name, // string  in 'Speaker name' Textbox component
+    seed, // number  in 'Seed' Number component
+    device, // string (Option from: ['cpu', 'cuda']) in 'Device' Dropdown component
+  ])) as {
+    data: [GradioFile, Object];
+  };
+
+  const [audio, metadata] = result?.data;
+  return {
+    audio,
+    metadata,
+  };
+}
+
+// maha_tts_refresh_voices
+
+async function maha_tts_refresh_voices() {
+  const app = await getClient();
+
+  const result = (await app.predict("/maha_tts_refresh_voices")) as {
+    data: [
+      {
+        choices: string[];
+        __type__: "update";
+      }
+    ];
+  };
+
+  return result?.data[0].choices.map((x) => x[0]);
+}
+
 const endpoints = {
+  maha,
+  maha_tts_refresh_voices,
   demucs,
   musicgen,
   magnet,
