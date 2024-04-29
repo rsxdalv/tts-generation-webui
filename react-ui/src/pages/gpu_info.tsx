@@ -8,6 +8,45 @@ type GPUInfo = {
   cuda_capabilities: number[];
   used_vram: number;
   used_vram_total: number;
+  cached_vram: number;
+};
+
+const REFRESH_RATE = 500;
+
+const ProgressBar = ({
+  label,
+  value,
+  total,
+}: {
+  label: string;
+  value: number;
+  total: number;
+}) => {
+  const percentage = (value / total) * 100;
+  return (
+    <div className="flex items-center">
+      <p className="text-sm w-36">
+        {label}: <br />
+        [{value.toFixed(0)} MB]
+      </p>
+      <div className="flex w-2/3">
+        <div
+          style={{
+            width: `${percentage}%`,
+            height: "10px",
+          }}
+          className="bg-orange-400"
+        ></div>
+        <div
+          style={{
+            width: `${100 - percentage}%`,
+            height: "10px",
+          }}
+          className="bg-slate-300"
+        ></div>
+      </div>
+    </div>
+  );
 };
 
 const GPUInfoWidget = ({}) => {
@@ -17,6 +56,7 @@ const GPUInfoWidget = ({}) => {
     cuda_capabilities: [],
     used_vram: 0,
     used_vram_total: 0,
+    cached_vram: 0,
   });
   const [loading, setLoading] = React.useState<boolean>(false);
 
@@ -33,54 +73,31 @@ const GPUInfoWidget = ({}) => {
 
   React.useEffect(() => {
     fetchGPUData();
-    const interval = setInterval(fetchGPUData, 1000);
+    const interval = setInterval(fetchGPUData, REFRESH_RATE);
     return () => clearInterval(interval);
   }, []);
 
   return (
     <div className="flex flex-col gap-2 w-3/4">
       <h2 className="text-lg">
-        {gpuData.name} [{gpuData.vram} MB]
+        {gpuData.name} [{Math.round(gpuData.vram / 1024)} GB]
       </h2>
       <h3>Compute Capability: {gpuData.cuda_capabilities.join(".")}</h3>
-      <div className="flex items-center">
-        <p className="text-sm w-36">Used VRAM Webui [{gpuData.used_vram.toFixed(0)} MB]:</p>
-        <div className="flex w-2/3">
-          <div
-            style={{
-              width: `${(gpuData.used_vram / gpuData.vram) * 100}%`,
-              height: "10px",
-            }}
-            className="bg-orange-400"
-          ></div>
-          <div
-            style={{
-              width: `${(1 - gpuData.used_vram / gpuData.vram) * 100}%`,
-              height: "10px",
-            }}
-            className="bg-slate-300"
-          ></div>
-        </div>
-      </div>
-      <div className="flex items-center">
-        <p className="text-sm w-36">Used VRAM Total [{gpuData.used_vram_total.toFixed(0)} MB]:</p>
-        <div className="flex w-2/3">
-          <div
-            style={{
-              width: `${(gpuData.used_vram_total / gpuData.vram) * 100}%`,
-              height: "10px",
-            }}
-            className="bg-orange-400"
-          ></div>
-          <div
-            style={{
-              width: `${(1 - gpuData.used_vram_total / gpuData.vram) * 100}%`,
-              height: "10px",
-            }}
-            className="bg-slate-300"
-          ></div>
-        </div>
-      </div>
+      <ProgressBar
+        label="Used VRAM"
+        value={gpuData.used_vram}
+        total={gpuData.vram}
+      />
+      <ProgressBar
+        label="Cached VRAM"
+        value={gpuData.cached_vram}
+        total={gpuData.vram}
+      />
+      <ProgressBar
+        label="Used VRAM System"
+        value={gpuData.used_vram_total}
+        total={gpuData.vram}
+      />
     </div>
   );
 };
@@ -89,7 +106,7 @@ const GPUInfoPage = () => {
   return (
     <Template>
       <Head>
-        <title>Magnet - TTS Generation Webui</title>
+        <title>GPU Info - TTS Generation Webui</title>
       </Head>
       <div className="gap-y-4 p-4 flex w-full flex-col items-center">
         <GPUInfoWidget />
