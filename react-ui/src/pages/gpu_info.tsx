@@ -9,6 +9,7 @@ type GPUInfo = {
   used_vram: number;
   used_vram_total: number;
   cached_vram: number;
+  torch_version: string;
 };
 
 const REFRESH_RATE = 500;
@@ -57,6 +58,7 @@ const GPUInfoWidget = ({}) => {
     used_vram: 0,
     used_vram_total: 0,
     cached_vram: 0,
+    torch_version: "",
   });
   const [loading, setLoading] = React.useState<boolean>(false);
 
@@ -83,6 +85,7 @@ const GPUInfoWidget = ({}) => {
         {gpuData.name} [{Math.round(gpuData.vram / 1024)} GB]
       </h2>
       <h3>Compute Capability: {gpuData.cuda_capabilities.join(".")}</h3>
+      <h3>PyTorch Version: {gpuData.torch_version}</h3>
       <ProgressBar
         label="Used VRAM"
         value={gpuData.used_vram}
