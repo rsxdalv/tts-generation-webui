@@ -716,6 +716,16 @@ async function maha_tts_refresh_voices() {
   return result?.data[0].choices.map((x) => x[0]);
 }
 
+async function get_gpu_info() {
+  const app = await getClient();
+
+  const result = (await app.predict("/get_gpu_info")) as {
+    data: [Object];
+  };
+
+  return result?.data[0];
+}
+
 const endpoints = {
   maha,
   maha_tts_refresh_voices,
@@ -753,4 +763,6 @@ const endpoints = {
   save_environment_variables_bark,
   save_config_bark,
   get_config_bark,
+
+  get_gpu_info,
 };

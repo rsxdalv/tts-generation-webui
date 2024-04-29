@@ -113,6 +113,10 @@ const routes: Route[] = [
     text: "Maha TTS",
   },
   {
+    href: "/gpu_info",
+    text: "GPU Info",
+  },
+  {
     href: "https://echo.ps.ai/?utm_source=bark_speaker_directory",
     text: <span>More Voices ↗</span>,
     target: "_blank",
