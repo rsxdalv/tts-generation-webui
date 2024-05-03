@@ -44,6 +44,12 @@ https://rsxdalv.github.io/bark-speaker-directory/
 https://github.com/rsxdalv/tts-generation-webui/discussions/186#discussioncomment-7291274
 
 ## Changelog
+
+May 4:
+* Group Changelog by month
+
+## April
+
 Apr 28:
 * Add Maha TTS to React UI.
 * Add GPU Info to React UI.
@@ -60,6 +66,8 @@ Apr 5:
 
 Apr 4:
 * Upgrade RVC to include RVMPE and FCPE. Remove the direct file input for models and indexes due to file duplication. Improve React UI interface for RVC.
+
+## March
 
 Mar 28:
 * Add GPU Info tab
@@ -102,6 +110,8 @@ Mar 3:
 * Add MMS demo as a notebook
 * Add MultiBandDiffusion high VRAM disclaimer
 
+## February
+
 Feb 21:
 * Fix Docker container builds and bug with Docker-Audiocraft
 
@@ -111,6 +121,8 @@ Feb 8:
 
 Feb 6:
 * Add FLAC file generation extension by https://github.com/JoaCHIP
+
+## January
 
 Jan 21:
 * Add CPU/M1 torch auto-repair script with each update. To disable, edit check_cuda.py and change FORCE_NO_REPAIR = True
@@ -151,12 +163,16 @@ Jan 9:
 Jan 8:
 * Release React UI
 
+## October
+
 Oct 26:
 * Improve model selection UX for Musicgen
 
 Oct 24:
 * Add initial React UI for Musicgen and Demucs (https://github.com/rsxdalv/tts-generation-webui/pull/202)
 * Fix Bark long generation seed drifting (thanks to https://github.com/520Pig520)
+
+## September
 
 Sep 21:
 * Bark: Add continue as semantic history button
@@ -175,6 +191,8 @@ Sep 5:
 * Add voice mixing to Bark
 * Add v1 Burn in prompt to Bark (Burn in prompts are for directing the semantic model without spending time on generating the audio. The v1 works by generating the semantic tokens and then using it as a prompt for the semantic model.)
 * Add generation length limiter to Bark
+
+## August
 
 Aug 27:
 * Fix MusicGen ignoring the melody https://github.com/rsxdalv/tts-generation-webui/issues/153
@@ -234,6 +252,8 @@ Aug 3:
 Aug 2:
 * Fix Model locations not showing after restart
 
+## July
+
 July 26:
 * Voice gallery
 * Voice cropping
@@ -276,6 +296,8 @@ July 2:
 July 1:
 * Studio-tab https://github.com/rsxdalv/tts-generation-webui/pull/58
 
+## June
+
 Jun 29:
 * Tortoise new params https://github.com/rsxdalv/tts-generation-webui/pull/54
 
@@ -303,6 +325,8 @@ June 4:
 
 June 3:
 * Update to v4 - new output structure, improved history view, codebase reorganization, improved metadata, output extensions support
+
+## May
 
 May 21:
 * Update to v3 - voice clone demo
