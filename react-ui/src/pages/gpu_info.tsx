@@ -79,6 +79,10 @@ const GPUInfoWidget = ({}) => {
     return () => clearInterval(interval);
   }, []);
 
+  if (loading && !gpuData.name) {
+    return <div>Loading GPU info...</div>;
+  }
+
   return (
     <div className="flex flex-col gap-2 w-3/4">
       <h2 className="text-lg">
