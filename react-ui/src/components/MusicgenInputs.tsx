@@ -6,6 +6,7 @@ import {
   initialMusicgenParams,
 } from "../tabs/MusicgenParams";
 import { MusicgenModelSelector } from "./MusicgenModelSelector";
+import { GenericSlider } from "./GenericSlider";
 
 export const MusicgenInputs = ({
   musicgenParams,
@@ -53,19 +54,15 @@ export const MusicgenInputs = ({
     </div>
 
     <div className="flex flex-col gap-y-2">
-      <label className="text-sm">
-        Duration: {musicgenParams.duration}s{" "}
-        {musicgenParams.duration > 30 && "(spliced)"}
-      </label>
-      <input
-        type="range"
+      <GenericSlider
+        label="Duration"
+        format={(x) => `${x.toFixed(1)}s ${x > 30 ? "(spliced)" : ""}`}
         name="duration"
-        value={musicgenParams.duration}
-        onChange={handleChange}
-        className="border border-gray-300 py-2 rounded"
         min="0.5"
         max="360"
         step="0.5"
+        params={musicgenParams}
+        handleChange={handleChange}
       />
 
       <label className="text-sm">Top-K:</label>
@@ -80,45 +77,35 @@ export const MusicgenInputs = ({
         step="1"
       />
 
-      <label className="text-sm">Top-P: {musicgenParams.topp}</label>
-      <input
-        type="range"
+      <GenericSlider
+        label="Top-P"
         name="topp"
-        value={musicgenParams.topp}
-        onChange={handleChange}
-        className="border border-gray-300 py-2 rounded"
         min="0"
         max="1.5"
         step="0.01"
+        params={musicgenParams}
+        handleChange={handleChange}
       />
 
-      <label className="text-sm">
-        Temperature: {musicgenParams.temperature}
-      </label>
-      <input
-        type="range"
+      <GenericSlider
+        label="Temperature"
         name="temperature"
-        value={musicgenParams.temperature}
-        onChange={handleChange}
-        className="border border-gray-300 py-2 rounded"
         min="0"
         max="1.5"
         step="0.01"
+        params={musicgenParams}
+        handleChange={handleChange}
       />
 
-      <label className="text-sm">
-        Classifier Free Guidance Coefficient:{" "}
-        {musicgenParams.cfg_coef.toFixed(1)}
-      </label>
-      <input
-        type="range"
+      <GenericSlider
+        label="Classifier Free Guidance Coefficient"
+        format={(x) => x.toFixed(1)}
         name="cfg_coef"
-        value={musicgenParams.cfg_coef}
-        onChange={handleChange}
-        className="border border-gray-300 py-2 rounded"
         min="0"
         max="10"
         step="0.1"
+        params={musicgenParams}
+        handleChange={handleChange}
       />
 
       <label className="text-sm">Seed:</label>

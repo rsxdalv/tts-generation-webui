@@ -5,7 +5,15 @@ export const GenericSlider = <
     [key: string]: number | string | boolean;
   }
 >({
-  params, handleChange, label, name, min, max, step, className,
+  params,
+  handleChange,
+  label,
+  name,
+  min,
+  max,
+  step,
+  className,
+  format = (x) => x.toString(),
 }: {
   params: T;
   handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
@@ -15,6 +23,7 @@ export const GenericSlider = <
   max: string;
   step: string;
   className?: string;
+  format?: (value: number) => string;
 }) => {
   const value = params[name] as number;
   return (
@@ -22,7 +31,7 @@ export const GenericSlider = <
       className={`flex flex-col border border-gray-300 p-2 rounded ${className}`}
     >
       <label className="text-sm">
-        {label}: {value}
+        {label}: {format(value)}
       </label>
       <input
         type="range"
@@ -32,7 +41,8 @@ export const GenericSlider = <
         className="border border-gray-300 py-2 rounded"
         min={min}
         max={max}
-        step={step} />
+        step={step}
+      />
     </div>
   );
 };
