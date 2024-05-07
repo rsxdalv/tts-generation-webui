@@ -1,6 +1,7 @@
 import React from "react";
 import { MagnetParams, MagnetResult } from "../tabs/MagnetParams";
 import { MagnetModelSelector } from "./MagnetModelSelector";
+import { GenericSlider } from "./GenericSlider";
 
 const SeedInput = ({
   magnetParams,
@@ -84,107 +85,90 @@ export const MagnetInputs = ({
           step="1"
         />
 
-        <label className="text-sm">Top-P: {magnetParams.top_p}</label>
-        <input
-          type="range"
+        <GenericSlider
+          label="Top-P"
           name="top_p"
-          value={magnetParams.top_p}
-          onChange={handleChange}
-          className="border border-gray-300 py-2 rounded"
+          params={magnetParams}
+          handleChange={handleChange}
           min="0"
           max="1.5"
           step="0.01"
         />
 
-        <label className="text-sm">
-          Temperature: {magnetParams.temperature}
-        </label>
-        <input
-          type="range"
+        <GenericSlider
+          label="Temperature"
           name="temperature"
-          value={magnetParams.temperature}
-          onChange={handleChange}
-          className="border border-gray-300 py-2 rounded"
+          params={magnetParams}
+          handleChange={handleChange}
           min="0"
           max="10"
           step="0.01"
         />
 
-        <div className="flex flex-col gap-2">
-          <div className="flex gap-2 justify-between items-center">
-            <label className="text-sm">
-              Min Cfg Coef: {magnetParams.min_cfg_coef}
-            </label>
-            <input
-              type="range"
-              name="min_cfg_coef"
-              value={magnetParams.min_cfg_coef}
-              onChange={handleChange}
-              className="border border-gray-300 p-2 rounded w-1/2"
-              min="0"
-              max="100"
-              step="0.1"
-            />
-          </div>
-          <div className="flex gap-2 justify-between items-center">
-            <label className="text-sm">
-              Max Cfg Coef: {magnetParams.max_cfg_coef}
-            </label>
-            <input
-              type="range"
-              name="max_cfg_coef"
-              value={magnetParams.max_cfg_coef}
-              onChange={handleChange}
-              className="border border-gray-300 p-2 rounded w-1/2"
-              min="0"
-              max="100"
-              step="0.1"
-            />
-          </div>
+        <div className="flex gap-2">
+          <GenericSlider
+            label="Min Cfg Coef"
+            name="min_cfg_coef"
+            params={magnetParams}
+            handleChange={handleChange}
+            className="w-1/2"
+            min="0"
+            max="100"
+            step="0.1"
+          />
+          <GenericSlider
+            label="Max Cfg Coef"
+            name="max_cfg_coef"
+            params={magnetParams}
+            handleChange={handleChange}
+            className="w-1/2"
+            min="0"
+            max="100"
+            step="0.1"
+          />
         </div>
 
         <label className="text-sm">
-          {/* Decoding Steps: {magnetParams.decoding_steps.join(", ")} */}
-          Decoding Steps: {magnetParams.decoding_steps_1},{" "}
-          {magnetParams.decoding_steps_2}, {magnetParams.decoding_steps_3},{" "}
-          {magnetParams.decoding_steps_4}
+          Decoding Steps:{" "}
+          {[
+            magnetParams.decoding_steps_1,
+            magnetParams.decoding_steps_2,
+            magnetParams.decoding_steps_3,
+            magnetParams.decoding_steps_4,
+          ].join(", ")}
         </label>
-        <input
-          type="range"
+        <GenericSlider
+          label="Decoding Steps (1)"
           name="decoding_steps_1"
-          value={magnetParams.decoding_steps_1}
-          onChange={handleChange}
-          className="border border-gray-300 p-2 rounded"
+          params={magnetParams}
+          handleChange={handleChange}
           min="0"
           max="100"
           step="1"
         />
-        <input
-          type="range"
+        <GenericSlider
+          label="Decoding Steps (2)"
           name="decoding_steps_2"
-          value={magnetParams.decoding_steps_2}
-          onChange={handleChange}
-          className="border border-gray-300 p-2 rounded"
+          params={magnetParams}
+          handleChange={handleChange}
           min="0"
           max="100"
           step="1"
         />
-        <input
-          type="range"
+        <GenericSlider
+          label="Decoding Steps (3)"
           name="decoding_steps_3"
-          value={magnetParams.decoding_steps_3}
-          onChange={handleChange}
-          className="border border-gray-300 p-2 rounded"
+          params={magnetParams}
+          handleChange={handleChange}
           min="0"
           max="100"
           step="1"
         />
-        <input
-          type="range"
+        <GenericSlider
+          label="Decoding Steps (4)"
           name="decoding_steps_4"
-          value={magnetParams.decoding_steps_4}
-          onChange={handleChange}
-          className="border border-gray-300 p-2 rounded"
+          params={magnetParams}
+          handleChange={handleChange}
           min="0"
           max="100"
           step="1"
