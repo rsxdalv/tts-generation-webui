@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useCallback, useEffect, useState } from "react";
 
 const defaultNamespace = "tts-generation-webui__";
 
@@ -53,7 +53,7 @@ export default function useLocalStorage<T>(
     setFirstLoadDone(true);
   }, [initialValue, prefixedKey]);
 
-  function setLocalValue(value: T) {
+  const setLocalValue = useCallback((value: T) => {
     if (!firstLoadDone) {
       return;
     }
@@ -65,22 +65,17 @@ export default function useLocalStorage<T>(
     } catch (error) {
       console.log(error);
     }
-  }
+  }, [firstLoadDone, prefixedKey]);
 
-  const setValue: Dispatch<SetStateAction<T>> = (value) => {
+  const setValue: Dispatch<SetStateAction<T>> = useCallback((value) => {
     // Allow value to be a function so we have the same API as useState
     // const valueToStore = value instanceof Function ? value(storedValue) : value;
-
-    // // update local storage
-    // setLocalValue(valueToStore);
-    // // Save state
-    // setStoredValue(valueToStore);
     setStoredValue(x => {
       const newValue = value instanceof Function ? value(x) : value;
       setLocalValue(newValue);
       return newValue;
     });
-  };
+  }, [setLocalValue]);
 
   // watch localStorage changes
   // useEffect(() => {
@@ -98,7 +93,5 @@ export default function useLocalStorage<T>(
   //   };
   // }, [prefixedKey]);
 
-  // Return the original useState functions
-  // return [storedValue, setStoredValue];
   return [storedValue, setValue];
 }
