@@ -103,6 +103,9 @@ const routes: Route[] = [
   // },
 ];
 
+const highlightOnRoute = (route: string, match: string) =>
+  route === match ? "font-bold" : "hover:text-gray-400";
+
 export const Header = ({}) => {
   const router = useRouter();
   const route = router.asPath.replace("/", "");
@@ -115,11 +118,18 @@ export const Header = ({}) => {
 
   const subroutes = currentRoute?.subroutes;
 
-  const renderLink = ({ href, text, target }: Route, i: number, arr: Route[]) => (
+  const renderLink = (
+    { href, text, target }: Route,
+    i: number,
+    arr: Route[]
+  ) => (
     <React.Fragment key={href}>
       <Link
         href={href}
-        className={highlightOnRoute(route, href.slice(1)) + " whitespace-pre"}
+        className={
+          highlightOnRoute(route, href.slice(1)) +
+          " whitespace-pre"
+        }
         target={target}
       >
         {text}
@@ -158,6 +168,3 @@ export const Header = ({}) => {
     </>
   );
 };
-
-const highlightOnRoute = (route: string, match: string) =>
-  route === match ? "font-bold" : "";
