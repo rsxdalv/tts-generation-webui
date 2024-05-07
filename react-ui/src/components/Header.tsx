@@ -136,9 +136,18 @@ export const Header = ({}) => {
 
   return (
     <>
-      <h1 className="text-3xl font-bold text-center text-gray-900 pb-1">
-        TTS Generation Webui
-      </h1>
+      <div className="flex items-center w-full pb-1">
+        <h1 className="text-3xl font-bold text-start w-full text-gray-900">
+          TTS Generation Webui
+        </h1>
+        <a
+          href="https://github.com/rsxdalv/tts-generation-webui"
+          target="_blank"
+          className="text-gray-500 hover:underline"
+        >
+          GitHub
+        </a>
+      </div>
       <RouteList>{routes.map(renderLink)}</RouteList>
       {subroutes && (
         <RouteList>
