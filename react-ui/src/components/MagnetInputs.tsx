@@ -87,6 +87,7 @@ export const MagnetInputs = ({
 
         <GenericSlider
           label="Top-P"
+          format={(x) => x.toFixed(2)}
           name="top_p"
           params={magnetParams}
           handleChange={handleChange}
@@ -97,6 +98,7 @@ export const MagnetInputs = ({
 
         <GenericSlider
           label="Temperature"
+          format={(x) => x.toFixed(2)}
           name="temperature"
           params={magnetParams}
           handleChange={handleChange}
@@ -108,6 +110,7 @@ export const MagnetInputs = ({
         <div className="flex gap-2">
           <GenericSlider
             label="Min Cfg Coef"
+            format={(x) => x.toFixed(1)}
             name="min_cfg_coef"
             params={magnetParams}
             handleChange={handleChange}
@@ -118,6 +121,7 @@ export const MagnetInputs = ({
           />
           <GenericSlider
             label="Max Cfg Coef"
+            format={(x) => x.toFixed(1)}
             name="max_cfg_coef"
             params={magnetParams}
             handleChange={handleChange}
