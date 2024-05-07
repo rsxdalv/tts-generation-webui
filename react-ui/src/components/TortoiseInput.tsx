@@ -2,6 +2,7 @@ import React from "react";
 import { TortoiseGenerationParams } from "../tabs/TortoiseGenerationParams";
 import FileInput from "./FileInput";
 import { TortoiseResult } from "../tabs/TortoiseResult";
+import { GenericSlider } from "./GenericSlider";
 
 export const TortoiseInput = ({
   tortoiseGenerationParams,
@@ -188,7 +189,7 @@ const CVVPAmount = ({
   ) => void;
 }) => (
   <GenericSlider
-    tortoiseGenerationParams={tortoiseGenerationParams}
+    params={tortoiseGenerationParams}
     handleChange={handleChange}
     label="CVVP Amount"
     name="cvvp_amount"
@@ -514,41 +515,7 @@ const GenericPromptTortoise = ({
     </div>
   );
 };
-const GenericSlider = ({
-  tortoiseGenerationParams,
-  handleChange,
-  label,
-  name,
-  min,
-  max,
-  step,
-}: {
-  tortoiseGenerationParams: TortoiseGenerationParams;
-  handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  label: string;
-  name: string;
-  min: string;
-  max: string;
-  step: string;
-}) => {
-  return (
-    <div className="flex flex-col border border-gray-300 p-2 rounded">
-      <label className="text-sm">
-        {label}: {tortoiseGenerationParams[name]}
-      </label>
-      <input
-        type="range"
-        name={name}
-        value={tortoiseGenerationParams[name]}
-        onChange={handleChange}
-        className="border border-gray-300 py-2 rounded"
-        min={min}
-        max={max}
-        step={step}
-      />
-    </div>
-  );
-};
+
 //   autoregressive
 // samples: 4,
 // temperature: 0.8,
@@ -564,7 +531,7 @@ const SamplesSlider = ({
   handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }) => (
   <GenericSlider
-    tortoiseGenerationParams={tortoiseGenerationParams}
+    params={tortoiseGenerationParams}
     handleChange={handleChange}
     label="Samples"
     name="samples"
@@ -582,7 +549,7 @@ const TemperatureSlider = ({
   handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }) => (
   <GenericSlider
-    tortoiseGenerationParams={tortoiseGenerationParams}
+    params={tortoiseGenerationParams}
     handleChange={handleChange}
     label="Temperature"
     name="temperature"
@@ -599,7 +566,7 @@ const LengthPenaltySlider = ({
   handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }) => (
   <GenericSlider
-    tortoiseGenerationParams={tortoiseGenerationParams}
+    params={tortoiseGenerationParams}
     handleChange={handleChange}
     label="Length Penalty"
     name="length_penalty"
@@ -621,7 +588,7 @@ const RepetitionPenaltySlider = ({
   ) => void;
 }) => (
   <GenericSlider
-    tortoiseGenerationParams={tortoiseGenerationParams}
+    params={tortoiseGenerationParams}
     handleChange={handleChange}
     label="Repetition Penalty"
     name="repetition_penalty"
@@ -643,7 +610,7 @@ const TopPSlider = ({
   ) => void;
 }) => (
   <GenericSlider
-    tortoiseGenerationParams={tortoiseGenerationParams}
+    params={tortoiseGenerationParams}
     handleChange={handleChange}
     label="Top P"
     name="top_p"
@@ -665,7 +632,7 @@ const MaxMelTokensSlider = ({
   ) => void;
 }) => (
   <GenericSlider
-    tortoiseGenerationParams={tortoiseGenerationParams}
+    params={tortoiseGenerationParams}
     handleChange={handleChange}
     label="Max Mel Tokens"
     name="max_mel_tokens"
@@ -730,7 +697,7 @@ const DiffusionIterationsSlider = ({
   ) => void;
 }) => (
   <GenericSlider
-    tortoiseGenerationParams={tortoiseGenerationParams}
+    params={tortoiseGenerationParams}
     handleChange={handleChange}
     label="Diffusion Iterations"
     name="diffusion_iterations"
@@ -752,7 +719,7 @@ const CondFreeKSlider = ({
   ) => void;
 }) => (
   <GenericSlider
-    tortoiseGenerationParams={tortoiseGenerationParams}
+    params={tortoiseGenerationParams}
     handleChange={handleChange}
     label="Cond Free K"
     name="cond_free_k"
@@ -774,7 +741,7 @@ const DiffusionTemperatureSlider = ({
   ) => void;
 }) => (
   <GenericSlider
-    tortoiseGenerationParams={tortoiseGenerationParams}
+    params={tortoiseGenerationParams}
     handleChange={handleChange}
     label="Diffusion Temperature"
     name="diffusion_temperature"

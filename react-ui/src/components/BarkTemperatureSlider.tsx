@@ -1,32 +1,31 @@
 import React from "react";
 import { BarkGenerationParams } from "../tabs/BarkGenerationParams";
+import { GenericSlider } from "./GenericSlider";
 
-const BarkTemperatureSlider = ({
-  barkGenerationParams,
+const TemperatureSlider = <
+  T extends {
+    [key: string]: number | string | boolean;
+  }
+>({
+  params,
   handleChange,
   label,
   name,
 }: {
-  barkGenerationParams: BarkGenerationParams;
+  params: T;
   handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   label: string;
-  name: string;
+  name: keyof T;
 }) => (
-  <div className="flex flex-col border border-gray-300 p-2 rounded">
-    <label className="text-sm">
-      {label}: {barkGenerationParams[name]}
-    </label>
-    <input
-      type="range"
-      name={name}
-      value={barkGenerationParams[name]}
-      onChange={handleChange}
-      className="border border-gray-300 py-2 rounded"
-      min="0"
-      max="1.2"
-      step="0.01"
-    />
-  </div>
+  <GenericSlider
+    params={params}
+    handleChange={handleChange}
+    label={label}
+    name={name}
+    min="0.0"
+    max="1.2"
+    step="0.01"
+  />
 );
 
 export const TextTemperature = ({
@@ -36,8 +35,8 @@ export const TextTemperature = ({
   barkGenerationParams: BarkGenerationParams;
   handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }) => (
-  <BarkTemperatureSlider
-    barkGenerationParams={barkGenerationParams}
+  <TemperatureSlider
+    params={barkGenerationParams}
     handleChange={handleChange}
     label="Text temperature"
     name="text_temp"
@@ -51,8 +50,8 @@ export const WaveformTemperature = ({
   barkGenerationParams: BarkGenerationParams;
   handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }) => (
-  <BarkTemperatureSlider
-    barkGenerationParams={barkGenerationParams}
+  <TemperatureSlider
+    params={barkGenerationParams}
     handleChange={handleChange}
     label="Waveform temperature"
     name="waveform_temp"
