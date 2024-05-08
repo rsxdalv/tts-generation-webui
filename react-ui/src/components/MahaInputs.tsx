@@ -1,5 +1,7 @@
 import React from "react";
 import { MahaParams, MahaResult, initialMahaParams } from "../tabs/MahaParams";
+import { HandleChange } from "../types/HandleChange";
+import { PromptTextArea } from "./PromptTextArea";
 
 const commonBorder = "border border-gray-300 p-2 rounded";
 
@@ -10,7 +12,7 @@ const SeedInput = ({
   seed,
 }: {
   mahaParams: MahaParams;
-  handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  handleChange: HandleChange;
   setMahaParams: React.Dispatch<React.SetStateAction<MahaParams>>;
   seed: number | string | undefined;
 }) => (
@@ -55,7 +57,7 @@ const Speaker = ({
   handleChange,
 }: {
   mahaParams: MahaParams;
-  handleChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
+  handleChange: HandleChange;
 }) => {
   const [options, setOptions] = React.useState<string[]>([]);
   const [loading, setLoading] = React.useState<boolean>(false);
@@ -125,26 +127,18 @@ export const MahaInputs = ({
   data,
 }: {
   mahaParams: MahaParams;
-  handleChange: (
-    event:
-      | React.ChangeEvent<HTMLInputElement>
-      | React.ChangeEvent<HTMLTextAreaElement>
-      | React.ChangeEvent<HTMLSelectElement>
-  ) => void;
+  handleChange: HandleChange;
   setMahaParams: React.Dispatch<React.SetStateAction<MahaParams>>;
   data: MahaResult | null;
 }) => {
   return (
     <div className="flex gap-x-6 w-full justify-center">
       <div className="flex flex-col gap-y-2 w-1/2">
-        <label className="text-sm">Text:</label>
-        <textarea
+        <PromptTextArea
+          params={mahaParams}
+          handleChange={handleChange}
+          label="Text"
           name="maha_tts_input"
-          value={mahaParams.maha_tts_input}
-          onChange={handleChange}
-          className={commonBorder}
-          placeholder="Enter text here..."
-          rows={3}
         />
       </div>
 
@@ -220,10 +214,7 @@ export const MahaInputs = ({
           </div>
         </div>
 
-        <Speaker
-          mahaParams={mahaParams}
-          handleChange={handleChange}
-        />
+        <Speaker mahaParams={mahaParams} handleChange={handleChange} />
 
         <SeedInput
           mahaParams={mahaParams}

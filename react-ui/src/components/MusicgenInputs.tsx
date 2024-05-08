@@ -7,6 +7,8 @@ import {
 } from "../tabs/MusicgenParams";
 import { MusicgenModelSelector } from "./MusicgenModelSelector";
 import { GenericSlider } from "./GenericSlider";
+import { PromptTextArea } from "./PromptTextArea";
+import { HandleChange } from "../types/HandleChange";
 
 export const MusicgenInputs = ({
   musicgenParams,
@@ -15,25 +17,17 @@ export const MusicgenInputs = ({
   musicgenResult,
 }: {
   musicgenParams: MusicgenParams;
-  handleChange: (
-    event:
-      | React.ChangeEvent<HTMLInputElement>
-      | React.ChangeEvent<HTMLTextAreaElement>
-      | React.ChangeEvent<HTMLSelectElement>
-  ) => void;
+  handleChange: HandleChange;
   setMusicgenParams: React.Dispatch<React.SetStateAction<MusicgenParams>>;
   musicgenResult: MusicgenResult | null;
 }) => (
   <div className="flex gap-x-6 w-full justify-center">
     <div className="flex flex-col gap-y-2 w-1/2">
-      <label className="text-sm">Text:</label>
-      <textarea
+      <PromptTextArea
+        handleChange={handleChange}
+        label="Text"
+        params={musicgenParams}
         name="text"
-        value={musicgenParams.text}
-        onChange={handleChange}
-        className="border border-gray-300 p-2 rounded"
-        placeholder="Enter text here..."
-        rows={3}
       />
 
       <MusicgenModelSelector
@@ -79,6 +73,7 @@ export const MusicgenInputs = ({
 
       <GenericSlider
         label="Top-P"
+        format={(x) => x.toFixed(2)}
         name="topp"
         min="0"
         max="1.5"
@@ -89,6 +84,7 @@ export const MusicgenInputs = ({
 
       <GenericSlider
         label="Temperature"
+        format={(x) => x.toFixed(2)}
         name="temperature"
         min="0"
         max="1.5"

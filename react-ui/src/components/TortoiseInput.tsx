@@ -4,6 +4,7 @@ import FileInput from "./FileInput";
 import { TortoiseResult } from "../tabs/TortoiseResult";
 import { GenericSlider } from "./GenericSlider";
 import { HandleChange } from "../types/HandleChange";
+import { PromptTextArea } from "./PromptTextArea";
 
 const SimpleGroup = ({ children }: { children: React.ReactNode }) => (
   <div className="flex flex-col space-y-2 border border-gray-300 p-2 rounded">
@@ -79,9 +80,11 @@ export const TortoiseInput = ({
         </SimpleGroup>
       </div>
     </div>
-    <TortoisePrompt
-      tortoiseGenerationParams={tortoiseGenerationParams}
+    <PromptTextArea
+      name="prompt"
+      label="Prompt"
       handleChange={handleChange}
+      params={tortoiseGenerationParams}
     />
   </div>
 );
@@ -401,20 +404,6 @@ const GenerationName = ({
     />
   </div>
 );
-const TortoisePrompt = ({
-  tortoiseGenerationParams,
-  handleChange,
-}: {
-  tortoiseGenerationParams: TortoiseGenerationParams;
-  handleChange: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
-}) => (
-  <GenericPromptTortoise
-    name="prompt"
-    label="Prompt"
-    handleChange={handleChange}
-    tortoiseGenerationParams={tortoiseGenerationParams}
-  />
-);
 const Seed = ({
   tortoiseGenerationParams,
   setTortoiseGenerationParams,
@@ -460,30 +449,6 @@ const Seed = ({
     >
       Randomize
     </button>
-  </div>
-);
-
-const GenericPromptTortoise = ({
-  tortoiseGenerationParams,
-  handleChange,
-  label,
-  name,
-}: {
-  tortoiseGenerationParams: TortoiseGenerationParams;
-  handleChange: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
-  label: string;
-  name: string;
-}) => (
-  <div className="flex flex-col space-y-2">
-    <label className="text-sm">{label}:</label>
-    <textarea
-      name={name}
-      value={tortoiseGenerationParams[name]}
-      onChange={handleChange}
-      className="border border-gray-300 p-2 rounded resize-none"
-      placeholder="Enter text here..."
-      rows={3}
-    />
   </div>
 );
 
@@ -561,20 +526,18 @@ const CondFree = ({
 }: {
   tortoiseGenerationParams: TortoiseGenerationParams;
   handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-}) => {
-  return (
-    <div className="flex items-center space-x-2">
-      <label className="text-sm">Cond Free:</label>
-      <input
-        type="checkbox"
-        name="cond_free"
-        checked={tortoiseGenerationParams.cond_free}
-        onChange={handleChange}
-        className="border border-gray-300 p-2 rounded"
-      />
-    </div>
-  );
-};
+}) => (
+  <div className="flex items-center space-x-2">
+    <label className="text-sm">Cond Free:</label>
+    <input
+      type="checkbox"
+      name="cond_free"
+      checked={tortoiseGenerationParams.cond_free}
+      onChange={handleChange}
+      className="border border-gray-300 p-2 rounded"
+    />
+  </div>
+);
 
 const DiffusionParameters = ({
   tortoiseGenerationParams,
