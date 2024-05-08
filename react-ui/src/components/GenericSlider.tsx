@@ -14,6 +14,8 @@ export const GenericSlider = <
   step,
   className,
   format = (x) => x.toString(),
+  border = false,
+  horizontal = false,
 }: {
   params: T;
   handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
@@ -24,11 +26,15 @@ export const GenericSlider = <
   step: string;
   className?: string;
   format?: (value: number) => string;
+  border?: boolean;
+  horizontal?: boolean;
 }) => {
   const value = params[name] as number;
   return (
     <div
-      className={`flex flex-col border border-gray-300 p-2 rounded ${className}`}
+      className={`flex ${horizontal ? "flex-row" : "flex-col"} ${
+        border ? "border border-gray-300" : ""
+      } p-2 rounded ${className}`}
     >
       <label className="text-sm">
         {label}: {format(value)}
@@ -38,7 +44,7 @@ export const GenericSlider = <
         name={name as string}
         value={value}
         onChange={handleChange}
-        className="border border-gray-300 py-2 rounded"
+        className={`${border ? "border border-gray-300" : ""} py-2 rounded`}
         min={min}
         max={max}
         step={step}
