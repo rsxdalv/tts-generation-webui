@@ -17,7 +17,7 @@ const inputs = {
   long_prompt_history_radio: "or Use old generation as history:",
   old_generation_dropdown:
     "voices\\2023-06-18_21-51-07__bark__continued_generation.npz",
-  seed_input: "123",
+  seed: "123",
   history_prompt_semantic_dropdown:
     "voices\\2023-06-18_21-51-07__bark__continued_generation.npz",
 };
@@ -34,7 +34,7 @@ export type BarkGenerationParams = {
   long_prompt_radio: string; // string  in 'Prompt type' Radio component
   long_prompt_history_radio: string; // string  in 'For each subsequent generation:' Radio component
   old_generation_dropdown: string; // string
-  seed_input: string; // string  in 'parameter_40' Textbox component
+  seed: string; // string  in 'parameter_40' Textbox component
   history_prompt_semantic_dropdown: string; // string
 };
 

@@ -145,7 +145,7 @@ async function bark({
   long_prompt_radio,
   long_prompt_history_radio,
   old_generation_dropdown,
-  seed_input,
+  seed: seed_input,
   history_prompt_semantic_dropdown,
 }) {
   const result = await gradioPredict<

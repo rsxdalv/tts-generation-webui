@@ -1,5 +1,6 @@
 import React from "react";
 import { BarkGenerationParams } from "../tabs/BarkGenerationParams";
+import { SeedInput } from "./SeedInput";
 
 export const BarkSeed = ({
   barkGenerationParams,
@@ -15,38 +16,11 @@ export const BarkSeed = ({
   lastSeed?: string;
 }) => {
   return (
-    <div className="flex items-center space-x-2">
-      <label className="text-sm">Seed:</label>
-      <input
-        type="text"
-        name="seed_input"
-        value={barkGenerationParams.seed_input}
-        onChange={handleChange}
-        className="border border-gray-300 p-2 rounded"
-      />
-      <button
-        className="border border-gray-300 p-2 rounded"
-        onClick={() => {
-          setBarkVoiceGenerationParams({
-            ...barkGenerationParams,
-            seed_input: lastSeed ?? "-1",
-          });
-        }}
-      >
-        Restore Last
-      </button>
-      <button
-        className="border border-gray-300 p-2 rounded"
-        onClick={() => {
-          setBarkVoiceGenerationParams({
-            ...barkGenerationParams,
-            // seed_input: randomSeed().toString(),
-            seed_input: "-1",
-          });
-        }}
-      >
-        Randomize
-      </button>
-    </div>
+    <SeedInput
+      params={barkGenerationParams}
+      handleChange={handleChange}
+      setParams={setBarkVoiceGenerationParams}
+      seed={lastSeed}
+    />
   );
 };
