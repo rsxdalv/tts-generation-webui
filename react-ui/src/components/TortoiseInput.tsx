@@ -5,6 +5,7 @@ import { TortoiseResult } from "../tabs/TortoiseResult";
 import { GenericSlider } from "./GenericSlider";
 import { HandleChange } from "../types/HandleChange";
 import { PromptTextArea } from "./PromptTextArea";
+import { SeedInput } from "./SeedInput";
 
 const SimpleGroup = ({ children }: { children: React.ReactNode }) => (
   <div className="flex flex-col space-y-2 border border-gray-300 p-2 rounded">
@@ -19,9 +20,9 @@ export const TortoiseInput = ({
   data,
 }: {
   tortoiseGenerationParams: TortoiseGenerationParams;
-  setTortoiseGenerationParams: (
-    tortoiseGenerationParams: TortoiseGenerationParams
-  ) => void;
+  setTortoiseGenerationParams: React.Dispatch<
+    React.SetStateAction<TortoiseGenerationParams>
+  >;
   handleChange: HandleChange;
   data?: TortoiseResult | null;
 }) => (
@@ -65,11 +66,11 @@ export const TortoiseInput = ({
             tortoiseGenerationParams={tortoiseGenerationParams}
             handleChange={handleChange}
           />
-          <Seed
-            tortoiseGenerationParams={tortoiseGenerationParams}
-            setTortoiseGenerationParams={setTortoiseGenerationParams}
+          <SeedInput
+            params={tortoiseGenerationParams}
+            setParams={setTortoiseGenerationParams}
             handleChange={handleChange}
-            lastSeed={Number(data?.seed) || -1}
+            seed={data?.seed}
           />
         </SimpleGroup>
         <SimpleGroup>
@@ -279,13 +280,16 @@ const Model = ({
     handleChange: HandleChange;
   }) => (
     <div className="flex items-center space-x-2">
-      <label className="text-sm">{label}:</label>
+      <label className="text-sm cursor-pointer" htmlFor={name}>
+        {label}:
+      </label>
       <input
         type="checkbox"
         name={name}
+        id={name}
         checked={tortoiseGenerationParams[name]}
         onChange={handleChange}
-        className="border border-gray-300 p-2 rounded"
+        className="border border-gray-300 p-2 rounded cursor-pointer"
       />
     </div>
   );
@@ -330,7 +334,8 @@ const Model = ({
         </button>
       </div>
       {/* 2x2 */}
-      <div className="grid grid-cols-2 gap-2">
+      {/* <div className="grid grid-cols-2 gap-2"> */}
+      <div className="flex gap-4">
         <BasicModelCheckbox
           name="kv_cache"
           label="KV Cache"
@@ -402,53 +407,6 @@ const GenerationName = ({
       onChange={handleChange}
       className="border border-gray-300 p-2 rounded"
     />
-  </div>
-);
-const Seed = ({
-  tortoiseGenerationParams,
-  setTortoiseGenerationParams,
-  handleChange,
-  lastSeed,
-}: {
-  tortoiseGenerationParams: TortoiseGenerationParams;
-  setTortoiseGenerationParams: (
-    tortoiseGenerationParams: TortoiseGenerationParams
-  ) => void;
-  handleChange: HandleChange;
-  lastSeed?: number;
-}) => (
-  <div className="flex items-center space-x-2">
-    <label className="text-sm">Seed:</label>
-    <input
-      type="text"
-      name="seed_input"
-      value={tortoiseGenerationParams.seed}
-      onChange={handleChange}
-      className="border border-gray-300 p-2 rounded"
-    />
-    <button
-      className="border border-gray-300 p-2 rounded"
-      onClick={() => {
-        setTortoiseGenerationParams({
-          ...tortoiseGenerationParams,
-          seed: lastSeed ?? -1,
-        });
-      }}
-    >
-      Restore Last
-    </button>
-    <button
-      className="border border-gray-300 p-2 rounded"
-      onClick={() => {
-        setTortoiseGenerationParams({
-          ...tortoiseGenerationParams,
-          // seed_input: randomSeed().toString(),
-          seed: -1,
-        });
-      }}
-    >
-      Randomize
-    </button>
   </div>
 );
 

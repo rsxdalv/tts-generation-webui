@@ -4,40 +4,7 @@ import { MagnetModelSelector } from "./MagnetModelSelector";
 import { GenericSlider } from "./GenericSlider";
 import { HandleChange } from "../types/HandleChange";
 import { PromptTextArea } from "./PromptTextArea";
-
-const SeedInput = ({
-  magnetParams,
-  handleChange,
-  setMagnetParams,
-  seed,
-}: {
-  magnetParams: MagnetParams;
-  handleChange: HandleChange;
-  setMagnetParams: React.Dispatch<React.SetStateAction<MagnetParams>>;
-  seed: number | string | undefined;
-}) => (
-  <>
-    <label className="text-sm">Seed:</label>
-    <input
-      type="number"
-      name="seed"
-      value={magnetParams.seed}
-      onChange={handleChange}
-      className="border border-gray-300 p-2 rounded"
-    />
-    <button
-      className="border border-gray-300 p-2 rounded"
-      onClick={() =>
-        setMagnetParams({
-          ...magnetParams,
-          seed: Number(seed) || -1,
-        })
-      }
-    >
-      Restore Last Seed
-    </button>
-  </>
-);
+import { SeedInput } from "./SeedInput";
 
 export const MagnetInputs = ({
   magnetParams,
@@ -204,9 +171,9 @@ export const MagnetInputs = ({
       </div>
 
       <SeedInput
-        magnetParams={magnetParams}
+        params={magnetParams}
         handleChange={handleChange}
-        setMagnetParams={setMagnetParams}
+        setParams={setMagnetParams}
         seed={data?.json?.seed}
       />
     </div>

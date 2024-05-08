@@ -9,6 +9,7 @@ import { MusicgenModelSelector } from "./MusicgenModelSelector";
 import { GenericSlider } from "./GenericSlider";
 import { PromptTextArea } from "./PromptTextArea";
 import { HandleChange } from "../types/HandleChange";
+import { SeedInput } from "./SeedInput";
 
 export const MusicgenInputs = ({
   musicgenParams,
@@ -104,25 +105,12 @@ export const MusicgenInputs = ({
         handleChange={handleChange}
       />
 
-      <label className="text-sm">Seed:</label>
-      <input
-        type="number"
-        name="seed"
-        value={musicgenParams.seed}
-        onChange={handleChange}
-        className="border border-gray-300 p-2 rounded"
+      <SeedInput
+        params={musicgenParams}
+        setParams={setMusicgenParams}
+        handleChange={handleChange}
+        seed={musicgenResult?.json?.seed}
       />
-      <button
-        className="border border-gray-300 p-2 rounded"
-        onClick={() =>
-          setMusicgenParams({
-            ...musicgenParams,
-            seed: Number(musicgenResult?.json.seed) || -1,
-          })
-        }
-      >
-        Restore Last Seed
-      </button>
 
       <div className="flex gap-x-2 items-center">
         <label className="text-sm">
