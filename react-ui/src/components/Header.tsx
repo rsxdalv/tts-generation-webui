@@ -78,6 +78,10 @@ const routes: Route[] = [
     text: "Maha TTS",
   },
   {
+    href: "/mms",
+    text: "MMS",
+  },
+  {
     href: "/gpu_info",
     text: "GPU Info",
   },

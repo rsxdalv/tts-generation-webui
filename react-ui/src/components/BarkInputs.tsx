@@ -2,7 +2,6 @@ import React from "react";
 import { BarkGenerationParams } from "../tabs/BarkGenerationParams";
 import { BarkResult } from "../tabs/BarkResult";
 import { BarkVoice } from "./BarkVoice";
-import { BarkSeed } from "./BarkSeed";
 import { BurnInPrompt, BarkPrompt } from "./BarkPrompt";
 import { TextTemperature, WaveformTemperature } from "./BarkTemperatureSlider";
 import { OldGeneration, HistoryPromptSemantic } from "./BarkOldGeneration";

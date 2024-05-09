@@ -538,6 +538,42 @@ const maha_tts_refresh_voices = () =>
 const get_gpu_info = () =>
   gradioPredict<[Object]>("/get_gpu_info").then((result) => result?.data[0]);
 
+const mms = ({
+  text,
+  language,
+  speaking_rate,
+  noise_scale,
+  noise_scale_duration,
+}: {
+  text: string;
+  language: string;
+  speaking_rate: number;
+  noise_scale: number;
+  noise_scale_duration: number;
+}) =>
+  gradioPredict<[GradioFile]>("/mms", [
+    text, // string  in 'Input Text' Textbox component
+    language, // string (Option from: ['eng', 'deu', 'fra', 'ita', 'por', 'spa', 'zho']) in 'Language' Dropdown component
+    speaking_rate, // number  in 'Speaking Rate' Number component
+    noise_scale, // number  in 'Noise Scale' Number component
+    noise_scale_duration, // number  in 'Noise Scale Duration' Number component
+  ]).then((result) => {
+    const [audio] = result?.data;
+    return {
+      audio,
+      metadata: {
+        _version: "",
+        _hash_version: "",
+        _type: "",
+        text,
+        language,
+        speaking_rate,
+        noise_scale,
+        noise_scale_duration,
+      },
+    };
+  });
+
 const endpoints = {
   maha,
   maha_tts_refresh_voices,
@@ -575,6 +611,8 @@ const endpoints = {
   save_environment_variables_bark,
   save_config_bark,
   get_config_bark,
+
+  mms,
 
   get_gpu_info,
 };

@@ -4,7 +4,7 @@ import useLocalStorage, {
 import router from "next/router";
 import { GradioFile } from "../types/GradioFile";
 
-export const mahaId = "mahaParams";
+const mahaId = "mahaParams";
 
 export type MahaParams = {
   maha_tts_input: string;
