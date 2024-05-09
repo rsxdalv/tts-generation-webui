@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Template } from "../../components/Template";
 import Head from "next/head";
 import useLocalStorage from "../../hooks/useLocalStorage";
@@ -7,13 +7,11 @@ import {
   initialBarkSettingsParams,
   barkSettingsId,
 } from "../../tabs/BarkSettingsParams";
-
-type Result = string;
+import { GPUInfoWidget } from "../../components/GPUInfoWidget";
 
 const BarkSettingsPage = () => {
-  const [data, setData] = useLocalStorage<Result | null>(
-    "barkSettingsBeacon",
-    null
+  const [data, setData] = useState<string>(
+    "Changes will be automatically saved"
   );
   const [barkSettingsParams, setBarkSettingsParams] =
     useLocalStorage<BarkSettingsParams>(
@@ -34,7 +32,7 @@ const BarkSettingsPage = () => {
     fetchData();
   }, [setBarkSettingsParams]);
 
-  const handleChange = async ( 
+  const handleChange = async (
     event:
       | React.ChangeEvent<HTMLInputElement>
       | React.ChangeEvent<HTMLTextAreaElement>
@@ -83,13 +81,10 @@ const BarkSettingsPage = () => {
 
     if (isEnv) {
       try {
-        await fetch(
-          "/api/gradio/save_environment_variables_bark",
-          {
-            method: "POST",
-            body: JSON.stringify(newBarkSettingsParams),
-          }
-        );
+        await fetch("/api/gradio/save_environment_variables_bark", {
+          method: "POST",
+          body: JSON.stringify(newBarkSettingsParams),
+        });
       } catch (error) {
         console.error("Error:", error);
       }
@@ -239,7 +234,7 @@ const BarkSettingsPage = () => {
             </div>
           </div>
         </div>
-        <div className="p-4">
+        <div className="flex flex-col gap-y-4 p-4">
           Recommended settings:
           <ul>
             <li>For VRAM &gt;= 10GB, use large models.</li>
@@ -274,6 +269,10 @@ const BarkSettingsPage = () => {
           >
             Reset to defaults
           </button>
+          <div className="flex flex-col gap-2">
+            <h2>GPU Info</h2>
+            <GPUInfoWidget />
+          </div>
         </div>
       </div>
     </Template>

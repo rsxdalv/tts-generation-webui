@@ -38,6 +38,9 @@ import { getWebuiURLWithHost } from "../data/getWebuiURL";
 import { useMahaParams, useMahaResult } from "../tabs/MahaParams";
 import { generateWithMaha } from "../functions/generateWithMaha";
 import { MahaInputs } from "../components/MahaInputs";
+import { useMMSParams, useMMSResult } from "../tabs/MMSParams";
+import { generateWithMMS } from "../functions/generateWithMMS";
+import { MMSInputs } from "../components/MMSInputs";
 
 interface PipelineParams {
   generation: string;
@@ -87,6 +90,8 @@ const PipelinePage = () => {
   const [magnetResult, setMagnetResult] = useMagnetResult();
   const [mahaParams, setMahaParams] = useMahaParams();
   const [mahaResult, setMahaResult] = useMahaResult();
+  const [mmsParams, setMmsParams] = useMMSParams();
+  const [mmsResult, setMmsResult] = useMMSResult();
 
   const [rvcGenerationParams, setRvcGenerationParams] =
     useRVCGenerationParams();
@@ -120,6 +125,11 @@ const PipelinePage = () => {
         case "maha": {
           const result = await generateWithMaha(mahaParams);
           setMahaResult(result);
+          return result;
+        }
+        case "mms": {
+          const result = await generateWithMMS(mmsParams);
+          setMmsResult(result);
           return result;
         }
       }
@@ -173,7 +183,14 @@ const PipelinePage = () => {
     setStatus("idle");
   }
 
-  const generationModels = ["bark", "tortoise", "musicgen", "magnet", "maha"];
+  const generationModels = [
+    "bark",
+    "tortoise",
+    "musicgen",
+    "magnet",
+    "maha",
+    "mms",
+  ];
 
   const onChangeModel = (event: React.ChangeEvent<HTMLInputElement>) => {
     const model = event.target.value;
@@ -253,6 +270,15 @@ const PipelinePage = () => {
             handleChange={parseFormChange(setMahaParams)}
             setMahaParams={setMahaParams}
             data={mahaResult}
+          />
+        );
+      case "mms":
+        return (
+          <MMSInputs
+            mmsParams={mmsParams}
+            handleChange={parseFormChange(setMmsParams)}
+            setMmsParams={setMmsParams}
+            data={mmsResult}
           />
         );
       default:

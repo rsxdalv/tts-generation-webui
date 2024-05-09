@@ -16,7 +16,7 @@ const routes: Route[] = [
   },
   {
     href: "/pipeline",
-    text: "Pipeline (Experimental!)",
+    text: "Pipeline",
   },
   {
     href: "/bark",
@@ -26,26 +26,6 @@ const routes: Route[] = [
         href: "/bark",
         text: "Generation",
       },
-      // {
-      //   href: "/bark_voice_generation",
-      //   text: "Voice Generation",
-      // },
-      // {
-      //   href: "/voices",
-      //   text: "Voices",
-      // },
-      // {
-      //   href: "/bark_settings",
-      //   text: "Settings",
-      // },
-      // {
-      //   href: "/vocos_wav",
-      //   text: "Vocos Wav",
-      // },
-      // {
-      //   href: "/vocos_npz",
-      //   text: "Vocos NPZ",
-      // },
       {
         href: "/bark/bark_voice_generation",
         text: "Voice Generation",
@@ -65,6 +45,11 @@ const routes: Route[] = [
       {
         href: "/bark/vocos_npz",
         text: "Vocos NPZ",
+      },
+      {
+        href: "https://echo.ps.ai/?utm_source=react_ui",
+        text: <span>More Voices&nbsp;↗</span>,
+        target: "_blank",
       },
     ],
   },
@@ -89,6 +74,18 @@ const routes: Route[] = [
     text: "RVC",
   },
   {
+    href: "/maha-tts",
+    text: "Maha TTS",
+  },
+  {
+    href: "/mms",
+    text: "MMS",
+  },
+  {
+    href: "/gpu_info",
+    text: "GPU Info",
+  },
+  {
     href: "/history/outputs",
     text: "History",
   },
@@ -108,20 +105,10 @@ const routes: Route[] = [
   //   href: "/voice-drafts",
   //   text: "Voice Tree",
   // },
-  {
-    href: "/maha-tts",
-    text: "Maha TTS",
-  },
-  {
-    href: "/gpu_info",
-    text: "GPU Info",
-  },
-  {
-    href: "https://echo.ps.ai/?utm_source=bark_speaker_directory",
-    text: <span>More Voices ↗</span>,
-    target: "_blank",
-  },
 ];
+
+const highlightOnRoute = (route: string, match: string) =>
+  route === match ? "font-bold" : "hover:text-gray-400";
 
 export const Header = ({}) => {
   const router = useRouter();
@@ -135,49 +122,53 @@ export const Header = ({}) => {
 
   const subroutes = currentRoute?.subroutes;
 
+  const renderLink = (
+    { href, text, target }: Route,
+    i: number,
+    arr: Route[]
+  ) => (
+    <React.Fragment key={href}>
+      <Link
+        href={href}
+        className={
+          highlightOnRoute(route, href.slice(1)) +
+          " whitespace-pre"
+        }
+        target={target}
+      >
+        {text}
+      </Link>
+      {i < arr.length - 1 && " | "}
+    </React.Fragment>
+  );
+
+  const RouteList = ({ children }: { children: React.ReactNode }) => (
+    <div className="flex flex-col items-center justify-center w-full p-2 bg-white rounded-lg shadow-lg">
+      <p className="text-base text-center text-gray-700">{children}</p>
+    </div>
+  );
+
   return (
     <>
-      <div className="flex flex-col items-center justify-center w-full p-8 bg-white rounded-lg shadow-lg">
-        <h1 className="text-4xl font-bold text-center text-gray-900">
+      <div className="flex items-center w-full pb-1">
+        <h1 className="text-3xl font-bold text-start w-full text-gray-900">
           TTS Generation Webui
         </h1>
-        <p className="text-lg text-center text-gray-700">
-          {routes.map(({ href, text, target, subroutes }, i) => (
-            <React.Fragment key={href}>
-              <Link
-                href={href}
-                className={highlightOnRoute(route, href.slice(1))}
-                target={target}
-              >
-                {text}
-              </Link>
-              {i < routes.length - 1 && " | "}
-            </React.Fragment>
-          ))}
-        </p>
+        <a
+          href="https://github.com/rsxdalv/tts-generation-webui"
+          target="_blank"
+          className="text-gray-500 hover:underline"
+        >
+          GitHub
+        </a>
       </div>
+      <RouteList>{routes.map(renderLink)}</RouteList>
       {subroutes && (
-        <div className="flex flex-col items-center justify-center w-full p-4 bg-white rounded-lg shadow-lg">
-          <p className="text-lg text-center text-gray-700">
-            {currentRoute?.text} {"> "}
-            {subroutes.map(({ href, text, target }, i) => (
-              <React.Fragment key={href}>
-                <Link
-                  href={href}
-                  className={highlightOnRoute(route, href.slice(1))}
-                  target={target}
-                >
-                  {text}
-                </Link>
-                {i < subroutes.length - 1 && " | "}
-              </React.Fragment>
-            ))}
-          </p>
-        </div>
+        <RouteList>
+          {currentRoute?.text} {"> "}
+          {subroutes.map(renderLink)}
+        </RouteList>
       )}
     </>
   );
 };
-
-const highlightOnRoute = (route: string, match: string) =>
-  route === match ? "font-bold" : "";

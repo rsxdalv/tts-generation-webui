@@ -7,6 +7,7 @@ const modelMap = {
   Large: { size: "large", stereo: true, melody: true },
   Audiogen: { size: "audiogen", stereo: false, melody: false },
 };
+
 const modelToType = {
   "facebook/musicgen-small": "Small",
   "facebook/musicgen-medium": "Medium",
@@ -23,6 +24,7 @@ const modelToType = {
   "facebook/musicgen-stereo-melody": "Medium",
   "facebook/musicgen-stereo-melody-large": "Large",
 };
+
 const computeModel = (type: string, stereo: boolean, melody: boolean) => {
   const lowerType = type.toLowerCase();
   const largeSuffix = type === "Large" ? "-large" : "";
@@ -34,9 +36,11 @@ const computeModel = (type: string, stereo: boolean, melody: boolean) => {
     ? `facebook/musicgen${stereoPrefix}-melody${largeSuffix}`
     : `facebook/musicgen${stereoPrefix}-${lowerType}`;
 };
+
 const getType = (model: string) => {
   return modelToType[model] || "Small";
 };
+
 const decomputeModel = (
   model: string
 ): { type: string; stereo: boolean; melody: boolean } => {

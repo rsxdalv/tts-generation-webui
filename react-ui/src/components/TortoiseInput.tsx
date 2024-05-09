@@ -2,6 +2,16 @@ import React from "react";
 import { TortoiseGenerationParams } from "../tabs/TortoiseGenerationParams";
 import FileInput from "./FileInput";
 import { TortoiseResult } from "../tabs/TortoiseResult";
+import { GenericSlider } from "./GenericSlider";
+import { HandleChange } from "../types/HandleChange";
+import { PromptTextArea } from "./PromptTextArea";
+import { SeedInput } from "./SeedInput";
+
+const SimpleGroup = ({ children }: { children: React.ReactNode }) => (
+  <div className="flex flex-col space-y-2 border border-gray-300 p-2 rounded">
+    {children}
+  </div>
+);
 
 export const TortoiseInput = ({
   tortoiseGenerationParams,
@@ -10,86 +20,81 @@ export const TortoiseInput = ({
   data,
 }: {
   tortoiseGenerationParams: TortoiseGenerationParams;
-  setTortoiseGenerationParams: (
-    tortoiseGenerationParams: TortoiseGenerationParams
-  ) => void;
-  handleChange: (
-    event:
-      | React.ChangeEvent<HTMLInputElement>
-      | React.ChangeEvent<HTMLTextAreaElement>
-      | React.ChangeEvent<HTMLSelectElement>
-  ) => void;
+  setTortoiseGenerationParams: React.Dispatch<
+    React.SetStateAction<TortoiseGenerationParams>
+  >;
+  handleChange: HandleChange;
   data?: TortoiseResult | null;
-}) => {
-  return (
-    <div className="flex flex-col w-full space-y-2">
-      <div className="flex flex-row space-x-2">
-        <div className="space-y-2 w-1/2">
-          <div className="flex flex-col space-y-2 border border-gray-300 p-2 rounded">
-            <Model
-              tortoiseGenerationParams={tortoiseGenerationParams}
-              handleChange={handleChange}
-            />
-          </div>
-          <div className="flex flex-col space-y-2 border border-gray-300 p-2 rounded">
-            <Speaker
-              tortoiseGenerationParams={tortoiseGenerationParams}
-              handleChange={handleChange}
-            />
-          </div>
-          <div className="flex flex-col space-y-2 border border-gray-300 p-2 rounded">
-            <Preset
-              tortoiseGenerationParams={tortoiseGenerationParams}
-              handleChange={handleChange}
-            />
-          </div>
-          <AutoRegressiveParameters
+}) => (
+  <div className="flex flex-col w-full space-y-2">
+    <div className="flex flex-row space-x-2">
+      <div className="space-y-2 w-1/2">
+        <SimpleGroup>
+          <Model
             tortoiseGenerationParams={tortoiseGenerationParams}
             handleChange={handleChange}
           />
-        </div>
-        <div className="space-y-2 w-1/2">
-          <DiffusionParameters
+        </SimpleGroup>
+        <SimpleGroup>
+          <Speaker
             tortoiseGenerationParams={tortoiseGenerationParams}
             handleChange={handleChange}
           />
-          <div className="flex flex-col space-y-2 border border-gray-300 p-2 rounded">
-            <CVVPAmount
-              tortoiseGenerationParams={tortoiseGenerationParams}
-              handleChange={handleChange}
-            />
-            <SplitPrompt
-              tortoiseGenerationParams={tortoiseGenerationParams}
-              handleChange={handleChange}
-            />
-            <Seed
-              tortoiseGenerationParams={tortoiseGenerationParams}
-              setTortoiseGenerationParams={setTortoiseGenerationParams}
-              handleChange={handleChange}
-              lastSeed={Number(data?.seed) || -1}
-            />
-          </div>
-          <div className="flex flex-col space-y-2 border border-gray-300 p-2 rounded">
-            <GenerationName
-              tortoiseGenerationParams={tortoiseGenerationParams}
-              handleChange={handleChange}
-            />
-          </div>
-        </div>
+        </SimpleGroup>
+        <SimpleGroup>
+          <Preset
+            tortoiseGenerationParams={tortoiseGenerationParams}
+            handleChange={handleChange}
+          />
+        </SimpleGroup>
+        <AutoRegressiveParameters
+          tortoiseGenerationParams={tortoiseGenerationParams}
+          handleChange={handleChange}
+        />
       </div>
-      <TortoisePrompt
-        tortoiseGenerationParams={tortoiseGenerationParams}
-        handleChange={handleChange}
-      />
+      <div className="space-y-2 w-1/2">
+        <DiffusionParameters
+          tortoiseGenerationParams={tortoiseGenerationParams}
+          handleChange={handleChange}
+        />
+        <SimpleGroup>
+          <CVVPAmount
+            tortoiseGenerationParams={tortoiseGenerationParams}
+            handleChange={handleChange}
+          />
+          <SplitPrompt
+            tortoiseGenerationParams={tortoiseGenerationParams}
+            handleChange={handleChange}
+          />
+          <SeedInput
+            params={tortoiseGenerationParams}
+            setParams={setTortoiseGenerationParams}
+            handleChange={handleChange}
+            seed={data?.seed}
+          />
+        </SimpleGroup>
+        <SimpleGroup>
+          <GenerationName
+            tortoiseGenerationParams={tortoiseGenerationParams}
+            handleChange={handleChange}
+          />
+        </SimpleGroup>
+      </div>
     </div>
-  );
-};
+    <PromptTextArea
+      name="prompt"
+      label="Prompt"
+      handleChange={handleChange}
+      params={tortoiseGenerationParams}
+    />
+  </div>
+);
 const Speaker = ({
   tortoiseGenerationParams,
   handleChange,
 }: {
   tortoiseGenerationParams: TortoiseGenerationParams;
-  handleChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
+  handleChange: HandleChange;
 }) => {
   const [options, setOptions] = React.useState<string[]>([]);
   const [loading, setLoading] = React.useState<boolean>(false);
@@ -156,23 +161,28 @@ const Preset = ({
   handleChange,
 }: {
   tortoiseGenerationParams: TortoiseGenerationParams;
-  handleChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
+  handleChange: HandleChange;
 }) => (
-  <div>
+  <div className="flex items-center space-x-2">
     <label className="text-sm">Preset:</label>
-    <select
-      name="preset"
-      id="preset"
-      className="border border-gray-300 p-2 rounded text-black w-full"
-      value={tortoiseGenerationParams?.preset}
-      onChange={handleChange}
-    >
+    <div className="flex flex-row space-x-2">
       {["ultra_fast", "fast", "standard", "high_quality"].map((preset) => (
-        <option key={preset} value={preset}>
-          {preset}
-        </option>
+        <div key={preset} className="flex items-center">
+          <input
+            type="radio"
+            name="preset"
+            id={preset}
+            value={preset}
+            checked={tortoiseGenerationParams.preset === preset}
+            onChange={handleChange}
+            className="border border-gray-300 p-2 rounded"
+          />
+          <label className="ml-1" htmlFor={preset}>
+            {preset}
+          </label>
+        </div>
       ))}
-    </select>
+    </div>
   </div>
 );
 const CVVPAmount = ({
@@ -180,15 +190,10 @@ const CVVPAmount = ({
   handleChange,
 }: {
   tortoiseGenerationParams: TortoiseGenerationParams;
-  handleChange: (
-    event:
-      | React.ChangeEvent<HTMLInputElement>
-      | React.ChangeEvent<HTMLTextAreaElement>
-      | React.ChangeEvent<HTMLSelectElement>
-  ) => void;
+  handleChange: HandleChange;
 }) => (
   <GenericSlider
-    tortoiseGenerationParams={tortoiseGenerationParams}
+    params={tortoiseGenerationParams}
     handleChange={handleChange}
     label="CVVP Amount"
     name="cvvp_amount"
@@ -202,7 +207,7 @@ const SplitPrompt = ({
   handleChange,
 }: {
   tortoiseGenerationParams: TortoiseGenerationParams;
-  handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  handleChange: HandleChange;
 }) => {
   return (
     <div className="flex items-center space-x-2">
@@ -217,37 +222,12 @@ const SplitPrompt = ({
     </div>
   );
 };
-const CondFree = ({
-  tortoiseGenerationParams,
-  handleChange,
-}: {
-  tortoiseGenerationParams: TortoiseGenerationParams;
-  handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-}) => {
-  return (
-    <div className="flex items-center space-x-2">
-      <label className="text-sm">Cond Free:</label>
-      <input
-        type="checkbox"
-        name="cond_free"
-        checked={tortoiseGenerationParams.cond_free}
-        onChange={handleChange}
-        className="border border-gray-300 p-2 rounded"
-      />
-    </div>
-  );
-};
 const Model = ({
   tortoiseGenerationParams,
   handleChange,
 }: {
   tortoiseGenerationParams: TortoiseGenerationParams;
-  handleChange: (
-    event:
-      | React.ChangeEvent<HTMLInputElement>
-      | React.ChangeEvent<HTMLTextAreaElement>
-      | React.ChangeEvent<HTMLSelectElement>
-  ) => void;
+  handleChange: HandleChange;
 }) => {
   const [options, setOptions] = React.useState<string[]>([]);
   const [loading, setLoading] = React.useState<boolean>(false);
@@ -297,16 +277,19 @@ const Model = ({
   }: {
     name: string;
     label: string;
-    handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    handleChange: HandleChange;
   }) => (
     <div className="flex items-center space-x-2">
-      <label className="text-sm">{label}:</label>
+      <label className="text-sm cursor-pointer" htmlFor={name}>
+        {label}:
+      </label>
       <input
         type="checkbox"
         name={name}
+        id={name}
         checked={tortoiseGenerationParams[name]}
         onChange={handleChange}
-        className="border border-gray-300 p-2 rounded"
+        className="border border-gray-300 p-2 rounded cursor-pointer"
       />
     </div>
   );
@@ -351,7 +334,8 @@ const Model = ({
         </button>
       </div>
       {/* 2x2 */}
-      <div className="grid grid-cols-2 gap-2">
+      {/* <div className="grid grid-cols-2 gap-2"> */}
+      <div className="flex gap-4">
         <BasicModelCheckbox
           name="kv_cache"
           label="KV Cache"
@@ -401,7 +385,6 @@ const Model = ({
           className="border border-gray-300 p-2 rounded"
           onClick={applyModelSettings}
         >
-          {/* Apply Model Settings */}
           {applyModelSettingsLoading ? "Applying..." : "Apply Model Settings"}
         </button>
       </div>
@@ -413,7 +396,7 @@ const GenerationName = ({
   handleChange,
 }: {
   tortoiseGenerationParams: TortoiseGenerationParams;
-  handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  handleChange: HandleChange;
 }) => (
   <div className="flex items-center space-x-2">
     <label className="text-sm">Generation Name:</label>
@@ -426,395 +409,134 @@ const GenerationName = ({
     />
   </div>
 );
-const TortoisePrompt = ({
-  tortoiseGenerationParams,
-  handleChange,
-}: {
-  tortoiseGenerationParams: TortoiseGenerationParams;
-  handleChange: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
-}) => (
-  <GenericPromptTortoise
-    name="prompt"
-    label="Prompt"
-    handleChange={handleChange}
-    tortoiseGenerationParams={tortoiseGenerationParams}
-  />
-);
-const Seed = ({
-  tortoiseGenerationParams,
-  setTortoiseGenerationParams,
-  handleChange,
-  lastSeed,
-}: {
-  tortoiseGenerationParams: TortoiseGenerationParams;
-  setTortoiseGenerationParams: (
-    tortoiseGenerationParams: TortoiseGenerationParams
-  ) => void;
-  handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  lastSeed?: number;
-}) => {
-  return (
-    <div className="flex items-center space-x-2">
-      <label className="text-sm">Seed:</label>
-      <input
-        type="text"
-        name="seed_input"
-        value={tortoiseGenerationParams.seed}
-        onChange={handleChange}
-        className="border border-gray-300 p-2 rounded"
-      />
-      <button
-        className="border border-gray-300 p-2 rounded"
-        onClick={() => {
-          setTortoiseGenerationParams({
-            ...tortoiseGenerationParams,
-            seed: lastSeed ?? -1,
-          });
-        }}
-      >
-        Restore Last
-      </button>
-      <button
-        className="border border-gray-300 p-2 rounded"
-        onClick={() => {
-          setTortoiseGenerationParams({
-            ...tortoiseGenerationParams,
-            // seed_input: randomSeed().toString(),
-            seed: -1,
-          });
-        }}
-      >
-        Randomize
-      </button>
-    </div>
-  );
-};
-const GenericPromptTortoise = ({
-  tortoiseGenerationParams,
-  handleChange,
-  label,
-  name,
-}: {
-  tortoiseGenerationParams: TortoiseGenerationParams;
-  handleChange: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
-  label: string;
-  name: string;
-}) => {
-  return (
-    <div className="flex flex-col space-y-2">
-      <label className="text-sm">{label}:</label>
-      <textarea
-        name={name}
-        value={tortoiseGenerationParams[name]}
-        onChange={handleChange}
-        className="border border-gray-300 p-2 rounded resize-none"
-        placeholder="Enter text here..."
-        rows={3}
-      />
-    </div>
-  );
-};
-const GenericSlider = ({
-  tortoiseGenerationParams,
-  handleChange,
-  label,
-  name,
-  min,
-  max,
-  step,
-}: {
-  tortoiseGenerationParams: TortoiseGenerationParams;
-  handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  label: string;
-  name: string;
-  min: string;
-  max: string;
-  step: string;
-}) => {
-  return (
-    <div className="flex flex-col border border-gray-300 p-2 rounded">
-      <label className="text-sm">
-        {label}: {tortoiseGenerationParams[name]}
-      </label>
-      <input
-        type="range"
-        name={name}
-        value={tortoiseGenerationParams[name]}
-        onChange={handleChange}
-        className="border border-gray-300 py-2 rounded"
-        min={min}
-        max={max}
-        step={step}
-      />
-    </div>
-  );
-};
-//   autoregressive
-// samples: 4,
-// temperature: 0.8,
-// length_penalty: 1.0,
-// repetition_penalty: 2.0,
-// top_p: 0.8,
-// max_mel_tokens: 500,
-const SamplesSlider = ({
-  tortoiseGenerationParams,
-  handleChange,
-}: {
-  tortoiseGenerationParams: TortoiseGenerationParams;
-  handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-}) => (
-  <GenericSlider
-    tortoiseGenerationParams={tortoiseGenerationParams}
-    handleChange={handleChange}
-    label="Samples"
-    name="samples"
-    // min="1" - needs to be at least GPU batch sized
-    min="4"
-    max="256"
-    step="1"
-  />
-);
-const TemperatureSlider = ({
-  tortoiseGenerationParams,
-  handleChange,
-}: {
-  tortoiseGenerationParams: TortoiseGenerationParams;
-  handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-}) => (
-  <GenericSlider
-    tortoiseGenerationParams={tortoiseGenerationParams}
-    handleChange={handleChange}
-    label="Temperature"
-    name="temperature"
-    min="0.0"
-    max="1.0"
-    step="0.01"
-  />
-);
-const LengthPenaltySlider = ({
-  tortoiseGenerationParams,
-  handleChange,
-}: {
-  tortoiseGenerationParams: TortoiseGenerationParams;
-  handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-}) => (
-  <GenericSlider
-    tortoiseGenerationParams={tortoiseGenerationParams}
-    handleChange={handleChange}
-    label="Length Penalty"
-    name="length_penalty"
-    min="0.0"
-    max="10.0"
-    step="0.01"
-  />
-);
-const RepetitionPenaltySlider = ({
-  tortoiseGenerationParams,
-  handleChange,
-}: {
-  tortoiseGenerationParams: TortoiseGenerationParams;
-  handleChange: (
-    event:
-      | React.ChangeEvent<HTMLInputElement>
-      | React.ChangeEvent<HTMLTextAreaElement>
-      | React.ChangeEvent<HTMLSelectElement>
-  ) => void;
-}) => (
-  <GenericSlider
-    tortoiseGenerationParams={tortoiseGenerationParams}
-    handleChange={handleChange}
-    label="Repetition Penalty"
-    name="repetition_penalty"
-    min="0.0"
-    max="10.0"
-    step="0.01"
-  />
-);
-const TopPSlider = ({
-  tortoiseGenerationParams,
-  handleChange,
-}: {
-  tortoiseGenerationParams: TortoiseGenerationParams;
-  handleChange: (
-    event:
-      | React.ChangeEvent<HTMLInputElement>
-      | React.ChangeEvent<HTMLTextAreaElement>
-      | React.ChangeEvent<HTMLSelectElement>
-  ) => void;
-}) => (
-  <GenericSlider
-    tortoiseGenerationParams={tortoiseGenerationParams}
-    handleChange={handleChange}
-    label="Top P"
-    name="top_p"
-    min="0.0"
-    max="1.0"
-    step="0.01"
-  />
-);
-const MaxMelTokensSlider = ({
-  tortoiseGenerationParams,
-  handleChange,
-}: {
-  tortoiseGenerationParams: TortoiseGenerationParams;
-  handleChange: (
-    event:
-      | React.ChangeEvent<HTMLInputElement>
-      | React.ChangeEvent<HTMLTextAreaElement>
-      | React.ChangeEvent<HTMLSelectElement>
-  ) => void;
-}) => (
-  <GenericSlider
-    tortoiseGenerationParams={tortoiseGenerationParams}
-    handleChange={handleChange}
-    label="Max Mel Tokens"
-    name="max_mel_tokens"
-    min="0"
-    max="600"
-    step="1"
-  />
-);
+
 const AutoRegressiveParameters = ({
   tortoiseGenerationParams,
   handleChange,
 }: {
   tortoiseGenerationParams: TortoiseGenerationParams;
-  handleChange: (
-    event:
-      | React.ChangeEvent<HTMLInputElement>
-      | React.ChangeEvent<HTMLTextAreaElement>
-      | React.ChangeEvent<HTMLSelectElement>
-  ) => void;
-}) => {
-  return (
-    <div className="flex flex-col gap-y-2 border border-gray-300 p-2 rounded">
-      {/* Autoregressive Parameters */}
-      <h2 className="text-md">Autoregressive Parameters</h2>
-      <SamplesSlider
-        tortoiseGenerationParams={tortoiseGenerationParams}
-        handleChange={handleChange}
-      />
-      <TemperatureSlider
-        tortoiseGenerationParams={tortoiseGenerationParams}
-        handleChange={handleChange}
-      />
-      <LengthPenaltySlider
-        tortoiseGenerationParams={tortoiseGenerationParams}
-        handleChange={handleChange}
-      />
-      <RepetitionPenaltySlider
-        tortoiseGenerationParams={tortoiseGenerationParams}
-        handleChange={handleChange}
-      />
-      <TopPSlider
-        tortoiseGenerationParams={tortoiseGenerationParams}
-        handleChange={handleChange}
-      />
-      <MaxMelTokensSlider
-        tortoiseGenerationParams={tortoiseGenerationParams}
-        handleChange={handleChange}
-      />
-    </div>
-  );
-};
-const DiffusionIterationsSlider = ({
+  handleChange: HandleChange;
+}) => (
+  <SimpleGroup>
+    <h2 className="text-md">Autoregressive Parameters</h2>
+    <GenericSlider
+      params={tortoiseGenerationParams}
+      handleChange={handleChange}
+      label="Samples"
+      name="samples"
+      // min="1" - needs to be at least GPU batch sized
+      min="4"
+      max="256"
+      step="1"
+    />
+    <GenericSlider
+      params={tortoiseGenerationParams}
+      handleChange={handleChange}
+      label="Temperature"
+      format={(x) => x.toFixed(2)}
+      name="temperature"
+      min="0.0"
+      max="1.0"
+      step="0.01"
+    />
+    <GenericSlider
+      params={tortoiseGenerationParams}
+      handleChange={handleChange}
+      label="Length Penalty"
+      name="length_penalty"
+      min="0.0"
+      max="10.0"
+      step="0.01"
+    />
+    <GenericSlider
+      params={tortoiseGenerationParams}
+      handleChange={handleChange}
+      label="Repetition Penalty"
+      name="repetition_penalty"
+      min="0.0"
+      max="10.0"
+      step="0.01"
+    />
+    <GenericSlider
+      params={tortoiseGenerationParams}
+      handleChange={handleChange}
+      label="Top P"
+      name="top_p"
+      min="0.0"
+      max="1.0"
+      step="0.01"
+    />
+    <GenericSlider
+      params={tortoiseGenerationParams}
+      handleChange={handleChange}
+      label="Max Mel Tokens"
+      name="max_mel_tokens"
+      min="0"
+      max="600"
+      step="1"
+    />
+  </SimpleGroup>
+);
+
+const CondFree = ({
   tortoiseGenerationParams,
   handleChange,
 }: {
   tortoiseGenerationParams: TortoiseGenerationParams;
-  handleChange: (
-    event:
-      | React.ChangeEvent<HTMLInputElement>
-      | React.ChangeEvent<HTMLTextAreaElement>
-      | React.ChangeEvent<HTMLSelectElement>
-  ) => void;
+  handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }) => (
-  <GenericSlider
-    tortoiseGenerationParams={tortoiseGenerationParams}
-    handleChange={handleChange}
-    label="Diffusion Iterations"
-    name="diffusion_iterations"
-    min="0"
-    max="400"
-    step="1"
-  />
+  <div className="flex items-center space-x-2">
+    <label className="text-sm">Cond Free:</label>
+    <input
+      type="checkbox"
+      name="cond_free"
+      checked={tortoiseGenerationParams.cond_free}
+      onChange={handleChange}
+      className="border border-gray-300 p-2 rounded"
+    />
+  </div>
 );
-const CondFreeKSlider = ({
-  tortoiseGenerationParams,
-  handleChange,
-}: {
-  tortoiseGenerationParams: TortoiseGenerationParams;
-  handleChange: (
-    event:
-      | React.ChangeEvent<HTMLInputElement>
-      | React.ChangeEvent<HTMLTextAreaElement>
-      | React.ChangeEvent<HTMLSelectElement>
-  ) => void;
-}) => (
-  <GenericSlider
-    tortoiseGenerationParams={tortoiseGenerationParams}
-    handleChange={handleChange}
-    label="Cond Free K"
-    name="cond_free_k"
-    min="0"
-    max="10"
-    step="1"
-  />
-);
-const DiffusionTemperatureSlider = ({
-  tortoiseGenerationParams,
-  handleChange,
-}: {
-  tortoiseGenerationParams: TortoiseGenerationParams;
-  handleChange: (
-    event:
-      | React.ChangeEvent<HTMLInputElement>
-      | React.ChangeEvent<HTMLTextAreaElement>
-      | React.ChangeEvent<HTMLSelectElement>
-  ) => void;
-}) => (
-  <GenericSlider
-    tortoiseGenerationParams={tortoiseGenerationParams}
-    handleChange={handleChange}
-    label="Diffusion Temperature"
-    name="diffusion_temperature"
-    min="0.0"
-    max="1.0"
-    step="0.01"
-  />
-);
+
 const DiffusionParameters = ({
   tortoiseGenerationParams,
   handleChange,
 }: {
   tortoiseGenerationParams: TortoiseGenerationParams;
-  handleChange: (
-    event:
-      | React.ChangeEvent<HTMLInputElement>
-      | React.ChangeEvent<HTMLTextAreaElement>
-      | React.ChangeEvent<HTMLSelectElement>
-  ) => void;
-}) => {
-  return (
-    <div className="flex flex-col gap-y-2 border border-gray-300 p-2 rounded">
-      {/* Diffusion Parameters */}
-      <h2 className="text-md">Diffusion Parameters</h2>
-      <DiffusionIterationsSlider
-        tortoiseGenerationParams={tortoiseGenerationParams}
-        handleChange={handleChange}
-      />
-      <CondFree
-        tortoiseGenerationParams={tortoiseGenerationParams}
-        handleChange={handleChange}
-      />
-      <CondFreeKSlider
-        tortoiseGenerationParams={tortoiseGenerationParams}
-        handleChange={handleChange}
-      />
-      <DiffusionTemperatureSlider
-        tortoiseGenerationParams={tortoiseGenerationParams}
-        handleChange={handleChange}
-      />
-    </div>
-  );
-};
+  handleChange: HandleChange;
+}) => (
+  <SimpleGroup>
+    <h2 className="text-md">Diffusion Parameters</h2>
+    <GenericSlider
+      params={tortoiseGenerationParams}
+      handleChange={handleChange}
+      label="Diffusion Iterations"
+      name="diffusion_iterations"
+      min="0"
+      max="400"
+      step="1"
+    />
+    <CondFree
+      tortoiseGenerationParams={tortoiseGenerationParams}
+      handleChange={handleChange}
+    />
+    <GenericSlider
+      params={tortoiseGenerationParams}
+      handleChange={handleChange}
+      label="Cond Free K"
+      name="cond_free_k"
+      min="0"
+      max="10"
+      step="1"
+    />
+    <GenericSlider
+      params={tortoiseGenerationParams}
+      handleChange={handleChange}
+      label="Diffusion Temperature"
+      format={(x) => x.toFixed(2)}
+      name="diffusion_temperature"
+      min="0.0"
+      max="1.0"
+      step="0.01"
+    />
+  </SimpleGroup>
+);

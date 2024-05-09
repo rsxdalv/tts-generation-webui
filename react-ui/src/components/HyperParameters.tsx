@@ -22,7 +22,7 @@ export const HyperParameters = <
   interrupt: () => void;
 }) => (
   <div className="flex flex-col gap-y-2 border border-gray-300 p-2 rounded">
-    <label className="text-sm">Hyperparameters:</label>
+    <label className="text-base">Extra Parameters:</label>
     <div className="flex gap-x-2 items-center">
       <label className="text-sm">Iterations:</label>
       <input

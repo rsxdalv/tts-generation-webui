@@ -2,7 +2,6 @@ import React from "react";
 import { BarkGenerationParams } from "../tabs/BarkGenerationParams";
 import { BarkResult } from "../tabs/BarkResult";
 import { BarkVoice } from "./BarkVoice";
-import { BarkSeed } from "./BarkSeed";
 import { BurnInPrompt, BarkPrompt } from "./BarkPrompt";
 import { TextTemperature, WaveformTemperature } from "./BarkTemperatureSlider";
 import { OldGeneration, HistoryPromptSemantic } from "./BarkOldGeneration";
@@ -11,6 +10,8 @@ import {
   PromptType,
   ForEachSubsequentGeneration,
 } from "./BarkRadios";
+import { SeedInput } from "./SeedInput";
+import { HandleChange } from "../types/HandleChange";
 
 export const BarkInputs = ({
   barkGenerationParams,
@@ -19,15 +20,10 @@ export const BarkInputs = ({
   data,
 }: {
   barkGenerationParams: BarkGenerationParams;
-  setBarkVoiceGenerationParams: (
-    barkGenerationParams: BarkGenerationParams
-  ) => void;
-  handleChange: (
-    event:
-      | React.ChangeEvent<HTMLInputElement>
-      | React.ChangeEvent<HTMLTextAreaElement>
-      | React.ChangeEvent<HTMLSelectElement>
-  ) => void;
+  setBarkVoiceGenerationParams: React.Dispatch<
+    React.SetStateAction<BarkGenerationParams>
+  >;
+  handleChange: HandleChange;
   data: BarkResult | null;
 }) => (
   <div className="flex flex-col space-y-2">
@@ -78,11 +74,11 @@ export const BarkInputs = ({
             handleChange={handleChange}
           />
         </div>
-        <BarkSeed
-          barkGenerationParams={barkGenerationParams}
-          setBarkVoiceGenerationParams={setBarkVoiceGenerationParams}
+        <SeedInput
+          params={barkGenerationParams}
           handleChange={handleChange}
-          lastSeed={data?.json_text?.seed}
+          setParams={setBarkVoiceGenerationParams}
+          seed={data?.json_text?.seed}
         />
       </div>
     </div>

@@ -22,7 +22,7 @@ import { parseFormChange } from "../data/parseFormChange";
 import { barkFavorite } from "../functions/barkFavorite";
 import { MahaInputs } from "../components/MahaInputs";
 import { generateWithMaha } from "../functions/generateWithMaha";
-import { MahaHistory } from "../components/MahaHistory";
+import { GenerationHistory } from "../components/GenerationHistory";
 
 const initialHistory = []; // prevent infinite loop
 const MahaPage = () => {
@@ -148,7 +148,7 @@ const MahaPage = () => {
           />
         </div>
 
-        <MahaHistory
+        <GenerationHistory
           clearHistory={clearHistory}
           showLast={showLast}
           setShowLast={setShowLast}

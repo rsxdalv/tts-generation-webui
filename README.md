@@ -42,6 +42,10 @@ https://github.com/rsxdalv/tts-generation-webui/discussions/186#discussioncommen
 
 ## Changelog
 
+May 9:
+* Add MMS to React UI.
+* Improve React UI and codebase.
+
 May 4:
 * Group Changelog by month
 
