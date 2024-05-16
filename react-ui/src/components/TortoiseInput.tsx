@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { TortoiseGenerationParams } from "../tabs/TortoiseGenerationParams";
 import FileInput from "./FileInput";
 import { TortoiseResult } from "../tabs/TortoiseResult";
@@ -6,6 +6,26 @@ import { GenericSlider } from "./GenericSlider";
 import { HandleChange } from "../types/HandleChange";
 import { PromptTextArea } from "./PromptTextArea";
 import { SeedInput } from "./SeedInput";
+
+const presets = {
+  ultra_fast: {
+    num_autoregressive_samples: 16,
+    diffusion_iterations: 30,
+    cond_free: false,
+  },
+  fast: {
+    num_autoregressive_samples: 96,
+    diffusion_iterations: 80,
+  },
+  standard: {
+    num_autoregressive_samples: 256,
+    diffusion_iterations: 200,
+  },
+  high_quality: {
+    num_autoregressive_samples: 256,
+    diffusion_iterations: 400,
+  },
+};
 
 const SimpleGroup = ({ children }: { children: React.ReactNode }) => (
   <div className="flex flex-col space-y-2 border border-gray-300 p-2 rounded">
@@ -89,6 +109,7 @@ export const TortoiseInput = ({
     />
   </div>
 );
+
 const Speaker = ({
   tortoiseGenerationParams,
   handleChange,
@@ -96,8 +117,8 @@ const Speaker = ({
   tortoiseGenerationParams: TortoiseGenerationParams;
   handleChange: HandleChange;
 }) => {
-  const [options, setOptions] = React.useState<string[]>([]);
-  const [loading, setLoading] = React.useState<boolean>(false);
+  const [options, setOptions] = useState<string[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const fetchOptions = async () => {
     setLoading(true);
@@ -174,7 +195,32 @@ const Preset = ({
             id={preset}
             value={preset}
             checked={tortoiseGenerationParams.preset === preset}
-            onChange={handleChange}
+            onChange={() => {
+              handleChange({
+                target: {
+                  name: "preset",
+                  value: preset,
+                },
+              } as React.ChangeEvent<HTMLTextAreaElement>);
+              handleChange({
+                target: {
+                  name: "samples",
+                  value: presets[preset]["num_autoregressive_samples"],
+                },
+              } as React.ChangeEvent<HTMLTextAreaElement>);
+              handleChange({
+                target: {
+                  name: "diffusion_iterations",
+                  value: presets[preset]["diffusion_iterations"],
+                },
+              } as React.ChangeEvent<HTMLTextAreaElement>);
+              handleChange({
+                target: {
+                  name: "cond_free",
+                  value: presets[preset]["cond_free"] ?? true,
+                },
+              } as React.ChangeEvent<HTMLTextAreaElement>);
+            }}
             className="border border-gray-300 p-2 rounded"
           />
           <label className="ml-1" htmlFor={preset}>
@@ -185,6 +231,7 @@ const Preset = ({
     </div>
   </div>
 );
+
 const CVVPAmount = ({
   tortoiseGenerationParams,
   handleChange,
@@ -229,10 +276,10 @@ const Model = ({
   tortoiseGenerationParams: TortoiseGenerationParams;
   handleChange: HandleChange;
 }) => {
-  const [options, setOptions] = React.useState<string[]>([]);
-  const [loading, setLoading] = React.useState<boolean>(false);
+  const [options, setOptions] = useState<string[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
   const [applyModelSettingsLoading, setApplyModelSettingsLoading] =
-    React.useState<boolean>(false);
+    useState<boolean>(false);
 
   const fetchOptions = async () => {
     setLoading(true);
@@ -294,7 +341,7 @@ const Model = ({
     </div>
   );
 
-  React.useEffect(() => {
+  useEffect(() => {
     fetchOptions();
   }, []);
 
@@ -391,6 +438,7 @@ const Model = ({
     </div>
   );
 };
+
 const GenerationName = ({
   tortoiseGenerationParams,
   handleChange,
@@ -447,6 +495,7 @@ const AutoRegressiveParameters = ({
       min="0.0"
       max="10.0"
       step="0.01"
+      format={(x) => x.toFixed(2)}
     />
     <GenericSlider
       params={tortoiseGenerationParams}
@@ -456,6 +505,7 @@ const AutoRegressiveParameters = ({
       min="0.0"
       max="10.0"
       step="0.01"
+      format={(x) => x.toFixed(2)}
     />
     <GenericSlider
       params={tortoiseGenerationParams}
@@ -465,6 +515,7 @@ const AutoRegressiveParameters = ({
       min="0.0"
       max="1.0"
       step="0.01"
+      format={(x) => x.toFixed(2)}
     />
     <GenericSlider
       params={tortoiseGenerationParams}
@@ -483,7 +534,7 @@ const CondFree = ({
   handleChange,
 }: {
   tortoiseGenerationParams: TortoiseGenerationParams;
-  handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  handleChange: HandleChange;
 }) => (
   <div className="flex items-center space-x-2">
     <label className="text-sm">Cond Free:</label>

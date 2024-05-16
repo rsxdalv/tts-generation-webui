@@ -42,6 +42,9 @@ https://github.com/rsxdalv/tts-generation-webui/discussions/186#discussioncommen
 
 ## Changelog
 
+May 17:
+* Fix Tortoise presets in React UI.
+
 May 9:
 * Add MMS to React UI.
 * Improve React UI and codebase.
