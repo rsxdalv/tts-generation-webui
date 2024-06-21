@@ -6,6 +6,7 @@ from src.rvc_tab.download_uvr5 import download_uvr5
 from src.rvc_tab.hide_argv import hide_argv
 
 import rvc_pkg
+
 rvc_dir = os.path.dirname(rvc_pkg.__file__)
 
 sys.path.append(rvc_dir)
@@ -34,8 +35,8 @@ weight_uvr5_root = os.environ.get("weight_uvr5_root")
 def uvr_wrapper(
     model_name, input_directory, opt_vocal_root, input_list, opt_ins_root, agg, format0
 ):
-    opt_vocal_root = "output-rvc"
-    opt_ins_root = "output-rvc"
+    opt_vocal_root = "outputs-rvc"
+    opt_ins_root = "outputs-rvc"
     agg = 10
     format0 = "wav"
     download_uvr5(model_name)
@@ -57,6 +58,20 @@ def uvr5_ui():
             label="Enter the path of the audio folder to be processed:",
             placeholder="C:\\Users\\Desktop\\todo-songs",
             visible=False,
+        )
+        gr.Markdown(
+            """
+### Import multiple audio files
+
+You can import multiple audio files by dragging them into the input box.
+Due to UVR5 bug, only files without spaces and special characters can be imported.
+
+Example failure:
+MyFile (3).mp3
+
+Working example:
+MyFile_3.mp3
+        """
         )
         input_list = gr.File(
             file_count="multiple",
@@ -95,10 +110,9 @@ def uvr5_ui():
         )
     with gr.Row():
         convert_button = gr.Button("Convert", variant="primary")
-        open_folder_button = gr.Button(
-            value="Open outputs folder", variant="secondary"
-        )
+        open_folder_button = gr.Button(value="Open outputs folder", variant="secondary")
         open_folder_button.click(lambda: open_folder("outputs-rvc"))
+
     uvr_output_log = gr.Textbox(label="Output information")
     convert_button.click(
         uvr_wrapper,

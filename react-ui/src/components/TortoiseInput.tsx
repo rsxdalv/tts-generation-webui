@@ -6,6 +6,7 @@ import { GenericSlider } from "./GenericSlider";
 import { HandleChange } from "../types/HandleChange";
 import { PromptTextArea } from "./PromptTextArea";
 import { SeedInput } from "./SeedInput";
+import { splitAndRecombineText } from "../data/split-and-recombine";
 
 const presets = {
   ultra_fast: {
@@ -86,6 +87,10 @@ export const TortoiseInput = ({
             tortoiseGenerationParams={tortoiseGenerationParams}
             handleChange={handleChange}
           />
+          <SplitPromptManually
+            tortoiseGenerationParams={tortoiseGenerationParams}
+            handleChange={handleChange}
+          />
           <SeedInput
             params={tortoiseGenerationParams}
             setParams={setTortoiseGenerationParams}
@@ -108,6 +113,36 @@ export const TortoiseInput = ({
       params={tortoiseGenerationParams}
     />
   </div>
+);
+
+const SplitPromptManually = ({
+  tortoiseGenerationParams,
+  handleChange,
+}: {
+  tortoiseGenerationParams: TortoiseGenerationParams;
+  handleChange: HandleChange;
+}) => (
+  <button
+    className="border border-gray-300 p-2 rounded"
+    onClick={() => {
+      handleChange({
+        target: {
+          name: "prompt",
+          value: splitAndRecombineText(tortoiseGenerationParams.prompt).join(
+            "\n"
+          ),
+        },
+      } as React.ChangeEvent<HTMLTextAreaElement>);
+      handleChange({
+        target: {
+          name: "split_prompt",
+          value: true as any,
+        },
+      } as React.ChangeEvent<HTMLInputElement>);
+    }}
+  >
+    Split prompt into lines by length
+  </button>
 );
 
 const Speaker = ({
@@ -258,7 +293,7 @@ const SplitPrompt = ({
 }) => {
   return (
     <div className="flex items-center space-x-2">
-      <label className="text-sm">Split prompt by lines:</label>
+      <label className="text-sm">Generate each line separately:</label>
       <input
         type="checkbox"
         name="split_prompt"

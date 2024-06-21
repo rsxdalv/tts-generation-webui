@@ -80,7 +80,7 @@ def valle_x_ui_generation():
             split_text = gr.Textbox(label="Text after split")
 
             split_text_into_sentences_button.click(
-                fn=lambda x: "\n".join(split_text_into_sentences(x)),
+                fn=lambda x: "###\n".join(split_text_into_sentences(x)),
                 inputs=[text],
                 outputs=[split_text],
                 api_name="vall_e_x_split_text_into_sentences",

@@ -346,10 +346,7 @@ async function rvc({
   ]);
 
   const [audio, metadata] = result?.data;
-  return {
-    audio,
-    metadata,
-  };
+  return { audio, metadata };
 }
 
 const rvc_model_reload = () =>
@@ -574,6 +571,44 @@ const mms = ({
     };
   });
 
+const vall_e_x_generate = ({ text, prompt, language, accent, mode }) =>
+  gradioPredict<[GradioFile]>(
+    mode === "short" ? "/vall_e_x_generate" : "/vall_e_x_generate_long_text",
+    [
+      text, // string  in 'Input Text' Textbox component
+      prompt, // string  in 'Prompt' Textbox component
+      language, // string (Option from: ["English", "中文", "日本語", "Mix"]) in 'Language' Dropdown component
+      accent, // string (Option from: ['English', '中文', '日本語', 'no-accent']) in in 'Accent' Dropdown component
+      mode === "short" ? undefined : mode, // string (Option from: ['fixed-prompt', 'sliding-window']) in 'Mode' Dropdown component
+    ]
+  ).then((result) => {
+    const [audio] = result?.data;
+    return {
+      audio,
+      metadata: {
+        _version: "",
+        _hash_version: "",
+        _type: "",
+        text,
+        prompt,
+        language,
+        accent,
+        mode,
+      },
+    };
+  });
+
+const vall_e_x_split_text_into_sentences = ({ text }) =>
+  gradioPredict<string[]>("/vall_e_x_split_text_into_sentences", [
+    text, // string  in 'Input Text' Textbox component
+  ]).then((result) => ({ split_text: result?.data?.[0] }));
+
+const vall_e_x_tokenize = ({ text, language }) =>
+  gradioPredict<string[]>("/vall_e_x_tokenize", [
+    text, // string  in 'Input Text' Textbox component
+    language, // string (Option from: ['eng', 'deu', 'fra', 'ita', 'por', 'spa', 'zho']) in 'Language' Dropdown component
+  ]).then((result) => ({ tokens: result?.data?.[0] }));
+
 const endpoints = {
   maha,
   maha_tts_refresh_voices,
@@ -615,4 +650,8 @@ const endpoints = {
   mms,
 
   get_gpu_info,
+
+  vall_e_x_generate,
+  vall_e_x_split_text_into_sentences,
+  vall_e_x_tokenize,
 };

@@ -82,6 +82,10 @@ const routes: Route[] = [
     text: "MMS",
   },
   {
+    href: "/vallex",
+    text: "Vall-E-X",
+  },
+  {
     href: "/gpu_info",
     text: "GPU Info",
   },

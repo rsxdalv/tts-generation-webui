@@ -61,7 +61,7 @@ with gr.Blocks(
     analytics_enabled=False,  # it broke too many times
 ) as demo:
     gr.Markdown(
-        """# TTS Generation WebUI (Bark, MusicGen + AudioGen, Tortoise, RVC) [React UI](https://localhost:3000)"""
+        """# TTS Generation WebUI (Bark, MusicGen + AudioGen, Tortoise, RVC) [React UI](http://localhost:3000)"""
     )
     with Joutai.singleton.tabs:
         from src.tortoise.generation_tab_tortoise import generation_tab_tortoise
@@ -280,6 +280,9 @@ def start_server():
 
 if __name__ == "__main__":
     import subprocess
+    import webbrowser
 
     subprocess.Popen("npm start --prefix react-ui", shell=True)
+    webbrowser.open("http://localhost:3000")
+
     start_server()

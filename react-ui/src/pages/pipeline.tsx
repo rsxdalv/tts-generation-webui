@@ -41,6 +41,9 @@ import { MahaInputs } from "../components/MahaInputs";
 import { useMMSParams, useMMSResult } from "../tabs/MMSParams";
 import { generateWithMMS } from "../functions/generateWithMMS";
 import { MMSInputs } from "../components/MMSInputs";
+import { useVallexParams, useVallexResult } from "../tabs/VallexParams";
+import { generateWithVallex } from "../functions/generateWithVallex";
+import { VallexInputs } from "../components/VallexInputs";
 
 interface PipelineParams {
   generation: string;
@@ -61,7 +64,7 @@ const GenerateButton = ({
   status: string;
   onClick: () => void;
 }) => (
-  <button className="border border-gray-300 p-2 rounded" onClick={onClick}>
+  <button className="border border-gray-300 p-2 rounded font-medium" onClick={onClick}>
     {status === "generating" && "Generating..."}
     {status === "postprocessing" && "Postprocessing..."}
     {status === "idle" && "Run Pipeline"}
@@ -97,6 +100,9 @@ const PipelinePage = () => {
     useRVCGenerationParams();
   const [vocosParams, setVocosParams] = useVocosParams();
 
+  const [vallexParams, setVallexParams] = useVallexParams();
+  const [vallexResult, setVallexResult] = useVallexResult();
+
   const [status, setStatus] = React.useState("idle");
 
   async function pipeline() {
@@ -130,6 +136,11 @@ const PipelinePage = () => {
         case "mms": {
           const result = await generateWithMMS(mmsParams);
           setMmsResult(result);
+          return result;
+        }
+        case "vallex": {
+          const result = await generateWithVallex(vallexParams);
+          setVallexResult(result);
           return result;
         }
       }
@@ -190,6 +201,7 @@ const PipelinePage = () => {
     "magnet",
     "maha",
     "mms",
+    "vallex",
   ];
 
   const onChangeModel = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -281,6 +293,15 @@ const PipelinePage = () => {
             data={mmsResult}
           />
         );
+      case "vallex":
+        return (
+          <VallexInputs
+            vallexParams={vallexParams}
+            handleChange={parseFormChange(setVallexParams)}
+            setVallexParams={setVallexParams}
+            data={vallexResult}
+          />
+        );
       default:
         return null;
     }
@@ -301,9 +322,10 @@ const PipelinePage = () => {
       </Head>
       <div className="flex flex-col gap-y-4 p-4">
         <div className="flex flex-col gap-y-2">
-          <h1 className="text-2xl font-bold">
-            Description (Experimental, subject to change)
-          </h1>
+          <p className="font-semibold">
+            The pipeline is still a work in progress and might change in future
+            updates.
+          </p>
           <p>
             This pipeline takes an audio file as input and runs it through a
             generation model to generate a representation of the audio. This
