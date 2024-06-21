@@ -1,6 +1,6 @@
 import React from "react";
 
-type HandleChangeEvent =
+export type HandleChangeEvent =
   | React.ChangeEvent<HTMLInputElement>
   | React.ChangeEvent<HTMLTextAreaElement>
   | React.ChangeEvent<HTMLSelectElement>;
