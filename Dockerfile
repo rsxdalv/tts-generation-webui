@@ -16,16 +16,14 @@ ENV PATH="/root/.nvm/versions/node/v${NODE_VERSION}/bin/:${PATH}"
 RUN node --version
 RUN npm --version
 
-# Version 24 is broken due to fairseq
-RUN python3 -m pip install pip==23.3.2
-
 # Setup venv
 RUN pip3 install virtualenv
 RUN virtualenv /venv
 ENV VIRTUAL_ENV=/venv
 RUN python3 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
-RUN pip3 install --upgrade pip setuptools && \
+# Version 24 is broken due to fairseq
+RUN pip3 install --upgrade pip==23.3.2 setuptools && \
     pip3 install torch torchvision torchaudio
 
 # Set working directory
