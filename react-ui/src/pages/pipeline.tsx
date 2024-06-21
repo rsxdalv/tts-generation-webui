@@ -301,9 +301,9 @@ const PipelinePage = () => {
       </Head>
       <div className="flex flex-col gap-y-4 p-4">
         <div className="flex flex-col gap-y-2">
-          <h1 className="text-2xl font-bold">
-            Description (Experimental, subject to change)
-          </h1>
+          <p className="font-semibold">
+            The pipeline is still a work in progress and might change in future updates.
+          </p>
           <p>
             This pipeline takes an audio file as input and runs it through a
             generation model to generate a representation of the audio. This
