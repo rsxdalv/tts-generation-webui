@@ -46,6 +46,7 @@ June 21:
 * Add Vall-E-X demo to React UI.
 * Open React UI automatically in browser, fix the link again.
 * Add Split By Length to React/Tortoise.
+* Fix UVR5 demo folders.
 
 May 17:
 * Fix Tortoise presets in React UI.
