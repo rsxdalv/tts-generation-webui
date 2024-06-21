@@ -9,5 +9,5 @@ export async function generateWithTortoise(
     body: JSON.stringify(tortoiseGenerationParams),
   });
 
-  return (await response.json()) as TortoiseResult;
+  return response.json() as Promise<TortoiseResult>;
 }
