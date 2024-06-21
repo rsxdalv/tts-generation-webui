@@ -112,13 +112,12 @@ const TokenizeButton = ({ params }: { params: VallexParams }) => {
         Preview Tokens
       </button>
       <div className="flex flex-col space-y-2">
-        <label className="text-sm">Result:</label>
         {loading && <p>Loading...</p>}
         <textarea
           className="border border-gray-300 p-2 rounded"
           value={result}
           readOnly
-          rows={3}
+          rows={2}
         />
       </div>
     </div>
@@ -152,13 +151,12 @@ const SplitTextIntoSentences = ({ params }: { params: VallexParams }) => {
         Preview sentences
       </button>
       <div className="flex flex-col space-y-2">
-        <label className="text-sm">Result:</label>
         {loading && <p>Loading...</p>}
         <textarea
           className="border border-gray-300 p-2 rounded"
           value={result}
           readOnly
-          rows={3}
+          rows={2}
         />
       </div>
     </div>
@@ -184,10 +182,7 @@ export const VallexInputs = ({
         name="text"
       />
 
-      {/* Tokenize */}
       <TokenizeButton params={vallexParams} />
-
-      {/* Split text into sentences */}
       <SplitTextIntoSentences params={vallexParams} />
 
       {/* <PromptTextArea

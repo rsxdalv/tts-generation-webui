@@ -13,16 +13,14 @@ import { HyperParameters } from "../components/HyperParameters";
 import {
   extractTexts,
   getMax,
-  incrementNonRandomSeed,
   initialHyperParams,
 } from "../data/hyperParamsUtils";
 import { useInterrupt } from "../hooks/useInterrupt";
 import { manageProgress } from "../components/Progress";
 import { parseFormChange } from "../data/parseFormChange";
-import { barkFavorite } from "../functions/barkFavorite";
 import { VallexInputs } from "../components/VallexInputs";
 import { generateWithVallex } from "../functions/generateWithVallex";
-import { GenerationHistory } from "../components/GenerationHistory";
+import { GenerationHistorySimple } from "../components/GenerationHistory";
 
 const initialHistory = []; // prevent infinite loop
 const VallexPage = () => {
@@ -35,7 +33,6 @@ const VallexPage = () => {
   const [hyperParams, setHyperParams] = useLocalStorage<
     typeof initialHyperParams
   >("vallexHyperParams", initialHyperParams);
-  const [showLast, setShowLast] = useLocalStorage<number>("vallexShowLast", 10);
 
   const { interrupted, resetInterrupt, interrupt } = useInterrupt();
   const [progress, setProgress] = React.useState({ current: 0, max: 0 });
@@ -112,7 +109,7 @@ const VallexPage = () => {
     // useSeed,
     useParameters,
   };
-  const clearHistory = () => setHistoryData([]);
+
   return (
     <Template>
       <Head>
@@ -165,12 +162,13 @@ const VallexPage = () => {
           </div>
         </div>
 
-        <GenerationHistory
-          clearHistory={clearHistory}
-          showLast={showLast}
-          setShowLast={setShowLast}
+        <GenerationHistorySimple
+          name="vallex"
+          setHistoryData={setHistoryData}
           historyData={historyData}
           funcs={funcs}
+          nameKey={undefined}
+          filter={["sendToVallex"]}
         />
       </div>
     </Template>

@@ -8,6 +8,7 @@ import { RVCInputs } from "../components/RVCInputs";
 import { applyRVC } from "../functions/applyRVC";
 import { RVCResult } from "../tabs/RVCResult";
 import { parseFormChange } from "../data/parseFormChange";
+import { GenerationHistorySimple } from "../components/GenerationHistory";
 
 const initialHistory = []; // prevent infinite loop
 const RvcGenerationPage = () => {
@@ -76,8 +77,7 @@ const RvcGenerationPage = () => {
       filter_radius_pitch:
         filter_radius_pitch ?? rvcGenerationParams.filter_radius_pitch,
       resample_sample_rate:
-        resample_sample_rate ??
-        rvcGenerationParams.resample_sample_rate,
+        resample_sample_rate ?? rvcGenerationParams.resample_sample_rate,
       voice_envelope_normalizaiton:
         voice_envelope_normalizaiton ??
         rvcGenerationParams.voice_envelope_normalizaiton,
@@ -118,31 +118,15 @@ const RvcGenerationPage = () => {
             filter={["sendToRvc", "sendToRvcVoiceGeneration"]}
           />
         </div>
-        <div className="flex flex-col space-y-2 border border-gray-300 p-2 rounded">
-          <label className="text-sm">History:</label>
-          <button
-            className="border border-gray-300 p-2 rounded"
-            onClick={() => {
-              setHistoryData([]);
-            }}
-          >
-            Clear History
-          </button>
-          <div className="flex flex-col space-y-2">
-            {historyData &&
-              historyData.map((item, index) => (
-                <AudioOutput
-                  key={index}
-                  audioOutput={item.audio}
-                  // label={item.}
-                  label={`History ${index}`}
-                  funcs={funcs}
-                  metadata={item}
-                  filter={["sendToRvc", "sendToRvcVoiceGeneration"]}
-                />
-              ))}
-          </div>
-        </div>
+
+        <GenerationHistorySimple
+          name="rvc"
+          setHistoryData={setHistoryData}
+          historyData={historyData}
+          funcs={funcs}
+          nameKey={undefined}
+          filter={["sendToRvc", "sendToRvcVoiceGeneration"]}
+        />
       </div>
       {/* <pre>{JSON.stringify(rvcGenerationParams, null, 2)}</pre> */}
     </Template>

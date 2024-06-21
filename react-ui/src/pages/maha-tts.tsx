@@ -22,7 +22,7 @@ import { parseFormChange } from "../data/parseFormChange";
 import { barkFavorite } from "../functions/barkFavorite";
 import { MahaInputs } from "../components/MahaInputs";
 import { generateWithMaha } from "../functions/generateWithMaha";
-import { GenerationHistory } from "../components/GenerationHistory";
+import { GenerationHistorySimple } from "../components/GenerationHistory";
 
 const initialHistory = []; // prevent infinite loop
 const MahaPage = () => {
@@ -35,7 +35,6 @@ const MahaPage = () => {
   const [hyperParams, setHyperParams] = useLocalStorage<
     typeof initialHyperParams
   >("mahaHyperParams", initialHyperParams);
-  const [showLast, setShowLast] = useLocalStorage<number>("mahaShowLast", 10);
 
   const { interrupted, resetInterrupt, interrupt } = useInterrupt();
   const [progress, setProgress] = React.useState({ current: 0, max: 0 });
@@ -112,7 +111,6 @@ const MahaPage = () => {
     useSeed,
     useParameters,
   };
-  const clearHistory = () => setHistoryData([]);
   return (
     <Template>
       <Head>
@@ -126,19 +124,7 @@ const MahaPage = () => {
           data={data}
         />
 
-        <HyperParameters
-          params={hyperParams}
-          setParams={setHyperParams}
-          interrupt={interrupt}
-          isInterrupted={interrupted.current}
-          progress={progress.current}
-          progressMax={progress.max}
-        />
-
-        <div className="flex flex-col gap-y-2">
-          <button className="border border-gray-300 p-2 rounded" onClick={maha}>
-            Generate
-          </button>
+        <div className="flex flex-row gap-2">
           <AudioOutput
             audioOutput={data?.audio}
             label="Maha Output"
@@ -146,14 +132,32 @@ const MahaPage = () => {
             metadata={data}
             filter={["sendToMaha"]}
           />
+          <div className="flex flex-col gap-2">
+            <HyperParameters
+              params={hyperParams}
+              setParams={setHyperParams}
+              interrupt={interrupt}
+              isInterrupted={interrupted.current}
+              progress={progress.current}
+              progressMax={progress.max}
+            />
+
+            <button
+              className="border border-gray-300 p-2 rounded font-medium"
+              onClick={maha}
+            >
+              Generate
+            </button>
+          </div>
         </div>
 
-        <GenerationHistory
-          clearHistory={clearHistory}
-          showLast={showLast}
-          setShowLast={setShowLast}
+        <GenerationHistorySimple
+          name="maha"
+          setHistoryData={setHistoryData}
           historyData={historyData}
           funcs={funcs}
+          nameKey={undefined}
+          filter={["sendToMaha"]}
         />
       </div>
     </Template>

@@ -1,5 +1,34 @@
 import React from "react";
 import { AudioOutput } from "./AudioComponents";
+import useLocalStorage from "../hooks/useLocalStorage";
+
+export const GenerationHistorySimple = ({
+  setHistoryData,
+  name,
+  ...props
+}: {
+  setHistoryData: React.Dispatch<React.SetStateAction<any[]>>;
+  name: string;
+  // pass through props
+  historyData: any[];
+  funcs?: Record<string, (audio: string | undefined | any) => void>;
+  nameKey?: string;
+  filter?: string[];
+}) => {
+  const [showLast, setShowLast] = useLocalStorage<number>(
+    name + "ShowLast",
+    10
+  );
+
+  return (
+    <GenerationHistory
+      clearHistory={() => setHistoryData([])}
+      showLast={showLast}
+      setShowLast={setShowLast}
+      {...props}
+    />
+  );
+};
 
 export const GenerationHistory = ({
   clearHistory,
@@ -7,12 +36,16 @@ export const GenerationHistory = ({
   setShowLast,
   historyData,
   funcs,
+  nameKey,
+  filter,
 }: {
   clearHistory: () => void;
   showLast: number;
   setShowLast: React.Dispatch<React.SetStateAction<number>>;
   historyData: any[];
   funcs?: Record<string, (audio: string | undefined | any) => void>;
+  nameKey?: string;
+  filter?: string[];
 }) => (
   <div className="flex flex-col gap-y-2 border border-gray-300 p-2 rounded">
     <div className="flex gap-x-2">
@@ -38,17 +71,18 @@ export const GenerationHistory = ({
     </div>
     <div className="flex flex-col gap-y-2">
       {historyData &&
-        historyData.slice(1, showLast + 1).map((item, index) => (
-          <AudioOutput
-            key={index}
-            audioOutput={item.audio}
-            metadata={item}
-            //   label={item.history_bundle_name_data}
-            label={`History ${index}`}
-            funcs={funcs}
-            filter={["sendToMusicgen"]}
-          />
-        ))}
+        historyData
+          .slice(1, showLast + 1)
+          .map((item, index) => (
+            <AudioOutput
+              key={index}
+              audioOutput={item.audio}
+              metadata={item}
+              label={nameKey ? item[nameKey] : `History ${index}`}
+              funcs={funcs}
+              filter={filter}
+            />
+          ))}
     </div>
   </div>
 );
