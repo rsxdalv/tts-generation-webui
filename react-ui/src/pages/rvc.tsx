@@ -63,10 +63,10 @@ const RvcGenerationPage = () => {
       ...rvcGenerationParams,
       pitch_up_key: pitch_up_key ?? rvcGenerationParams.pitch_up_key,
       // original_audio,
-      index: index ?? rvcGenerationParams.index,
+      index: index ? index.replace(".index", "") : rvcGenerationParams.index,
       pitch_collection_method:
         pitch_collection_method ?? rvcGenerationParams.pitch_collection_method,
-      model: model ?? rvcGenerationParams.model,
+      model: model ? model.replace(".pth", "") : rvcGenerationParams.model,
       search_feature_ratio:
         search_feature_ratio ?? rvcGenerationParams.search_feature_ratio,
       device: device ?? rvcGenerationParams.device,
@@ -112,7 +112,7 @@ const RvcGenerationPage = () => {
           </button>
           <AudioOutput
             audioOutput={data?.audio}
-            label="Rvc Output"
+            label="RVC Output"
             funcs={funcs}
             metadata={data}
             filter={["sendToRvc", "sendToRvcVoiceGeneration"]}
