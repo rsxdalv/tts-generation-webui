@@ -16,6 +16,9 @@ ENV PATH="/root/.nvm/versions/node/v${NODE_VERSION}/bin/:${PATH}"
 RUN node --version
 RUN npm --version
 
+# Version 24 is broken due to fairseq
+RUN python3 -m pip install pip==23.3.2
+
 # Setup venv
 RUN pip3 install virtualenv
 RUN virtualenv /venv
@@ -45,7 +48,7 @@ RUN pip3 install -r requirements_styletts2.txt
 RUN pip3 install -r requirements_vall_e.txt
 RUN pip3 install -r requirements_maha_tts.txt
 
-# Add React webui (testing)
+# Build the React UI
 RUN cd react-ui && npm install && npm run build
 
 # Run the server
