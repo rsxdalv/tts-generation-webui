@@ -61,7 +61,7 @@ with gr.Blocks(
     analytics_enabled=False,  # it broke too many times
 ) as demo:
     gr.Markdown(
-        """# TTS Generation WebUI (Bark, MusicGen + AudioGen, Tortoise, RVC) [React UI](https://localhost:3000)"""
+        """# TTS Generation WebUI (Bark, MusicGen + AudioGen, Tortoise, RVC) [React UI](http://localhost:3000)"""
     )
     with Joutai.singleton.tabs:
         from src.tortoise.generation_tab_tortoise import generation_tab_tortoise
