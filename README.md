@@ -47,6 +47,8 @@ June 21:
 * Open React UI automatically in browser, fix the link again.
 * Add Split By Length to React/Tortoise.
 * Fix UVR5 demo folders.
+* Set fairseq version to 0.12.2 for Linux and Mac. (#323)
+* Improve generation history for all React UI tabs.
 
 May 17:
 * Fix Tortoise presets in React UI.

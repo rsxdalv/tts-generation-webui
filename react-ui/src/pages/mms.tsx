@@ -22,7 +22,40 @@ import { parseFormChange } from "../data/parseFormChange";
 import { barkFavorite } from "../functions/barkFavorite";
 import { MMSInputs } from "../components/MMSInputs";
 import { generateWithMMS } from "../functions/generateWithMMS";
-import { GenerationHistory } from "../components/GenerationHistory";
+import {
+  GenerationHistory,
+  GenerationHistorySimple,
+} from "../components/GenerationHistory";
+
+const DETAILS = (
+  <details>
+    <summary>Description</summary>
+    <p>
+      The MMS-TTS checkpoints are trained on lower-cased, un-punctuated text. By
+      default, the VitsTokenizer normalizes the inputs by removing any casing
+      and punctuation, to avoid passing out-of-vocabulary characters to the
+      model. Hence, the model is agnostic to casing and punctuation, so these
+      should be avoided in the text prompt.
+    </p>
+    <p>
+      For certain languages with non-Roman alphabets, such as Arabic, Mandarin
+      or Hindi, the uroman perl package is required to pre-process the text
+      inputs to the Roman alphabet.
+    </p>
+    <p>Parameters:</p>
+    <ul className="list-disc list-inside">
+      <li>Speaking rate: Larger values give faster synthesised speech.</li>
+      <li>
+        Noise Scale: How random the speech prediction is. Larger values create
+        more variation in the predicted speech.
+      </li>
+      <li>
+        Noise Scale Duration: How random the duration prediction is. Larger
+        values create more variation in the predicted durations.
+      </li>
+    </ul>
+  </details>
+);
 
 const initialHistory = []; // prevent infinite loop
 const MMSPage = () => {
@@ -35,7 +68,6 @@ const MMSPage = () => {
   const [hyperParams, setHyperParams] = useLocalStorage<
     typeof initialHyperParams
   >("mmsHyperParams", initialHyperParams);
-  const [showLast, setShowLast] = useLocalStorage<number>("mmsShowLast", 10);
 
   const { interrupted, resetInterrupt, interrupt } = useInterrupt();
   const [progress, setProgress] = React.useState({ current: 0, max: 0 });
@@ -112,45 +144,14 @@ const MMSPage = () => {
     // useSeed,
     useParameters,
   };
-  const clearHistory = () => setHistoryData([]);
+
   return (
     <Template>
       <Head>
         <title>MMS - TTS Generation Webui</title>
       </Head>
       <div className="gap-y-4 p-4 flex w-full flex-col">
-        <div>
-          <details>
-            <summary>Description</summary>
-            <p>
-              The MMS-TTS checkpoints are trained on lower-cased, un-punctuated
-              text. By default, the VitsTokenizer normalizes the inputs by
-              removing any casing and punctuation, to avoid passing
-              out-of-vocabulary characters to the model. Hence, the model is
-              agnostic to casing and punctuation, so these should be avoided in
-              the text prompt.
-            </p>
-            <p>
-              For certain languages with non-Roman alphabets, such as Arabic,
-              Mandarin or Hindi, the uroman perl package is required to
-              pre-process the text inputs to the Roman alphabet.
-            </p>
-            <p>Parameters:</p>
-            <ul className="list-disc list-inside">
-              <li>
-                Speaking rate: Larger values give faster synthesised speech.
-              </li>
-              <li>
-                Noise Scale: How random the speech prediction is. Larger values
-                create more variation in the predicted speech.
-              </li>
-              <li>
-                Noise Scale Duration: How random the duration prediction is.
-                Larger values create more variation in the predicted durations.
-              </li>
-            </ul>
-          </details>
-        </div>
+        {DETAILS}
         <MMSInputs
           mmsParams={mmsParams}
           handleChange={handleChange}
@@ -176,7 +177,7 @@ const MMSPage = () => {
               progressMax={progress.max}
             />
             <button
-              className="border border-gray-300 p-2 rounded"
+              className="border border-gray-300 p-2 rounded font-medium"
               onClick={mms}
             >
               Generate
@@ -184,12 +185,13 @@ const MMSPage = () => {
           </div>
         </div>
 
-        <GenerationHistory
-          clearHistory={clearHistory}
-          showLast={showLast}
-          setShowLast={setShowLast}
+        <GenerationHistorySimple
+          name="mms"
+          setHistoryData={setHistoryData}
           historyData={historyData}
           funcs={funcs}
+          nameKey={undefined}
+          filter={["sendToMMS"]}
         />
       </div>
     </Template>

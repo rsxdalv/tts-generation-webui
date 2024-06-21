@@ -1,4 +1,5 @@
 torch==2.0.0 # BSD 3-Clause - ensures torch is not reinstalled
 # pre-install fairseq for bark_hubert_quantizer
 fairseq @ https://github.com/Sharrnah/fairseq/releases/download/v0.12.4/fairseq-0.12.4-cp310-cp310-win_amd64.whl ; sys_platform == 'win32' # MIT License
+fairseq==0.12.2 ; sys_platform == 'linux' or sys_platform == 'darwin' # MIT License
 bark_hubert_quantizer @ git+https://github.com/rsxdalv/bark-voice-cloning-HuBERT-quantizer@bark_hubert_quantizer#egg=bark_hubert_quantizer # MIT License

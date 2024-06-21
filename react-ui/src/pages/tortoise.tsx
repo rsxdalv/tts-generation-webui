@@ -12,6 +12,10 @@ import { TortoiseResult } from "../tabs/TortoiseResult";
 import { generateWithTortoise } from "../functions/generateWithTortoise";
 import { barkFavorite } from "../functions/barkFavorite";
 import { parseFormChange } from "../data/parseFormChange";
+import {
+  GenerationHistory,
+  GenerationHistorySimple,
+} from "../components/GenerationHistory";
 
 const initialHistory = []; // prevent infinite loop
 const TortoiseGenerationPage = () => {
@@ -121,30 +125,15 @@ const TortoiseGenerationPage = () => {
             filter={["sendToTortoise", "sendToTortoiseVoiceGeneration"]}
           />
         </div>
-        <div className="flex flex-col space-y-2 border border-gray-300 p-2 rounded">
-          <label className="text-sm">History:</label>
-          <button
-            className="border border-gray-300 p-2 rounded"
-            onClick={() => {
-              setHistoryData([]);
-            }}
-          >
-            Clear History
-          </button>
-          <div className="flex flex-col space-y-2">
-            {historyData &&
-              historyData.map((item, index) => (
-                <AudioOutput
-                  key={index}
-                  audioOutput={item.audio}
-                  label={item.bundle_name}
-                  funcs={funcs}
-                  metadata={item}
-                  filter={["sendToTortoise", "sendToTortoiseVoiceGeneration"]}
-                />
-              ))}
-          </div>
-        </div>
+
+        <GenerationHistorySimple
+          name="tortoise"
+          setHistoryData={setHistoryData}
+          historyData={historyData}
+          funcs={funcs}
+          nameKey="bundle_name"
+          filter={["sendToTortoise", "sendToTortoiseVoiceGeneration"]}
+        />
       </div>
       {/* <pre>{JSON.stringify(tortoiseGenerationParams, null, 2)}</pre> */}
     </Template>

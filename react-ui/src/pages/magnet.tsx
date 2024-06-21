@@ -23,7 +23,7 @@ import { parseFormChange } from "../data/parseFormChange";
 import { barkFavorite } from "../functions/barkFavorite";
 import { MagnetInputs } from "../components/MagnetInputs";
 import { generateWithMagnet } from "../functions/generateWithMagnet";
-import { MagnetHistory } from "../components/MagnetHistory";
+import { GenerationHistorySimple } from "../components/GenerationHistory";
 
 const initialHistory = []; // prevent infinite loop
 const MagnetPage = () => {
@@ -36,7 +36,6 @@ const MagnetPage = () => {
   const [hyperParams, setHyperParams] = useLocalStorage<
     typeof initialHyperParams
   >("magnetHyperParams", initialHyperParams);
-  const [showLast, setShowLast] = useLocalStorage<number>("magnetShowLast", 10);
 
   const { interrupted, resetInterrupt, interrupt } = useInterrupt();
   const [progress, setProgress] = React.useState({ current: 0, max: 0 });
@@ -118,7 +117,6 @@ const MagnetPage = () => {
     useSeed,
     useParameters,
   };
-  const clearHistory = () => setHistoryData([]);
   return (
     <Template>
       <Head>
@@ -157,12 +155,13 @@ const MagnetPage = () => {
           />
         </div>
 
-        <MagnetHistory
-          clearHistory={clearHistory}
-          showLast={showLast}
-          setShowLast={setShowLast}
+        <GenerationHistorySimple
+          name="magnet"
+          setHistoryData={setHistoryData}
           historyData={historyData}
           funcs={funcs}
+          nameKey="history_bundle_name_data"
+          filter={["sendToMagnet"]}
         />
       </div>
     </Template>

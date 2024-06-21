@@ -22,6 +22,7 @@ import { parseFormChange } from "../data/parseFormChange";
 import { barkFavorite } from "../functions/barkFavorite";
 import { generateWithMusicgen } from "../functions/generateWithMusicgen";
 import { MusicgenInputs } from "../components/MusicgenInputs";
+import { GenerationHistorySimple } from "../components/GenerationHistory";
 
 const initialHistory = []; // prevent infinite loop
 const MusicgenPage = () => {
@@ -34,10 +35,6 @@ const MusicgenPage = () => {
   const [musicgenHyperParams, setMusicgenHyperParams] = useLocalStorage<
     typeof initialHyperParams
   >("musicgenHyperParams", initialHyperParams);
-  const [showLast, setShowLast] = useLocalStorage<number>(
-    "musicgenShowLast",
-    10
-  );
 
   const { interrupted, resetInterrupt, interrupt } = useInterrupt();
   const [progress, setProgress] = React.useState({ current: 0, max: 0 });
@@ -125,7 +122,6 @@ const MusicgenPage = () => {
     useParameters,
   };
 
-  const clearHistory = () => setHistoryData([]);
   return (
     <Template>
       <Head>
@@ -164,12 +160,13 @@ const MusicgenPage = () => {
           />
         </div>
 
-        <MusicgenHistory
-          clearHistory={clearHistory}
-          showLast={showLast}
-          setShowLast={setShowLast}
+        <GenerationHistorySimple
+          name="musicgen"
+          setHistoryData={setHistoryData}
           historyData={historyData}
           funcs={funcs}
+          nameKey="history_bundle_name_data"
+          filter={["sendToMusicgen"]}
         />
       </div>
     </Template>
@@ -177,64 +174,3 @@ const MusicgenPage = () => {
 };
 
 export default MusicgenPage;
-
-const MusicgenHistory = ({
-  clearHistory,
-  showLast,
-  setShowLast,
-  historyData,
-  funcs,
-}: {
-  clearHistory: () => void;
-  showLast: number;
-  setShowLast: React.Dispatch<React.SetStateAction<number>>;
-  historyData: MusicgenResult[];
-  funcs: {
-    useAsMelody: (melody?: string, metadata?: MusicgenResult) => void;
-    favorite: (
-      _url: string,
-      data?: { history_bundle_name_data?: string | undefined } | undefined
-    ) => Promise<any>;
-    useSeed: (_url: string, data?: MusicgenResult) => void;
-    useParameters: (_url: string, data?: MusicgenResult) => void;
-  };
-}) => (
-  <div className="flex flex-col gap-y-2 border border-gray-300 p-2 rounded">
-    <label className="text-sm">History:</label>
-    <div className="flex gap-x-2 items-center">
-      <button
-        className="border border-gray-300 p-2 px-40 rounded"
-        onClick={clearHistory}
-      >
-        Clear History
-      </button>
-      <div className="flex gap-x-2 items-center">
-        <label className="text-sm">Show Last X entries:</label>
-        <input
-          type="number"
-          value={showLast}
-          onChange={(event) => setShowLast(Number(event.target.value))}
-          className="border border-gray-300 p-2 rounded"
-          min="0"
-          max="100"
-          step="1"
-        />
-      </div>
-    </div>
-    <div className="flex flex-col gap-y-2">
-      {historyData &&
-        historyData
-          .slice(1, showLast + 1)
-          .map((item, index) => (
-            <AudioOutput
-              key={index}
-              audioOutput={item.audio}
-              metadata={item}
-              label={item.history_bundle_name_data}
-              funcs={funcs}
-              filter={["sendToMusicgen"]}
-            />
-          ))}
-    </div>
-  </div>
-);

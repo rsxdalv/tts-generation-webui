@@ -12,6 +12,7 @@ import {
   useBarkResult,
 } from "../tabs/BarkGenerationParams";
 import { parseFormChange } from "../data/parseFormChange";
+import { GenerationHistorySimple } from "../components/GenerationHistory";
 
 const initialHistory = []; // prevent infinite loop
 const BarkGenerationPage = () => {
@@ -66,30 +67,15 @@ const BarkGenerationPage = () => {
             filter={["sendToBark", "sendToBarkVoiceGeneration"]}
           />
         </div>
-        <div className="flex flex-col space-y-2 border border-gray-300 p-2 rounded">
-          <label className="text-sm">History:</label>
-          <button
-            className="border border-gray-300 p-2 rounded"
-            onClick={() => {
-              setHistoryData([]);
-            }}
-          >
-            Clear History
-          </button>
-          <div className="flex flex-col space-y-2">
-            {historyData &&
-              historyData.map((item, index) => (
-                <AudioOutput
-                  key={index}
-                  audioOutput={item.audio}
-                  label={item.history_bundle_name_data}
-                  funcs={funcs}
-                  metadata={item}
-                  filter={["sendToBark", "sendToBarkVoiceGeneration"]}
-                />
-              ))}
-          </div>
-        </div>
+
+        <GenerationHistorySimple
+          name="bark"
+          setHistoryData={setHistoryData}
+          historyData={historyData}
+          funcs={funcs}
+          nameKey="history_bundle_name_data"
+          filter={["sendToBark", "sendToBarkVoiceGeneration"]}
+        />
       </div>
       {/* <pre>{JSON.stringify(barkGenerationParams, null, 2)}</pre> */}
     </Template>
