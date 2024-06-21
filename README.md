@@ -45,6 +45,7 @@ https://github.com/rsxdalv/tts-generation-webui/discussions/186#discussioncommen
 June 21:
 * Add Vall-E-X demo to React UI.
 * Open React UI automatically in browser, fix the link again.
+* Add Split By Length to React/Tortoise.
 
 May 17:
 * Fix Tortoise presets in React UI.
