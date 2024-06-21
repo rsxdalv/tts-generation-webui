@@ -101,6 +101,18 @@ export default function Home() {
               href="/maha-tts"
               projectLink="https://github.com/dubverse-ai/MahaTTS"
             />
+            <Card
+              title="MMS"
+              description="Scaling Speech Technology to 1000+ languages"
+              href="/mms"
+              projectLink="https://github.com/facebookresearch/fairseq/blob/main/examples/mms/README.md"
+            />
+            <Card
+              title="VALL-E X"
+              description="Multilingual Text-to-Speech Synthesis"
+              href="/vallex"
+              projectLink="https://github.com/Plachtaa/VALL-E-X"
+            />
           </div>
           <h3 className="text-xl font-bold">Post-Processing Models:</h3>
           <div className="flex flex-col gap-y-2">

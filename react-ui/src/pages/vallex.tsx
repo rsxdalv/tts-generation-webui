@@ -4,11 +4,11 @@ import Head from "next/head";
 import useLocalStorage from "../hooks/useLocalStorage";
 import { AudioOutput } from "../components/AudioComponents";
 import {
-  MMSParams,
-  MMSResult,
-  useMMSParams,
-  useMMSResult,
-} from "../tabs/MMSParams";
+  VallexParams,
+  VallexResult,
+  useVallexParams,
+  useVallexResult,
+} from "../tabs/VallexParams";
 import { HyperParameters } from "../components/HyperParameters";
 import {
   extractTexts,
@@ -20,34 +20,34 @@ import { useInterrupt } from "../hooks/useInterrupt";
 import { manageProgress } from "../components/Progress";
 import { parseFormChange } from "../data/parseFormChange";
 import { barkFavorite } from "../functions/barkFavorite";
-import { MMSInputs } from "../components/MMSInputs";
-import { generateWithMMS } from "../functions/generateWithMMS";
+import { VallexInputs } from "../components/VallexInputs";
+import { generateWithVallex } from "../functions/generateWithVallex";
 import { GenerationHistory } from "../components/GenerationHistory";
 
 const initialHistory = []; // prevent infinite loop
-const MMSPage = () => {
-  const [data, setData] = useMMSResult();
-  const [historyData, setHistoryData] = useLocalStorage<MMSResult[]>(
-    "mmsHistory",
+const VallexPage = () => {
+  const [data, setData] = useVallexResult();
+  const [historyData, setHistoryData] = useLocalStorage<VallexResult[]>(
+    "vallexHistory",
     initialHistory
   );
-  const [mmsParams, setMMSParams] = useMMSParams();
+  const [vallexParams, setVallexParams] = useVallexParams();
   const [hyperParams, setHyperParams] = useLocalStorage<
     typeof initialHyperParams
-  >("mmsHyperParams", initialHyperParams);
-  const [showLast, setShowLast] = useLocalStorage<number>("mmsShowLast", 10);
+  >("vallexHyperParams", initialHyperParams);
+  const [showLast, setShowLast] = useLocalStorage<number>("vallexShowLast", 10);
 
   const { interrupted, resetInterrupt, interrupt } = useInterrupt();
   const [progress, setProgress] = React.useState({ current: 0, max: 0 });
 
-  function mmsWithProgress() {
-    const texts = extractTexts(mmsParams.text, hyperParams);
+  function vallexWithProgress() {
+    const texts = extractTexts(vallexParams.text, hyperParams);
     const { iterations } = hyperParams;
 
     return manageProgress(
       ({ incrementProgress }) =>
-        mmsConsumer(
-          mmsGenerator(texts, iterations, mmsParams),
+        vallexConsumer(
+          vallexGenerator(texts, iterations, vallexParams),
           incrementProgress
         ),
       getMax(texts, iterations),
@@ -55,28 +55,28 @@ const MMSPage = () => {
     );
   }
 
-  async function* mmsGenerator(
+  async function* vallexGenerator(
     texts: string[],
     iterations: number,
-    mmsParams: MMSParams
+    vallexParams: VallexParams
   ) {
     for (let iteration = 0; iteration < iterations; iteration++) {
       for (const text of texts) {
         if (interrupted.current) {
           return;
         }
-        yield generateWithMMS({
-          ...mmsParams,
+        yield generateWithVallex({
+          ...vallexParams,
           text,
-          //   seed: incrementNonRandomSeed(mmsParams.seed, iteration),
+          //   seed: incrementNonRandomSeed(vallexParams.seed, iteration),
         });
       }
     }
   }
 
-  async function mmsConsumer(
-    generator: AsyncGenerator<MMSResult, void, unknown>,
-    callback: (result: MMSResult) => void
+  async function vallexConsumer(
+    generator: AsyncGenerator<VallexResult, void, unknown>,
+    callback: (result: VallexResult) => void
   ) {
     for await (const result of generator) {
       setData(result);
@@ -85,23 +85,23 @@ const MMSPage = () => {
     }
   }
 
-  const mms = resetInterrupt(mmsWithProgress);
-  const handleChange = parseFormChange(setMMSParams);
+  const vallex = resetInterrupt(vallexWithProgress);
+  const handleChange = parseFormChange(setVallexParams);
 
-  //   const useSeed = (_url: string, data?: MMSResult) => {
+  //   const useSeed = (_url: string, data?: VallexResult) => {
   //     const seed = data?.metadata?.seed;
   //     if (!seed) return;
-  //     setMMSParams({
-  //       ...mmsParams,
+  //     setVallexParams({
+  //       ...vallexParams,
   //       //   seed: Number(seed),
   //     });
   //   };
 
-  const useParameters = (_url: string, data?: MMSResult) => {
+  const useParameters = (_url: string, data?: VallexResult) => {
     const params = data?.metadata;
     if (!params) return;
-    setMMSParams({
-      ...mmsParams,
+    setVallexParams({
+      ...vallexParams,
       ...params,
       //   seed: Number(params.seed),
     });
@@ -116,55 +116,36 @@ const MMSPage = () => {
   return (
     <Template>
       <Head>
-        <title>MMS - TTS Generation Webui</title>
+        <title>Vallex - TTS Generation Webui</title>
       </Head>
       <div className="gap-y-4 p-4 flex w-full flex-col">
         <div>
           <details>
             <summary>Description</summary>
-            <p>
-              The MMS-TTS checkpoints are trained on lower-cased, un-punctuated
-              text. By default, the VitsTokenizer normalizes the inputs by
-              removing any casing and punctuation, to avoid passing
-              out-of-vocabulary characters to the model. Hence, the model is
-              agnostic to casing and punctuation, so these should be avoided in
-              the text prompt.
-            </p>
-            <p>
-              For certain languages with non-Roman alphabets, such as Arabic,
-              Mandarin or Hindi, the uroman perl package is required to
-              pre-process the text inputs to the Roman alphabet.
-            </p>
-            <p>Parameters:</p>
-            <ul className="list-disc list-inside">
-              <li>
-                Speaking rate: Larger values give faster synthesised speech.
-              </li>
-              <li>
-                Noise Scale: How random the speech prediction is. Larger values
-                create more variation in the predicted speech.
-              </li>
-              <li>
-                Noise Scale Duration: How random the duration prediction is.
-                Larger values create more variation in the predicted durations.
-              </li>
-            </ul>
+            VALL-E X is an amazing multilingual text-to-speech (TTS) model
+            proposed by Microsoft. While Microsoft initially publish in their
+            research paper, they did not release any code or pretrained models.
+            Recognizing the potential and value of this technology, our team
+            took on the challenge to reproduce the results and train our own
+            model. We are glad to share our trained VALL-E X model with the
+            community, allowing everyone to experience the power next-generation
+            TTS! 🎧
           </details>
         </div>
-        <MMSInputs
-          mmsParams={mmsParams}
+        <VallexInputs
+          vallexParams={vallexParams}
           handleChange={handleChange}
-          setMmsParams={setMMSParams}
+          setVallexParams={setVallexParams}
           data={data}
         />
 
         <div className="flex flex-row gap-2">
           <AudioOutput
             audioOutput={data?.audio}
-            label="MMS Output"
+            label="Vallex Output"
             funcs={funcs}
             metadata={data}
-            filter={["sendToMMS"]}
+            filter={["sendToVallex"]}
           />
           <div className="flex flex-col gap-2">
             <HyperParameters
@@ -176,8 +157,8 @@ const MMSPage = () => {
               progressMax={progress.max}
             />
             <button
-              className="border border-gray-300 p-2 rounded"
-              onClick={mms}
+              className="border border-gray-300 p-2 rounded font-semibold"
+              onClick={vallex}
             >
               Generate
             </button>
@@ -196,4 +177,4 @@ const MMSPage = () => {
   );
 };
 
-export default MMSPage;
+export default VallexPage;
