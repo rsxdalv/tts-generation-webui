@@ -42,6 +42,9 @@ https://github.com/rsxdalv/tts-generation-webui/discussions/186#discussioncommen
 
 ## Changelog
 
+June 21:
+* Open React UI automatically in browser, fix the link again.
+
 May 17:
 * Fix Tortoise presets in React UI.
 

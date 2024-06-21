@@ -280,6 +280,9 @@ def start_server():
 
 if __name__ == "__main__":
     import subprocess
+    import webbrowser
 
     subprocess.Popen("npm start --prefix react-ui", shell=True)
+    webbrowser.open("http://localhost:3000")
+
     start_server()
