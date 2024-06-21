@@ -346,10 +346,7 @@ async function rvc({
   ]);
 
   const [audio, metadata] = result?.data;
-  return {
-    audio,
-    metadata,
-  };
+  return { audio, metadata };
 }
 
 const rvc_model_reload = () =>
