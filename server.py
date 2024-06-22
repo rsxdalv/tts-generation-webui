@@ -214,6 +214,20 @@ with gr.Blocks(
             print("Failed to load style_tts2 demo")
             print(e)
 
+        try:
+            from src.stable_audio.stable_audio import stable_audio_ui_tab
+
+            stable_audio_ui_tab()
+
+        except Exception as e:
+            with gr.Tab("Stable Audio (!)", id="stable_audio"):
+                gr.Markdown(
+                    """Failed to load Stable Audio demo. Please check your configuration."""
+                )
+                gr.Markdown(f"""Error: {e}""")
+                print("Failed to load stable_audio demo")
+                print(e)
+
         vocos_tabs()
         generation_tab_tortoise()
 

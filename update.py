@@ -74,6 +74,9 @@ def main():
     try_install("requirements_styletts2.txt", "StyleTTS")
     try_install("requirements_vall_e.txt", "Vall-E-X")
     try_install("requirements_maha_tts.txt", "Maha TTS")
+    try_install("requirements_stable_audio.txt", "Stable Audio")
+    # soundfile fix because of aeiou
+    do("pip install soundfile==0.12.1")
 
     if is_node_installed():
         setup_node_modules()

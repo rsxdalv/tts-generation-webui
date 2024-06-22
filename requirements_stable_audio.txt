@@ -1,0 +1,2 @@
+torch==2.0.0 # BSD 3-Clause - ensures torch is not reinstalled
+stable-audio-tools @ git+https://github.com/rsxdalv/stable-audio-tools@release#egg=stable-audio-tools # MIT License
