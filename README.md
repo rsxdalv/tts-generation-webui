@@ -42,6 +42,9 @@ https://github.com/rsxdalv/tts-generation-webui/discussions/186#discussioncommen
 
 ## Changelog
 
+June 22:
+* Add Stable Audio to Gradio.
+
 June 21:
 * Add Vall-E-X demo to React UI.
 * Open React UI automatically in browser, fix the link again.
