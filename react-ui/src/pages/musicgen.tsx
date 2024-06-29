@@ -1,353 +1,173 @@
-import React, { useState } from "react";
+import React from "react";
 import { Template } from "../components/Template";
 import Head from "next/head";
-import FileInput from "../components/FileInput";
-import { AudioPlayer } from "../components/MemoizedWaveSurferPlayer";
+import useLocalStorage from "../hooks/useLocalStorage";
+import { AudioOutput } from "../components/AudioComponents";
+import {
+  MusicgenParams,
+  MusicgenResult,
+  useMusicgenParams,
+  useMusicgenResult,
+} from "../tabs/MusicgenParams";
+import { HyperParameters } from "../components/HyperParameters";
+import { useInterrupt } from "../hooks/useInterrupt";
+import {
+  initialHyperParams,
+  extractTexts,
+  getMax,
+  incrementNonRandomSeed,
+} from "../data/hyperParamsUtils";
+import { manageProgress } from "../components/Progress";
+import { parseFormChange } from "../data/parseFormChange";
+import { barkFavorite } from "../functions/barkFavorite";
+import { generateWithMusicgen } from "../functions/generateWithMusicgen";
+import { MusicgenInputs } from "../components/MusicgenInputs";
+import { GenerationHistorySimple } from "../components/GenerationHistory";
 
-type AudioOutput = {
-  name: string;
-  data: string;
-  size?: number;
-  is_file?: boolean;
-  orig_name?: string;
-  type_name?: string;
-};
-
-const musicgenParams0: MusicgenParams = {
-  // text: "",
-  text: "lofi hip hop beats to relax/study to",
-  melody: null,
-  model: "Small",
-  duration: 1,
-  topk: 250,
-  topp: 0,
-  temperature: 1.0,
-  cfg_coef: 3.0,
-  seed: -1,
-  use_multi_band_diffusion: false,
-};
-
-type MusicgenParams = {
-  text: string;
-  melody: string | null;
-  model: string;
-  duration: number;
-  topk: number;
-  topp: number;
-  temperature: number;
-  cfg_coef: number;
-  seed: number;
-  use_multi_band_diffusion: boolean;
-};
-
-const modelNameMapping = {
-  Melody: "facebook/musicgen-melody",
-  Medium: "facebook/musicgen-medium",
-  Small: "facebook/musicgen-small",
-  Large: "facebook/musicgen-large",
-  Audiogen: "facebook/audiogen-medium",
-};
-
+const initialHistory = []; // prevent infinite loop
 const MusicgenPage = () => {
-  const [musicgenData, setMusicgenData] = useState<AudioOutput[] | null>(null);
-  const [historyData, setHistoryData] = useState<AudioOutput[]>([]);
-  const [lastSeed, setLastSeed] = useState<number>(-1);
-  const [image, setImage] = useState<string>("");
-  const [audioUrl, setAudioUrl] = useState<string>("");
-  const [musicgenParams, setMusicgenParams] =
-    useState<MusicgenParams>(musicgenParams0);
-  const [melody, setMelody] = useState<string | undefined>();
+  const [musicgenResult, setMusicgenResult] = useMusicgenResult();
+  const [historyData, setHistoryData] = useLocalStorage<MusicgenResult[]>(
+    "musicgenHistory",
+    initialHistory
+  );
+  const [musicgenParams, setMusicgenParams] = useMusicgenParams();
+  const [musicgenHyperParams, setMusicgenHyperParams] = useLocalStorage<
+    typeof initialHyperParams
+  >("musicgenHyperParams", initialHyperParams);
 
-  async function musicgen() {
-    const body = JSON.stringify({
-      ...musicgenParams,
-      melody: musicgenParams.model === "Melody" ? musicgenParams.melody : null,
-      model: modelNameMapping[musicgenParams.model],
-    });
-    console.log(body);
-    return;
-    const response = await fetch("/api/demucs_musicgen", {
-      method: "POST",
-      body,
-    });
+  const { interrupted, resetInterrupt, interrupt } = useInterrupt();
+  const [progress, setProgress] = React.useState({ current: 0, max: 0 });
 
-    const result = await response.json();
-    const data = result?.data;
-    const [generated_audio, , image, , json] = data;
-    console.log(generated_audio, image, json);
-    const { seed } = json;
-    setMusicgenData(result?.data);
-    setHistoryData((x) => [result?.data[0], ...x]);
-    setLastSeed(seed);
-    setImage(image);
-    setAudioUrl(generated_audio.data);
+  function musicgenWithProgress() {
+    const texts = extractTexts(musicgenParams.text, musicgenHyperParams);
+    const { iterations } = musicgenHyperParams;
+
+    return manageProgress(
+      ({ incrementProgress }) =>
+        musicgenConsumer(
+          musicgenGenerator(texts, iterations, musicgenParams),
+          incrementProgress
+        ),
+      getMax(texts, iterations),
+      setProgress
+    );
   }
 
-  const handleChange = async (
-    event:
-      | React.ChangeEvent<HTMLInputElement>
-      | React.ChangeEvent<HTMLTextAreaElement>
-      | React.ChangeEvent<HTMLSelectElement>
-  ) => {
-    const { name, value, type } = event.target;
-
-    if (name === "melody") {
-      if (!(event.target instanceof HTMLInputElement)) return;
-      const file = event.target.files?.[0];
-      console.log(file);
-      const reader = new FileReader();
-      reader.readAsDataURL(file!);
-      console.log(reader);
-      console.log(reader.result);
-      setMusicgenParams({
-        ...musicgenParams,
-        [name]: reader.result,
-      });
-      return;
+  async function* musicgenGenerator(
+    texts: string[],
+    iterations: number,
+    musicgenParams: MusicgenParams
+  ) {
+    for (let iteration = 0; iteration < iterations; iteration++) {
+      for (const text of texts) {
+        if (interrupted.current) {
+          return;
+        }
+        yield generateWithMusicgen({
+          ...musicgenParams,
+          text,
+          seed: incrementNonRandomSeed(musicgenParams.seed, iteration),
+        });
+      }
     }
+  }
 
+  async function musicgenConsumer(
+    generator: AsyncGenerator<MusicgenResult, void, unknown>,
+    callback: (result: MusicgenResult) => void
+  ) {
+    for await (const result of generator) {
+      setMusicgenResult(result);
+      setHistoryData((x) => [result, ...x]);
+      callback(result);
+    }
+  }
+
+  const musicgen = resetInterrupt(musicgenWithProgress);
+  const handleChange = parseFormChange(setMusicgenParams);
+
+  const useAsMelody = (melody?: string, metadata?: MusicgenResult) => {
+    if (!melody) return;
     setMusicgenParams({
       ...musicgenParams,
-      [name]:
-        type === "number" || type === "range"
-          ? Number(value)
-          : type === "checkbox"
-          ? (event.target as HTMLInputElement).checked // type assertion
-          : value,
+      melody,
     });
+  };
+
+  const useSeed = (_url: string, data?: MusicgenResult) => {
+    const seed = data?.json.seed;
+    if (!seed) return;
+    setMusicgenParams({
+      ...musicgenParams,
+      seed: Number(seed),
+    });
+  };
+
+  const useParameters = (_url: string, data?: MusicgenResult) => {
+    const params = data?.json;
+    if (!params) return;
+    setMusicgenParams({
+      ...musicgenParams,
+      ...params,
+      seed: Number(params.seed),
+      model: params.model || "facebook/musicgen-small",
+    });
+  };
+
+  const funcs = {
+    useAsMelody,
+    favorite: barkFavorite,
+    useSeed,
+    useParameters,
   };
 
   return (
     <Template>
       <Head>
-        <title>TTS Generation Webui - Musicgen</title>
+        <title>Musicgen - TTS Generation Webui</title>
       </Head>
-      <div className="p-4">
-        <div className="my-4">
-          <div className="flex space-x-6 w-full">
-            <div className="flex flex-col space-y-2">
-              <label className="text-sm">Text:</label>
-              <textarea
-                name="text"
-                value={musicgenParams.text}
-                onChange={handleChange}
-                className="border border-gray-300 p-2 rounded"
-                placeholder="Enter text here..."
-                rows={3}
-              />
+      <div className="p-4 flex flex-col gap-y-4">
+        <MusicgenInputs
+          musicgenParams={musicgenParams}
+          handleChange={handleChange}
+          setMusicgenParams={setMusicgenParams}
+          musicgenResult={musicgenResult}
+        />
 
-              <div className="space-y-2">
-                <label className="text-sm">Model:</label>
-                <div className="flex flex-row space-x-2">
-                  {["Melody", "Small", "Medium", "Large", "Audiogen"].map(
-                    (model) => (
-                      <div key={model} className="flex items-center">
-                        <input
-                          type="radio"
-                          name="model"
-                          id={model}
-                          value={model}
-                          checked={musicgenParams.model === model}
-                          onChange={handleChange}
-                          className="border border-gray-300 p-2 rounded"
-                        />
-                        <label className="ml-1" htmlFor={model}>
-                          {model}
-                        </label>
-                      </div>
-                    )
-                  )}
-                </div>
-              </div>
+        <HyperParameters
+          params={musicgenHyperParams}
+          setParams={setMusicgenHyperParams}
+          progress={progress.current}
+          progressMax={progress.max}
+          isInterrupted={interrupted.current}
+          interrupt={interrupt}
+        />
 
-              <label className="text-sm">Melody:</label>
-              <FileInput
-                callback={(file: File | undefined) => {
-                  const melody = file?.name || null;
-                  setMelody(file && URL.createObjectURL(file));
-                  setMusicgenParams({
-                    ...musicgenParams,
-                    melody,
-                  });
-                }}
-              />
-              {/* Preview melody */}
-              <AudioPlayer
-                height={100}
-                waveColor="#ffa500"
-                progressColor="#d59520"
-                url={melody}
-                volume={0.4}
-                barWidth={2}
-                barGap={1}
-                barRadius={2}
-              />
-            </div>
-
-            <div className="flex flex-col space-y-2">
-              <label className="text-sm">
-                Duration: {musicgenParams.duration}s{" "}
-                {musicgenParams.duration > 30 && "(spliced)"}
-              </label>
-              <input
-                type="range"
-                name="duration"
-                value={musicgenParams.duration}
-                onChange={handleChange}
-                className="border border-gray-300 py-2 rounded"
-                min="0.5"
-                max="360"
-                step="0.5"
-              />
-
-              <label className="text-sm">Top-K:</label>
-              <input
-                type="number"
-                name="topk"
-                value={musicgenParams.topk}
-                onChange={handleChange}
-                className="border border-gray-300 p-2 rounded"
-                min="0"
-                max="250"
-                step="1"
-              />
-
-              <label className="text-sm">Top-P: {musicgenParams.topp}</label>
-              <input
-                type="range"
-                name="topp"
-                value={musicgenParams.topp}
-                onChange={handleChange}
-                className="border border-gray-300 py-2 rounded"
-                min="0"
-                max="1.5"
-                step="0.01"
-              />
-
-              <label className="text-sm">
-                Temperature: {musicgenParams.temperature}
-              </label>
-              <input
-                type="range"
-                name="temperature"
-                value={musicgenParams.temperature}
-                onChange={handleChange}
-                className="border border-gray-300 py-2 rounded"
-                min="0"
-                max="1.5"
-                step="0.01"
-              />
-
-              <label className="text-sm">
-                Classifier Free Guidance Coefficient:{" "}
-                {musicgenParams.cfg_coef.toFixed(1)}
-              </label>
-              <input
-                type="range"
-                name="cfg_coef"
-                value={musicgenParams.cfg_coef}
-                onChange={handleChange}
-                className="border border-gray-300 py-2 rounded"
-                min="0"
-                max="10"
-                step="0.1"
-              />
-
-              <label className="text-sm">Seed:</label>
-              <input
-                type="number"
-                name="seed"
-                value={musicgenParams.seed}
-                onChange={handleChange}
-                className="border border-gray-300 p-2 rounded"
-              />
-              <button
-                className="border border-gray-300 p-2 rounded"
-                onClick={() =>
-                  setMusicgenParams({
-                    ...musicgenParams,
-                    seed: lastSeed,
-                  })
-                }
-              >
-                Restore Last Seed
-              </button>
-
-              <div className="flex space-x-2 items-center">
-                <label className="text-sm">
-                  Use{" "}
-                  <a
-                    className="underline"
-                    href="https://huggingface.co/facebook/multiband-diffusion"
-                    target="_blank"
-                  >
-                    Multi Band Diffusion:
-                  </a>
-                </label>
-                <input
-                  type="checkbox"
-                  name="use_multi_band_diffusion"
-                  checked={musicgenParams.use_multi_band_diffusion}
-                  onChange={handleChange}
-                  className="border border-gray-300 p-2 rounded"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="my-4 flex flex-col space-y-2">
-          <div>
-            <label className="text-sm">Output:</label>
-            <AudioPlayer
-              height={100}
-              waveColor="#ffa500"
-              progressColor="#d59520"
-              url={audioUrl}
-              volume={0.4}
-              barWidth={2}
-              barGap={1}
-              barRadius={2}
-            />
-          </div>
+        <div className="flex flex-col gap-y-2">
           <button
             className="border border-gray-300 p-2 rounded"
             onClick={musicgen}
           >
             Generate
           </button>
+          <AudioOutput
+            audioOutput={musicgenResult?.audio}
+            label="Musicgen Output"
+            funcs={funcs}
+            metadata={musicgenResult}
+            filter={["sendToMusicgen"]}
+          />
         </div>
 
-        {/* History */}
-        <div className="my-4">
-          <div className="flex flex-col space-y-2">
-            <label className="text-sm">History:</label>
-            <div className="flex flex-col space-y-2">
-              {historyData &&
-                historyData.map((item, index) => (
-                  // <div key={index}>
-                  //   <audio src={item.data} controls></audio>
-                  // </div>
-                  <AudioPlayer
-                    height={100}
-                    waveColor="#ffa500"
-                    progressColor="#d59520"
-                    url={item.data}
-                    volume={0.4}
-                    // // Set a bar width
-                    // barWidth: 2,
-                    // // Optionally, specify the spacing between bars
-                    // barGap: 1,
-                    // // And the bar radius
-                    // barRadius: 2,
-                    barWidth={2}
-                    barGap={1}
-                    barRadius={2}
-                  />
-                ))}
-            </div>
-          </div>
-        </div>
+        <GenerationHistorySimple
+          name="musicgen"
+          setHistoryData={setHistoryData}
+          historyData={historyData}
+          funcs={funcs}
+          nameKey="history_bundle_name_data"
+          filter={["sendToMusicgen"]}
+        />
       </div>
     </Template>
   );

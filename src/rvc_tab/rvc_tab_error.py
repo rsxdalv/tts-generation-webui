@@ -29,11 +29,11 @@ def install_rvc():
         yield "Failed to install RVC"
 
 
-def rvc_tab_error(e: Exception):
-    with gr.Tab("RVC Beta Demo (!)"):
-        gr.Markdown("Failed to load voice clone demo")
+def rvc_tab_error(e: Exception, name="RVC Beta Demo"):
+    with gr.Tab(name + " (!)"):
+        gr.Markdown("Failed to load RVC demo")
         gr.Markdown(f"Error: {e}")
-        gr.Markdown("Please install the requirements_bark_hubert_quantizer.txt file")
+        gr.Markdown("Please install the requirements_rvc.txt file")
         gr.Markdown("Please check the console for more information")
         install_btn = gr.Button("Install RVC")
         gr.Markdown("Installation console:")

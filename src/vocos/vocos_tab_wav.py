@@ -55,6 +55,7 @@ def vocos_tab_wav():
             fn=vocos_predict,
             inputs=[file_input, bandwidth_id],
             outputs=output,
+            api_name="vocos_wav",
         )
 
 

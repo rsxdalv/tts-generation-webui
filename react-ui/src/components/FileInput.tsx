@@ -1,32 +1,36 @@
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent } from "react";
+
+const uploadFile = async (file?: File) => {
+  if (!file) return;
+
+  try {
+    const data = new FormData();
+    data.set("file", file);
+
+    const res = await fetch("/api/upload", {
+      method: "POST",
+      body: data,
+    });
+    // handle the error
+    if (!res.ok) throw new Error(await res.text());
+  } catch (e: any) {
+    // Handle errors here
+    console.error(e);
+  }
+};
+
+const parseFileEvent = (e: ChangeEvent<HTMLInputElement>) =>
+  e.target.files?.[0];
 
 export default function FileInput({
   callback,
+  accept = "audio/*",
+  hide_text = true,
 }: {
-  callback: (file: File | undefined) => void;
+  callback: (file?: string) => void;
+  accept?: string;
+  hide_text?: boolean;
 }) {
-  const parseFileEvent = (e: ChangeEvent<HTMLInputElement>) =>
-    e.target.files?.[0];
-
-  const uploadFile = async (file: File | undefined) => {
-    if (!file) return;
-
-    try {
-      const data = new FormData();
-      data.set("file", file);
-
-      const res = await fetch("/api/upload", {
-        method: "POST",
-        body: data,
-      });
-      // handle the error
-      if (!res.ok) throw new Error(await res.text());
-    } catch (e: any) {
-      // Handle errors here
-      console.error(e);
-    }
-  };
-
   return (
     <div>
       <input
@@ -35,14 +39,17 @@ export default function FileInput({
         onChange={async (e) => {
           const file = parseFileEvent(e);
           await uploadFile(file);
-          callback(file);
+          callback(getLocalFileURL(file));
         }}
-        accept="audio/*"
+        accept={accept}
         style={{
-          color: "transparent",
+          color: hide_text ? "transparent" : undefined,
         }}
       />
       <button onClick={() => callback(undefined)}>Clear File</button>
     </div>
   );
 }
+
+const getLocalFileURL = (file?: File) =>
+  file && "/file-input-cache/" + file.name;

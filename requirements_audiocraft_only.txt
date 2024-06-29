@@ -1,0 +1,1 @@
+audiocraft @ git+https://git@github.com/facebookresearch/audiocraft@905371a779f608169353fe6ad42bb5fc10c5c9a8#egg=audiocraft # MIT License

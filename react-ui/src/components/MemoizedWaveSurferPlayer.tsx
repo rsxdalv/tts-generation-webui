@@ -4,7 +4,7 @@ import Timeline from "wavesurfer.js/dist/plugins/timeline";
 import { WaveSurferOptions } from "wavesurfer.js";
 
 const WaveSurferPlayerRaw = (props) => {
-  const containerRef = useRef();
+  const containerRef = useRef<HTMLDivElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const wavesurfer = useWavesurfer(containerRef, props);
@@ -36,7 +36,7 @@ const WaveSurferPlayerRaw = (props) => {
     return () => {
       subscriptions.forEach((unsub) => unsub());
     };
-  }, [wavesurfer]);
+  }, [wavesurfer]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // const { volume } = props;
   // useEffect(() => {
@@ -59,7 +59,10 @@ const WaveSurferPlayerRaw = (props) => {
 // memoize the player component
 export const MemoizedWaveSurferPlayer = React.memo(WaveSurferPlayerRaw);
 export const AudioPlayer = (
-  props: Omit<WaveSurferOptions, "container"> & { volume: number }
+  props: Omit<WaveSurferOptions, "container"> & {
+    volume: number;
+    // sendAudioTo: (audio: string | undefined) => void;
+  }
 ) => {
   const [plugins, setPlugins] = useState<any[]>([]);
   useEffect(() => {
@@ -67,9 +70,5 @@ export const AudioPlayer = (
     setPlugins([timeline_plugin]);
   }, []);
 
-  return (
-    <div className="">
-      <MemoizedWaveSurferPlayer {...props} plugins={plugins} />
-    </div>
-  );
+  return <MemoizedWaveSurferPlayer {...props} plugins={plugins} />;
 };

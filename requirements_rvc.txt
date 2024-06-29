@@ -1,3 +1,2 @@
 torch==2.0.0 # BSD 3-Clause - ensures torch is not reinstalled
-torchcrepe @ git+https://github.com/rsxdalv/torchcrepe@patch-1 # MIT License
-rvc-beta @ git+https://github.com/rsxdalv/Retrieval-based-Voice-Conversion-WebUI@package # MIT License
+rvc_pkg @ git+https://github.com/rsxdalv/rvc_pkg#egg=rvc_pkg # MIT License

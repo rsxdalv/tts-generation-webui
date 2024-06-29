@@ -1,4 +1,5 @@
-# TTS Generation WebUI (Bark, MusicGen + AudioGen, Tortoise, RVC, Vocos, Demucs)
+# TTS Generation WebUI (Bark, MusicGen + AudioGen, Tortoise, RVC, Vocos, Demucs, SeamlessM4T, MAGNeT)
+*Note: Not all models support all platforms. For example, MusicGen and AudioGen are not supported on MacOS as of yet.*
 
 ## One click installers
 
@@ -11,23 +12,23 @@ Google Colab demo: [![Open In Colab](https://colab.research.google.com/assets/co
 
 ## Videos
 
-|                  **How To Use TTS Voice Generation Web UI With AI Voice Cloning Technology (Bark AI Tutorial)**                  |                  **TTS Generation WebUI - A Tool for Text to Speech and Voice Cloning**                             |                       **Text to speech and voice cloning - TTS Generation WebUI**                                |
+|                  **Bark TTS, Seamless Translation, RVC, Music Generation and More**                  |                  **TTS Generation WebUI - A Tool for Text to Speech and Voice Cloning**                             |                       **Text to speech and voice cloning - TTS Generation WebUI**                                |
 | :------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------: |
-| [![Watch the video](https://img.youtube.com/vi/gYNCnltAHzY/sddefault.jpg)](https://youtu.be/gYNCnltAHzY) | [![Watch the video](https://img.youtube.com/vi/ScN2ypewABc/sddefault.jpg)](https://youtu.be/ScN2ypewABc) | [![Watch the video](https://img.youtube.com/vi/JXojhFjZ39k/sddefault.jpg)](https://youtu.be/JXojhFjZ39k) |
+| [![Watch the video](https://img.youtube.com/vi/Y8J717tr9t0/sddefault.jpg)](https://youtu.be/Y8J717tr9t0) | [![Watch the video](https://img.youtube.com/vi/ScN2ypewABc/sddefault.jpg)](https://youtu.be/ScN2ypewABc) | [![Watch the video](https://img.youtube.com/vi/JXojhFjZ39k/sddefault.jpg)](https://youtu.be/JXojhFjZ39k) |
 
 ## Screenshots
 
-|      ![musicgen](./screenshots/v2/musicgen.png)       |    ![rvc](./screenshots/v2/rvc.png)     | ![history](./screenshots/v2/history.jpg) |
-| :---------------------------------------------------: | :---------------------------------------------------: | :--------------------------------------: |
-| ![Screenshot 1](<./screenshots/screenshot%20(1).png>) | ![Screenshot 5](<./screenshots/screenshot%20(5).png>) | ![cloning](./screenshots/v2/cloning.png) |
+|  ![react](./screenshots/v2/react.png)  | ![musicgen](./screenshots/v2/musicgen.png) | ![rvc](./screenshots/v2/rvc.png) |
+| :-----------------------------------------: | :-----------------------------------------: | :-------------------------------: |
+
 
 ## Examples
 
-[audio__bark__continued_generation__2023-05-04_16-07-49_long.webm](https://user-images.githubusercontent.com/6757283/236218842-b9dc253e-05de-49e5-ada9-e714e1e2cbd4.webm)
+[audio__bark__continued_generation__2024-05-04_16-07-49_long.webm](https://user-images.githubusercontent.com/6757283/236218842-b9dc253e-05de-49e5-ada9-e714e1e2cbd4.webm)
 
-[audio__bark__continued_generation__2023-05-04_16-09-21_long.webm](https://user-images.githubusercontent.com/6757283/236219228-518d2b70-51a3-4175-af44-b24c01d14932.webm)
+[audio__bark__continued_generation__2024-05-04_16-09-21_long.webm](https://user-images.githubusercontent.com/6757283/236219228-518d2b70-51a3-4175-af44-b24c01d14932.webm)
 
-[audio__bark__continued_generation__2023-05-04_16-10-55_long.webm](https://user-images.githubusercontent.com/6757283/236219243-dad96404-0879-4274-828e-7f3afc6bac65.webm)
+[audio__bark__continued_generation__2024-05-04_16-10-55_long.webm](https://user-images.githubusercontent.com/6757283/236219243-dad96404-0879-4274-828e-7f3afc6bac65.webm)
 
 ## Extra Voices for Bark
 [![Echo AI](https://echo.ps.ai/echo.play.ai.jpg)](https://echo.ps.ai/)
@@ -40,12 +41,173 @@ https://rsxdalv.github.io/bark-speaker-directory/
 https://github.com/rsxdalv/tts-generation-webui/discussions/186#discussioncomment-7291274
 
 ## Changelog
+
+June 22:
+* Add Stable Audio to Gradio.
+
+June 21:
+* Add Vall-E-X demo to React UI.
+* Open React UI automatically in browser, fix the link again.
+* Add Split By Length to React/Tortoise.
+* Fix UVR5 demo folders.
+* Set fairseq version to 0.12.2 for Linux and Mac. (#323)
+* Improve generation history for all React UI tabs.
+
+May 17:
+* Fix Tortoise presets in React UI.
+
+May 9:
+* Add MMS to React UI.
+* Improve React UI and codebase.
+
+May 4:
+* Group Changelog by month
+
+## April 2024
+
+Apr 28:
+* Add Maha TTS to React UI.
+* Add GPU Info to React UI.
+
+Apr 6:
+* Add Vall-E-X generation demo tab.
+* Add MMS demo tab.
+* Add Maha TTS demo tab.
+* Add StyleTTS2 demo tab.
+
+Apr 5:
+* Fix RVC installation bug.
+* Add basic UVR5 demo tab.
+
+Apr 4:
+* Upgrade RVC to include RVMPE and FCPE. Remove the direct file input for models and indexes due to file duplication. Improve React UI interface for RVC.
+
+## March 2024
+
+<details>
+<summary>Click to expand</summary>
+
+Mar 28:
+* Add GPU Info tab
+
+Mar 27:
+* Add information about voice cloning to tab voice clone
+
+Mar 26:
+* Add Maha TTS demo notebook
+
+Mar 22:
+* Vall-E X demo via notebook (#292)
+* Add React UI to Docker image
+* Add install disclaimer
+
+Mar 16:
+* Upgrade vocos to 0.1.0
+
+Mar 14:
+* StyleTTS2 Demo Notebook
+
+Mar 13:
+* Add Experimental Pipeline (Bark / Tortoise / MusicGen / AudioGen / MAGNeT -> RVC / Demucs / Vocos) (#287)
+* Fix RVC bug with model reloading on each generation. For short inputs that results in a visible speedup.
+
+Mar 11:
+* Add Play as Audio and Save to Voices to bark (#286)
+* Change UX to show that files are deleted from favorites
+* Fix images for bark voices not showing
+* Fix audio playback in favorites
+
+Mar 10:
+* Add Batching to React UI Magnet (#283)
+* Add audio to audio translation to SeamlessM4T (#284)
+
+Mar 5:
+* Add Batching to React UI MusicGen (#281), thanks to https://github.com/Aamir3d for requesting this and providing feedback
+
+Mar 3:
+* Add MMS demo as a notebook
+* Add MultiBandDiffusion high VRAM disclaimer
+
+</details>
+
+## February 2024
+
+<details>
+<summary>Click to expand</summary>
+
+Feb 21:
+* Fix Docker container builds and bug with Docker-Audiocraft
+
+Feb 8:
+* Fix MultiBandDiffusion for MusicGen's stereo models, thank you https://github.com/mykeehu
+* Fix Node.js installation steps on Google Colab, code by https://github.com/miaohf
+
+Feb 6:
+* Add FLAC file generation extension by https://github.com/JoaCHIP
+
+</details>
+
+## January 2024
+
+<details>
+<summary>Click to expand</summary>
+
+Jan 21:
+* Add CPU/M1 torch auto-repair script with each update. To disable, edit check_cuda.py and change FORCE_NO_REPAIR = True
+
+Jan 16:
+* Upgrade MusicGen, adding support for stereo and large melody models
+* Add MAGNeT
+
+Jan 15:
+* Upgraded Gradio to 3.48.0
+  * Several visual bugs have appeared, if they are critical, please report them or downgrade gradio.
+  * Gradio: Suppress useless warnings
+* Supress Triton warnings
+* Gradio-Bark: Fix "Use last generation as history" behavior, empty selection no longer errors
+* Improve extensions loader display
+* Upgrade transformers to 4.36.1 from 4.31.0
+* Add SeamlessM4T Demo
+
+Jan 14:
+* React UI: Fix missing directory errors
+
+Jan 13:
+* React UI: Fix missing npm build step from automatic install
+
+Jan 12:
+* React UI: Fix names for audio actions
+* Gradio: Fix multiple API warnings
+* Integration - React UI now is launched alongside Gradio, with a link to open it
+
+Jan 11:
+* React UI: Make the build work without any errors
+
+Jan 9:
+* React UI
+  * Fix 404 handler for Wavesurfer
+  * Group Bark tabs together
+
+Jan 8:
+* Release React UI
+
+</details>
+
+
+## 2023
+<details>
+<summary>Click to expand</summary>
+
+## October 2023
+
 Oct 26:
 * Improve model selection UX for Musicgen
 
 Oct 24:
 * Add initial React UI for Musicgen and Demucs (https://github.com/rsxdalv/tts-generation-webui/pull/202)
 * Fix Bark long generation seed drifting (thanks to https://github.com/520Pig520)
+
+## September 2023
 
 Sep 21:
 * Bark: Add continue as semantic history button
@@ -64,6 +226,8 @@ Sep 5:
 * Add voice mixing to Bark
 * Add v1 Burn in prompt to Bark (Burn in prompts are for directing the semantic model without spending time on generating the audio. The v1 works by generating the semantic tokens and then using it as a prompt for the semantic model.)
 * Add generation length limiter to Bark
+
+## August 2023
 
 Aug 27:
 * Fix MusicGen ignoring the melody https://github.com/rsxdalv/tts-generation-webui/issues/153
@@ -123,6 +287,8 @@ Aug 3:
 Aug 2:
 * Fix Model locations not showing after restart
 
+## July 2023
+
 July 26:
 * Voice gallery
 * Voice cropping
@@ -165,6 +331,8 @@ July 2:
 July 1:
 * Studio-tab https://github.com/rsxdalv/tts-generation-webui/pull/58
 
+## June 2023
+
 Jun 29:
 * Tortoise new params https://github.com/rsxdalv/tts-generation-webui/pull/54
 
@@ -193,6 +361,8 @@ June 4:
 June 3:
 * Update to v4 - new output structure, improved history view, codebase reorganization, improved metadata, output extensions support
 
+## May 2023
+
 May 21:
 * Update to v3 - voice clone demo
 
@@ -219,14 +389,13 @@ May 4:
 May 3:
 * Improved Tortoise UI: Voice, Preset and CVVP settings as well as ability to generate 3 results (https://github.com/rsxdalv/tts-generation-webui/pull/6)
 
-May 2 Update 2:
+May 2:
 * Added support for history recylcing to continue longer prompts manually
-
-May 2 Update 1:
 * Added support for v2 prompts
 
 Before:
 * Added support for Tortoise TTS
+</details>
 
 ## Upgrading
 *In case of issues, feel free to contact the developers*.
@@ -239,11 +408,6 @@ Before:
 #### *Is there any more optimal way to do this?*
 
 Not exactly, the dependencies clash, especially between conda and python (and dependencies are already in a critical state, moving them to conda is ways off). Therefore, while it might be possible to just replace the old installer with the new one and running the update, the problems are unpredictable and **unfixable**. Making an update to installer requires a lot of testing so it's not done lightly.
-
-### Upgrading from v4 to v5 installer
-* Download and run the new installer
-* Replace the "tts-generation-webui" directory in the newly installed directory
-* Run update_*platform*
 
 ## Manual installation (not recommended, check installer source for reference)
 
@@ -258,6 +422,14 @@ Not exactly, the dependencies clash, especially between conda and python (and de
 * run using `(venv) python server.py`
 
 * Potentially needed to install build tools (without Visual Studio): https://visualstudio.microsoft.com/visual-cpp-build-tools/
+
+### React UI
+
+* Install nodejs (if not already installed with conda)
+* Install react dependencies: `npm install`
+* Build react: `npm run build`
+* Run react: `npm start`
+* Also run the python server: `python server.py` or with `start_(platform)` script
 
 ## Docker Setup
 
@@ -281,7 +453,8 @@ docker logs tts-generation-webui
 
 ## Open Source Libraries
 
-This project utilizes the following open source libraries:
+<details>
+<summary>This project utilizes the following open source libraries:</summary>
 
 - **suno-ai/bark** - [MIT License](https://github.com/suno-ai/bark/blob/main/LICENSE)
   - Description: A powerful library for XYZ.
@@ -311,6 +484,7 @@ This project utilizes the following open source libraries:
 - **RVC** - [MIT License](https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI/blob/main/LICENSE)
   - Description: An easy-to-use Voice Conversion framework based on VITS.
   - Repository: [RVC-Project/Retrieval-based-Voice-Conversion-WebUI](https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI)
+</details>
 
 ## Ethical and Responsible Use
 This technology is intended for enablement and creativity, not for harm.
@@ -349,6 +523,21 @@ Most notably:
 - AudioGen: CC BY-NC 4.0
 
 
+## Compatibility / Errors
+
+Audiocraft is currently only compatible with Linux and Windows. MacOS support still has not arrived, although it might be possible to install manually.
+
+### Torch being reinstalled
+
+Due to the python package manager (pip) limitations, torch can get reinstalled several times. This is a wide ranging issue of pip and torch.
+
+### Red messages in console
+These messages:
+```
+---- requires ----, but you have ---- which is incompatible.
+```
+Are completely normal. It's both a limitation of pip and because this Web UI combines a lot of different AI projects together. Since the projects are not always compatible with each other, they will complain about the other projects being installed. This is normal and expected. And in the end, despite the warnings/errors the projects will work together.
+It's not clear if this situation will ever be resolvable, but that is the hope.
 
 ## Configuration Guide
 

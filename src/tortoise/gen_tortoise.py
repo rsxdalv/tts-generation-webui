@@ -166,6 +166,7 @@ def _process_gen(candidates, audio_array, id, params: TortoiseParameters):
         save_button=gr.Button.update(value="Save to favorites", visible=True),
         seed=params.seed,
         bundle_name=history_bundle_name_data,
+        params=gr.JSON.update(value=metadata), # broken because gradio returns only __type__
     )
 
 

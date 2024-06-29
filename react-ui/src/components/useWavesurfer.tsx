@@ -11,11 +11,13 @@ export const useWavesurfer = (containerRef, options: WaveSurferOptions) => {
 
     const ws = WaveSurfer.create({
       ...options,
+      url: undefined,
       container: containerRef.current,
     });
-
+    ws.load(options.url!).catch((e) => {
+      console.log("=== Wavesurfer loading failed", e);
+    });
     setWavesurfer(ws);
-
     return () => {
       ws.destroy();
     };

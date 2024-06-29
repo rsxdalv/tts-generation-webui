@@ -1,32 +1,8 @@
-export type Generation = {
-  name: string;
-  prompt?: string;
-  directory: string;
-  audio: string;
-  tags: string[];
-  // deprecated
-  download: string;
-  language:
-    | "american"
-    | "german"
-    | "spanish"
-    | "french"
-    | "hindi"
-    | "chinese"
-    | "portuguese"
-    | "russian"
-    | "turkish"
-    | "polish"
-    | "korean"
-    | "japanese"
-    | "italian";
-  author: string;
-  gender: "male" | "female" | "other";
-  image: string;
-};
-
 export interface GenerationRaw {
-  prompt: string;
+  _type?: string;
+
+  prompt?: string;
+  text?: string;
   language: string;
   speaker_id: string;
   history_prompt: string;
@@ -46,5 +22,32 @@ export interface GenerationRaw {
   is_big_fine_model: boolean;
 
   hash?: string;
-  name?: string;
+  name?: String;
+  history_bundle_name_data?: string;
+  api_filename?: string;
+}
+
+export interface TortoiseMeta {
+  _version: string;
+  _type: string;
+  date: string;
+  candidates: number;
+  text: string;
+  voice: string;
+  preset: string;
+  seed: string;
+  cvvp_amount: number;
+  split_prompt: boolean;
+  num_autoregressive_samples: number;
+  diffusion_iterations: number;
+  temperature: number;
+  length_penalty: number;
+  repetition_penalty: number;
+  top_p: number;
+  max_mel_tokens: number;
+  cond_free: boolean;
+  cond_free_k: number;
+  diffusion_temperature: number;
+  model: string;
+  name: string;
 }

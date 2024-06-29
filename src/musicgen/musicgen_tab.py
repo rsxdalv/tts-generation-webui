@@ -2,6 +2,8 @@ import torch
 import gradio as gr
 from audiocraft.models.musicgen import MusicGen
 from audiocraft.models.audiogen import AudioGen
+from audiocraft.models.encodec import InterleaveStereoCompressionModel
+from einops import rearrange
 from typing import Optional, Tuple, TypedDict
 import numpy as np
 import os
@@ -27,8 +29,6 @@ from typing import Optional
 from importlib.metadata import version
 
 AUDIOCRAFT_VERSION = version("audiocraft")
-FB_MUSICGEN_MELODY = "facebook/musicgen-melody"
-
 
 class MusicGenGeneration(TypedDict):
     model: str
@@ -88,6 +88,9 @@ def save_generation(
     base_filename = create_base_filename(title, "outputs", model="musicgen", date=date)
 
     filename, filename_png, filename_json, filename_npz = get_filenames(base_filename)
+    stereo = audio_array.shape[0] == 2
+    if stereo:
+        audio_array = np.transpose(audio_array)
     write_wav(filename, SAMPLE_RATE, audio_array)
     plot = save_waveform_plot(audio_array, filename_png)
 
@@ -139,7 +142,7 @@ def generate(params: MusicGenGeneration, melody_in: Optional[Tuple[int, np.ndarr
     model = params["model"]
     text = params["text"]
     # due to JSON serialization limitations
-    params["melody"] = None if model != FB_MUSICGEN_MELODY else melody_in
+    params["melody"] = None if "melody" not in model else melody_in
     melody = params["melody"]
 
     global MODEL
@@ -166,7 +169,7 @@ def generate(params: MusicGenGeneration, melody_in: Optional[Tuple[int, np.ndarr
     params["seed"] = parse_or_set_seed(params["seed"], 0)
     # generator = torch.Generator(device=MODEL.device).manual_seed(params["seed"])
     log_generation_musicgen(params)
-    if model == FB_MUSICGEN_MELODY and melody is not None:
+    if "melody" in model and melody is not None:
         sr, melody = melody[0], torch.from_numpy(melody[1]).to(
             MODEL.device
         ).float().t().unsqueeze(0)
@@ -206,8 +209,14 @@ def generate(params: MusicGenGeneration, melody_in: Optional[Tuple[int, np.ndarr
             from audiocraft.models.multibanddiffusion import MultiBandDiffusion
 
             mbd = MultiBandDiffusion.get_mbd_musicgen()
-            wav_diffusion = mbd.tokens_to_wav(tokens)
-            output = wav_diffusion.detach().cpu().numpy().squeeze()
+            if isinstance(MODEL.compression_model, InterleaveStereoCompressionModel):
+                left, right = MODEL.compression_model.get_left_right_codes(tokens)
+                tokens = torch.cat([left, right])
+            outputs_diffusion = mbd.tokens_to_wav(tokens)
+            if isinstance(MODEL.compression_model, InterleaveStereoCompressionModel):
+                assert outputs_diffusion.shape[1] == 1  # output is mono
+                outputs_diffusion = rearrange(outputs_diffusion, '(s b) c t -> b (s c) t', s=2)
+            output = outputs_diffusion.detach().cpu().numpy().squeeze()
         else:
             print("NOTICE: Multi-band diffusion is not supported for AudioGen")
             params["use_multi_band_diffusion"] = False
@@ -223,7 +232,7 @@ def generate(params: MusicGenGeneration, melody_in: Optional[Tuple[int, np.ndarr
     )
 
     return [
-        (MODEL.sample_rate, output),
+        (MODEL.sample_rate, output.transpose()),
         os.path.dirname(filename),
         plot,
         params["seed"],
@@ -258,16 +267,17 @@ def generation_tab_musicgen():
                 )
                 model = gr.Radio(
                     [
-                        FB_MUSICGEN_MELODY,
-                        # "musicgen-melody",
+                        "facebook/musicgen-melody",
                         "facebook/musicgen-medium",
-                        # "musicgen-medium",
                         "facebook/musicgen-small",
-                        # "musicgen-small",
                         "facebook/musicgen-large",
-                        # "musicgen-large",
                         "facebook/audiogen-medium",
-                        # "audiogen-medium",
+                        "facebook/musicgen-melody-large",
+                        "facebook/musicgen-stereo-small",
+                        "facebook/musicgen-stereo-medium",
+                        "facebook/musicgen-stereo-melody",
+                        "facebook/musicgen-stereo-large",
+                        "facebook/musicgen-stereo-melody-large",
                     ],
                     label="Model",
                     value="facebook/musicgen-small",
@@ -313,7 +323,7 @@ def generation_tab_musicgen():
                         step=0.1,
                     )
                 use_multi_band_diffusion = gr.Checkbox(
-                    label="Use Multi-Band Diffusion",
+                    label="Use Multi-Band Diffusion (High VRAM Usage)",
                     value=False,
                 )
                 seed, set_old_seed_button, _ = setup_seed_ui_musicgen()
@@ -327,7 +337,9 @@ def generation_tab_musicgen():
             )
             image = gr.Image(label="Waveform", shape=(None, 100), elem_classes="tts-image")  # type: ignore
             with gr.Row():
-                history_bundle_name_data = gr.State()  # type: ignore
+                history_bundle_name_data = gr.Textbox(
+                    visible=False,
+                )
                 send_to_demucs_button = gr.Button("Send to Demucs", visible=True)
                 save_button = gr.Button("Save to favorites", visible=True)
                 melody_button = gr.Button("Use as melody", visible=True)

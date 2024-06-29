@@ -114,10 +114,7 @@ def get_encodec_prompts(path_to_wav: str, use_gpu=True):
     coarse_prompt = fine_prompt[:2, :]
     return fine_prompt, coarse_prompt
 
-
-def save_cloned_voice(
-    full_generation: FullGeneration,
-):
+def save_cloned_voice(full_generation: FullGeneration):
     voice_name = f"voice_from_audio_{history_to_hash(full_generation)}"
     filename = f"voices/{voice_name}.npz"
     date = get_date_string()
@@ -143,8 +140,29 @@ def tab_voice_clone(register_use_as_history_button):
                 """
             Unethical use of this technology is prohibited.
             This demo is based on https://github.com/gitmylo/bark-voice-cloning-HuBERT-quantizer repository.
+
+            Information from the original repository (https://github.com/gitmylo/bark-voice-cloning-HuBERT-quantizer?tab=readme-ov-file#voices-cloned-arent-very-convincing-why-are-other-peoples-cloned-voices-better-than-mine)
+
+            ## Voices cloned aren't very convincing, why are other people's cloned voices better than mine?
+            Make sure these things are **NOT** in your voice input: (in no particular order)
+            * Noise (You can use a noise remover before)
+            * Music (There are also music remover tools) (Unless you want music in the background)
+            * A cut-off at the end (This will cause it to try and continue on the generation)
+            * Under 1 second of training data (i personally suggest around 10 seconds for good potential, but i've had great results with 5 seconds as well.)
+
+            What makes for good prompt audio? (in no particular order)
+            * Clearly spoken
+            * No weird background noises
+            * Only one speaker
+            * Audio which ends after a sentence ends
+            * Regular/common voice (They usually have more success, it's still capable of cloning complex voices, but not as good at it)
+            * Around 10 seconds of data
+
             """
             )
+
+
+        with gr.Column():
             tokenizer_dropdown = gr.Dropdown(
                 label="Tokenizer",
                 choices=[
@@ -155,6 +173,7 @@ def tab_voice_clone(register_use_as_history_button):
                     "german-HuBERT-quantizer_14_epoch.pth @ CountFloyd/bark-voice-cloning-german-HuBERT-quantizer",
                     "es_tokenizer.pth @ Lancer1408/bark-es-tokenizer",
                     "portuguese-HuBERT-quantizer_24_epoch.pth @ MadVoyager/bark-voice-cloning-portuguese-HuBERT-quantizer",
+                    "turkish_model_epoch_14.pth @ egeadam/bark-voice-cloning-turkish-HuBERT-quantizer",
                 ],
                 value="quantifier_hubert_base_ls960_14.pth @ GitMylo/bark-voice-cloning",
                 allow_custom_value=True,
@@ -167,7 +186,6 @@ def tab_voice_clone(register_use_as_history_button):
                 source="upload",
                 interactive=True,
             )
-
             with gr.Row():
                 use_gpu_checkbox = gr.Checkbox(label="Use GPU", value=True)
                 clear_models_button = gr.Button(
@@ -207,9 +225,9 @@ def tab_voice_clone(register_use_as_history_button):
                 load_tokenizer,
                 inputs=[tokenizer_dropdown, use_gpu_checkbox],
                 outputs=[tokenizer_dropdown],
+                api_name="bark_voice_tokenizer_load",
             )
-
-        with gr.Column():
+            
             gr.Markdown("Generated voice:")
             voice_file_name = gr.Textbox(
                 label="Voice file name", value="", interactive=False
@@ -229,8 +247,10 @@ def tab_voice_clone(register_use_as_history_button):
         generate_voice_button.click(
             fn=generate_voice,
             inputs=[file_input, use_gpu_checkbox],
+            # inputs=[file_input, use_gpu_checkbox, tokenizer_dropdown],
             outputs=[voice_file_name, audio_preview],
             preprocess=True,
+            api_name="bark_voice_generate",
         )
 
         register_use_as_history_button(
