@@ -47,7 +47,7 @@ const routes: Route[] = [
         text: "Vocos NPZ",
       },
       {
-        href: "https://echo.ps.ai/?utm_source=react_ui",
+        href: "https://promptecho.com/?utm_source=react_ui",
         text: <span>More Voices&nbsp;↗</span>,
         target: "_blank",
       },
