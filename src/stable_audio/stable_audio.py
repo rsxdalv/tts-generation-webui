@@ -12,11 +12,11 @@ from stable_audio_tools.interface.gradio import (
 )
 
 from src.history_tab.open_folder import open_folder
-from src.tortoise.gr_reload_button import gr_open_button_simple
 from src.utils.get_path_from_root import get_path_from_root
 
-LOCAL_DIR_BASE = "data/models/stable-audio"
+LOCAL_DIR_BASE = os.path.join("data", "models", "stable-audio")
 LOCAL_DIR_BASE_ABSOLUTE = get_path_from_root(*LOCAL_DIR_BASE.split("/"))
+OUTPUT_DIR = os.path.join("outputs-rvc", "Stable Audio")
 
 
 def get_local_dir(name):
@@ -107,7 +107,7 @@ def load_model_config(model_name):
 
 
 def stable_audio_ui():
-    default_model_config_path = "data/models/stable-audio/diffusion_cond.json"
+    default_model_config_path = os.path.join(LOCAL_DIR_BASE, "diffusion_cond.json")
     with open(default_model_config_path) as f:
         model_config = json.load(f)
 
@@ -181,8 +181,18 @@ def stable_audio_ui():
     with gr.Tabs():
         with gr.Tab("Generation"):
             create_sampling_ui(model_config)
+            open_dir_btn = gr.Button("Open outputs folder")
+            open_dir_btn.click(
+                lambda: open_folder(OUTPUT_DIR),
+                api_name="stable_audio_open_output_dir",
+            )
         with gr.Tab("Inpainting"):
             create_sampling_ui(model_config, inpainting=True)
+            open_dir_btn = gr.Button("Open outputs folder")
+            open_dir_btn.click(
+                lambda: open_folder(OUTPUT_DIR),
+                api_name="stable_audio_open_output_dir",
+            )
         with gr.Tab("Model Download"):
             gr.Markdown(
                 "Models can be found on the [HuggingFace model hub](https://huggingface.co/models?search=stable-audio-open-1.0)."
@@ -219,8 +229,10 @@ def stable_audio_ui_tab():
     with gr.Tab("Stable Audio"):
         stable_audio_ui()
 
+
 import scipy.io.wavfile as wavfile
 from src.utils.date import get_date_string
+
 
 def save_result(audio, *generation_args):
 
@@ -260,8 +272,7 @@ def save_result(audio, *generation_args):
 
     name = f"{date}_{get_name(prompt)}"
 
-    root_dir = os.path.join("outputs-rvc", "Stable Audio")
-    base_dir = os.path.join(root_dir, name)
+    base_dir = os.path.join(OUTPUT_DIR, name)
     os.makedirs(base_dir, exist_ok=True)
 
     sr, data = audio
@@ -526,14 +537,6 @@ def create_sampling_ui(model_config, inpainting=False):
                 outputs=[init_audio_input],
             )
 
-    # FEATURE - crop the audio to the actual length specified
-    # def crop_audio(audio, seconds_start_slider, seconds_total_slider):
-    #     sr, data = audio
-    #     seconds_start = seconds_start_slider.value
-    #     seconds_total = seconds_total_slider.value
-    #     data = data[int(seconds_start * sr) : int(seconds_total * sr)]
-    #     return sr, data
-
     generate_button.click(
         fn=generate_cond,
         inputs=inputs,
@@ -554,6 +557,14 @@ def create_sampling_ui(model_config, inpainting=False):
 def torch_clear_memory():
     torch.cuda.empty_cache()
 
+
+# FEATURE - crop the audio to the actual length specified
+# def crop_audio(audio, seconds_start_slider, seconds_total_slider):
+#     sr, data = audio
+#     seconds_start = seconds_start_slider.value
+#     seconds_total = seconds_total_slider.value
+#     data = data[int(seconds_start * sr) : int(seconds_total * sr)]
+#     return sr, data
 
 if __name__ == "__main__":
     exec(
