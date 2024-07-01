@@ -219,6 +219,63 @@ def stable_audio_ui_tab():
     with gr.Tab("Stable Audio"):
         stable_audio_ui()
 
+import scipy.io.wavfile as wavfile
+from src.utils.date import get_date_string
+
+def save_result(audio, *generation_args):
+
+    date = get_date_string()
+
+    generation_args = {
+        "date": date,
+        "version": "0.0.1",
+        "prompt": generation_args[0],
+        "negative_prompt": generation_args[1],
+        "seconds_start_slider": generation_args[2],
+        "seconds_total_slider": generation_args[3],
+        "cfg_scale_slider": generation_args[4],
+        "steps_slider": generation_args[5],
+        "preview_every_slider": generation_args[6],
+        "seed_textbox": generation_args[7],
+        "sampler_type_dropdown": generation_args[8],
+        "sigma_min_slider": generation_args[9],
+        "sigma_max_slider": generation_args[10],
+        "cfg_rescale_slider": generation_args[11],
+        "init_audio_checkbox": generation_args[12],
+        "init_audio_input": generation_args[13],
+        "init_noise_level_slider": generation_args[14],
+    }
+    print(generation_args)
+    prompt = generation_args["prompt"]
+
+    def get_name(prompt):
+        return (
+            prompt.replace(" ", "_")
+            .replace(":", "_")
+            .replace("'", "_")
+            .replace('"', "_")
+            .replace("\\", "_")
+            .replace(",", "_")
+        )
+
+    name = f"{date}_{get_name(prompt)}"
+
+    root_dir = os.path.join("outputs-rvc", "Stable Audio")
+    base_dir = os.path.join(root_dir, name)
+    os.makedirs(base_dir, exist_ok=True)
+
+    sr, data = audio
+
+    wavfile.write(os.path.join(base_dir, f"{name}.wav"), sr, data)
+
+    with open(os.path.join(base_dir, f"{name}.json"), "w") as outfile:
+        json.dump(
+            generation_args,
+            outfile,
+            indent=2,
+            default=lambda o: "<not serializable>",
+        )
+
 
 sample_rate = 32000
 sample_size = 1920000
@@ -469,81 +526,6 @@ def create_sampling_ui(model_config, inpainting=False):
                 outputs=[init_audio_input],
             )
 
-    save_button = gr.Button("Save to favorites")
-
-    import scipy.io.wavfile as wavfile
-    import datetime
-
-    def get_date_string():
-        now = datetime.datetime.now()
-        return now.strftime("%Y-%m-%d_%H-%M-%S")
-
-    def save_cond(audio, *generation_args):
-
-        date = get_date_string()
-
-        generation_args = {
-            "date": date,
-            "version": "0.0.1",
-            "prompt": generation_args[0],
-            "negative_prompt": generation_args[1],
-            "seconds_start_slider": generation_args[2],
-            "seconds_total_slider": generation_args[3],
-            "cfg_scale_slider": generation_args[4],
-            "steps_slider": generation_args[5],
-            "preview_every_slider": generation_args[6],
-            "seed_textbox": generation_args[7],
-            "sampler_type_dropdown": generation_args[8],
-            "sigma_min_slider": generation_args[9],
-            "sigma_max_slider": generation_args[10],
-            "cfg_rescale_slider": generation_args[11],
-            "init_audio_checkbox": generation_args[12],
-            "init_audio_input": generation_args[13],
-            "init_noise_level_slider": generation_args[14],
-        }
-        print(generation_args)
-        prompt = generation_args["prompt"]
-
-        name = (
-            prompt.replace(" ", "_")
-            .replace(":", "_")
-            .replace("'", "_")
-            .replace('"', "_")
-            .replace("\\", "_")
-            .replace(",", "_")
-        )
-
-        name = f"{date}_{name}"
-
-        os.makedirs(os.path.join("favorites", "Stable Audio", name), exist_ok=True)
-        sr, data = audio
-        wavfile.write(
-            os.path.join("favorites", "Stable Audio", name, f"{name}.wav"),
-            sr,
-            data,
-        )
-
-        with open(
-            os.path.join("favorites", "Stable Audio", name, f"{name}.json"), "w"
-        ) as outfile:
-            json.dump(
-                generation_args,
-                outfile,
-                indent=2,
-                default=lambda o: "<not serializable>",
-            )
-        return save_button
-
-    save_button.click(
-        fn=save_cond,
-        inputs=[
-            audio_output,
-            *inputs,
-        ],
-        outputs=[save_button],
-        api_name="save",
-    )
-
     # FEATURE - crop the audio to the actual length specified
     # def crop_audio(audio, seconds_start_slider, seconds_total_slider):
     #     sr, data = audio
@@ -556,15 +538,14 @@ def create_sampling_ui(model_config, inpainting=False):
         fn=generate_cond,
         inputs=inputs,
         outputs=[audio_output, audio_spectrogram_output],
-        api_name="generate",
-        # ).then(
-        #     fn=save_cond,
-        #     inputs=[
-        #         audio_output,
-        #         *inputs,
-        #     ],
-        #     outputs=[save_button],
-        #     api_name="save",
+        api_name="stable_audio_generate",
+    ).then(
+        fn=save_result,
+        inputs=[
+            audio_output,
+            *inputs,
+        ],
+        api_name="stable_audio_save",
     ).then(
         fn=torch_clear_memory,
     )
