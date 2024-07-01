@@ -92,6 +92,20 @@ def get_model_list():
         return []
 
 
+def load_model_config(model_name):
+    path = get_config_path(model_name)
+    try:
+        with open(path) as f:
+            return json.load(f)
+    except Exception as e:
+        print(e)
+        message = (
+            f"Model config not found at {path}. Please ensure model_config.json exists."
+        )
+        gr.Error(message)
+        raise Exception(message)
+
+
 def stable_audio_ui():
     default_model_config_path = "data/models/stable-audio/diffusion_cond.json"
     with open(default_model_config_path) as f:
@@ -105,11 +119,6 @@ def stable_audio_ui():
             return model_name
 
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-        def load_model_config(model_name):
-            path = get_config_path(model_name)
-            with open(path) as f:
-                return json.load(f)
 
         _, model_config_new = load_model(
             model_config=load_model_config(model_name),
