@@ -148,11 +148,18 @@ def stable_audio_ui():
                 type="value",
             )
 
-            half_checkbox = gr.Checkbox(
-                label="Use half precision",
-                value=True,
-                type="value",
-            )
+            with gr.Column():
+                gr.Markdown(
+                    """
+                    Stable Audio requires a manual download of a model.
+                    Please download a model using the download tab or manually place it in the `data/models/stable-audio` folder.
+                    """
+                )
+                half_checkbox = gr.Checkbox(
+                    label="Use half precision",
+                    value=True,
+                    type="value",
+                )
 
             model_select.change(
                 fn=load_model_helper,
