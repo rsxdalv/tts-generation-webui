@@ -85,7 +85,7 @@ def get_model_list():
         return [
             x
             for x in os.listdir(LOCAL_DIR_BASE)
-            if x != ".gitkeep" and x != "diffusion_cond.json"
+            if os.path.isdir(os.path.join(LOCAL_DIR_BASE, x))
         ]
     except FileNotFoundError as e:
         print(e)
@@ -488,7 +488,14 @@ def create_sampling_ui(model_config, inpainting=False):
         print(generation_args)
         prompt = generation_args["prompt"]
 
-        name = prompt.replace(" ", "_").replace(":", "_").replace("'", "_").replace("\"", "_").replace("\\", "_").replace(",", "_")
+        name = (
+            prompt.replace(" ", "_")
+            .replace(":", "_")
+            .replace("'", "_")
+            .replace('"', "_")
+            .replace("\\", "_")
+            .replace(",", "_")
+        )
 
         name = f"{date}_{name}"
 
@@ -503,7 +510,12 @@ def create_sampling_ui(model_config, inpainting=False):
         with open(
             os.path.join("favorites", "Stable Audio", name, f"{name}.json"), "w"
         ) as outfile:
-            json.dump(generation_args, outfile, indent=2, default=lambda o: '<not serializable>')
+            json.dump(
+                generation_args,
+                outfile,
+                indent=2,
+                default=lambda o: "<not serializable>",
+            )
         return save_button
 
     save_button.click(
@@ -523,30 +535,32 @@ def create_sampling_ui(model_config, inpainting=False):
     #     seconds_total = seconds_total_slider.value
     #     data = data[int(seconds_start * sr) : int(seconds_total * sr)]
     #     return sr, data
-    
+
     generate_button.click(
         fn=generate_cond,
         inputs=inputs,
         outputs=[audio_output, audio_spectrogram_output],
         api_name="generate",
-    # ).then(
-    #     fn=save_cond,
-    #     inputs=[
-    #         audio_output,
-    #         *inputs,
-    #     ],
-    #     outputs=[save_button],
-    #     api_name="save",
+        # ).then(
+        #     fn=save_cond,
+        #     inputs=[
+        #         audio_output,
+        #         *inputs,
+        #     ],
+        #     outputs=[save_button],
+        #     api_name="save",
     ).then(
         fn=torch_clear_memory,
     )
+
 
 def torch_clear_memory():
     torch.cuda.empty_cache()
 
 
 if __name__ == "__main__":
-    exec("""
+    exec(
+        """
     main()
         with gr.Blocks() as interface:
             stable_audio_ui_tab()
@@ -556,6 +570,7 @@ if __name__ == "__main__":
             debug=True,
         )
 
-    """)
+    """
+    )
 
     # main()
