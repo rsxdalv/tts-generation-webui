@@ -546,19 +546,16 @@ def torch_clear_memory():
 
 
 if __name__ == "__main__":
+    exec("""
+    main()
+        with gr.Blocks() as interface:
+            stable_audio_ui_tab()
 
-exec("""
-def main():
-    torch.manual_seed(42)
+        interface.queue()
+        interface.launch(
+            debug=True,
+        )
 
-    with gr.Blocks() as interface:
-        stable_audio_ui_tab()
+    """)
 
-    interface.queue()
-    interface.launch(
-        debug=True,
-    )
-
-""")
-
-main()
+    # main()
