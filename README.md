@@ -30,8 +30,9 @@ Google Colab demo: [![Open In Colab](https://colab.research.google.com/assets/co
 
 [audio__bark__continued_generation__2024-05-04_16-10-55_long.webm](https://user-images.githubusercontent.com/6757283/236219243-dad96404-0879-4274-828e-7f3afc6bac65.webm)
 
-## Extra Voices for Bark
-[![Echo AI](https://echo.ps.ai/echo.play.ai.jpg)](https://echo.ps.ai/)
+## Extra Voices for Bark, Prompt Samples
+[![PromptEcho](https://promptecho.com/echo.play.ai.jpg)](https://promptecho.com/)
+
 https://rsxdalv.github.io/bark-speaker-directory/
 
 ## Bark Readme
@@ -41,6 +42,12 @@ https://rsxdalv.github.io/bark-speaker-directory/
 https://github.com/rsxdalv/tts-generation-webui/discussions/186#discussioncomment-7291274
 
 ## Changelog
+
+July 1:
+* Optimize Stable Audio memory usage after generation.
+* Open React UI automatically only if gradio also opens automatically.
+* Remove unnecessary conda git reinstall.
+* Update to lastest Stable Audio which has mps support (requires newer torch versions).
 
 June 22:
 * Add Stable Audio to Gradio.

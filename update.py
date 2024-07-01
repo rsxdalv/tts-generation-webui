@@ -88,7 +88,7 @@ def main():
             "Torch does not have CUDA, assuming CPU mode, installing CPU version of PyTorch"
         )
         do(
-            "conda install --force-reinstall -y -k pytorch torchvision torchaudio cpuonly git -c pytorch"
+            "conda install --force-reinstall -y -k pytorch torchvision torchaudio cpuonly -c pytorch"
         )
 
 

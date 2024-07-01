@@ -297,6 +297,7 @@ if __name__ == "__main__":
     import webbrowser
 
     subprocess.Popen("npm start --prefix react-ui", shell=True)
-    webbrowser.open("http://localhost:3000")
+    if gradio_interface_options["inbrowser"]:
+        webbrowser.open("http://localhost:3000")
 
     start_server()
