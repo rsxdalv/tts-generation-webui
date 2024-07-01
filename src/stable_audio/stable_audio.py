@@ -165,7 +165,7 @@ def stable_audio_ui():
                     """
                 )
                 half_checkbox = gr.Checkbox(
-                    label="Use half precision",
+                    label="Use half precision when loading the model",
                     value=True,
                     type="value",
                 )
