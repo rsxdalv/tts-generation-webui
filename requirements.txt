@@ -1,5 +1,4 @@
 safetensors==0.3.1 # Until they fix it
-torch==2.0.0 # BSD 3-Clause - ensures torch is not reinstalled
 ffmpeg-python # Apache 2.0
 gradio==3.48.0
 python-dotenv==1.0.0
