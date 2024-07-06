@@ -1,2 +1,1 @@
-torch==2.0.0 # BSD 3-Clause - ensures torch is not reinstalled
-maha-tts @ git+https://github.com/dubverse-ai/MahaTTS.git@e6680df225a99367e070c0090dd564bc74647e23 # Apache 2.0
+maha-tts @ git+https://github.com/dubverse-ai/MahaTTS.git@9d45f75e74de8f6b5e6458be52cfc3a21cfd4435 # Apache 2.0
