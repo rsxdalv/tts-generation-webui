@@ -44,6 +44,8 @@ https://github.com/rsxdalv/tts-generation-webui/discussions/186#discussioncommen
 
 July 6:
 * Initial release of new mamba based installer.
+* Save Stable Audio results to outputs-rvc/StableAudio folder.
+* Add a disclaimer to Stable Audio model selection and show better error messages when files are missing.
 
 July 1:
 * Optimize Stable Audio memory usage after generation.
