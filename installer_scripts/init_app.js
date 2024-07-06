@@ -48,7 +48,6 @@ const updateConda = async () => {
   await $("conda update -y -n base -c defaults conda");
 };
 
-let hasPulledGit = false;
 const syncRepo = async () => {
   if (!fs.existsSync(".git")) {
     displayMessage("Linking to tts-generation-webui repository");
@@ -60,13 +59,22 @@ const syncRepo = async () => {
     await $("git fetch");
     await $("git reset --hard origin/main"); // Required when the versioned files existed in path before "git init" of this repo.
     await $("git branch --set-upstream-to=origin/main");
+    return true;
   } else {
     displayMessage("Pulling updates from tts-generation-webui");
     try {
+      const file = ".git/refs/heads/main";
+      const currentHash = fs.readFileSync(file, "utf8");
       await $("git pull");
-      hasPulledGit = true; // Check if anything changed
+      const newHash = fs.readFileSync(file, "utf8");
+      if (currentHash === newHash) {
+        displayMessage("No updates found, skipping...");
+        return false;
+      }
+      return true;
     } catch (error) {
-      displayMessage("There was a problem while pulling updates. Skipping...");
+      displayMessage("There was a problem while pulling updates. Aborting...");
+      throw error;
     }
   }
 };
@@ -157,10 +165,6 @@ const initializeApp = async () => {
 };
 
 function setupReactUI() {
-  if (!hasPulledGit) {
-    displayMessage("No updates found, skipping react-ui setup");
-    return;
-  }
   try {
     displayMessage("Installing node_modules...");
     $sh("cd react-ui && npm install");
@@ -200,7 +204,6 @@ function tryInstall(requirements, name = "") {
 }
 
 async function updateDependencies(optional = true) {
-  // hasPulledGit ?
   if (optional) {
     if (
       (await menu(["Yes", "No"], "Do you want to update dependencies?")) ===
@@ -263,7 +266,10 @@ async function main() {
   try {
     await checkConda();
     // await updateConda();
-    await syncRepo();
+    const isUpdated = await syncRepo();
+    if (!isUpdated) {
+      return;
+    }
     await initializeApp();
     await setupReactUI();
     await repairTorch();
