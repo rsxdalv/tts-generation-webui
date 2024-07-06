@@ -1,6 +1,9 @@
 # Ignore Python bytecode
 __pycache__
 
+# Ignore Conda environment
+installer_files/
+
 # Ignore settings
 config.json
 .env

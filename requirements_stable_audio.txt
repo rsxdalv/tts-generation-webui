@@ -1,2 +1,5 @@
 torch==2.0.0 # BSD 3-Clause - ensures torch is not reinstalled
 stable-audio-tools @ git+https://github.com/rsxdalv/stable-audio-tools@release#egg=stable-audio-tools # MIT License
+descript-audiotools @ git+https://github.com/rsxdalv/audiotools@release#egg=descript-audiotools # MIT License
+protobuf==4.25.3 # needs to be pinned on audiotools too
+setuptools<=69.5.0 # prevent a bug with 70.0.0

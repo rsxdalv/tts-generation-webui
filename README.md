@@ -5,7 +5,8 @@
 
 [Download](https://github.com/rsxdalv/one-click-installers-tts/archive/refs/tags/v6.0.zip) ||
 [Upgrading](#upgrading) ||
-[Manual installation](#manual-installation)
+[Manual installation](#manual-installation-not-recommended-check-installer-source-for-reference) ||
+[Docker Setup](#docker-setup) || [Configuration Guide](#configuration-guide) || [Discord Server](https://discord.gg/3JbBrKrH)
 
 Google Colab demo: [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rsxdalv/tts-generation-webui/blob/main/notebooks/google_collab.ipynb)
 
@@ -42,6 +43,9 @@ https://rsxdalv.github.io/bark-speaker-directory/
 https://github.com/rsxdalv/tts-generation-webui/discussions/186#discussioncomment-7291274
 
 ## Changelog
+
+July 6:
+* Initial release of new mamba based installer.
 
 July 1:
 * Optimize Stable Audio memory usage after generation.
@@ -415,6 +419,11 @@ Before:
 #### *Is there any more optimal way to do this?*
 
 Not exactly, the dependencies clash, especially between conda and python (and dependencies are already in a critical state, moving them to conda is ways off). Therefore, while it might be possible to just replace the old installer with the new one and running the update, the problems are unpredictable and **unfixable**. Making an update to installer requires a lot of testing so it's not done lightly.
+
+## New Installer
+* Download the repository as a zip file and extract it.
+* Run start_tts_webui.bat or start_tts_webui.sh to start the server. The server will be available at http://localhost:7860
+* Output log will be available in the installer_scripts/output.log file.
 
 ## Manual installation (not recommended, check installer source for reference)
 
