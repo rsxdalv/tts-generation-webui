@@ -1,0 +1,1 @@
+audiocraft @ git+https://git@github.com/rsxdalv/audiocraft@main#egg=audiocraft # MIT License
