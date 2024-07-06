@@ -1,0 +1,6 @@
+# Ignore output log
+output.log
+
+# Bat exists test
+.tmp1
+.tmp2

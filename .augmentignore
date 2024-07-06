@@ -1,6 +1,9 @@
 # Ignore Python bytecode
 __pycache__
 
+# Ignore Conda environment
+installer_files/
+
 # Ignore settings
 config.json
 .env
@@ -14,7 +17,15 @@ config.json
 /voices-tortoise/
 
 # Ignore model checkpoints
-/data/models
+/data/models/hubert/
+/data/models/magnet/
+/data/models/maha-tts/
+/data/models/rvc/checkpoints/
+/data/models/rvc/rmvpe/
+/data/models/rvc/uvr5_weights/
+/data/models/stable-audio/*/
+/data/models/tortoise/
+/data/models/vall-e-x/
 
 # Ignore temporary files
 temp/
