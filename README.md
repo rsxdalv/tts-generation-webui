@@ -1,11 +1,9 @@
 # TTS Generation WebUI (Bark, MusicGen + AudioGen, Tortoise, RVC, Vocos, Demucs, SeamlessM4T, MAGNeT)
 *Note: Not all models support all platforms. For example, MusicGen and AudioGen are not supported on MacOS as of yet.*
 
-## One click installers
-
-[Download](https://github.com/rsxdalv/one-click-installers-tts/archive/refs/tags/v6.0.zip) ||
+[Download](https://github.com/rsxdalv/tts-generation-webui/archive/refs/heads/main.zip) ||
 [Upgrading](#upgrading) ||
-[Manual installation](#manual-installation-not-recommended-check-installer-source-for-reference) ||
+[Manual installation](#manual-installation-not-recommended) ||
 [Docker Setup](#docker-setup) || [Configuration Guide](#configuration-guide) || [Discord Server](https://discord.gg/3JbBrKrH)
 
 Google Colab demo: [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rsxdalv/tts-generation-webui/blob/main/notebooks/google_collab.ipynb)
@@ -411,6 +409,20 @@ Before:
 ## Upgrading
 *In case of issues, feel free to contact the developers*.
 
+### Upgrading from v6 to new installer
+
+#### Recommended: Fresh install
+* Download the [new version](https://github.com/rsxdalv/tts-generation-webui/archive/refs/heads/main.zip) and run the start_tts_webui.bat (Windows) or start_tts_webui.sh (MacOS, Linux)
+* Once it is finished, close the server.
+* Recommended: Copy the old generations to the new directory, such as favorites/ outputs/ outputs-rvc/ models/ collections/ config.json
+* With caution: you can copy the whole new tts-generation-webui directory over the old one, but there might be some old files that are lost.
+
+#### In-place upgrade, can delete some files, tweaks
+* Update the existing installation using the update_*platform* script
+* After the update run the new start_tts_webui.bat (Windows) or start_tts_webui.sh (MacOS, Linux) inside of the tts-generation-webui directory
+* Once the server starts, check if it works.
+* With caution: if the new server works, within the one-click-installers directory, delete the old installer_files.
+
 ### Upgrading from v5 to v6 installer
 * Download and run the new installer
 * Replace the "tts-generation-webui" directory in the newly installed directory
@@ -425,19 +437,42 @@ Not exactly, the dependencies clash, especially between conda and python (and de
 * Run start_tts_webui.bat or start_tts_webui.sh to start the server. The server will be available at http://localhost:7860
 * Output log will be available in the installer_scripts/output.log file.
 
-## Manual installation (not recommended, check installer source for reference)
+## Manual installation (not recommended)
+* These instructions might not reflect all of the latest fixes and adjustments, but could be useful as a reference for debugging or understanding what the installer does. Hopefully they can be a basis for supporting new platforms, such as AMD/Intel.
 
-* Install conda or another virtual environment
-* Highly recommended to use Python 3.10
-* Install git (`conda install git`)
-* Install ffmpeg (`conda install -y -c pytorch ffmpeg`)
-* Set up pytorch with CUDA or CPU (https://pytorch.org/audio/stable/build.windows.html#install-pytorch)
-* Clone the repo: `git clone https://github.com/rsxdalv/tts-generation-webui.git`
-* install the root requirements.txt with `pip install -r requirements.txt`
-* clone the repos in the ./models/ directory and install requirements under them
-* run using `(venv) python server.py`
+* Install conda (https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html)
+* Set up an environment: `conda create -n venv python=3.10`
+* Install git, ffmpeg, node.js `conda install -y -c conda-forge git nodejs -c pytorch ffmpeg`
+* a) Either Continue with the installer script
+  * activate the environment: `conda activate venv` and
+  * `(venv) node installer_scripts\init_app.js`
+  * then run the server with `(venv) python server.py`
+* b) Or install the requirements manually
+  * Set up pytorch with CUDA or CPU (https://pytorch.org/audio/stable/build.windows.html#install-pytorch):
+    * `(venv) conda install pytorch torchvision torchaudio cpuonly -c pytorch` for CPU/Mac
+    * `(venv) conda install -y -k pytorch[version=2,build=py3.10_cuda11.7*] torchvision torchaudio pytorch-cuda=11.7 cuda-toolkit ninja -c pytorch -c nvidia/label/cuda-11.7.0 -c nvidia` for CUDA
+  * Clone the repo: `git clone https://github.com/rsxdalv/tts-generation-webui.git`
+  * Potentially (if errors occur in the next step) need to install build tools (without Visual Studio): https://visualstudio.microsoft.com/visual-cpp-build-tools/
+  * Install the requirements:
+    * activate the environment: `conda activate venv` and
+    * install all the requirements*.txt (this list might not be up to date, check https://github.com/rsxdalv/tts-generation-webui/blob/main/Dockerfile#L39-L40):
+      * `(venv) pip install -r requirements.txt`
+      * `(venv) pip install -r requirements_audiocraft_only.txt --no-deps`
+      * `(venv) pip install -r requirements_audiocraft_deps.txt`
+      * `(venv) pip install -r requirements_bark_hubert_quantizer.txt`
+      * `(venv) pip install -r requirements_rvc.txt`
+      * `(venv) pip install hydra-core==1.3.2`
+      * `(venv) pip install -r requirements_styletts2.txt`
+      * `(venv) pip install -r requirements_vall_e.txt`
+      * `(venv) pip install -r requirements_maha_tts.txt`
+      * `(venv) pip install -r requirements_stable_audio.txt`
+      * `(venv) pip install soundfile==0.12.1`
+    * due to pip-torch _incompatibilities_ torch will be reinstalled to 2.0.0, thus it might be necessary to reinstall it again after the requirements if you have a CPU/Mac or installed a specific torch version other than 2.0.0:
+      * `(venv) conda install pytorch torchvision torchaudio cpuonly -c pytorch` for CPU/Mac
+      * `(venv) conda install -y -k pytorch[version=2,build=py3.10_cuda11.7*] torchvision torchaudio pytorch-cuda=11.7 cuda-toolkit ninja -c pytorch -c nvidia/label/cuda-11.7.0 -c nvidia` for CUDA
+    * build the react app: `(venv) cd react-ui && npm install && npm run build`
+  * run the server: `(venv) python server.py`
 
-* Potentially needed to install build tools (without Visual Studio): https://visualstudio.microsoft.com/visual-cpp-build-tools/
 
 ### React UI
 

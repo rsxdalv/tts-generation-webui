@@ -15,9 +15,9 @@ const { menu } = require("./js/menu");
 // };
 
 const processExit = (code) => {
-  endConnection(() => {
-    process.exit(code);
-  });
+  // endConnection(() => {
+  process.exit(code);
+  // });
 };
 
 const sendToWebConsole = (message) => void message;
@@ -258,7 +258,8 @@ async function main() {
   //     });
   //   })
   //   .listen(8080);
-  displayMessage("\n\nStarting init app...\n\n");
+  const version = "0.0.2";
+  displayMessage("\n\nStarting init app (version: " + version + ")...\n\n");
   try {
     await checkConda();
     // await updateConda();
@@ -271,8 +272,8 @@ async function main() {
     processExit(1);
   }
   displayMessage("\n\nFinished init app.\n\n");
-  processExit(1);
-  // processExit(0);
+  // processExit(1);
+  processExit(0);
 }
 
 main();
