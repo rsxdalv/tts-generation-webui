@@ -206,7 +206,7 @@ function tryInstall(requirements, name = "") {
 async function updateDependencies(optional = true) {
   if (optional) {
     if (
-      (await menu(["Yes", "No"], "Do you want to update dependencies?")) ===
+      (await menu(["Yes", "No"], "Do you want to update dependencies?\n(not updating might break new features)")) ===
       "No"
     ) {
       displayMessage("Skipping dependencies update");
