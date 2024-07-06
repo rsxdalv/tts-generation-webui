@@ -4,3 +4,6 @@ output.log
 # Bat exists test
 .tmp1
 .tmp2
+
+# Ignore GPU choice
+.gpu

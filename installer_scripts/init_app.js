@@ -79,7 +79,7 @@ const syncRepo = async () => {
   }
 };
 
-const gpuFile = ".gpu";
+const gpuFile = "./installer_scripts/.gpu";
 
 const saveGPUChoice = (gpuchoice) => {
   fs.writeFileSync(gpuFile, gpuchoice.toString());
@@ -195,6 +195,7 @@ function tryInstall(requirements, name = "") {
   try {
     displayMessage(`Installing ${name || requirements} dependencies...`);
     $sh(`pip install -r ${requirements}`);
+//    $sh(`pip install -r ${requirements} torch==2.0.0`);
     displayMessage(
       `Successfully installed ${name || requirements} dependencies`
     );
