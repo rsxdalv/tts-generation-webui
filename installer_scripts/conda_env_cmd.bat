@@ -1,5 +1,6 @@
 @echo off
 
+cd %~dp0
 cd ..
 call .\installer_files\mamba\condabin\activate.bat .\installer_files\env
 
