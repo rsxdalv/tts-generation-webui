@@ -12,11 +12,11 @@ from stable_audio_tools.interface.gradio import (
 )
 
 from src.history_tab.open_folder import open_folder
-from src.tortoise.gr_reload_button import gr_open_button_simple
 from src.utils.get_path_from_root import get_path_from_root
 
-LOCAL_DIR_BASE = "data/models/stable-audio"
+LOCAL_DIR_BASE = os.path.join("data", "models", "stable-audio")
 LOCAL_DIR_BASE_ABSOLUTE = get_path_from_root(*LOCAL_DIR_BASE.split("/"))
+OUTPUT_DIR = os.path.join("outputs-rvc", "Stable Audio")
 
 
 def get_local_dir(name):
@@ -85,15 +85,29 @@ def get_model_list():
         return [
             x
             for x in os.listdir(LOCAL_DIR_BASE)
-            if x != ".gitkeep" and x != "diffusion_cond.json"
+            if os.path.isdir(os.path.join(LOCAL_DIR_BASE, x))
         ]
     except FileNotFoundError as e:
         print(e)
         return []
 
 
+def load_model_config(model_name):
+    path = get_config_path(model_name)
+    try:
+        with open(path) as f:
+            return json.load(f)
+    except Exception as e:
+        print(e)
+        message = (
+            f"Model config not found at {path}. Please ensure model_config.json exists."
+        )
+        gr.Error(message)
+        raise Exception(message)
+
+
 def stable_audio_ui():
-    default_model_config_path = "data/models/stable-audio/diffusion_cond.json"
+    default_model_config_path = os.path.join(LOCAL_DIR_BASE, "diffusion_cond.json")
     with open(default_model_config_path) as f:
         model_config = json.load(f)
 
@@ -105,11 +119,6 @@ def stable_audio_ui():
             return model_name
 
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-        def load_model_config(model_name):
-            path = get_config_path(model_name)
-            with open(path) as f:
-                return json.load(f)
 
         _, model_config_new = load_model(
             model_config=load_model_config(model_name),
@@ -148,11 +157,18 @@ def stable_audio_ui():
                 type="value",
             )
 
-            half_checkbox = gr.Checkbox(
-                label="Use half precision",
-                value=True,
-                type="value",
-            )
+            with gr.Column():
+                gr.Markdown(
+                    """
+                    Stable Audio requires a manual download of a model.
+                    Please download a model using the download tab or manually place it in the `data/models/stable-audio` folder.
+                    """
+                )
+                half_checkbox = gr.Checkbox(
+                    label="Use half precision when loading the model",
+                    value=True,
+                    type="value",
+                )
 
             model_select.change(
                 fn=load_model_helper,
@@ -165,8 +181,18 @@ def stable_audio_ui():
     with gr.Tabs():
         with gr.Tab("Generation"):
             create_sampling_ui(model_config)
+            open_dir_btn = gr.Button("Open outputs folder")
+            open_dir_btn.click(
+                lambda: open_folder(OUTPUT_DIR),
+                api_name="stable_audio_open_output_dir",
+            )
         with gr.Tab("Inpainting"):
             create_sampling_ui(model_config, inpainting=True)
+            open_dir_btn = gr.Button("Open outputs folder")
+            open_dir_btn.click(
+                lambda: open_folder(OUTPUT_DIR),
+                api_name="stable_audio_open_output_dir",
+            )
         with gr.Tab("Model Download"):
             gr.Markdown(
                 "Models can be found on the [HuggingFace model hub](https://huggingface.co/models?search=stable-audio-open-1.0)."
@@ -202,6 +228,64 @@ def stable_audio_ui():
 def stable_audio_ui_tab():
     with gr.Tab("Stable Audio"):
         stable_audio_ui()
+
+
+import scipy.io.wavfile as wavfile
+from src.utils.date import get_date_string
+
+
+def save_result(audio, *generation_args):
+
+    date = get_date_string()
+
+    generation_args = {
+        "date": date,
+        "version": "0.0.1",
+        "prompt": generation_args[0],
+        "negative_prompt": generation_args[1],
+        "seconds_start_slider": generation_args[2],
+        "seconds_total_slider": generation_args[3],
+        "cfg_scale_slider": generation_args[4],
+        "steps_slider": generation_args[5],
+        "preview_every_slider": generation_args[6],
+        "seed_textbox": generation_args[7],
+        "sampler_type_dropdown": generation_args[8],
+        "sigma_min_slider": generation_args[9],
+        "sigma_max_slider": generation_args[10],
+        "cfg_rescale_slider": generation_args[11],
+        "init_audio_checkbox": generation_args[12],
+        "init_audio_input": generation_args[13],
+        "init_noise_level_slider": generation_args[14],
+    }
+    print(generation_args)
+    prompt = generation_args["prompt"]
+
+    def get_name(prompt):
+        return (
+            prompt.replace(" ", "_")
+            .replace(":", "_")
+            .replace("'", "_")
+            .replace('"', "_")
+            .replace("\\", "_")
+            .replace(",", "_")
+        )
+
+    name = f"{date}_{get_name(prompt)}"
+
+    base_dir = os.path.join(OUTPUT_DIR, name)
+    os.makedirs(base_dir, exist_ok=True)
+
+    sr, data = audio
+
+    wavfile.write(os.path.join(base_dir, f"{name}.wav"), sr, data)
+
+    with open(os.path.join(base_dir, f"{name}.json"), "w") as outfile:
+        json.dump(
+            generation_args,
+            outfile,
+            indent=2,
+            default=lambda o: "<not serializable>",
+        )
 
 
 sample_rate = 32000
@@ -453,100 +537,38 @@ def create_sampling_ui(model_config, inpainting=False):
                 outputs=[init_audio_input],
             )
 
-    save_button = gr.Button("Save to favorites")
-
-    import scipy.io.wavfile as wavfile
-    import datetime
-
-    def get_date_string():
-        now = datetime.datetime.now()
-        return now.strftime("%Y-%m-%d_%H-%M-%S")
-
-    def save_cond(audio, *generation_args):
-
-        date = get_date_string()
-
-        generation_args = {
-            "date": date,
-            "version": "0.0.1",
-            "prompt": generation_args[0],
-            "negative_prompt": generation_args[1],
-            "seconds_start_slider": generation_args[2],
-            "seconds_total_slider": generation_args[3],
-            "cfg_scale_slider": generation_args[4],
-            "steps_slider": generation_args[5],
-            "preview_every_slider": generation_args[6],
-            "seed_textbox": generation_args[7],
-            "sampler_type_dropdown": generation_args[8],
-            "sigma_min_slider": generation_args[9],
-            "sigma_max_slider": generation_args[10],
-            "cfg_rescale_slider": generation_args[11],
-            "init_audio_checkbox": generation_args[12],
-            "init_audio_input": generation_args[13],
-            "init_noise_level_slider": generation_args[14],
-        }
-        print(generation_args)
-        prompt = generation_args["prompt"]
-
-        name = prompt.replace(" ", "_").replace(":", "_").replace("'", "_").replace("\"", "_").replace("\\", "_").replace(",", "_")
-
-        name = f"{date}_{name}"
-
-        os.makedirs(os.path.join("favorites", "Stable Audio", name), exist_ok=True)
-        sr, data = audio
-        wavfile.write(
-            os.path.join("favorites", "Stable Audio", name, f"{name}.wav"),
-            sr,
-            data,
-        )
-
-        with open(
-            os.path.join("favorites", "Stable Audio", name, f"{name}.json"), "w"
-        ) as outfile:
-            json.dump(generation_args, outfile, indent=2, default=lambda o: '<not serializable>')
-        return save_button
-
-    save_button.click(
-        fn=save_cond,
-        inputs=[
-            audio_output,
-            *inputs,
-        ],
-        outputs=[save_button],
-        api_name="save",
-    )
-
-    # FEATURE - crop the audio to the actual length specified
-    # def crop_audio(audio, seconds_start_slider, seconds_total_slider):
-    #     sr, data = audio
-    #     seconds_start = seconds_start_slider.value
-    #     seconds_total = seconds_total_slider.value
-    #     data = data[int(seconds_start * sr) : int(seconds_total * sr)]
-    #     return sr, data
-    
     generate_button.click(
         fn=generate_cond,
         inputs=inputs,
         outputs=[audio_output, audio_spectrogram_output],
-        api_name="generate",
-    # ).then(
-    #     fn=save_cond,
-    #     inputs=[
-    #         audio_output,
-    #         *inputs,
-    #     ],
-    #     outputs=[save_button],
-    #     api_name="save",
+        api_name="stable_audio_generate",
+    ).then(
+        fn=save_result,
+        inputs=[
+            audio_output,
+            *inputs,
+        ],
+        api_name="stable_audio_save",
     ).then(
         fn=torch_clear_memory,
     )
+
 
 def torch_clear_memory():
     torch.cuda.empty_cache()
 
 
+# FEATURE - crop the audio to the actual length specified
+# def crop_audio(audio, seconds_start_slider, seconds_total_slider):
+#     sr, data = audio
+#     seconds_start = seconds_start_slider.value
+#     seconds_total = seconds_total_slider.value
+#     data = data[int(seconds_start * sr) : int(seconds_total * sr)]
+#     return sr, data
+
 if __name__ == "__main__":
-    exec("""
+    exec(
+        """
     main()
         with gr.Blocks() as interface:
             stable_audio_ui_tab()
@@ -556,6 +578,7 @@ if __name__ == "__main__":
             debug=True,
         )
 
-    """)
+    """
+    )
 
     # main()
