@@ -119,7 +119,6 @@ set PACKAGES_TO_INSTALL=git python=3.10 nodejs=18.16.1 conda
 @REM if not exist "%MAMBA_ROOT_PREFIX%\micromamba.exe" set umamba_exists=F
 if not exist "temp" mkdir temp
 call "%MAMBA_ROOT_PREFIX%\micromamba.exe" --version >%cd%\temp\tmp1 2>%cd%\temp\tmp2
-call node --version >%cd%\temp\tmp1 2>%cd%\temp\tmp2
 if "!ERRORLEVEL!" EQU "0" set umamba_exists=T
 
 @rem download micromamba
