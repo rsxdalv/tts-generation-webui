@@ -17,14 +17,14 @@ RUN node --version
 RUN npm --version
 
 # Setup venv
-RUN pip3 install virtualenv
+RUN pip3 install --no-cache-dir virtualenv
 RUN virtualenv /venv
 ENV VIRTUAL_ENV=/venv
 RUN python3 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 # Version 24 is broken due to fairseq
-RUN pip3 install --upgrade pip==23.3.2 setuptools && \
-    pip3 install torch torchvision torchaudio
+RUN pip3 install --no-cache-dir --upgrade pip==23.3.2 setuptools && \
+    pip3 install --no-cache-dir torch torchvision torchaudio
 
 # Set working directory
 WORKDIR /app
@@ -36,19 +36,19 @@ RUN git clone https://github.com/rsxdalv/tts-generation-webui.git
 WORKDIR /app/tts-generation-webui
 
 # Install all requirements
-RUN pip3 install -r requirements.txt
-RUN pip3 install -r requirements_audiocraft_only.txt --no-deps
-RUN pip3 install -r requirements_audiocraft_deps.txt
-RUN pip3 install -r requirements_bark_hubert_quantizer.txt
-RUN pip3 install -r requirements_rvc.txt
+RUN pip3 install --no-cache-dir -r requirements.txt
+RUN pip3 install --no-cache-dir -r requirements_audiocraft_only.txt --no-deps
+RUN pip3 install --no-cache-dir -r requirements_audiocraft_deps.txt
+RUN pip3 install --no-cache-dir -r requirements_bark_hubert_quantizer.txt
+RUN pip3 install --no-cache-dir -r requirements_rvc.txt
 # hydracore fix because of fairseq
-RUN pip3 install hydra-core==1.3.2 
-RUN pip3 install -r requirements_styletts2.txt
-RUN pip3 install -r requirements_vall_e.txt
-RUN pip3 install -r requirements_maha_tts.txt
-RUN pip3 install -r requirements_stable_audio.txt
+RUN pip3 install --no-cache-dir hydra-core==1.3.2 
+RUN pip3 install --no-cache-dir -r requirements_styletts2.txt
+RUN pip3 install --no-cache-dir -r requirements_vall_e.txt
+RUN pip3 install --no-cache-dir -r requirements_maha_tts.txt
+RUN pip3 install --no-cache-dir -r requirements_stable_audio.txt
 # soundfile fix because of aeiou
-RUN pip3 install soundfile==0.12.1
+RUN pip3 install --no-cache-dir soundfile==0.12.1
 
 # Build the React UI
 RUN cd react-ui && npm install && npm run build
