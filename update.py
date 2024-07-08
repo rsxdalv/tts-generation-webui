@@ -60,23 +60,32 @@ def check_if_torch_has_cuda():
 
 def main():
     print("Updating dependencies...")
-    try_install(
-        "requirements_audiocraft_only.txt --no-deps", "musicgen, audiocraft 1/2"
-    )
-    try_install("requirements_audiocraft_deps.txt", "musicgen, audiocraft 2/2")
-    try_install(
-        "requirements_bark_hubert_quantizer.txt",
-        "Bark Voice Clone, bark-hubert-quantizer",
-    )
-    try_install("requirements_rvc.txt", "RVC")
-    # hydracore fix because of fairseq
-    do("pip install hydra-core==1.3.2")
-    try_install("requirements_styletts2.txt", "StyleTTS")
-    try_install("requirements_vall_e.txt", "Vall-E-X")
-    try_install("requirements_maha_tts.txt", "Maha TTS")
-    try_install("requirements_stable_audio.txt", "Stable Audio")
-    # soundfile fix because of aeiou
-    do("pip install soundfile==0.12.1")
+    # try_install(
+    #     "requirements_audiocraft_only.txt --no-deps", "musicgen, audiocraft 1/2"
+    # )
+    # try_install("requirements_audiocraft_deps.txt", "musicgen, audiocraft 2/2")
+    # try_install(
+    #     "requirements_bark_hubert_quantizer.txt",
+    #     "Bark Voice Clone, bark-hubert-quantizer",
+    # )
+    # try_install("requirements_rvc.txt", "RVC")
+    # # hydracore fix because of fairseq
+    # do("pip install hydra-core==1.3.2")
+    # try_install("requirements_styletts2.txt", "StyleTTS")
+    # try_install("requirements_vall_e.txt", "Vall-E-X")
+    # try_install("requirements_maha_tts.txt", "Maha TTS")
+    # try_install("requirements_stable_audio.txt", "Stable Audio")
+    # # soundfile fix because of aeiou
+    # do("pip install soundfile==0.12.1")
+
+    #   // xformers==0.0.19 # For torch==2.0.0 project plane
+    try_install("requirements_audiocraft.txt torch==2.0.0 xformers==0.0.19", "Audiocraft")
+    try_install("requirements_bark_hubert_quantizer.txt torch==2.0.0", "Bark Voice Clone")
+    try_install("requirements_rvc.txt torch==2.0.0", "RVC")
+    try_install("requirements_styletts2.txt torch==2.0.0", "StyleTTS")
+    try_install("requirements_vall_e.txt torch==2.0.0", "Vall-E-X")
+    try_install("requirements_maha_tts.txt torch==2.0.0", "Maha TTS")
+    try_install("requirements_stable_audio.txt torch==2.0.0", "Stable Audio")
 
     if is_node_installed():
         setup_node_modules()

@@ -22,9 +22,13 @@ RUN virtualenv /venv
 ENV VIRTUAL_ENV=/venv
 RUN python3 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+
+# Define PyTorch version, torch 2.0.0 known to work
+ENV TORCH_VERSION=2.0.0
+
 # Version 24 is broken due to fairseq
 RUN pip3 install --no-cache-dir --upgrade pip==23.3.2 setuptools && \
-    pip3 install --no-cache-dir torch torchvision torchaudio
+    pip3 install --no-cache-dir torch==$TORCH_VERSION torchvision torchaudio
 
 # Set working directory
 WORKDIR /app
@@ -36,19 +40,15 @@ RUN git clone https://github.com/rsxdalv/tts-generation-webui.git
 WORKDIR /app/tts-generation-webui
 
 # Install all requirements
-RUN pip3 install --no-cache-dir -r requirements.txt
-RUN pip3 install --no-cache-dir -r requirements_audiocraft_only.txt --no-deps
-RUN pip3 install --no-cache-dir -r requirements_audiocraft_deps.txt
-RUN pip3 install --no-cache-dir -r requirements_bark_hubert_quantizer.txt
-RUN pip3 install --no-cache-dir -r requirements_rvc.txt
-# hydracore fix because of fairseq
-RUN pip3 install --no-cache-dir hydra-core==1.3.2 
-RUN pip3 install --no-cache-dir -r requirements_styletts2.txt
-RUN pip3 install --no-cache-dir -r requirements_vall_e.txt
-RUN pip3 install --no-cache-dir -r requirements_maha_tts.txt
-RUN pip3 install --no-cache-dir -r requirements_stable_audio.txt
-# soundfile fix because of aeiou
-RUN pip3 install --no-cache-dir soundfile==0.12.1
+RUN pip3 install --no-cache-dir torch==$TORCH_VERSION -r requirements.txt
+RUN pip3 install --no-cache-dir torch==$TORCH_VERSION -r requirements_audiocraft_only.txt --no-deps
+RUN pip3 install --no-cache-dir torch==$TORCH_VERSION -r requirements_audiocraft_deps.txt
+RUN pip3 install --no-cache-dir torch==$TORCH_VERSION -r requirements_bark_hubert_quantizer.txt
+RUN pip3 install --no-cache-dir torch==$TORCH_VERSION -r requirements_rvc.txt
+RUN pip3 install --no-cache-dir torch==$TORCH_VERSION -r requirements_styletts2.txt
+RUN pip3 install --no-cache-dir torch==$TORCH_VERSION -r requirements_vall_e.txt
+RUN pip3 install --no-cache-dir torch==$TORCH_VERSION -r requirements_maha_tts.txt
+RUN pip3 install --no-cache-dir torch==$TORCH_VERSION -r requirements_stable_audio.txt
 
 # Build the React UI
 RUN cd react-ui && npm install && npm run build
