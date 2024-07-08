@@ -25,6 +25,7 @@ exports.$$ = $$;
 
 function $sh(cmd) {
   try {
+    console.log(`>${cmd}`);
     return execSync(cmd, { stdio: "inherit" });
   } catch (error) {
     try {

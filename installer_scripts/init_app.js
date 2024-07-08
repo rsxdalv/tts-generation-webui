@@ -1,4 +1,3 @@
-const http = require("http");
 const fs = require("fs");
 const { $, $$, $sh } = require("./js/shell");
 const { menu } = require("./js/menu");
@@ -79,10 +78,16 @@ const syncRepo = async () => {
   }
 };
 
-const gpuFile = ".gpu";
+const gpuFile = "./installer_scripts/.gpu";
 
 const saveGPUChoice = (gpuchoice) => {
   fs.writeFileSync(gpuFile, gpuchoice.toString());
+};
+
+const removeGPUChoice = () => {
+  if (fs.existsSync(gpuFile)) {
+    fs.unlinkSync(gpuFile);
+  }
 };
 
 const readGPUChoice = () => {
@@ -105,6 +110,7 @@ const installDependencies = async (gpuchoice) => {
       );
     } else {
       displayMessage("Unsupported or cancelled. Exiting...");
+      removeGPUChoice();
       processExit(1);
     }
 
@@ -142,27 +148,30 @@ const initializeApp = async () => {
     await installDependencies(gpuchoice);
     return;
   } else {
-    const gpuchoice = await menu(
-      [
-        "NVIDIA GPU",
-        "Apple M Series Chip",
-        "CPU",
-        "Cancel",
-        "AMD GPU (unsupported)",
-        "Intel GPU (unsupported)",
-        "Integrated GPU (unsupported)",
-      ],
-      `
-  These are automatically supported yet: AMD GPU, Intel GPU, Integrated GPU. Select CPU mode.
-  Select the device (GPU/CPU) you are using to run the application:
-  (use arrow keys to move, enter to select)
-    `
-    );
+    const gpuchoice = await askForGPUChoice();
     displayMessage(`You selected: ${gpuchoice}`);
     saveGPUChoice(gpuchoice);
     await installDependencies(gpuchoice);
   }
 };
+
+const askForGPUChoice = () =>
+  menu(
+    [
+      "NVIDIA GPU",
+      "Apple M Series Chip",
+      "CPU",
+      "Cancel",
+      "AMD GPU (unsupported)",
+      "Intel GPU (unsupported)",
+      "Integrated GPU (unsupported)",
+    ],
+    `
+These are automatically supported yet: AMD GPU, Intel GPU, Integrated GPU. Select CPU mode.
+Select the device (GPU/CPU) you are using to run the application:
+(use arrow keys to move, enter to select)
+  `
+  );
 
 function setupReactUI() {
   try {
@@ -194,7 +203,9 @@ const checkIfTorchHasCuda = async () => {
 function tryInstall(requirements, name = "") {
   try {
     displayMessage(`Installing ${name || requirements} dependencies...`);
-    $sh(`pip install -r ${requirements}`);
+    // const torchVersion = $$(`pip show torch | grep Version`);
+    const torchVersion = "2.0.0";
+    $sh(`pip install --dry-run ${requirements} torch==${torchVersion}`);
     displayMessage(
       `Successfully installed ${name || requirements} dependencies`
     );
@@ -206,26 +217,26 @@ function tryInstall(requirements, name = "") {
 async function updateDependencies(optional = true) {
   if (optional) {
     if (
-      (await menu(["Yes", "No"], "Do you want to update dependencies?\n(not updating might break new features)")) ===
-      "No"
+      (await menu(
+        ["Yes", "No"],
+        "Do you want to update dependencies?\n(not updating might break new features)"
+      )) === "No"
     ) {
       displayMessage("Skipping dependencies update");
       return;
     }
   }
 
-  tryInstall("requirements.txt", "Core Packages, Bark, Tortoise");
+  tryInstall("-r requirements.txt", "Core Packages, Bark, Tortoise");
   displayMessage("Updating dependencies...");
-  tryInstall("requirements_audiocraft_only.txt --no-deps", "Audiocraft 1/2");
-  tryInstall("requirements_audiocraft_deps.txt", "Audiocraft 2/2");
-  tryInstall("requirements_bark_hubert_quantizer.txt", "Bark Voice Clone");
-  tryInstall("requirements_rvc.txt", "RVC");
-  $sh("pip install hydra-core==1.3.2");
-  tryInstall("requirements_styletts2.txt", "StyleTTS");
-  tryInstall("requirements_vall_e.txt", "Vall-E-X");
-  tryInstall("requirements_maha_tts.txt", "Maha TTS");
-  tryInstall("requirements_stable_audio.txt", "Stable Audio");
-  $sh("pip install soundfile==0.12.1");
+  // xformers==0.0.19 # For torch==2.0.0 project plane
+  tryInstall("-r requirements_audiocraft.txt xformers==0.0.19", "Audiocraft");
+  tryInstall("-r requirements_bark_hubert_quantizer.txt", "Bark Voice Clone");
+  tryInstall("-r requirements_rvc.txt", "RVC");
+  tryInstall("-r requirements_styletts2.txt", "StyleTTS");
+  tryInstall("-r requirements_vall_e.txt", "Vall-E-X");
+  tryInstall("-r requirements_maha_tts.txt", "Maha TTS");
+  tryInstall("-r requirements_stable_audio.txt", "Stable Audio");
 }
 
 async function repairTorch() {
@@ -238,7 +249,7 @@ async function repairTorch() {
     } catch (error) {
       displayError("Failed to fix torch");
     }
-  } else if (choice === "CPU") {
+  } else if (choice === "CPU" || choice === "Apple M Series Chip") {
     displayMessage("Backend is CPU/Apple M Series Chip, fixing PyTorch");
     try {
       await $(
@@ -266,13 +277,13 @@ async function main() {
   try {
     await checkConda();
     // await updateConda();
-    const isUpdated = await syncRepo();
-    if (!isUpdated) {
-      return;
-    }
+    // const isUpdated = await syncRepo();
+    // if (!isUpdated) {
+    //   return;
+    // }
     await initializeApp();
-    await setupReactUI();
-    await repairTorch();
+    // await setupReactUI();
+    // await repairTorch();
   } catch (error) {
     displayError(error.message);
     processExit(1);

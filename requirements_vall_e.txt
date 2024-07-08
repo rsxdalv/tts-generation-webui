@@ -1,2 +1,1 @@
-torch==2.0.0 # BSD 3-Clause - ensures torch is not reinstalled
 valle-x @ git+https://github.com/rsxdalv/VALL-E-X@79e57d0fb167439af6baa303a968e7970c7d5a38#egg=valle-x # MIT License
