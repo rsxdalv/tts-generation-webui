@@ -42,6 +42,12 @@ https://github.com/rsxdalv/tts-generation-webui/discussions/186#discussioncommen
 
 ## Changelog
 
+July 9:
+* Fix new installer and installation instructions thanks to https://github.com/Xeraster !
+
+July 8:
+* Change the installation process to reduce package clashes and enable torch version flexibility.
+
 July 6:
 * Initial release of new mamba based installer.
 * Save Stable Audio results to outputs-rvc/StableAudio folder.
@@ -444,23 +450,22 @@ Not exactly, the dependencies clash, especially between conda and python (and de
 
 * Install conda (https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html)
 * Set up an environment: `conda create -n venv python=3.10`
-* Install git, ffmpeg, node.js `conda install -y -c conda-forge git nodejs -c pytorch ffmpeg`
+* Install git, node.js `conda install -y -c conda-forge git nodejs conda`
 * a) Either Continue with the installer script
   * activate the environment: `conda activate venv` and
   * `(venv) node installer_scripts\init_app.js`
   * then run the server with `(venv) python server.py`
 * b) Or install the requirements manually
   * Set up pytorch with CUDA or CPU (https://pytorch.org/audio/stable/build.windows.html#install-pytorch):
-    * `(venv) conda install pytorch torchvision torchaudio cpuonly -c pytorch` for CPU/Mac
-    * `(venv) conda install -y -k pytorch[version=2,build=py3.10_cuda11.7*] torchvision torchaudio pytorch-cuda=11.7 cuda-toolkit ninja -c pytorch -c nvidia/label/cuda-11.7.0 -c nvidia` for CUDA
+    * `(venv) conda install pytorch torchvision torchaudio cpuonly ffmpeg -c pytorch` for CPU/Mac
+    * `(venv) conda install -y -k pytorch[version=2,build=py3.10_cuda11.7*] torchvision torchaudio pytorch-cuda=11.7 cuda-toolkit ninja ffmpeg -c pytorch -c nvidia/label/cuda-11.7.0 -c nvidia` for CUDA
   * Clone the repo: `git clone https://github.com/rsxdalv/tts-generation-webui.git`
   * Potentially (if errors occur in the next step) need to install build tools (without Visual Studio): https://visualstudio.microsoft.com/visual-cpp-build-tools/
   * Install the requirements:
     * activate the environment: `conda activate venv` and
     * install all the requirements*.txt (this list might not be up to date, check https://github.com/rsxdalv/tts-generation-webui/blob/main/Dockerfile#L39-L40):
       * `(venv) pip install -r requirements.txt`
-      * `(venv) pip install -r requirements_audiocraft_only.txt --no-deps`
-      * `(venv) pip install -r requirements_audiocraft_deps.txt`
+      * `(venv) pip install -r requirements_audiocraft.txt`
       * `(venv) pip install -r requirements_bark_hubert_quantizer.txt`
       * `(venv) pip install -r requirements_rvc.txt`
       * `(venv) pip install hydra-core==1.3.2`
@@ -470,8 +475,8 @@ Not exactly, the dependencies clash, especially between conda and python (and de
       * `(venv) pip install -r requirements_stable_audio.txt`
       * `(venv) pip install soundfile==0.12.1`
     * due to pip-torch _incompatibilities_ torch will be reinstalled to 2.0.0, thus it might be necessary to reinstall it again after the requirements if you have a CPU/Mac or installed a specific torch version other than 2.0.0:
-      * `(venv) conda install pytorch torchvision torchaudio cpuonly -c pytorch` for CPU/Mac
-      * `(venv) conda install -y -k pytorch[version=2,build=py3.10_cuda11.7*] torchvision torchaudio pytorch-cuda=11.7 cuda-toolkit ninja -c pytorch -c nvidia/label/cuda-11.7.0 -c nvidia` for CUDA
+      * `(venv) conda install pytorch torchvision torchaudio cpuonly ffmpeg -c pytorch` for CPU/Mac
+      * `(venv) conda install -y -k pytorch[version=2,build=py3.10_cuda11.7*] torchvision torchaudio pytorch-cuda=11.7 cuda-toolkit ninja ffmpeg -c pytorch -c nvidia/label/cuda-11.7.0 -c nvidia` for CUDA
     * build the react app: `(venv) cd react-ui && npm install && npm run build`
   * run the server: `(venv) python server.py`
 

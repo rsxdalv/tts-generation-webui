@@ -97,6 +97,7 @@ const readGPUChoice = () => {
   return -1;
 };
 
+// pytorch::ffmpeg
 const cudaPytorchInstall$ =
   "conda install -y -k pytorch[version=2,build=py3.10_cuda11.7*] torchvision torchaudio pytorch-cuda=11.7 cuda-toolkit ninja ffmpeg -c pytorch -c nvidia/label/cuda-11.7.0 -c nvidia";
 

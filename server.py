@@ -284,6 +284,10 @@ if gradio_interface_options["auth"] is not None:
     )
     print("Gradio server authentication enabled")
 print_pretty_options(gradio_interface_options)
+if gradio_interface_options["server_name"] == "0.0.0.0":
+    print(
+        f"Gradio server will be available on http://localhost:{gradio_interface_options['server_port']}"
+    )
 
 
 def start_server():
