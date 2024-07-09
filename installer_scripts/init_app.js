@@ -205,7 +205,7 @@ function tryInstall(requirements, name = "") {
     displayMessage(`Installing ${name || requirements} dependencies...`);
     // const torchVersion = $$(`pip show torch | grep Version`);
     const torchVersion = "2.0.0";
-    $sh(`pip install --dry-run ${requirements} torch==${torchVersion}`);
+    $sh(`pip install ${requirements} torch==${torchVersion}`);
     displayMessage(
       `Successfully installed ${name || requirements} dependencies`
     );
