@@ -277,14 +277,14 @@ async function main() {
   displayMessage("\n\nStarting init app (version: " + version + ")...\n\n");
   try {
     await checkConda();
-    // await updateConda();
-    // const isUpdated = await syncRepo();
-    // if (!isUpdated) {
-    //   return;
-    // }
+    await updateConda();
+    const isUpdated = await syncRepo();
+    if (!isUpdated) {
+      return;
+    }
     await initializeApp();
-    // await setupReactUI();
-    // await repairTorch();
+    await setupReactUI();
+    await repairTorch();
   } catch (error) {
     displayError(error.message);
     processExit(1);
