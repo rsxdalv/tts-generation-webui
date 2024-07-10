@@ -268,6 +268,10 @@ def save_result(audio, *generation_args):
             .replace('"', "_")
             .replace("\\", "_")
             .replace(",", "_")
+            .replace("(", "_")
+            .replace(")", "_")
+            .replace("?", "_")
+            .replace("!", "_")
         )
 
     name = f"{date}_{get_name(prompt)}"
