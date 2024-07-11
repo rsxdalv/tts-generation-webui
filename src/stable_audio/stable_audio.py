@@ -272,6 +272,8 @@ def save_result(audio, *generation_args):
             .replace(")", "_")
             .replace("?", "_")
             .replace("!", "_")
+            # only first 15 characters
+            .replace("__", "_")[:15]
         )
 
     name = f"{date}_{get_name(prompt)}"

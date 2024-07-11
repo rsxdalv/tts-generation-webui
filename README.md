@@ -1,13 +1,13 @@
-# TTS Generation WebUI (Bark, MusicGen + AudioGen, Tortoise, RVC, Vocos, Demucs, SeamlessM4T, MAGNeT)
-*Note: Not all models support all platforms. For example, MusicGen and AudioGen are not supported on MacOS as of yet.*
+# TTS Generation WebUI
 
 [Download](https://github.com/rsxdalv/tts-generation-webui/archive/refs/heads/main.zip) ||
 [Upgrading](#upgrading) ||
 [Manual installation](#manual-installation-not-recommended) ||
-[Docker Setup](#docker-setup) || [Configuration Guide](#configuration-guide) || [Discord Server](https://discord.gg/3JbBrKrH)
+[Docker Setup](#docker-setup) || [Configuration Guide](#configuration-guide) || [Discord Server](https://discord.gg/3JbBrKrH) || [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rsxdalv/tts-generation-webui/blob/main/notebooks/google_collab.ipynb)
 
-Google Colab demo: [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rsxdalv/tts-generation-webui/blob/main/notebooks/google_collab.ipynb)
+List of models: Bark, MusicGen + AudioGen, Tortoise, RVC, Vocos, Demucs, SeamlessM4T, MAGNeT, Stable Audio, Maha TTS, MMS, and more.
 
+*Note: Not all models support all platforms. For example, MusicGen and AudioGen are not supported on MacOS as of yet.*
 
 ## Videos
 
@@ -15,32 +15,16 @@ Google Colab demo: [![Open In Colab](https://colab.research.google.com/assets/co
 | :------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------: |
 | [![Watch the video](https://img.youtube.com/vi/Y8J717tr9t0/sddefault.jpg)](https://youtu.be/Y8J717tr9t0) | [![Watch the video](https://img.youtube.com/vi/ScN2ypewABc/sddefault.jpg)](https://youtu.be/ScN2ypewABc) | [![Watch the video](https://img.youtube.com/vi/JXojhFjZ39k/sddefault.jpg)](https://youtu.be/JXojhFjZ39k) |
 
-## Screenshots
+<!-- ## Screenshots
 
 |  ![react](./screenshots/v2/react.png)  | ![musicgen](./screenshots/v2/musicgen.png) | ![rvc](./screenshots/v2/rvc.png) |
-| :-----------------------------------------: | :-----------------------------------------: | :-------------------------------: |
+| :-----------------------------------------: | :-----------------------------------------: | :-------------------------------: | -->
 
-
-## Examples
-
-[audio__bark__continued_generation__2024-05-04_16-07-49_long.webm](https://user-images.githubusercontent.com/6757283/236218842-b9dc253e-05de-49e5-ada9-e714e1e2cbd4.webm)
-
-[audio__bark__continued_generation__2024-05-04_16-09-21_long.webm](https://user-images.githubusercontent.com/6757283/236219228-518d2b70-51a3-4175-af44-b24c01d14932.webm)
-
-[audio__bark__continued_generation__2024-05-04_16-10-55_long.webm](https://user-images.githubusercontent.com/6757283/236219243-dad96404-0879-4274-828e-7f3afc6bac65.webm)
-
-## Extra Voices for Bark, Prompt Samples
-[![PromptEcho](https://promptecho.com/echo.play.ai.jpg)](https://promptecho.com/)
-
-https://rsxdalv.github.io/bark-speaker-directory/
-
-## Bark Readme
-[README_Bark.md](./README_Bark.md)
-
-## Info about managing models, caches and system space for AI projects
-https://github.com/rsxdalv/tts-generation-webui/discussions/186#discussioncomment-7291274
 
 ## Changelog
+
+July 11:
+* Improve Stable Audio generation filenames
 
 July 9:
 * Fix new installer and installation instructions thanks to https://github.com/Xeraster !
@@ -82,6 +66,9 @@ May 4:
 
 ## April 2024
 
+
+<details>
+<summary>Click to expand</summary>
 Apr 28:
 * Add Maha TTS to React UI.
 * Add GPU Info to React UI.
@@ -98,6 +85,8 @@ Apr 5:
 
 Apr 4:
 * Upgrade RVC to include RVMPE and FCPE. Remove the direct file input for models and indexes due to file duplication. Improve React UI interface for RVC.
+
+</details>
 
 ## March 2024
 
@@ -516,6 +505,27 @@ If you wish to build your own docker container, you can use the included Dockerf
 docker build -t tts-generation-webui .
 ```
 Please note that the docker-compose needs to be edited to use the image you just built.
+
+
+## Extra Voices for Bark, Prompt Samples
+[![PromptEcho](https://promptecho.com/echo.play.ai.jpg)](https://promptecho.com/)
+
+https://rsxdalv.github.io/bark-speaker-directory/
+
+## Bark Readme
+[README_Bark.md](./README_Bark.md)
+
+## Info about managing models, caches and system space for AI projects
+https://github.com/rsxdalv/tts-generation-webui/discussions/186#discussioncomment-7291274
+
+
+## Examples
+
+[audio__bark__continued_generation__2024-05-04_16-07-49_long.webm](https://user-images.githubusercontent.com/6757283/236218842-b9dc253e-05de-49e5-ada9-e714e1e2cbd4.webm)
+
+[audio__bark__continued_generation__2024-05-04_16-09-21_long.webm](https://user-images.githubusercontent.com/6757283/236219228-518d2b70-51a3-4175-af44-b24c01d14932.webm)
+
+[audio__bark__continued_generation__2024-05-04_16-10-55_long.webm](https://user-images.githubusercontent.com/6757283/236219243-dad96404-0879-4274-828e-7f3afc6bac65.webm)
 
 
 ## Open Source Libraries
