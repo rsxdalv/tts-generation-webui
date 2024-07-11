@@ -98,8 +98,9 @@ const readGPUChoice = () => {
 };
 
 // pytorch::ffmpeg
-const cudaPytorchInstall$ =
-  "conda install -y -k pytorch[version=2,build=py3.10_cuda11.7*] torchvision torchaudio pytorch-cuda=11.7 cuda-toolkit ninja ffmpeg -c pytorch -c nvidia/label/cuda-11.7.0 -c nvidia";
+const cudaPackages =
+  "pytorch[version=2,build=py3.10_cuda11.7*] torchvision torchaudio pytorch-cuda=11.7 cuda-toolkit ninja ffmpeg -c pytorch -c nvidia/label/cuda-11.7.0 -c nvidia";
+const cudaPytorchInstall$ = `conda install -y -k ${cudaPackages}`;
 
 const installDependencies = async (gpuchoice) => {
   try {
@@ -246,7 +247,7 @@ async function repairTorch() {
   if (!checkIfTorchHasCuda() && choice === "NVIDIA GPU") {
     displayMessage("Backend is NVIDIA GPU, fixing PyTorch");
     try {
-      await $(cudaPytorchInstall$);
+      await $(`conda install -y -k --force-reinstall ${cudaPackages}`);
     } catch (error) {
       displayError("Failed to fix torch");
     }
@@ -254,7 +255,7 @@ async function repairTorch() {
     displayMessage("Backend is CPU/Apple M Series Chip, fixing PyTorch");
     try {
       await $(
-        "conda install -y -k pytorch torchvision torchaudio cpuonly -c pytorch"
+        "conda install -y -k --force-reinstall pytorch torchvision torchaudio cpuonly -c pytorch"
       );
     } catch (error) {
       displayError("Failed to fix torch");
@@ -277,7 +278,7 @@ async function main() {
   displayMessage("\n\nStarting init app (version: " + version + ")...\n\n");
   try {
     await checkConda();
-    await updateConda();
+    // await updateConda();
     const isUpdated = await syncRepo();
     if (!isUpdated) {
       return;

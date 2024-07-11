@@ -15,16 +15,12 @@ List of models: Bark, MusicGen + AudioGen, Tortoise, RVC, Vocos, Demucs, Seamles
 | :------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------: |
 | [![Watch the video](https://img.youtube.com/vi/Y8J717tr9t0/sddefault.jpg)](https://youtu.be/Y8J717tr9t0) | [![Watch the video](https://img.youtube.com/vi/ScN2ypewABc/sddefault.jpg)](https://youtu.be/ScN2ypewABc) | [![Watch the video](https://img.youtube.com/vi/JXojhFjZ39k/sddefault.jpg)](https://youtu.be/JXojhFjZ39k) |
 
-<!-- ## Screenshots
-
-|  ![react](./screenshots/v2/react.png)  | ![musicgen](./screenshots/v2/musicgen.png) | ![rvc](./screenshots/v2/rvc.png) |
-| :-----------------------------------------: | :-----------------------------------------: | :-------------------------------: | -->
-
 
 ## Changelog
 
 July 11:
 * Improve Stable Audio generation filenames
+* Add force reinstall to torch repair
 
 July 9:
 * Fix new installer and installation instructions thanks to https://github.com/Xeraster !
@@ -518,6 +514,11 @@ https://rsxdalv.github.io/bark-speaker-directory/
 ## Info about managing models, caches and system space for AI projects
 https://github.com/rsxdalv/tts-generation-webui/discussions/186#discussioncomment-7291274
 
+
+## Screenshots
+
+|  ![react](./screenshots/v2/react.png)  | ![musicgen](./screenshots/v2/musicgen.png) | ![rvc](./screenshots/v2/rvc.png) |
+| :-----------------------------------------: | :-----------------------------------------: | :-------------------------------: |
 
 ## Examples
 
