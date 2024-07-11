@@ -21,6 +21,7 @@ List of models: Bark, MusicGen + AudioGen, Tortoise, RVC, Vocos, Demucs, Seamles
 July 11:
 * Improve Stable Audio generation filenames
 * Add force reinstall to torch repair
+* Make the installer auto-update before running
 
 July 9:
 * Fix new installer and installation instructions thanks to https://github.com/Xeraster !

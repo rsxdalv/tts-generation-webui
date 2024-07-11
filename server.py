@@ -33,6 +33,7 @@ from src.Joutai import Joutai
 from src.history_tab.collections_directories_atom import collections_directories_atom
 from src.utils.gpu_info_tab import gpu_info_tab
 
+print("Starting server...\n")
 
 setup_or_recover.dummy()
 dotenv_init.init()
