@@ -2,7 +2,10 @@ const fs = require("fs");
 const { displayError, displayMessage } = require("./displayMessage.js");
 const { processExit } = require("./processExit.js");
 const { menu } = require("./menu.js");
-const { $$, $sh } = require("./shell.js");
+const { $, $$, $sh } = require("./shell.js");
+
+// const torchVersion = $$(`pip show torch | grep Version`);
+const torchVersion = "2.0.0";
 
 // pytorch::ffmpeg
 const cudaPackages =
