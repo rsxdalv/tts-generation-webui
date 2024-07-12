@@ -153,8 +153,7 @@ def stable_audio_ui():
             model_select = gr.Dropdown(
                 choices=get_model_list(),  # type: ignore
                 label="Model",
-                default=pretrained_name,
-                type="value",
+                value=pretrained_name,
             )
 
             with gr.Column():
@@ -167,7 +166,6 @@ def stable_audio_ui():
                 half_checkbox = gr.Checkbox(
                     label="Use half precision when loading the model",
                     value=True,
-                    type="value",
                 )
 
             model_select.change(
