@@ -19,6 +19,8 @@ const updateConda = async () => {
   await $("conda update -y -n base -c defaults conda");
 };
 
+const DEBUG_ALWAYS_RETURN_UPDATED = false;
+
 const syncRepo = async () => {
   if (!fs.existsSync(".git")) {
     displayMessage("Linking to tts-generation-webui repository");
@@ -40,7 +42,7 @@ const syncRepo = async () => {
       const newHash = fs.readFileSync(file, "utf8");
       if (currentHash === newHash) {
         displayMessage("No updates found, skipping...");
-        return false;
+        return false || DEBUG_ALWAYS_RETURN_UPDATED;
       }
       return true;
     } catch (error) {
@@ -67,7 +69,7 @@ async function main() {
     // await updateConda();
     const isUpdated = await syncRepo();
     if (!isUpdated) {
-      // return;
+      return;
     }
     const {
       initializeApp,

@@ -4,6 +4,8 @@ const { processExit } = require("./processExit.js");
 const { menu } = require("./menu.js");
 const { $, $$, $sh } = require("./shell.js");
 
+const DEBUG_DRY_RUN = false;
+
 // const torchVersion = $$(`pip show torch | grep Version`);
 const torchVersion = "2.3.1";
 const cudaVersion = "11.8";
@@ -119,13 +121,12 @@ const saveMajorVersion = (majorVersion) => {
   fs.writeFileSync(majorVersionFile, majorVersion.toString());
 };
 
-const DRY_RUN = false;
-const dry_run_debug = DRY_RUN ? "--dry-run " : "";
+const dry_run_flag = DEBUG_DRY_RUN ? "--dry-run " : "";
 
 function tryInstall(requirements, name = "") {
   try {
     displayMessage(`Installing ${name || requirements} dependencies...`);
-    $sh(`pip install ${dry_run_debug}${requirements} torch==${torchVersion}`);
+    $sh(`pip install ${dry_run_flag}${requirements} torch==${torchVersion}`);
     displayMessage(
       `Successfully installed ${name || requirements} dependencies`
     );
