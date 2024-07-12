@@ -18,7 +18,7 @@ List of models: Bark, MusicGen + AudioGen, Tortoise, RVC, Vocos, Demucs, Seamles
 
 ## Changelog
 
-July 12:
+July 13:
 * Major upgrade to Torch 2.3.1 and xformers 0.0.27
   * All users, including Mac and CPU will now have the same PyTorch version.
 * Upgrade CUDA to 11.8
@@ -26,6 +26,7 @@ July 12:
 * Modify installer to allow upgrading Python and Torch without reinstalling (currently major version 2)
 * Fix magnet default params for better quality
 * Improve installer script checks to avoid bugs
+* Update StyleTTS2
 
 July 11:
 * Improve Stable Audio generation filenames
