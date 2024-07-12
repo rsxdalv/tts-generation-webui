@@ -1,1 +1,1 @@
-styletts2 @ git+https://github.com/rsxdalv/StyleTTS2@cc36a19610df42123230237a73e798d4fdd3dcb8#egg=styletts2 # MIT License
+styletts2 @ git+https://github.com/rsxdalv/StyleTTS2#egg=styletts2 # MIT License
