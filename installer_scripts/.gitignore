@@ -7,3 +7,5 @@ output.log
 
 # Ignore GPU choice
 .gpu
+.major_version
+.python_version

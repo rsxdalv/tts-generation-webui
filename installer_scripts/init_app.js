@@ -1,10 +1,5 @@
-// import fs from "fs";
-// import { $, $$, $sh } from "./js/shell";
-// import { initializeApp, repairTorch, setupReactUI } from "./js/initializeApp.mjs";
-// import { displayError, displayMessage } from "./js/displayMessage.mjs";
-// import { processExit } from "./js/processExit.mjs";
 const fs = require("fs");
-const { $, $$, $sh } = require("./js/shell");
+const { $ } = require("./js/shell");
 const { displayError, displayMessage } = require("./js/displayMessage.js");
 const { processExit } = require("./js/processExit.js");
 
@@ -65,7 +60,7 @@ async function main() {
   //     });
   //   })
   //   .listen(8080);
-  const version = "0.0.3";
+  const version = "0.0.4";
   displayMessage("\n\nStarting init app (version: " + version + ")...\n\n");
   try {
     await checkConda();
@@ -87,7 +82,6 @@ async function main() {
     processExit(1);
   }
   displayMessage("\n\nFinished init app.\n");
-  // processExit(1);
   processExit(0);
 }
 
