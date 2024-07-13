@@ -16,7 +16,8 @@ print("Starting server...\n")
 
 setup_or_recover.dummy()
 dotenv_init.init()
-
+# required for proper rendering due to gr.* methods
+from src.Joutai import Joutai
 
 def reload_config_and_restart_ui():
     os._exit(0)

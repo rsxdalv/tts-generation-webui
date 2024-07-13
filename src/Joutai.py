@@ -3,7 +3,7 @@ import gradio as gr
 
 class Joutai:
     def __init__(self):
-        self.tabs = gr.Tabs()
+        # self.tabs = gr.Tabs()
         self.remixer_input = gr.Audio(label="Input Audio")
         self.rvc_input = gr.Audio(label="Original Audio", type="filepath")
         self.demucs_input = gr.Audio(label="Input", type="filepath")
@@ -44,9 +44,13 @@ class Joutai:
         }
 
     def switch_to_tab(self, tab: str):
+        def empty_fn():
+            pass
         return {
-            "fn": lambda: gr.Tabs.update(selected=tab),
-            "outputs": self.tabs,
+            # "fn": lambda: gr.Tabs.update(selected=tab),
+            # "outputs": self.tabs,
+            "fn": empty_fn,
+            "outputs": [],
         }
 
     singleton: "Joutai"
