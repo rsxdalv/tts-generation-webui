@@ -2,7 +2,7 @@ import os
 import src.utils.setup_or_recover as setup_or_recover
 import src.utils.dotenv_init as dotenv_init
 import gradio as gr
-from utils.suppress_warnings import suppress_warnings
+from src.utils.suppress_warnings import suppress_warnings
 
 suppress_warnings()
 
