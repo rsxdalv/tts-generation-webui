@@ -37,6 +37,12 @@ gradio_interface_options = (
 )
 
 
+def generic_error_tab(e, name="SeamlessM4Tv2Model", id="seamless"):
+    with gr.Tab(name + " (!)", id=id):
+        gr.Markdown(f"""Failed to load {name} tab. Please check your configuration.""")
+        gr.Markdown(f"""Error: {e}""")
+
+
 with gr.Blocks(
     css=full_css,
     title="TTS Generation WebUI",
@@ -65,9 +71,12 @@ with gr.Blocks(
                 print("Failed to load voice clone demo")
                 print(e)
 
-            from src.tortoise.generation_tab_tortoise import generation_tab_tortoise
+            try:
+                from src.tortoise.generation_tab_tortoise import generation_tab_tortoise
 
-            generation_tab_tortoise()
+                generation_tab_tortoise()
+            except Exception as e:
+                generic_error_tab(e, name="Tortoise TTS", id="tortoise")
 
             try:
                 from src.seamlessM4T.seamless_tab import seamless_tab
@@ -75,13 +84,7 @@ with gr.Blocks(
                 seamless_tab()
 
             except Exception as e:
-                with gr.Tab("SeamlessM4Tv2Model (!)", id="seamless"):
-                    gr.Markdown(
-                        """Failed to load SeamlessM4Tv2Model demo. Please check your configuration."""
-                    )
-                    gr.Markdown(f"""Error: {e}""")
-                print("Failed to load seamless demo")
-                print(e)
+                generic_error_tab(e, name="SeamlessM4Tv2Model", id="seamless")
 
             try:
                 from src.vall_e_x.vall_e_x_tab import valle_x_tab
@@ -89,13 +92,7 @@ with gr.Blocks(
                 valle_x_tab()
 
             except Exception as e:
-                with gr.Tab("Valle-X (!)", id="vall_e_x"):
-                    gr.Markdown(
-                        """Failed to load Valle-X demo. Please check your configuration."""
-                    )
-                    gr.Markdown(f"""Error: {e}""")
-                print("Failed to load vall-e-x demo")
-                print(e)
+                generic_error_tab(e, name="Valle-X", id="vall_e_x")
 
             try:
                 from src.mms.mms_tab import mms_tab
@@ -103,13 +100,7 @@ with gr.Blocks(
                 mms_tab()
 
             except Exception as e:
-                with gr.Tab("MMS (!)", id="mms"):
-                    gr.Markdown(
-                        """Failed to load MMS demo. Please check your configuration."""
-                    )
-                    gr.Markdown(f"""Error: {e}""")
-                print("Failed to load mms demo")
-                print(e)
+                generic_error_tab(e, name="MMS", id="mms")
 
             try:
                 from src.maha_tts.maha_tts_tab import maha_tts_tab
@@ -117,13 +108,7 @@ with gr.Blocks(
                 maha_tts_tab()
 
             except Exception as e:
-                with gr.Tab("MahaTTS (!)", id="maha_tts"):
-                    gr.Markdown(
-                        """Failed to load MahaTTS demo. Please check your configuration."""
-                    )
-                    gr.Markdown(f"""Error: {e}""")
-                print("Failed to load maha_tts demo")
-                print(e)
+                generic_error_tab(e, name="MahaTTS", id="maha_tts")
 
             try:
                 from src.styletts2.styletts2_tab import style_tts2_tab
@@ -131,13 +116,7 @@ with gr.Blocks(
                 style_tts2_tab()
 
             except Exception as e:
-                with gr.Tab("StyleTTS2 (!)", id="style_tts2"):
-                    gr.Markdown(
-                        """Failed to load StyleTTS2 demo. Please check your configuration."""
-                    )
-                    gr.Markdown(f"""Error: {e}""")
-                print("Failed to load style_tts2 demo")
-                print(e)
+                generic_error_tab(e, name="StyleTTS2", id="style_tts2")
 
         with gr.Tab("Audio/Music Generation"), gr.Tabs():
 
@@ -147,13 +126,7 @@ with gr.Blocks(
                 stable_audio_ui_tab()
 
             except Exception as e:
-                with gr.Tab("Stable Audio (!)", id="stable_audio"):
-                    gr.Markdown(
-                        """Failed to load Stable Audio demo. Please check your configuration."""
-                    )
-                    gr.Markdown(f"""Error: {e}""")
-                    print("Failed to load stable_audio demo")
-                    print(e)
+                generic_error_tab(e, name="Stable Audio", id="stable_audio")
 
             try:
                 from src.magnet.magnet_tab import generation_tab_magnet
@@ -161,13 +134,7 @@ with gr.Blocks(
                 generation_tab_magnet()
 
             except Exception as e:
-                with gr.Tab("MAGNeT (!)", id="magnet"):
-                    gr.Markdown(
-                        """Failed to load MAGNeT demo. Please check your configuration."""
-                    )
-                    gr.Markdown(f"""Error: {e}""")
-                print("Failed to load magnet demo")
-                print(e)
+                generic_error_tab(e, name="MAGNeT", id="magnet")
 
             try:
                 from src.musicgen.musicgen_tab import generation_tab_musicgen
