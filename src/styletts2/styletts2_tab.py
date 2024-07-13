@@ -113,7 +113,7 @@ def style_tts2_ui():
 
 
 def style_tts2_tab():
-    with gr.Tab("StyleTTS2 Generation Demo") as tab:
+    with gr.Tab("StyleTTS2 Generation"):
         style_tts2_ui()
 
 

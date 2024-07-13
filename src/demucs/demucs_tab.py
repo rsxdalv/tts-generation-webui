@@ -73,7 +73,7 @@ def demucs_ui():
 
 
 def demucs_tab():
-    with gr.Tab("Demucs Demo", id="demucs"):
+    with gr.Tab("Demucs", id="demucs"):
         demucs_ui()
 
 

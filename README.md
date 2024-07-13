@@ -3,7 +3,7 @@
 [Download](https://github.com/rsxdalv/tts-generation-webui/archive/refs/heads/main.zip) ||
 [Upgrading](#upgrading) ||
 [Manual installation](#manual-installation-not-recommended) ||
-[Docker Setup](#docker-setup) || [Configuration Guide](#configuration-guide) || [Discord Server](https://discord.gg/3JbBrKrH) || [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rsxdalv/tts-generation-webui/blob/main/notebooks/google_collab.ipynb)
+[Docker Setup](#docker-setup) || [Configuration Guide](#configuration-guide) || [Discord Server](https://discord.gg/3JbBrKrH) || [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rsxdalv/tts-generation-webui/blob/main/notebooks/google_collab.ipynb) || [Feedback / Bug reports](https://forms.gle/2L62owhBsGFzdFBC8)
 
 List of models: Bark, MusicGen + AudioGen, Tortoise, RVC, Vocos, Demucs, SeamlessM4T, MAGNeT, Stable Audio, Maha TTS, MMS, and more.
 

@@ -5,14 +5,13 @@ import torch
 from huggingface_hub import hf_hub_download
 import gradio as gr
 
-from stable_audio_tools.interface.gradio import (
-    create_sampling_ui,
-    load_model,
-    generate_cond,
-)
+from stable_audio_tools.interface.gradio import load_model, generate_cond
 
 from src.history_tab.open_folder import open_folder
 from src.utils.get_path_from_root import get_path_from_root
+
+import numpy as np
+import gc
 
 LOCAL_DIR_BASE = os.path.join("data", "models", "stable-audio")
 LOCAL_DIR_BASE_ABSOLUTE = get_path_from_root(*LOCAL_DIR_BASE.split("/"))
@@ -187,10 +186,7 @@ def stable_audio_ui():
         with gr.Tab("Inpainting"):
             create_sampling_ui(model_config, inpainting=True)
             open_dir_btn = gr.Button("Open outputs folder")
-            open_dir_btn.click(
-                lambda: open_folder(OUTPUT_DIR),
-                api_name="stable_audio_open_output_dir",
-            )
+            open_dir_btn.click(lambda: open_folder(OUTPUT_DIR))
         with gr.Tab("Model Download"):
             gr.Markdown(
                 "Models can be found on the [HuggingFace model hub](https://huggingface.co/models?search=stable-audio-open-1.0)."
@@ -270,6 +266,8 @@ def save_result(audio, *generation_args):
             .replace(")", "_")
             .replace("?", "_")
             .replace("!", "_")
+            .replace("/", "_")
+            .replace("\n", "_")
             # only first 15 characters
             .replace("__", "_")[:15]
         )
@@ -357,8 +355,10 @@ def create_sampling_ui(model_config, inpainting=False):
             with gr.Accordion("Sampler params", open=False):
 
                 # Seed
-                seed_textbox = gr.Textbox(
-                    label="Seed (set to -1 for random seed)", value="-1"
+                seed_textbox = gr.Textbox(label="Seed", value="-1")
+
+                CUSTOM_randomize_seed_checkbox = gr.Checkbox(
+                    label="Randomize seed", value=True
                 )
 
                 # Sampler params
@@ -541,18 +541,28 @@ def create_sampling_ui(model_config, inpainting=False):
                 outputs=[init_audio_input],
             )
 
+    def randomize_seed(seed, randomize_seed):
+        if randomize_seed:
+            return np.random.randint(0, 2**32 - 1, dtype=np.uint32)
+        else:
+            return int(seed)
+
     generate_button.click(
+        fn=randomize_seed,
+        inputs=[seed_textbox, CUSTOM_randomize_seed_checkbox],
+        outputs=[seed_textbox],
+    ).then(
         fn=generate_cond,
         inputs=inputs,
         outputs=[audio_output, audio_spectrogram_output],
-        api_name="stable_audio_generate",
+        api_name="stable_audio_inpaint" if inpainting else "stable_audio_generate",
     ).then(
         fn=save_result,
         inputs=[
             audio_output,
             *inputs,
         ],
-        api_name="stable_audio_save",
+        api_name="stable_audio_save_inpaint" if inpainting else "stable_audio_save",
     ).then(
         fn=torch_clear_memory,
     )
@@ -560,6 +570,7 @@ def create_sampling_ui(model_config, inpainting=False):
 
 def torch_clear_memory():
     torch.cuda.empty_cache()
+    gc.collect()
 
 
 # FEATURE - crop the audio to the actual length specified

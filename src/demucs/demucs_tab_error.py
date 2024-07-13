@@ -32,8 +32,8 @@ def install_musicgen():
 
 
 def demucs_tab_error(e: Exception):
-    with gr.Tab("Demucs Demo (!)"):
-        gr.Markdown("Failed to load Demucs demo")
+    with gr.Tab("Demucs (!)"):
+        gr.Markdown("Failed to load Demucs")
         gr.Markdown(f"Error: {e}")
         gr.Markdown("Please install the requirements_bark_hubert_quantizer.txt file")
         gr.Markdown("Please check the console for more information")

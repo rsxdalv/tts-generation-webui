@@ -29,7 +29,7 @@ def install_rvc():
         yield "Failed to install RVC"
 
 
-def rvc_tab_error(e: Exception, name="RVC Beta Demo"):
+def rvc_tab_error(e: Exception, name="RVC"):
     with gr.Tab(name + " (!)"):
         gr.Markdown("Failed to load RVC demo")
         gr.Markdown(f"Error: {e}")

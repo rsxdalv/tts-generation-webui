@@ -131,5 +131,5 @@ def seamless_ui():
 
 
 def seamless_tab():
-    with gr.Tab("Seamless M4Tv2 Demo", id="seamless"):
+    with gr.Tab("Seamless M4Tv2", id="seamless"):
         seamless_ui()

@@ -252,7 +252,7 @@ def maha_tts_ui():
 
 
 def maha_tts_tab():
-    with gr.Tab(label="Maha TTS Demo"):
+    with gr.Tab(label="Maha TTS"):
         maha_tts_ui()
 
 
