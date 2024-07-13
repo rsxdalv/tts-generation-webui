@@ -23,8 +23,8 @@ ENV VIRTUAL_ENV=/venv
 RUN python3 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
-# Define PyTorch version, torch 2.0.0 known to work
-ENV TORCH_VERSION=2.0.0
+# Define PyTorch version
+ENV TORCH_VERSION=2.3.1
 
 # Version 24 is broken due to fairseq
 RUN pip3 install --no-cache-dir --upgrade pip==23.3.2 setuptools && \
