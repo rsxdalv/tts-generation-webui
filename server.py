@@ -78,7 +78,7 @@ with gr.Blocks(
     analytics_enabled=False,  # it broke too many times
 ) as demo:
     gr.Markdown(
-        """# TTS Generation WebUI (Bark, MusicGen + AudioGen, Tortoise, RVC) [React UI](http://localhost:3000)"""
+        """# TTS Generation WebUI (Bark, MusicGen + AudioGen, Tortoise, RVC) [React UI](http://localhost:3000) [Feedback / Bug reports](https://forms.gle/2L62owhBsGFzdFBC8)"""
     )
     with Joutai.singleton.tabs:
         from src.tortoise.generation_tab_tortoise import generation_tab_tortoise
@@ -269,9 +269,9 @@ with gr.Blocks(
             )
 
             model_location_settings_tab()
+            gpu_info_tab()
 
         remixer_input = simple_remixer_tab()
-        gpu_info_tab()
     Joutai.singleton.tabs.render()
 
 

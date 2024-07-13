@@ -165,6 +165,13 @@ export const Header = ({}) => {
         >
           GitHub
         </a>
+        &nbsp;
+        &nbsp;
+        <a
+          href="https://forms.gle/2L62owhBsGFzdFBC8"
+          target="_blank"
+          className="text-gray-500 hover:underline whitespace-pre"
+        >Feedback / Bug reports</a>
       </div>
       <RouteList>{routes.map(renderLink)}</RouteList>
       {subroutes && (
