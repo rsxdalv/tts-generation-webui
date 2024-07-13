@@ -243,7 +243,7 @@ def rvc_ui():
 
 
 def rvc_conversion_tab():
-    with gr.Tab("RVC Beta Demo", id="rvc_tab"):
+    with gr.Tab("RVC", id="rvc_tab"):
         rvc_ui()
 
 

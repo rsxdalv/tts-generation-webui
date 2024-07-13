@@ -1,14 +1,14 @@
 import gradio as gr
-from typing import Type
 
 
 class Joutai:
     def __init__(self):
-        self.tabs = gr.Tabs()
         self.remixer_input = gr.Audio(label="Input Audio")
         self.rvc_input = gr.Audio(label="Original Audio", type="filepath")
         self.demucs_input = gr.Audio(label="Input", type="filepath")
-        self.vocos_input_npz = gr.File(label="Input NPZ", file_types=[".npz"], interactive=True)
+        self.vocos_input_npz = gr.File(
+            label="Input NPZ", file_types=[".npz"], interactive=True
+        )
 
     def send_to_remixer(self, **kwargs):
         remixer_input = self.remixer_input
@@ -42,11 +42,9 @@ class Joutai:
             **kwargs,
         }
 
+    # deprecated
     def switch_to_tab(self, tab: str):
-        return {
-            "fn": lambda: gr.Tabs.update(selected=tab),
-            "outputs": self.tabs,
-        }
+        return { "fn": lambda: gr.Tabs.update(selected=tab) }
 
     singleton: "Joutai"
 

@@ -10,9 +10,7 @@ from src.config.load_config import default_config
 from src.config.config import config
 
 from src.css.css import full_css
-from src.Joutai import Joutai
 from src.history_tab.collections_directories_atom import collections_directories_atom
-from src.utils.gpu_info_tab import gpu_info_tab
 
 print("Starting server...\n")
 
@@ -213,6 +211,7 @@ with gr.Blocks(
             )
 
             model_location_settings_tab()
+            from src.utils.gpu_info_tab import gpu_info_tab
             gpu_info_tab()
 
         # from src.studio.studio_tab import simple_remixer_tab

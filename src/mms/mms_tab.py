@@ -116,7 +116,7 @@ def mms_ui():
 
 
 def mms_tab():
-    with gr.Tab(label="MMS Demo"):
+    with gr.Tab(label="MMS"):
         mms_ui()
 
 
