@@ -1,14 +1,27 @@
 import os
 import gradio as gr
-import torch
 from src.Joutai import Joutai
 from src.history_tab.open_folder import open_folder
 from src.utils.get_path_from_root import get_path_from_root
 import glob
 from src.tortoise.gr_reload_button import gr_reload_button, gr_open_button_simple
-from src.rvc_tab.infer_rvc import infer_rvc as infer_rvc
+# from src.rvc_tab.infer_rvc import infer_rvc as infer_rvc
+from src.rvc_tab.get_and_load_hubert import download_rmvpe
 
+from pathlib import Path
 
+from rvc.modules.vc.modules import VC
+
+from huggingface_hub import hf_hub_download
+
+hubert_path = hf_hub_download(
+    repo_id="lj1995/VoiceConversionWebUI", filename="hubert_base.pt"
+)
+
+last_model_path = None
+vc = None
+
+# add f0_file
 def run_rvc(
     f0up_key: str,
     original_audio_path: str,
@@ -16,27 +29,66 @@ def run_rvc(
     f0method: str,
     model_path: str,
     index_rate: float,
-    device: str,
-    is_half: bool,
     filter_radius: int,
     resample_sr: int,
     rms_mix_rate: float,
     protect: float,
 ):
-    return infer_rvc(
-        f0method=f0method,
-        f0up_key=int(f0up_key),
-        input_path=original_audio_path,
-        index_path_2=index_path + ".index",
+    print("Starting RVC...")
+    print("RVCParameters(")
+    print(f'  "f0up_key": {f0up_key}')
+    print(f'  "original_audio_path": {original_audio_path}')
+    print(f'  "index_path": {index_path}')
+    print(f'  "f0method": {f0method}')
+    print(f'  "model_path": {model_path}')
+    print(f'  "index_rate": {index_rate}')
+    print(f'  "filter_radius": {filter_radius}')
+    print(f'  "resample_sr": {resample_sr}')
+    print(f'  "rms_mix_rate": {rms_mix_rate}')
+    print(f'  "protect": {protect}')
+    print(")")
+    global vc, last_model_path
+    # load_dotenv()
+    # with hide_argv():
+    #     config = Config()
+    # config.device = device if device else config.device
+    # config.is_half = is_half if is_half else config.is_half
+    if vc is None:
+        vc = VC()
+        # if vc.hubert_model is None:
+        #     vc.hubert_model = get_and_load_hubert_new(config)
+    if last_model_path != model_path:
+        vc.get_vc(model_path + ".pth")
+        last_model_path = model_path
+    if f0method == "rmvpe":
+        download_rmvpe()
+    tgt_sr, audio_opt, times, _ = vc.vc_inference(
+        sid=1,
+        input_audio_path=Path(original_audio_path),
+        f0_up_key=int(f0up_key),
+        f0_method=f0method,
+        f0_file=None,
+        index_file=Path(index_path + ".index"),
         index_rate=index_rate,
-        device=device,
-        is_half=is_half,
         filter_radius=filter_radius,
         resample_sr=resample_sr,
         rms_mix_rate=rms_mix_rate,
         protect=protect,
-        model_name=model_path + ".pth",
+        hubert_path=hubert_path,
+        # hubert_path="data/models/hubert/hubert_base.pt",
     )
+    return (tgt_sr, audio_opt), {
+        "original_audio_path": original_audio_path,
+        "index_path": index_path,
+        "model_path": model_path,
+        "f0method": f0method,
+        "f0up_key": f0up_key,
+        "index_rate": index_rate,
+        "filter_radius": filter_radius,
+        "resample_sr": resample_sr,
+        "rms_mix_rate": rms_mix_rate,
+        "protect": protect,
+    }
 
 
 RVC_LOCAL_MODELS_DIR = get_path_from_root("data", "models", "rvc", "checkpoints")
@@ -150,16 +202,6 @@ def rvc_ui():
                     value=0.33,
                     label="Protect Breath Sounds",
                 )
-            with gr.Box():
-                gr.Markdown("### Hubert")
-                with gr.Row():
-                    device = gr.Dropdown(
-                        ["cuda:0", "cpu", "mps"], label="Device", value="cuda:0"
-                    )
-                    is_half = gr.Checkbox(
-                        label="Use half precision model (Depends on GPU support)",
-                        value=False,
-                    )
 
         with gr.Column():
             original_audio = Joutai.singleton.rvc_input
@@ -185,8 +227,6 @@ def rvc_ui():
                 f0method,
                 model_path,
                 index_rate,
-                device,
-                is_half,
                 filter_radius,
                 resample_sr,
                 rms_mix_rate,

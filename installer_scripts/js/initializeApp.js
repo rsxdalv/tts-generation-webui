@@ -4,28 +4,67 @@ const { processExit } = require("./processExit.js");
 const { menu } = require("./menu.js");
 const { $, $$, $sh } = require("./shell.js");
 
-// const torchVersion = $$(`pip show torch | grep Version`);
-const torchVersion = "2.0.0";
+const DEBUG_DRY_RUN = false;
 
-// pytorch::ffmpeg
-const cudaPackages =
-  "pytorch[version=2,build=py3.10_cuda11.7*] torchvision torchaudio pytorch-cuda=11.7 cuda-toolkit ninja ffmpeg -c pytorch -c nvidia/label/cuda-11.7.0 -c nvidia";
-const cudaPytorchInstall$ = `conda install -y -k ${cudaPackages}`;
+// const torchVersion = $$(`pip show torch | grep Version`);
+const torchVersion = "2.3.1";
+const cudaVersion = "11.8";
+
+// xformers==0.0.19 # For torch==2.0.0 project plane
+// xformers==xformers-0.0.22.post7 # For torch==2.1.0 project plane
+const pythonVersion = `3.10.11`;
+const pythonPackage = `python=${pythonVersion}`;
+const ffmpegPackage = `pytorch::ffmpeg`;
+const cudaChannels = [
+  "",
+  "pytorch",
+  `nvidia/label/cuda-${cudaVersion}.0`,
+  "nvidia",
+].join(" -c ");
+const cpuChannels = ["", "pytorch"].join(" -c ");
+
+const cudaPackages = `pytorch[version=${torchVersion},build=py3.10_cuda${cudaVersion}*] torchvision torchaudio pytorch-cuda=${cudaVersion} cuda-toolkit ninja`;
+const cudaPytorchInstall$ = `conda install -y -k ${ffmpegPackage} ${cudaPackages} ${cudaChannels}`;
+
+const cpuPackages = `pytorch=${torchVersion} torchvision torchaudio cpuonly`;
+const pytorchCPUInstall$ = `conda install -y -k ${ffmpegPackage} ${cpuPackages} ${cpuChannels}`;
+
+// console.log(cudaPytorchInstall$);
+// console.log(pytorchCPUInstall$);
+
+const ensurePythonVersion = async () => {
+  try {
+    displayMessage("Checking python version...");
+    const version = await getPythonVersion();
+    if (version !== `Python ${pythonVersion}`) {
+      displayMessage(`Current python version is """${version}"""`);
+      displayMessage(`Python version is not ${pythonVersion}. Reinstalling...`);
+      await $(`conda install -y -k -c conda-forge ${pythonPackage}`);
+      await $(`conda install -y -k -c conda-forge pip==23.3.2`);
+    }
+  } catch (error) {
+    displayError("Failed to check/install python version");
+  }
+
+  async function getPythonVersion() {
+    await $sh(`python --version > installer_scripts/.python_version`);
+    return fs.readFileSync("installer_scripts/.python_version", "utf8").trim();
+  }
+};
 
 const installDependencies = async (gpuchoice) => {
   try {
     if (gpuchoice === "NVIDIA GPU") {
       await $(cudaPytorchInstall$);
     } else if (gpuchoice === "Apple M Series Chip" || gpuchoice === "CPU") {
-      await $(
-        "conda install -y -k pytorch torchvision torchaudio cpuonly ffmpeg -c pytorch"
-      );
+      await $(pytorchCPUInstall$);
     } else {
       displayMessage("Unsupported or cancelled. Exiting...");
       removeGPUChoice();
       processExit(1);
     }
 
+    saveMajorVersion(majorVersion);
     await updateDependencies(false);
   } catch (error) {
     displayError(`Error during installation: ${error.message}`);
@@ -51,6 +90,8 @@ Select the device (GPU/CPU) you are using to run the application:
   );
 
 const gpuFile = "./installer_scripts/.gpu";
+const majorVersionFile = "./installer_scripts/.major_version";
+const majorVersion = "2";
 
 const saveGPUChoice = (gpuchoice) => {
   fs.writeFileSync(gpuFile, gpuchoice.toString());
@@ -69,12 +110,23 @@ const readGPUChoice = () => {
   return -1;
 };
 
+const readMajorVersion = () => {
+  if (fs.existsSync(majorVersionFile)) {
+    return fs.readFileSync(majorVersionFile, "utf8");
+  }
+  return -1;
+};
+
+const saveMajorVersion = (majorVersion) => {
+  fs.writeFileSync(majorVersionFile, majorVersion.toString());
+};
+
+const dry_run_flag = DEBUG_DRY_RUN ? "--dry-run " : "";
+
 function tryInstall(requirements, name = "") {
   try {
     displayMessage(`Installing ${name || requirements} dependencies...`);
-    // const torchVersion = $$(`pip show torch | grep Version`);
-    const torchVersion = "2.0.0";
-    $sh(`pip install ${requirements} torch==${torchVersion}`);
+    $sh(`pip install ${dry_run_flag}${requirements} torch==${torchVersion}`);
     displayMessage(
       `Successfully installed ${name || requirements} dependencies`
     );
@@ -96,16 +148,21 @@ async function updateDependencies(optional = true) {
     }
   }
 
-  tryInstall("-r requirements.txt", "Core Packages, Bark, Tortoise");
   displayMessage("Updating dependencies...");
-  // xformers==0.0.19 # For torch==2.0.0 project plane
-  tryInstall("-r requirements_audiocraft.txt xformers==0.0.19", "Audiocraft");
+  tryInstall("-r requirements.txt", "Core Packages, Bark, Tortoise");
+  tryInstall(
+    "xformers==0.0.27 --index-url https://download.pytorch.org/whl/cu118",
+    "xformers"
+  );
   tryInstall("-r requirements_bark_hubert_quantizer.txt", "Bark Voice Clone");
   tryInstall("-r requirements_rvc.txt", "RVC");
+  tryInstall("-r requirements_audiocraft.txt", "Audiocraft");
   tryInstall("-r requirements_styletts2.txt", "StyleTTS");
   tryInstall("-r requirements_vall_e.txt", "Vall-E-X");
   tryInstall("-r requirements_maha_tts.txt", "Maha TTS");
   tryInstall("-r requirements_stable_audio.txt", "Stable Audio");
+  // reinstall hydra-core==1.1.0 because of fairseq
+  tryInstall("hydra-core==1.1.0", "hydra-core fix");
 }
 
 const checkIfTorchInstalled = async () => {
@@ -122,13 +179,20 @@ const checkIfTorchInstalled = async () => {
 };
 
 const initializeApp = async () => {
+  displayMessage("Ensuring that python has the correct version...");
+  await ensurePythonVersion();
   displayMessage("Checking if Torch is installed...");
-  if (await checkIfTorchInstalled()) {
-    displayMessage("Torch is already installed. Skipping installation...");
-    await updateDependencies();
-    return;
+  if (readMajorVersion() === majorVersion) {
+    if (await checkIfTorchInstalled()) {
+      displayMessage("Torch is already installed. Skipping installation...");
+      await updateDependencies();
+      return;
+    } else {
+      displayMessage("Torch is not installed. Starting installation...\n");
+    }
+  } else {
+    displayMessage("Major version update detected. Upgrading base environment");
   }
-  displayMessage("Torch is not installed. Starting installation...\n");
 
   if (fs.existsSync(gpuFile)) {
     const gpuchoice = readGPUChoice();
@@ -159,21 +223,18 @@ const checkIfTorchHasCuda = async () => {
 };
 
 async function repairTorch() {
-  // get gpu choice
-  const choice = readGPUChoice();
-  if (!checkIfTorchHasCuda() && choice === "NVIDIA GPU") {
+  const gpuChoice = readGPUChoice();
+  if (!checkIfTorchHasCuda() && gpuChoice === "NVIDIA GPU") {
     displayMessage("Backend is NVIDIA GPU, fixing PyTorch");
     try {
       await $(`conda install -y -k --force-reinstall ${cudaPackages}`);
     } catch (error) {
       displayError("Failed to fix torch");
     }
-  } else if (choice === "CPU" || choice === "Apple M Series Chip") {
+  } else if (gpuChoice === "CPU" || gpuChoice === "Apple M Series Chip") {
     displayMessage("Backend is CPU/Apple M Series Chip, fixing PyTorch");
     try {
-      await $(
-        "conda install -y -k --force-reinstall pytorch torchvision torchaudio cpuonly -c pytorch"
-      );
+      await $(`conda install -y -k --force-reinstall ${cpuPackages}`);
     } catch (error) {
       displayError("Failed to fix torch");
     }

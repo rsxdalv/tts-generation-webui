@@ -1,10 +1,5 @@
-// import fs from "fs";
-// import { $, $$, $sh } from "./js/shell";
-// import { initializeApp, repairTorch, setupReactUI } from "./js/initializeApp.mjs";
-// import { displayError, displayMessage } from "./js/displayMessage.mjs";
-// import { processExit } from "./js/processExit.mjs";
 const fs = require("fs");
-const { $, $$, $sh } = require("./js/shell");
+const { $ } = require("./js/shell");
 const { displayError, displayMessage } = require("./js/displayMessage.js");
 const { processExit } = require("./js/processExit.js");
 
@@ -23,6 +18,8 @@ const checkConda = async () => {
 const updateConda = async () => {
   await $("conda update -y -n base -c defaults conda");
 };
+
+const DEBUG_ALWAYS_RETURN_UPDATED = false;
 
 const syncRepo = async () => {
   if (!fs.existsSync(".git")) {
@@ -45,7 +42,7 @@ const syncRepo = async () => {
       const newHash = fs.readFileSync(file, "utf8");
       if (currentHash === newHash) {
         displayMessage("No updates found, skipping...");
-        return false;
+        return false || DEBUG_ALWAYS_RETURN_UPDATED;
       }
       return true;
     } catch (error) {
@@ -65,14 +62,14 @@ async function main() {
   //     });
   //   })
   //   .listen(8080);
-  const version = "0.0.3";
+  const version = "0.0.4";
   displayMessage("\n\nStarting init app (version: " + version + ")...\n\n");
   try {
     await checkConda();
     // await updateConda();
     const isUpdated = await syncRepo();
     if (!isUpdated) {
-      // return;
+      return;
     }
     const {
       initializeApp,
@@ -87,7 +84,6 @@ async function main() {
     processExit(1);
   }
   displayMessage("\n\nFinished init app.\n");
-  // processExit(1);
   processExit(0);
 }
 

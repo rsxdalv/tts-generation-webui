@@ -18,6 +18,16 @@ List of models: Bark, MusicGen + AudioGen, Tortoise, RVC, Vocos, Demucs, Seamles
 
 ## Changelog
 
+July 13:
+* Major upgrade to Torch 2.3.1 and xformers 0.0.27
+  * All users, including Mac and CPU will now have the same PyTorch version.
+* Upgrade CUDA to 11.8
+* Force python to be 3.10.11
+* Modify installer to allow upgrading Python and Torch without reinstalling (currently major version 2)
+* Fix magnet default params for better quality
+* Improve installer script checks to avoid bugs
+* Update StyleTTS2
+
 July 11:
 * Improve Stable Audio generation filenames
 * Add force reinstall to torch repair
@@ -40,6 +50,11 @@ July 1:
 * Remove unnecessary conda git reinstall.
 * Update to lastest Stable Audio which has mps support (requires newer torch versions).
 
+
+## June 2024
+
+<details>
+<summary>Click to expand</summary>
 June 22:
 * Add Stable Audio to Gradio.
 
@@ -60,6 +75,8 @@ May 9:
 
 May 4:
 * Group Changelog by month
+
+</details>
 
 ## April 2024
 
