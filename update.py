@@ -86,6 +86,8 @@ def main():
     try_install("requirements_vall_e.txt torch==2.0.0", "Vall-E-X")
     try_install("requirements_maha_tts.txt torch==2.0.0", "Maha TTS")
     try_install("requirements_stable_audio.txt torch==2.0.0", "Stable Audio")
+    # hydracore fix because of fairseq
+    do("pip install hydra-core==1.3.2")
 
     if is_node_installed():
         setup_node_modules()

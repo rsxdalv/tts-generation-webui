@@ -214,6 +214,8 @@ with gr.Blocks(
             model_location_settings_tab()
             from src.utils.gpu_info_tab import gpu_info_tab
             gpu_info_tab()
+            from src.utils.pip_list_tab import pip_list_tab
+            pip_list_tab()
 
         # from src.studio.studio_tab import simple_remixer_tab
         # remixer_input = simple_remixer_tab()

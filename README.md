@@ -18,6 +18,15 @@ List of models: Bark, MusicGen + AudioGen, Tortoise, RVC, Vocos, Demucs, Seamles
 
 ## Changelog
 
+July 14:
+* Regroup Gradio tabs into groups - Text to Speech, Audio Conversion, Music Generation, Outputs and Settings
+* Clean up the header, add link for feedback
+* Add seed control to Stable Audio
+* Fix Stable Audio filename bug with newlines
+* Disable "Simple Remixer" Gradio tab
+* Fix bark voice clone & RVC once more
+* Add "Installed Packages" tab for debugging
+
 July 13:
 * Major upgrade to Torch 2.3.1 and xformers 0.0.27
   * All users, including Mac and CPU will now have the same PyTorch version.

@@ -161,8 +161,8 @@ async function updateDependencies(optional = true) {
   tryInstall("-r requirements_vall_e.txt", "Vall-E-X");
   tryInstall("-r requirements_maha_tts.txt", "Maha TTS");
   tryInstall("-r requirements_stable_audio.txt", "Stable Audio");
-  // reinstall hydra-core==1.1.0 because of fairseq
-  tryInstall("hydra-core==1.1.0", "hydra-core fix");
+  // reinstall hydra-core==1.3.2 because of fairseq
+  tryInstall("hydra-core==1.3.2", "hydra-core fix due to fairseq");
 }
 
 const checkIfTorchInstalled = async () => {
