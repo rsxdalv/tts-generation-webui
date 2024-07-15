@@ -49,18 +49,18 @@ def save_to_voices_cb(npz_filename: str):
 
 
 def history_tab(
-    register_use_as_history_button, directory="outputs", show_collections=False
+    directory="outputs", show_collections=False
 ):
     with gr.Tab(
         show_collections and "Collections" or directory.capitalize()
     ) as history_tab:
         return history_content(
-            register_use_as_history_button, directory, history_tab, show_collections
+            directory, history_tab, show_collections
         )
 
 
 def history_content(
-    register_use_as_history_button, directory, history_tab, show_collections
+    directory, history_tab, show_collections
 ):
     directories = get_collections()
     directory_dropdown = gr.Dropdown(
@@ -125,11 +125,7 @@ def history_content(
                 save_to_favorites_history = gr.Button(
                     value="Save to favorites", variant="primary", visible=False
                 )
-                use_as_voice = gr.Button(
-                    value="Use as voice",
-                    variant=directory == "favorites" and "primary" or "secondary",
-                    visible=False,
-                )
+                gr.Markdown("""Use as voice button is now only available in React UI""")
                 save_to_voices = gr.Button(
                     value="Save to voices", variant="secondary", visible=False
                 )
@@ -142,11 +138,6 @@ def history_content(
                     fn=save_to_favorites,
                     inputs=history_bundle_name_data,
                     outputs=save_to_favorites_history,
-                )
-
-                register_use_as_history_button(
-                    use_as_voice,
-                    history_npz,
                 )
 
                 save_to_voices.click(
@@ -175,7 +166,6 @@ def history_content(
             save_to_favorites_history: gr.Button.update(
                 visible=directory != "favorites", value="Save to favorites"
             ),
-            use_as_voice: gr.Button.update(visible=True, value="Use as voice"),
             save_to_voices: gr.Button.update(visible=True, value="Save to voices"),
             open_folder_button: gr.Button.update(visible=True),
         }
@@ -195,7 +185,6 @@ def history_content(
         history_npz,
         delete_from_history,
         save_to_favorites_history,
-        use_as_voice,
         save_to_voices,
         open_folder_button,
     ]

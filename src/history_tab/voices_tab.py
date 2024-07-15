@@ -18,7 +18,7 @@ def update_voices_tab():
     return gr.List.update(value=get_npz_files_voices())
 
 
-def voices_tab(register_use_as_history_button, directory="voices"):
+def voices_tab(directory="voices"):
     with gr.Tab(directory.capitalize()) as voices_tab, gr.Row(equal_height=False):
         with gr.Column():
             with gr.Accordion("Gallery Selector (Click to Open)", open=False):
@@ -69,7 +69,7 @@ def voices_tab(register_use_as_history_button, directory="voices"):
             with gr.Row():
                 rename_voice_button = gr.Button(value="Rename voice")
                 delete_voice_button = gr.Button(value="Delete voice", variant="stop")
-                use_voice_button = gr.Button(value="Use voice", variant="primary")
+                gr.Markdown("""Use voice button is now only available in React UI""")
 
             metadata = gr.JSON(label="Metadata")
             metadata_input = edit_metadata_ui(voice_file_name, metadata)
@@ -163,10 +163,6 @@ def voices_tab(register_use_as_history_button, directory="voices"):
         inputs=[voice_file_name, new_voice_file_name],
         outputs=[rename_voice_button, voices_list, voice_file_name],
     )
-    register_use_as_history_button(
-        use_voice_button,
-        voice_file_name,
-    )
     delete_voice_button.click(
         fn=delete_voice,
         inputs=[voice_file_name],
@@ -239,13 +235,14 @@ def voices_tab(register_use_as_history_button, directory="voices"):
     def select_gallery(_list_data, evt: gr.SelectData):
         def get_gallery_file_selection(_gallery_data, evt: gr.SelectData):
             selected_image = _gallery_data[evt.index]
-            image_path = selected_image['name']
+            image_path = selected_image["name"]
             import os
+
             image_name = os.path.basename(image_path)
-            return image_name.replace('.png', '')
-        
+            return image_name.replace(".png", "")
+
         filename_base = get_gallery_file_selection(_list_data, evt)
-        return select_filename(f'voices/{filename_base}.npz')
+        return select_filename(f"voices/{filename_base}.npz")
 
     history_list_as_gallery.select(
         fn=select_gallery, inputs=[history_list_as_gallery], outputs=outputs

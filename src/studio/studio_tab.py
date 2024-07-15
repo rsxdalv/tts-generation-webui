@@ -2,7 +2,6 @@ from src.utils.save_waveform_plot import plot_waveform_as_image
 import gradio as gr
 import torchaudio
 import torch
-from src.Joutai import Joutai
 
 
 def gr_mini_button(value, **kwargs):
@@ -15,8 +14,7 @@ def gr_mini_button(value, **kwargs):
 
 
 def simple_remixer_ui():
-    input_audio = Joutai.singleton.remixer_input
-    input_audio.render()
+    input_audio = gr.Audio(label="Input Audio")
 
     def create_slot(id=0):
         with gr.Group(
@@ -30,11 +28,13 @@ def simple_remixer_ui():
             )
 
             audio.change(
-                fn=lambda x: image.update(
-                    plot_waveform_as_image(x[1]),
-                )
-                if x is not None
-                else None,
+                fn=lambda x: (
+                    image.update(
+                        plot_waveform_as_image(x[1]),
+                    )
+                    if x is not None
+                    else None
+                ),
                 inputs=[audio],
                 outputs=[image],
             )

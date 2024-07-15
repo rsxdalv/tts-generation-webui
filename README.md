@@ -18,6 +18,13 @@ List of models: Bark, MusicGen + AudioGen, Tortoise, RVC, Vocos, Demucs, Seamles
 
 ## Changelog
 
+July 15:
+* Comment - As the React UI has been out for a long time now, Gradio UI is going to have the role of serving only the functions to the user, without the extremely complicated UI that it cannot handle. There is a real shortage of development time to add new models and features, but the old style of integration was not viable. As the new APIs and 'the role of the model' is defined, it will be possible to have extensions for entire models, enabling a lot more flexibility and lighter installations.
+* Start scaling back Gradio UI complexity - removed _send to RVC/Demucs/Voice_ buttons. (Remove internal component Joutai).
+* Add version.json for better updates in the future.
+* Reduce Gradio Bark maximum number of outputs to 1.
+* Add unload model button to Tortoise, also unload the model before loading the next one/changing parameters, thus tortoise no longer uses 2x model memory during the settings change.
+
 July 14:
 * Regroup Gradio tabs into groups - Text to Speech, Audio Conversion, Music Generation, Outputs and Settings
 * Clean up the header, add link for feedback

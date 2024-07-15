@@ -16,8 +16,7 @@ print("Starting server...\n")
 
 setup_or_recover.dummy()
 dotenv_init.init()
-# required for proper rendering due to gr.* methods
-from src.Joutai import Joutai
+
 
 def reload_config_and_restart_ui():
     os._exit(0)
@@ -36,7 +35,7 @@ gradio_interface_options = (
 )
 
 
-def generic_error_tab(e, name="SeamlessM4Tv2Model", id="seamless"):
+def generic_error_tab(e, name="", id=""):
     with gr.Tab(name + " (!)", id=id):
         gr.Markdown(f"""Failed to load {name} tab. Please check your configuration.""")
         gr.Markdown(f"""Error: {e}""")
@@ -49,7 +48,7 @@ with gr.Blocks(
 ) as demo:
     gr.Markdown(
         """
-# TTS Generation WebUI [React UI](http://localhost:3000) [Feedback / Bug reports](https://forms.gle/2L62owhBsGFzdFBC8)
+# TTS Generation WebUI (Legacy - Gradio) [React UI](http://localhost:3000) [Feedback / Bug reports](https://forms.gle/2L62owhBsGFzdFBC8)
 ### _(Text To Speech, Audio & Music Generation, Conversion)_
 """
     )
@@ -57,12 +56,12 @@ with gr.Blocks(
         with gr.Tab("Text-to-Speech"), gr.Tabs():
             from src.bark.generation_tab_bark import generation_tab_bark
 
-            register_use_as_history_button = generation_tab_bark()
+            generation_tab_bark()
 
             try:
                 from src.bark.clone.tab_voice_clone import tab_voice_clone
 
-                tab_voice_clone(register_use_as_history_button)
+                tab_voice_clone()
             except Exception as e:
                 from src.bark.clone.tab_voice_clone_error import tab_voice_clone_error
 
@@ -188,16 +187,15 @@ with gr.Blocks(
             from src.history_tab.main import history_tab
 
             collections_directories_atom.render()
-            history_tab(register_use_as_history_button)
-            history_tab(register_use_as_history_button, directory="favorites")
+            history_tab()
+            history_tab(directory="favorites")
             history_tab(
-                register_use_as_history_button,
                 directory="outputs",
                 show_collections=True,
             )
             from src.history_tab.voices_tab import voices_tab
 
-            voices_tab(register_use_as_history_button)
+            voices_tab()
 
         with gr.Tab("Settings"), gr.Tabs():
             from src.settings_tab_gradio import settings_tab_gradio
@@ -213,8 +211,10 @@ with gr.Blocks(
 
             model_location_settings_tab()
             from src.utils.gpu_info_tab import gpu_info_tab
+
             gpu_info_tab()
             from src.utils.pip_list_tab import pip_list_tab
+
             pip_list_tab()
 
         # from src.studio.studio_tab import simple_remixer_tab

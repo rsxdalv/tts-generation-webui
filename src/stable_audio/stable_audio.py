@@ -11,7 +11,8 @@ from src.history_tab.open_folder import open_folder
 from src.utils.get_path_from_root import get_path_from_root
 
 import numpy as np
-import gc
+
+from src.stable_audio.torch_clear_memory import torch_clear_memory
 
 LOCAL_DIR_BASE = os.path.join("data", "models", "stable-audio")
 LOCAL_DIR_BASE_ABSOLUTE = get_path_from_root(*LOCAL_DIR_BASE.split("/"))
@@ -566,11 +567,6 @@ def create_sampling_ui(model_config, inpainting=False):
     ).then(
         fn=torch_clear_memory,
     )
-
-
-def torch_clear_memory():
-    torch.cuda.empty_cache()
-    gc.collect()
 
 
 # FEATURE - crop the audio to the actual length specified

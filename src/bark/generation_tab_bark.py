@@ -653,7 +653,7 @@ def generation_tab_bark():
             history_prompt_semantic_dropdown,
         ]
 
-        MAX_OUTPUTS = 9
+        MAX_OUTPUTS = 1
 
         with gr.Row():
             output_components, output_cols, seeds = map(
@@ -715,18 +715,6 @@ def generation_tab_bark():
             inputs=[seed_1],  # type: ignore
             outputs=[seed_input],
         )
-
-    def register_use_as_history_button(button, source):
-        button.click(
-            fn=lambda value: {
-                old_generation_dropdown: value,
-                history_setting: HistorySettings.NPZ_FILE,
-            },
-            inputs=[source],
-            outputs=[old_generation_dropdown, history_setting],
-        ).then(**Joutai.singleton.switch_to_tab(tab="generation_bark"))
-
-    return register_use_as_history_button
 
 
 def old_generation_dropdown_ui(label):
@@ -824,34 +812,6 @@ def create_components(
         with gr.Row(visible=False) as buttons_row:
             save_button = gr.Button("Save", size="sm")
             reuse_seed_button = gr.Button("Seed", size="sm")
-            gr.Button("Remix", size="sm").click(
-                **Joutai.singleton.send_to_remixer(
-                    inputs=[audio],
-                )
-            ).then(
-                **Joutai.singleton.switch_to_tab(
-                    tab="simple_remixer",
-                )
-            )
-            gr.Button("RVC", size="sm").click(
-                **Joutai.singleton.sent_to_rvc(
-                    inputs=[audio],
-                )
-            ).then(
-                **Joutai.singleton.switch_to_tab(
-                    tab="rvc_tab",
-                )
-            )
-            gr.Button("Demucs", size="sm").click(
-                **Joutai.singleton.send_to_demucs(
-                    inputs=[audio],
-                )
-            ).then(
-                **Joutai.singleton.switch_to_tab(
-                    tab="demucs",
-                )
-            )
-            send_to_vocos_button = gr.Button("Vocos", size="sm")
             continue_button = gr.Button("Use as history", size="sm")
             continue_semantic_button = gr.Button("Use as semantic history", size="sm")
         npz = gr.Textbox(
@@ -876,16 +836,6 @@ def create_components(
             fn=lambda x: gr.Textbox.update(value=str(x)),
             inputs=[seed],
             outputs=[seed_input],
-        )
-
-        send_to_vocos_button.click(
-            **Joutai.singleton.send_to_vocos_npz(
-                inputs=[npz],
-            )
-        ).then(
-            **Joutai.singleton.switch_to_tab(
-                tab="vocos",
-            )
         )
 
         continue_button.click(

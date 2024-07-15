@@ -4,7 +4,6 @@ import gradio as gr
 from demucs import pretrained
 from demucs.apply import apply_model
 from demucs.audio import convert_audio
-from src.Joutai import Joutai
 
 
 _demucs_model = None
@@ -59,8 +58,7 @@ def demucs_ui():
     )
     with gr.Row(equal_height=False):
         with gr.Column():
-            demucs_input = Joutai.singleton.demucs_input
-            demucs_input.render()
+            demucs_input = gr.Audio(label="Input", type="filepath")
             button = gr.Button("Separate")
         with gr.Column():
             outputs = [gr.Audio(label=label) for label in COMPONENTS]

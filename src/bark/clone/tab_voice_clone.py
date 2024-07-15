@@ -133,7 +133,7 @@ def generate_cloned_voice_metadata(full_generation, date):
     }
 
 
-def tab_voice_clone(register_use_as_history_button):
+def tab_voice_clone():
     with gr.Tab("Bark Voice Clone"), gr.Row(equal_height=False):
         with gr.Column():
             gr.Markdown(
@@ -235,9 +235,7 @@ def tab_voice_clone(register_use_as_history_button):
 
             audio_preview = gr.Audio(label="Encodec audio preview")
 
-            use_as_history_button = gr.Button(
-                value="Use as history", variant="secondary"
-            )
+            gr.Markdown("Use as history button is now only available in React UI")
 
         def generate_voice(wav_file: str, use_gpu: bool):
             full_generation = get_prompts(wav_file, use_gpu)
@@ -253,13 +251,8 @@ def tab_voice_clone(register_use_as_history_button):
             api_name="bark_voice_generate",
         )
 
-        register_use_as_history_button(
-            use_as_history_button,
-            voice_file_name,
-        )
-
 
 if __name__ == "__main__":
     with gr.Blocks() as demo:
-        tab_voice_clone(lambda *args: None)
+        tab_voice_clone()
     demo.launch()

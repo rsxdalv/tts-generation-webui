@@ -1,10 +1,9 @@
 import torch
 import gradio as gr
-from typing import List, Optional, Tuple, TypedDict, Literal
+from typing import List, Optional, TypedDict, Literal
 import numpy as np
 import os
 from src.magnet.utils import Seed, Timer
-from src.Joutai import Joutai
 from src.bark.npz_tools import save_npz_musicgen
 from src.musicgen.setup_seed_ui_musicgen import setup_seed_ui_musicgen
 from src.bark.parse_or_set_seed import parse_or_generate_seed
@@ -21,7 +20,6 @@ from scipy.io.wavfile import write as write_wav
 from src.utils.save_waveform_plot import save_waveform_plot
 
 import json
-from typing import Optional
 from importlib.metadata import version
 from audiocraft.models.magnet import MAGNeT
 
@@ -258,22 +256,22 @@ initial_params = MagnetParams(
     seed=0,
     use_sampling=True,
     top_k=0,
-    top_p=0.8,
-    temperature=3.5,
+    top_p=0.95,
+    temperature=1.0,
     max_cfg_coef=20.0,
     min_cfg_coef=1.0,
     decoding_steps=[
+        80,
+        40,
+        40,
         20,
-        10,
-        10,
-        10,
     ],
     span_arrangement="nonoverlap",
 )
 
 
 def generation_tab_magnet():
-    with gr.Tab("Magnet") as tab:
+    with gr.Tab("Magnet"):
         gr.Markdown(f"""Audiocraft version: {AUDIOCRAFT_VERSION}""")
         with gr.Row(equal_height=False):
             with gr.Column():
@@ -286,7 +284,7 @@ def generation_tab_magnet():
                     value=initial_params["model"],
                 )
                 gr_reload_button().click(
-                    fn=lambda: gr.Radio.update(choices=get_models()), # type: ignore
+                    fn=lambda: gr.Radio.update(choices=get_models()),  # type: ignore
                     outputs=[model],
                     api_name="magnet_get_models",
                 )
@@ -361,22 +359,11 @@ def generation_tab_magnet():
                 history_bundle_name_data = gr.Textbox(
                     visible=False,
                 )
-                send_to_demucs_button = gr.Button("Send to Demucs", visible=True)
                 save_button = gr.Button("Save to favorites", visible=True)
             save_button.click(
                 fn=save_to_favorites,
                 inputs=[history_bundle_name_data],
                 outputs=[save_button],
-            )
-
-            send_to_demucs_button.click(
-                **Joutai.singleton.send_to_demucs(
-                    inputs=[output],
-                )
-            ).then(
-                **Joutai.singleton.switch_to_tab(
-                    tab="demucs",
-                )
             )
 
     seed_cache = gr.State()  # type: ignore
