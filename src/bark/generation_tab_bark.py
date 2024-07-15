@@ -811,7 +811,6 @@ def create_components(
         image = gr.Image(label="Waveform", shape=(None, 100), elem_classes="tts-image")  # type: ignore
         with gr.Row(visible=False) as buttons_row:
             save_button = gr.Button("Save", size="sm")
-            reuse_seed_button = gr.Button("Seed", size="sm")
             continue_button = gr.Button("Use as history", size="sm")
             continue_semantic_button = gr.Button("Use as semantic history", size="sm")
         npz = gr.Textbox(
@@ -830,12 +829,6 @@ def create_components(
             inputs=[history_bundle_name_data],
             outputs=[save_button],
             api_name=f"bark_favorite{ '_' + str(index) if index > 0 else ''}",
-        )
-
-        reuse_seed_button.click(
-            fn=lambda x: gr.Textbox.update(value=str(x)),
-            inputs=[seed],
-            outputs=[seed_input],
         )
 
         continue_button.click(
