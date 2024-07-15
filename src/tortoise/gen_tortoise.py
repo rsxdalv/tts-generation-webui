@@ -12,6 +12,7 @@ from src.tortoise.save_json import save_json
 from scipy.io.wavfile import write as write_wav
 from src.tortoise.TortoiseParameters import TortoiseParameters
 from src.utils.get_path_from_root import get_path_from_root
+from src.stable_audio.torch_clear_memory import torch_clear_memory
 
 
 SAMPLE_RATE = 24_000
@@ -47,9 +48,9 @@ def switch_model(
     use_basic_cleaners=False,
 ):
     get_tts(
-        models_dir=MODELS_DIR
-        if model_dir == "Default"
-        else get_full_model_dir(model_dir),
+        models_dir=(
+            MODELS_DIR if model_dir == "Default" else get_full_model_dir(model_dir)
+        ),
         force_reload=True,
         kv_cache=kv_cache,
         use_deepspeed=use_deepspeed,
@@ -80,7 +81,9 @@ def get_tts(
 ):
     global MODEL
     if MODEL is None or force_reload:
-        # TODO - clear the old model from memory
+        if MODEL is not None:
+            del MODEL
+            torch_clear_memory()
         MODEL = TextToSpeech(
             models_dir=models_dir,
             kv_cache=kv_cache,
@@ -166,7 +169,9 @@ def _process_gen(candidates, audio_array, id, params: TortoiseParameters):
         save_button=gr.Button.update(value="Save to favorites", visible=True),
         seed=params.seed,
         bundle_name=history_bundle_name_data,
-        params=gr.JSON.update(value=metadata), # broken because gradio returns only __type__
+        params=gr.JSON.update(
+            value=metadata
+        ),  # broken because gradio returns only __type__
     )
 
 
