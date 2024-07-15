@@ -17,7 +17,7 @@ from src.history_tab.save_to_favorites import save_to_favorites
 from src.bark.get_filenames import get_filenames
 from src.utils.date import get_date_string
 from scipy.io.wavfile import write as write_wav
-from src.utils.save_waveform_plot import save_waveform_plot
+from src.utils.save_waveform_plot import middleware_save_waveform_plot
 
 import json
 from importlib.metadata import version
@@ -116,7 +116,7 @@ def save_generation(
     if stereo:
         audio_array = np.transpose(audio_array)
     write_wav(filename, SAMPLE_RATE, audio_array)
-    plot = save_waveform_plot(audio_array, filename_png)
+    plot = middleware_save_waveform_plot(audio_array, filename_png)
 
     metadata = generate_and_save_metadata(
         prompt=prompt,

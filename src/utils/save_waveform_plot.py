@@ -20,7 +20,7 @@ def plot_waveform_as_image(audio_array: np.ndarray):
     return figure_to_image(fig)
 
 
-def save_waveform_plot(audio_array: np.ndarray, filename_png: str):
+def middleware_save_waveform_plot(audio_array: np.ndarray, filename_png: str):
     # fig = plt.figure(figsize=(10, 3))
     # plt.style.use("dark_background")
     # plt.plot(audio_array, color="orange")
@@ -46,6 +46,6 @@ if __name__ == "__main__":
     print("Testing save_waveform_plot.py")
     audio_array = np.random.rand(100)
     filename_png = "test.png"
-    data = save_waveform_plot(audio_array, filename_png)
+    data = middleware_save_waveform_plot(audio_array, filename_png)
     print(data)
     print("Testing save_waveform_plot.py done")

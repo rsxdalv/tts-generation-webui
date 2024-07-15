@@ -3,7 +3,7 @@ from src.bark.split_text_functions import split_by_lines
 import numpy as np
 from src.utils.create_base_filename import create_base_filename
 from src.utils.date import get_date_string
-from src.utils.save_waveform_plot import save_waveform_plot
+from src.utils.save_waveform_plot import middleware_save_waveform_plot
 from tortoise.api import TextToSpeech, MODELS_DIR
 from tortoise.utils.audio import load_voices, get_voices
 import gradio as gr
@@ -153,7 +153,7 @@ def _process_gen(candidates, audio_array, id, params: TortoiseParameters):
         create_base_filename_tortoise(name, id, model, date)
     )
     save_wav_tortoise(audio_array, filename)
-    save_waveform_plot(audio_array, filename_png)
+    middleware_save_waveform_plot(audio_array, filename_png)
 
     metadata = {
         "_version": "0.0.1",
