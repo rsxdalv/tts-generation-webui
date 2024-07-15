@@ -152,7 +152,7 @@ def valle_x_ui_prompt_making():
         audio = gr.Audio(label="Audio", elem_classes="tts-audio")
 
 def valle_x_tab():
-    with gr.Tab("Valle-X Generation", id="valle_x"):
+    with gr.Tab("Valle-X", id="valle_x"):
         valle_x_ui_generation()
     # with gr.Tab("Valle-X Prompt Making Demo", id="valle_x_prompt_making"):
     #     valle_x_ui_prompt_making()

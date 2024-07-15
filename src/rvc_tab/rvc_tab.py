@@ -1,10 +1,10 @@
 import os
 import gradio as gr
-from src.Joutai import Joutai
 from src.history_tab.open_folder import open_folder
 from src.utils.get_path_from_root import get_path_from_root
 import glob
 from src.tortoise.gr_reload_button import gr_reload_button, gr_open_button_simple
+
 # from src.rvc_tab.infer_rvc import infer_rvc as infer_rvc
 from src.rvc_tab.get_and_load_hubert import download_rmvpe
 
@@ -20,6 +20,7 @@ hubert_path = hf_hub_download(
 
 last_model_path = None
 vc = None
+
 
 # add f0_file
 def run_rvc(
@@ -151,7 +152,6 @@ def get_rvc_local_path(path: str, file_type: str):
 
 
 def rvc_ui():
-    gr.Markdown("# RVC Beta Demo")
     with gr.Row(equal_height=False):
         with gr.Column():
             with gr.Row():
@@ -204,8 +204,7 @@ def rvc_ui():
                 )
 
         with gr.Column():
-            original_audio = Joutai.singleton.rvc_input
-            original_audio.render()
+            original_audio = gr.Audio(label="Original Audio", type="filepath")
             button = gr.Button(value="Convert", variant="primary")
             result = gr.Audio(label="result", interactive=False)
             open_folder_button = gr.Button(
