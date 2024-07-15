@@ -68,6 +68,12 @@ def get_voice_list():
 def save_wav_tortoise(audio_array, filename):
     write_wav(filename, SAMPLE_RATE, audio_array)
 
+def unload_tortoise_model():
+    global MODEL
+    if MODEL is not None:
+        del MODEL
+        torch_clear_memory()
+        MODEL = None
 
 def get_tts(
     models_dir=MODELS_DIR,
@@ -81,9 +87,7 @@ def get_tts(
 ):
     global MODEL
     if MODEL is None or force_reload:
-        if MODEL is not None:
-            del MODEL
-            torch_clear_memory()
+        unload_tortoise_model()
         MODEL = TextToSpeech(
             models_dir=models_dir,
             kv_cache=kv_cache,
