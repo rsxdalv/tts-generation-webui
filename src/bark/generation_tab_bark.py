@@ -653,7 +653,7 @@ def generation_tab_bark():
             history_prompt_semantic_dropdown,
         ]
 
-        MAX_OUTPUTS = 9
+        MAX_OUTPUTS = 1
 
         with gr.Row():
             output_components, output_cols, seeds = map(
