@@ -271,7 +271,7 @@ initial_params = MagnetParams(
 
 
 def generation_tab_magnet():
-    with gr.Tab("Magnet") as tab:
+    with gr.Tab("Magnet"):
         gr.Markdown(f"""Audiocraft version: {AUDIOCRAFT_VERSION}""")
         with gr.Row(equal_height=False):
             with gr.Column():
