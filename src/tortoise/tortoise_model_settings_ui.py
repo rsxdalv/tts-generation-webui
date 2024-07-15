@@ -2,6 +2,7 @@ from src.tortoise.gen_tortoise import (
     TORTOISE_LOCAL_MODELS_DIR,
     get_model_list,
     switch_model,
+    unload_tortoise_model,
 )
 from src.tortoise.gr_reload_button import gr_open_button_simple, gr_reload_button
 import gradio as gr
@@ -33,6 +34,17 @@ def tortoise_model_settings_ui_inner():
             label="Tokenizer",
             file_types=[".json"],
         )
+        
+    unload_model = gr.Button(
+        "Unload model",
+        variant="secondary",
+    )
+
+    unload_model.click(
+        fn=unload_tortoise_model,
+        api_name="tortoise_unload_model",
+    )
+
     apply_model_settings = gr.Button(
         "Apply model settings",
         variant="secondary",
