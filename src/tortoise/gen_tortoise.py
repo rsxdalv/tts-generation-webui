@@ -12,7 +12,7 @@ from src.tortoise.save_json import save_json
 from scipy.io.wavfile import write as write_wav
 from src.tortoise.TortoiseParameters import TortoiseParameters
 from src.utils.get_path_from_root import get_path_from_root
-from src.stable_audio.torch_clear_memory import torch_clear_memory
+from src.utils.torch_clear_memory import torch_clear_memory
 
 
 SAMPLE_RATE = 24_000
