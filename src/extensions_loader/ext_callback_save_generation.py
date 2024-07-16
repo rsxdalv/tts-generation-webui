@@ -5,6 +5,7 @@ import numpy as np
 from typing import Any, Dict, List
 import os
 import importlib
+import traceback
 
 # callbacks_save_generation: List[CallbackSaveGeneration] = [
 # ]
@@ -74,6 +75,7 @@ def ext_callback_save_generation(
             )
         except Exception as e:
             print("Error in callback_save_generation extension:", e)
+            traceback.print_exc()
 
 
 def ext_callback_save_generation_musicgen(
@@ -92,6 +94,7 @@ def ext_callback_save_generation_musicgen(
             )
         except Exception as e:
             print("Error in callback_save_generation_musicgen extension:", e)
+            traceback.print_exc()
 
 
 if __name__ == "__main__":
