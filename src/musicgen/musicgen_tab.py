@@ -63,7 +63,7 @@ def generate_and_save_metadata(
         "_type": "musicgen",
         "_audiocraft_version": AUDIOCRAFT_VERSION,
         "models": {},
-        "prompt": prompt,
+        "text": prompt,
         "hash": audio_array_to_sha256(audio_array),
         "date": date,
         **params,

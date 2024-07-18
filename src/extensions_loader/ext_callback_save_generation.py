@@ -14,7 +14,7 @@ callbacks_save_generation_musicgen = []
 extensions_folder = os.path.join(os.path.dirname(__file__), "extensions")
 
 # Get the list of files in the extensions folder
-print("Loading extensions:")
+print("Loading post generation extensions:")
 extension_files = os.listdir(extensions_folder)
 for file_name in extension_files:
     if file_name.endswith(".py"):

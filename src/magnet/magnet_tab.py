@@ -1,18 +1,16 @@
 import torch
 import gradio as gr
-from typing import List, Optional, TypedDict, Literal
+from typing import Any, List, Optional, TypedDict, Literal
 import numpy as np
 import os
 from src.magnet.utils import Seed, Timer
 from src.bark.npz_tools import save_npz_musicgen
 from src.musicgen.setup_seed_ui_musicgen import setup_seed_ui_musicgen
-from src.bark.parse_or_set_seed import parse_or_generate_seed
 from src.musicgen.audio_array_to_sha256 import audio_array_to_sha256
 
 from src.extensions_loader.ext_callback_save_generation import (
     ext_callback_save_generation_musicgen,
 )
-from src.utils.create_base_filename import create_base_filename
 from src.history_tab.save_to_favorites import save_to_favorites
 from src.bark.get_filenames import get_filenames
 from src.utils.date import get_date_string
@@ -25,6 +23,7 @@ from audiocraft.models.magnet import MAGNeT
 
 from src.utils.get_path_from_root import get_path_from_root
 from src.tortoise.gr_reload_button import gr_open_button_simple, gr_reload_button
+from src.utils.torch_clear_memory import torch_clear_memory
 
 AUDIOCRAFT_VERSION = version("audiocraft")
 
@@ -44,6 +43,15 @@ class MagnetParams(MagnetGenerationParams):
     model: str
     text: str
     seed: int
+    date: str
+    base_filename: str
+
+    _version: str
+    _hash_version: str
+    _type: str
+    _audiocraft_version: str
+    model_hash: str
+    hash: str
 
 
 def just_generation(full_params_instance):
@@ -51,7 +59,7 @@ def just_generation(full_params_instance):
         **{
             key: value
             for key, value in full_params_instance.items()
-            if key not in ["text", "seed", "model"]
+            if key in MagnetGenerationParams.__required_keys__
         }
     )
 
@@ -75,72 +83,11 @@ def get_model(model):
     return MODEL
 
 
-def generate_and_save_metadata(
-    prompt: str,
-    date: str,
-    filename_json: str,
-    params: MagnetParams,
-    audio_array: np.ndarray,
-):
-    metadata = {
-        "_version": "0.0.1",
-        "_hash_version": "0.0.3",
-        "_type": "magnet",
-        "_audiocraft_version": AUDIOCRAFT_VERSION,
-        "models": {},
-        "prompt": prompt,
-        "hash": audio_array_to_sha256(audio_array),
-        "date": date,
-        **params,
-        "seed": str(params["seed"]),
-    }
-    with open(filename_json, "w") as outfile:
-        json.dump(metadata, outfile, indent=2)
-
-    return metadata
-
-
-def save_generation(
-    audio_array: np.ndarray,
-    SAMPLE_RATE: int,
-    params: MagnetParams,
-    tokens: Optional[torch.Tensor] = None,
-):
-    prompt = params["text"]
-    date = get_date_string()
-    title = prompt[:20].replace(" ", "_")
-    base_filename = create_base_filename(title, "outputs", model="musicgen", date=date)
-
-    filename, filename_png, filename_json, filename_npz = get_filenames(base_filename)
-    stereo = audio_array.shape[0] == 2
-    if stereo:
-        audio_array = np.transpose(audio_array)
-    write_wav(filename, SAMPLE_RATE, audio_array)
-    plot = middleware_save_waveform_plot(audio_array, filename_png)
-
-    metadata = generate_and_save_metadata(
-        prompt=prompt,
-        date=date,
-        filename_json=filename_json,
-        params=params,
-        audio_array=audio_array,
-    )
-    if tokens is not None:
-        save_npz_musicgen(filename_npz, tokens, metadata)
-
-    filename_ogg = filename.replace(".wav", ".ogg")
-    ext_callback_save_generation_musicgen(
-        audio_array=audio_array,
-        files={
-            "wav": filename,
-            "png": filename_png,
-            "ogg": filename_ogg,
-        },
-        metadata=metadata,
-        SAMPLE_RATE=SAMPLE_RATE,
-    )
-
-    return filename, plot, metadata
+def unload_model():
+    global MODEL
+    del MODEL
+    MODEL = None
+    torch_clear_memory()
 
 
 def log_generation_musicgen(
@@ -168,14 +115,16 @@ def generate(
     decoding_step_4: int,
     span_arrangement: Literal["nonoverlap", "stride1"],
 ):
-    MODEL = get_model(model)
-
-    seed2 = parse_or_generate_seed(seed, 0)
-
     params = MagnetParams(
+        _version="0.0.1",
+        _hash_version="0.0.3",
+        _type="magnet",
+        _audiocraft_version=AUDIOCRAFT_VERSION,
+        model_hash="",
+        hash="",
         model=model,
         text=text,
-        seed=seed2,
+        seed=seed,
         use_sampling=use_sampling,
         top_k=top_k,
         top_p=top_p,
@@ -189,16 +138,28 @@ def generate(
             decoding_step_4,
         ],
         span_arrangement=span_arrangement,
+        date=get_date_string(),
+        base_filename="",
     )
 
-    MODEL.set_generation_params(
-        **just_generation(params),
-    )
+    def add_base_filename_to_params(params: dict | MagnetParams):
+        from src.utils.create_base_filename import create_base_filename
+        from src.utils.prompt_to_title import prompt_to_title
 
-    tokens = None
+        params["base_filename"] = create_base_filename(
+            prompt_to_title(params["text"]),
+            "outputs",
+            model=params["_type"],
+            date=params["date"],
+        )
 
-    with Timer(), Seed(seed2):
-        log_generation_musicgen(params)
+    add_base_filename_to_params(params)
+
+    log_generation_musicgen(params)
+    MODEL = get_model(model)
+    MODEL.set_generation_params(**just_generation(params))
+
+    with Timer(), Seed(seed):
         output, tokens = MODEL.generate(
             descriptions=[text],
             progress=True,
@@ -207,19 +168,48 @@ def generate(
 
     output = output.detach().cpu().numpy().squeeze()
 
-    filename, plot, _metadata = save_generation(
-        audio_array=output,
-        SAMPLE_RATE=MODEL.sample_rate,
-        params=params,
-        tokens=tokens,
+    audio = (MODEL.sample_rate, output.transpose())
+
+    audio_array = output
+    SAMPLE_RATE = MODEL.sample_rate
+    params = params
+    tokens = tokens
+
+    base_filename = params["base_filename"]
+    stereo = audio_array.shape[0] == 2
+    if stereo:
+        audio_array = np.transpose(audio_array)
+    write_wav(base_filename + ".wav", SAMPLE_RATE, audio_array)
+
+    def convert_seed_to_str(params: dict | Any):
+        params["seed"] = str(params["seed"])
+
+    convert_seed_to_str(params)
+    params["hash"] = audio_array_to_sha256(audio_array)
+
+    with open(params["base_filename"] + ".json", "w") as outfile:
+        json.dump(params, outfile, indent=2)
+
+    if tokens is not None:
+        save_npz_musicgen(base_filename + ".npz", tokens, params)
+
+    # make into a plugin
+    plot = middleware_save_waveform_plot(audio_array, base_filename + ".png")
+    ext_callback_save_generation_musicgen(
+        audio_array=audio_array,
+        files={
+            "wav": base_filename + ".wav",
+            "png": base_filename + ".png",
+            "ogg": base_filename + ".ogg",
+        },
+        metadata=params,
+        SAMPLE_RATE=SAMPLE_RATE,
     )
 
     return [
-        (MODEL.sample_rate, output.transpose()),
-        os.path.dirname(filename),
-        plot,
-        params["seed"],
-        _metadata,
+        audio,
+        os.path.dirname(base_filename),
+        params,
     ]
 
 
@@ -251,6 +241,12 @@ def get_models():
 
 
 initial_params = MagnetParams(
+    _version="0.0.1",
+    _hash_version="0.0.3",
+    _type="magnet",
+    _audiocraft_version=AUDIOCRAFT_VERSION,
+    model_hash="",
+    hash="",
     model="facebook/magnet-small-10secs",
     text="",
     seed=0,
@@ -267,6 +263,8 @@ initial_params = MagnetParams(
         20,
     ],
     span_arrangement="nonoverlap",
+    date=get_date_string(),
+    base_filename="",
 )
 
 
@@ -290,6 +288,11 @@ def generation_tab_magnet():
                 )
                 gr_open_button_simple(
                     MAGNET_LOCAL_MODELS_DIR, api_name="magnet_open_model_dir"
+                )
+                unload_model_button = gr.Button("Unload Model", visible=False)
+                unload_model_button.click(
+                    fn=unload_model,
+                    api_name="magnet_unload_model",
                 )
                 submit = gr.Button("Generate", variant="primary")
             with gr.Column():
@@ -346,6 +349,27 @@ def generation_tab_magnet():
                         label="Use Sampling", value=initial_params["use_sampling"]
                     )
                 seed, set_old_seed_button, _ = setup_seed_ui_musicgen()
+                # gr.Markdown("Seed")
+                # with gr.Row():
+                #     seed_input = gr.Number(value=-1, show_label=False, container=False)
+                #     set_random_seed_button = gr.Button(
+                #         "backspace", elem_classes="btn-sm material-symbols-outlined", size="sm"
+                #     )
+
+                #     set_random_seed_button.click(
+                #         fn=lambda: gr.Number.update(value=-1), outputs=[seed_input]
+                #     )
+
+                #     set_old_seed_button = gr.Button(
+                #         "repeat", elem_classes="btn-sm material-symbols-outlined", size="sm"
+                #     )
+
+                #     def link_seed_cache(seed_cache):
+                #         set_old_seed_button.click(
+                #             fn=lambda x: gr.Number.update(value=x),
+                #             inputs=seed_cache,
+                #             outputs=seed_input,
+                #         )
 
         with gr.Column():
             output = gr.Audio(
@@ -354,7 +378,6 @@ def generation_tab_magnet():
                 interactive=False,
                 elem_classes="tts-audio",
             )
-            image = gr.Image(label="Waveform", shape=(None, 100), elem_classes="tts-image")  # type: ignore
             with gr.Row():
                 history_bundle_name_data = gr.Textbox(
                     visible=False,
@@ -366,15 +389,8 @@ def generation_tab_magnet():
                 outputs=[save_button],
             )
 
-    seed_cache = gr.State()  # type: ignore
     result_json = gr.JSON(
         visible=False,
-    )
-
-    set_old_seed_button.click(
-        fn=lambda x: gr.Number.update(value=x),
-        inputs=seed_cache,
-        outputs=seed,
     )
 
     submit.click(
@@ -395,7 +411,7 @@ def generation_tab_magnet():
             decoding_steps_4,
             span_arrangement,
         ],
-        outputs=[output, history_bundle_name_data, image, seed_cache, result_json],
+        outputs=[output, history_bundle_name_data, result_json],
         api_name="magnet",
     )
 
