@@ -1,47 +1,25 @@
 import gradio as gr
 
-
-def install_rvc():
-    import subprocess
-
-    process = subprocess.Popen(
-        "pip install -r requirements_rvc.txt",
-        shell=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-        universal_newlines=True,
-    )
-
-    # Stream the output to the console
-    for line in process.stdout:  # type: ignore
-        print(line, end="")
-        yield line
-
-    # Wait for the process to finish
-    process.wait()
-
-    # Check if the process was successful
-    if process.returncode == 0:
-        print("Successfully installed RVC")
-        yield "Successfully installed RVC, please restart the webui"
-    else:
-        print("Failed to install RVC")
-        yield "Failed to install RVC"
+from src.utils.pip_install import pip_install_wrapper
 
 
-def rvc_tab_error(e: Exception, name="RVC"):
+def generic_error_tab(e: Exception, name="RVC", requirements="-r requirements_rvc.txt"):
     with gr.Tab(name + " (!)"):
-        gr.Markdown("Failed to load RVC demo")
+        gr.Markdown(f"Failed to load {name} demo")
         gr.Markdown(f"Error: {e}")
-        gr.Markdown("Please install the requirements_rvc.txt file")
+        gr.Markdown(f"Please install the {requirements} file")
         gr.Markdown("Please check the console for more information")
-        install_btn = gr.Button("Install RVC")
+        install_btn = gr.Button(f"Install {name}")
         gr.Markdown("Installation console:")
         console_text = gr.HTML()
         install_btn.click(
-            install_rvc,
+            pip_install_wrapper(requirements, name),
             outputs=[console_text],
         )
+
+
+def rvc_tab_error(e: Exception, name="RVC"):
+    generic_error_tab(e, name=name, requirements="-r requirements_rvc.txt")
 
 
 if __name__ == "__main__":
