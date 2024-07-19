@@ -1,7 +1,7 @@
 from typing import Any, TypedDict, Optional
 
 
-class FinalGenParams(TypedDict):
+class BarkParams(TypedDict):
     burn_in_prompt: str | Any
     text: str
     history_prompt: str | Any
@@ -9,3 +9,5 @@ class FinalGenParams(TypedDict):
     text_temp: float
     waveform_temp: float
     output_full: bool
+    seed: int
+    max_gen_duration_s: int

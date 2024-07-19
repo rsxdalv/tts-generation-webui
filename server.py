@@ -56,7 +56,7 @@ with gr.Blocks(
 ) as demo:
     gr.Markdown(
         """
-# TTS Generation WebUI (Legacy - Gradio) [React UI](http://localhost:3000) [Feedback / Bug reports](https://forms.gle/2L62owhBsGFzdFBC8)
+# TTS Generation WebUI (Legacy - Gradio) [React UI](http://localhost:3000) [Feedback / Bug reports](https://forms.gle/2L62owhBsGFzdFBC8) [Discord Server](https://discord.gg/V8BKTVRtJ9)
 ### _(Text To Speech, Audio & Music Generation, Conversion)_
 """
     )

@@ -3,7 +3,7 @@
 [Download](https://github.com/rsxdalv/tts-generation-webui/archive/refs/heads/main.zip) ||
 [Upgrading](#upgrading) ||
 [Manual installation](#manual-installation-not-recommended) ||
-[Docker Setup](#docker-setup) || [Configuration Guide](#configuration-guide) || [Discord Server](https://discord.gg/3JbBrKrH) || [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rsxdalv/tts-generation-webui/blob/main/notebooks/google_collab.ipynb) || [Feedback / Bug reports](https://forms.gle/2L62owhBsGFzdFBC8)
+[Docker Setup](#docker-setup) || [Configuration Guide](#configuration-guide) || [Discord Server](https://discord.gg/V8BKTVRtJ9) || [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rsxdalv/tts-generation-webui/blob/main/notebooks/google_collab.ipynb) || [Feedback / Bug reports](https://forms.gle/2L62owhBsGFzdFBC8)
 
 List of models: Bark, MusicGen + AudioGen, Tortoise, RVC, Vocos, Demucs, SeamlessM4T, MAGNeT, Stable Audio, Maha TTS, MMS, and more.
 
@@ -19,6 +19,7 @@ List of models: Bark, MusicGen + AudioGen, Tortoise, RVC, Vocos, Demucs, Seamles
 ## Changelog
 
 July 19:
+* Fix Discord join link
 * Simplify Bark further, removing excessive complexity in code.
 * Add UI/Modular extensions, these extensions allow installing new models and features to the UI. In the future, models will start as extensions before being added permamently.
 
