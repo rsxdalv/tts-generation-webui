@@ -1,3 +1,4 @@
+# %%
 import os
 import src.utils.setup_or_recover as setup_or_recover
 import src.utils.dotenv_init as dotenv_init
@@ -16,6 +17,13 @@ print("Starting server...\n")
 
 setup_or_recover.dummy()
 dotenv_init.init()
+
+
+from src.utils.generic_error_tab_advanced import generic_error_tab_advanced
+from src.extensions_loader.interface_extensions import (
+    extension_list_tab,
+    handle_extension_class,
+)
 
 
 def reload_config_and_restart_ui():
@@ -116,6 +124,8 @@ with gr.Blocks(
             except Exception as e:
                 generic_error_tab(e, name="StyleTTS2", id="style_tts2")
 
+            handle_extension_class("text-to-speech")
+
         with gr.Tab("Audio/Music Generation"), gr.Tabs():
 
             try:
@@ -145,17 +155,17 @@ with gr.Blocks(
                 print("Failed to load musicgen demo")
                 print(e)
 
+            handle_extension_class("audio-music-generation")
+
         with gr.Tab("Audio Conversion"), gr.Tabs():
             try:
                 from src.rvc_tab.rvc_tab import rvc_conversion_tab
 
                 rvc_conversion_tab()
             except Exception as e:
-                from src.rvc_tab.rvc_tab_error import rvc_tab_error
-
-                rvc_tab_error(e)
-                print("Failed to load rvc demo")
-                print(e)
+                generic_error_tab_advanced(
+                    e, name="RVC", requirements="-r requirements_rvc.txt"
+                )
 
             try:
                 from src.rvc_tab.uvr5_tab import uvr5_tab
@@ -183,6 +193,8 @@ with gr.Blocks(
 
             vocos_tabs()
 
+            handle_extension_class("audio-conversion")
+
         with gr.Tab("Outputs"), gr.Tabs():
             from src.history_tab.main import history_tab
 
@@ -196,6 +208,8 @@ with gr.Blocks(
             from src.history_tab.voices_tab import voices_tab
 
             voices_tab()
+
+            handle_extension_class("outputs")
 
         with gr.Tab("Settings"), gr.Tabs():
             from src.settings_tab_gradio import settings_tab_gradio
@@ -216,6 +230,10 @@ with gr.Blocks(
             from src.utils.pip_list_tab import pip_list_tab
 
             pip_list_tab()
+
+            handle_extension_class("settings")
+
+            extension_list_tab()
 
         # from src.studio.studio_tab import simple_remixer_tab
         # remixer_input = simple_remixer_tab()
