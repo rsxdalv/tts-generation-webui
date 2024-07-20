@@ -18,10 +18,12 @@ List of models: Bark, MusicGen + AudioGen, Tortoise, RVC, Vocos, Demucs, Seamles
 
 ## Changelog
 
-July 19:
+July 20:
 * Fix Discord join link
 * Simplify Bark further, removing excessive complexity in code.
 * Add UI/Modular extensions, these extensions allow installing new models and features to the UI. In the future, models will start as extensions before being added permamently.
+* Disable Gallery view in outputs
+* Known issue: Firefox fails at showing outputs in Gradio, it fails at fetching them from backend. Within React UI this works fine.
 
 July 15:
 * Comment - As the React UI has been out for a long time now, Gradio UI is going to have the role of serving only the functions to the user, without the extremely complicated UI that it cannot handle. There is a real shortage of development time to add new models and features, but the old style of integration was not viable. As the new APIs and 'the role of the model' is defined, it will be possible to have extensions for entire models, enabling a lot more flexibility and lighter installations.

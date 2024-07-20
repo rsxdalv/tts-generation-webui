@@ -78,16 +78,17 @@ def history_content(
     if show_collections:
         create_collection_ui(collections_directories_atom)
 
-    with gr.Accordion("Gallery Selector (Click to Open)", open=False):
-        history_list_as_gallery = gr.Gallery(
-            value=[], columns=8, object_fit="contain", height="auto"
-        )
+    # with gr.Accordion("Gallery Selector (Click to Open)", open=False):
+    #     history_list_as_gallery = gr.Gallery(
+    #         value=[], columns=8, object_fit="contain", height="auto"
+    #     )
     with gr.Row():
         with gr.Column():
             with gr.Row():
                 button_output = gr.Button(
                     value=f"Open {show_collections and 'collection' or directory} folder"
                 )
+                reload_button = gr.Button(value="refresh", variant="secondary")
             button_output.click(
                 lambda x: open_folder(x),
                 inputs=[directory_dropdown],
@@ -159,7 +160,10 @@ def history_content(
             history_bundle_name: gr.Textbox.update(value=os.path.dirname(filename)),
             history_bundle_name_data: os.path.dirname(filename),
             history_audio: gr.Audio.update(value=filename, label=filename),
-            history_image: gr.Image.update(value=filename.replace(".wav", ".png")),
+            history_image: gr.Image.update(value=filename.replace(".wav", ".png")) if os.path.exists(
+                filename.replace(".wav", ".png")
+            )
+            else gr.Image.update(value=None),
             history_json: gr.JSON.update(value=json_text),
             history_npz: gr.Textbox.update(value=filename.replace(".wav", ".npz")),
             delete_from_history: gr.Button.update(visible=True),
@@ -196,18 +200,19 @@ def history_content(
         preprocess=False,
     )
 
-    history_list_as_gallery.select(
-        fn=select_audio_history2,
-        inputs=[history_list_as_gallery, history_list],
-        outputs=outputs,
-        preprocess=False,
-    )
+    # history_list_as_gallery.select(
+    #     fn=select_audio_history2,
+    #     inputs=[history_list_as_gallery, history_list],
+    #     outputs=outputs,
+    #     preprocess=False,
+    # )
 
     def update_history_tab(directory: str):
-        return [
-            gr.Dataframe.update(value=get_wav_files(directory)),
-            gr.Gallery.update(value=get_wav_files_img(directory)),
-        ]
+        # return [
+            # gr.Dataframe.update(value=get_wav_files(directory)),
+            # gr.Gallery.update(value=get_wav_files_img(directory)),
+        # ]
+        return gr.Dataframe.update(value=get_wav_files(directory))
 
     delete_from_history.click(
         fn=clear_audio,
@@ -216,7 +221,8 @@ def history_content(
     delete_from_history.click(
         fn=delete_generation_cb(update_history_tab),
         inputs=[history_bundle_name_data, directory_dropdown],
-        outputs=[history_list, history_list_as_gallery],
+        # outputs=[history_list, history_list_as_gallery],
+        outputs=[history_list],
     )
     # API ONLY
     gr.Button(
@@ -230,15 +236,23 @@ def history_content(
     history_tab.select(
         fn=update_history_tab,
         inputs=[directory_dropdown],
-        outputs=[history_list, history_list_as_gallery],
+        # outputs=[history_list, history_list_as_gallery],
+        outputs=[history_list],
     )
 
     directory_dropdown.change(
         fn=update_history_tab,
         inputs=[directory_dropdown],
-        outputs=[history_list, history_list_as_gallery],
+        # outputs=[history_list, history_list_as_gallery],
+        outputs=[history_list],
     )
 
+    reload_button.click(
+        fn=lambda x: gr.Dataframe.update(value=get_wav_files(x)),
+        inputs=[directory_dropdown],
+        outputs=[history_list],
+        api_name=f"{directory}_refresh_history",
+    )
 
 def save_to_collection_ui(
     directory: str,
