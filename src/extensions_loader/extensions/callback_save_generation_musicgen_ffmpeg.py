@@ -24,8 +24,8 @@ def callback_save_generation_musicgen(
 
     filename = files.get("ogg")
     input_data = audio_array.tobytes()
-    metadata["prompt"] = double_escape_quotes(metadata["prompt"])
-    metadata["prompt"] = double_escape_newlines(metadata["prompt"])
+    metadata["text"] = double_escape_quotes(metadata["text"])
+    metadata["text"] = double_escape_newlines(metadata["text"])
     metadata_str = json.dumps(metadata, ensure_ascii=False)
 
     channels = audio_array.shape[1] if len(audio_array.shape) > 1 else 1

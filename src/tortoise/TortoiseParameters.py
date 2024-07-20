@@ -1,5 +1,26 @@
 import gradio as gr
 
+from typing import TypedDict, Optional
+
+class _TortoiseParametersTypedDict(TypedDict):
+    text: str
+    voice: str
+    preset: str
+    seed: Optional[int]
+    cvvp_amount: float
+    split_prompt: bool
+    num_autoregressive_samples: int
+    diffusion_iterations: int
+    temperature: float
+    length_penalty: float
+    repetition_penalty: float
+    top_p: float
+    max_mel_tokens: int
+    cond_free: bool
+    cond_free_k: int
+    diffusion_temperature: float
+    model: str
+    name: str
 
 class TortoiseParameters:
     def __init__(

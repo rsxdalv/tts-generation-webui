@@ -31,14 +31,25 @@ def generate_audio_styleTTS2(
     diffusion_steps=5,
     embedding_scale=1,
 ):
+    params_dict = {
+        "text": text,
+        "alpha": alpha,
+        "beta": beta,
+        "diffusion_steps": diffusion_steps,
+        "embedding_scale": embedding_scale,
+        # "target_voice_path": target_voice_path,
+        # "ref_s": None,
+        # "phonemize": True,
+    }
     style_tts2_model = preload_models_if_needed()
     audio_array = style_tts2_model.inference(
-        text=text,
+        # text=text,
+        # alpha=alpha,
+        # beta=beta,
+        # diffusion_steps=diffusion_steps,
+        # embedding_scale=embedding_scale,
+        **params_dict,
         # target_voice_path=target_voice_path,
-        alpha=alpha,
-        beta=beta,
-        diffusion_steps=diffusion_steps,
-        embedding_scale=embedding_scale,
         # ref_s=None,
         # phonemize=True
     )

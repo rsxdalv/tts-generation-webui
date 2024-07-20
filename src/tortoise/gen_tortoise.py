@@ -3,7 +3,7 @@ from src.bark.split_text_functions import split_by_lines
 import numpy as np
 from src.utils.create_base_filename import create_base_filename
 from src.utils.date import get_date_string
-from src.utils.save_waveform_plot import save_waveform_plot
+from src.utils.save_waveform_plot import middleware_save_waveform_plot
 from tortoise.api import TextToSpeech, MODELS_DIR
 from tortoise.utils.audio import load_voices, get_voices
 import gradio as gr
@@ -12,7 +12,7 @@ from src.tortoise.save_json import save_json
 from scipy.io.wavfile import write as write_wav
 from src.tortoise.TortoiseParameters import TortoiseParameters
 from src.utils.get_path_from_root import get_path_from_root
-from src.stable_audio.torch_clear_memory import torch_clear_memory
+from src.utils.torch_clear_memory import torch_clear_memory
 
 
 SAMPLE_RATE = 24_000
@@ -153,7 +153,7 @@ def _process_gen(candidates, audio_array, id, params: TortoiseParameters):
         create_base_filename_tortoise(name, id, model, date)
     )
     save_wav_tortoise(audio_array, filename)
-    save_waveform_plot(audio_array, filename_png)
+    middleware_save_waveform_plot(audio_array, filename_png)
 
     metadata = {
         "_version": "0.0.1",

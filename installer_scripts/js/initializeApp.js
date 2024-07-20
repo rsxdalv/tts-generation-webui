@@ -58,6 +58,8 @@ const installDependencies = async (gpuchoice) => {
       await $(cudaPytorchInstall$);
     } else if (gpuchoice === "Apple M Series Chip" || gpuchoice === "CPU") {
       await $(pytorchCPUInstall$);
+    // } else if (gpuchoice === "AMD GPU") {
+    // python3 -m pip install torch==2.3.0.dev20240301+rocm5.7 --index-url https://download.pytorch.org/whl/nightly/rocm5.7
     } else {
       displayMessage("Unsupported or cancelled. Exiting...");
       removeGPUChoice();

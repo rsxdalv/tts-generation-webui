@@ -12,7 +12,8 @@ from src.utils.get_path_from_root import get_path_from_root
 
 import numpy as np
 
-from src.stable_audio.torch_clear_memory import torch_clear_memory
+from src.utils.torch_clear_memory import torch_clear_memory
+from src.utils.prompt_to_title import prompt_to_title
 
 LOCAL_DIR_BASE = os.path.join("data", "models", "stable-audio")
 LOCAL_DIR_BASE_ABSOLUTE = get_path_from_root(*LOCAL_DIR_BASE.split("/"))
@@ -255,25 +256,7 @@ def save_result(audio, *generation_args):
     print(generation_args)
     prompt = generation_args["prompt"]
 
-    def get_name(prompt):
-        return (
-            prompt.replace(" ", "_")
-            .replace(":", "_")
-            .replace("'", "_")
-            .replace('"', "_")
-            .replace("\\", "_")
-            .replace(",", "_")
-            .replace("(", "_")
-            .replace(")", "_")
-            .replace("?", "_")
-            .replace("!", "_")
-            .replace("/", "_")
-            .replace("\n", "_")
-            # only first 15 characters
-            .replace("__", "_")[:15]
-        )
-
-    name = f"{date}_{get_name(prompt)}"
+    name = f"{date}_{prompt_to_title(prompt)}"
 
     base_dir = os.path.join(OUTPUT_DIR, name)
     os.makedirs(base_dir, exist_ok=True)

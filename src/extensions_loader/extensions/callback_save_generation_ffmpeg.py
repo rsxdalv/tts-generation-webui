@@ -57,6 +57,7 @@ def callback_save_generation(
 
     pipe_input = ffmpeg.input("pipe:", format="f32le", ar=str(SAMPLE_RATE))
     metadata_filename = files.get("ogg") + ".ffmetadata.ini"  # type: ignore
+    # with NamedTemporaryFile("wb", suffix=".ffmetadata.ini", delete=False) as file:
     with open(metadata_filename, "w", encoding="utf-8") as f:
         f.write(
             f""";FFMETADATA1
