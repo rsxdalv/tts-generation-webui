@@ -18,6 +18,12 @@ List of models: Bark, MusicGen + AudioGen, Tortoise, RVC, Vocos, Demucs, Seamles
 
 ## Changelog
 
+July 21:
+* Add Gallery History extension (adapted from the old gallery view)
+* Convert Simple Remixer to extension
+* Fix update.py to use the newer torch versions (update.py is only for legacy purposes and will likely break)
+* Add Diagnostic script and Force Reinstall scripts for Windows.
+
 July 20:
 * Fix Discord join link
 * Simplify Bark further, removing excessive complexity in code.
