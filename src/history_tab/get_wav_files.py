@@ -28,10 +28,6 @@ def get_wav_files(directory: str):
     return file_date_list
 
 
-def get_wav_files_img(directory):
-    return [file[-1].replace(".wav", ".png") for file in get_wav_files(directory)]
-
-
 def generate_pretty_name_npz(name: str):
     return name.replace(".npz", "").strip().capitalize()
 

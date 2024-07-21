@@ -4,6 +4,25 @@ import torchaudio
 import torch
 
 
+def extension__tts_generation_webui():
+    simple_remixer_ui()
+    return {
+        "package_name": "extension_simple_remixer",
+        "name": "Simple Remixer",
+        "version": "0.0.1",
+        "requirements": "git+https://github.com/rsxdalv/extension_simple_remixer@main",
+        "description": "Simple remixer allows concatenating multiple audio files and mixing them together.",
+        "extension_type": "interface",
+        "extension_class": "tools",
+        "author": "rsxdalv",
+        "extension_author": "rsxdalv",
+        "license": "MIT",
+        "website": "https://github.com/rsxdalv/extension_simple_remixer",
+        "extension_website": "https://github.com/rsxdalv/extension_simple_remixer",
+        "extension_platform_version": "0.0.1",
+    }
+
+
 def gr_mini_button(value, **kwargs):
     return gr.Button(
         value,
@@ -68,7 +87,7 @@ def simple_remixer_ui():
         return a, b, c
 
     with gr.Row(elem_classes="studio-slots-row"):
-        slots = [slot_stack(i) for i in range(5)]
+        slots = [slot_stack(i) for i in range(3)]
         slots = [x for y in slots for x in y]
 
     concat = gr.Button("Concatenate")

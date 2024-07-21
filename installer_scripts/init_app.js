@@ -19,8 +19,6 @@ const updateConda = async () => {
   await $("conda update -y -n base -c defaults conda");
 };
 
-const DEBUG_ALWAYS_RETURN_UPDATED = false;
-
 const syncRepo = async () => {
   if (!fs.existsSync(".git")) {
     displayMessage("Linking to tts-generation-webui repository");
@@ -62,8 +60,13 @@ async function main() {
   //     });
   //   })
   //   .listen(8080);
-  const version = "0.0.4";
+  const version = "0.0.5";
   displayMessage("\n\nStarting init app (version: " + version + ")...\n\n");
+
+  if (process.env.DEBUG_ALWAYS_RETURN_UPDATED) {
+    displayMessage("Forcing update");
+  }
+
   try {
     await checkConda();
     // await updateConda();

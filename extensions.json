@@ -14,6 +14,36 @@
             "website": "https://github.com/GrandaddyShmax/audiocraft_plus",
             "extension_website": "https://github.com/rsxdalv/extension_audiocraft_plus",
             "extension_platform_version": "0.0.1"
+        },
+        {
+            "package_name": "extensions.builtin.extension_gallery_history",
+            "name": "Gallery History",
+            "version": "0.0.1",
+            "requirements": "git+https://github.com/rsxdalv/extension_gallery_history@main",
+            "description": "Gallery History allows selecting previously generated audio files by looking at their waveforms",
+            "extension_type": "interface",
+            "extension_class": "outputs",
+            "author": "rsxdalv",
+            "extension_author": "rsxdalv",
+            "license": "MIT",
+            "website": "https://github.com/rsxdalv/extension_gallery_history",
+            "extension_website": "https://github.com/rsxdalv/extension_gallery_history",
+            "extension_platform_version": "0.0.1"
+        },
+        {
+            "package_name": "extensions.builtin.extension_simple_remixer",
+            "name": "Simple Remixer",
+            "version": "0.0.1",
+            "requirements": "git+https://github.com/rsxdalv/extension_simple_remixer@main",
+            "description": "Simple remixer allows concatenating multiple audio files and mixing them together.",
+            "extension_type": "interface",
+            "extension_class": "tools",
+            "author": "rsxdalv",
+            "extension_author": "rsxdalv",
+            "license": "MIT",
+            "website": "https://github.com/rsxdalv/extension_simple_remixer",
+            "extension_website": "https://github.com/rsxdalv/extension_simple_remixer",
+            "extension_platform_version": "0.0.1"
         }
     ],
     "post_generation_extensions": [
