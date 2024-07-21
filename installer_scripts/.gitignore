@@ -9,3 +9,6 @@ output.log
 .gpu
 .major_version
 .python_version
+
+# Diagnostic
+diagnostic.txt
