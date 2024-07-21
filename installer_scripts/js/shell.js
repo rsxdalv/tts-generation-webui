@@ -8,6 +8,8 @@ const runCommand = (command, args) =>
       code === 0
         ? resolve()
         : reject(new Error(`Command failed with exit code ${code}`))
+        // kill installer on error?
+        // process.exit(code)
     );
   });
 
