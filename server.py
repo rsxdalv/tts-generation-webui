@@ -24,7 +24,9 @@ from src.extensions_loader.interface_extensions import (
     extension_list_tab,
     handle_extension_class,
 )
+from src.extensions_loader.ext_callback_save_generation import load_ext_callback_save_generation
 
+load_ext_callback_save_generation()
 
 def reload_config_and_restart_ui():
     os._exit(0)

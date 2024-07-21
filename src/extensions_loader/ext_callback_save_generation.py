@@ -11,44 +11,54 @@ import traceback
 # ]
 callbacks_save_generation = []
 callbacks_save_generation_musicgen = []
-extensions_folder = os.path.join(os.path.dirname(__file__), "extensions")
+# extensions_folder = os.path.join(os.path.dirname(__file__), "extensions")
+extensions_folder = os.path.join("extensions", "legacy")
 
-# Get the list of files in the extensions folder
-print("Loading post generation extensions:")
-extension_files = os.listdir(extensions_folder)
-for file_name in extension_files:
-    if file_name.endswith(".py"):
-        module_name = file_name[:-3]
-        print("  ", end="")
-        try:
-            spec = importlib.util.spec_from_file_location(
-                module_name, os.path.join(extensions_folder, file_name)
-            )
-            module = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(module)
 
-            # Retrieve the function from the module
-            callback_save_generation = getattr(module, "callback_save_generation", None)
-
-            if callback_save_generation is not None:
-                callbacks_save_generation.append(callback_save_generation)
-
-            callback_save_generation_musicgen = getattr(
-                module, "callback_save_generation_musicgen", None
-            )
-
-            if callback_save_generation_musicgen is not None:
-                callbacks_save_generation_musicgen.append(
-                    callback_save_generation_musicgen
+def load_ext_callback_save_generation():
+    # Get the list of files in the extensions folder
+    print("Loading post generation extensions:")
+    extension_files = os.listdir(extensions_folder)
+    for file_name in extension_files:
+        if file_name.endswith(".py"):
+            module_name = file_name[:-3]
+            try:
+                spec = importlib.util.spec_from_file_location(
+                    module_name, os.path.join(extensions_folder, file_name)
                 )
-            print("Loaded extension:", module_name)
-        except ImportError:
-            print(f"Failed to import module: {module_name}")
-            print("Error:", sys.exc_info()[0], sys.exc_info()[1])
-        except AttributeError:
-            print(
-                f"Module {module_name} does not contain the function 'callback_save_generation'"
-            )
+                module = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(module)
+
+                # Retrieve the function from the module
+                callback_save_generation = getattr(
+                    module, "callback_save_generation", None
+                )
+
+                if callback_save_generation is not None:
+                    callbacks_save_generation.append(callback_save_generation)
+
+                callback_save_generation_musicgen = getattr(
+                    module, "callback_save_generation_musicgen", None
+                )
+
+                if callback_save_generation_musicgen is not None:
+                    callbacks_save_generation_musicgen.append(
+                        callback_save_generation_musicgen
+                    )
+                print("  ", end="")
+                print("Loaded extension:", module_name)
+            except ImportError:
+                print("  ", end="")
+                print(f"Failed to import module: {module_name}")
+                print("  ", end="")
+                print("Error:", sys.exc_info()[0], sys.exc_info()[1])
+                traceback.print_exc()
+            except AttributeError:
+                print("  ", end="")
+                print(
+                    f"Module {module_name} does not contain the function 'callback_save_generation'"
+                )
+
 
 print("  ", end="")
 print(f"Loaded {len(callbacks_save_generation)} callback_save_generation extensions.")
