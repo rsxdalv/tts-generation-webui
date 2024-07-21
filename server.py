@@ -24,9 +24,12 @@ from src.extensions_loader.interface_extensions import (
     extension_list_tab,
     handle_extension_class,
 )
-from src.extensions_loader.ext_callback_save_generation import load_ext_callback_save_generation
+from src.extensions_loader.ext_callback_save_generation import (
+    load_ext_callback_save_generation,
+)
 
 load_ext_callback_save_generation()
+
 
 def reload_config_and_restart_ui():
     os._exit(0)
@@ -213,6 +216,13 @@ with gr.Blocks(
 
             handle_extension_class("outputs")
 
+        with gr.Tab("Tools"), gr.Tabs():
+            # from src.studio.studio_tab import simple_remixer_tab
+
+            # simple_remixer_tab()
+
+            handle_extension_class("tools")
+
         with gr.Tab("Settings"), gr.Tabs():
             from src.settings_tab_gradio import settings_tab_gradio
 
@@ -236,9 +246,6 @@ with gr.Blocks(
             handle_extension_class("settings")
 
             extension_list_tab()
-
-        # from src.studio.studio_tab import simple_remixer_tab
-        # remixer_input = simple_remixer_tab()
 
 
 def print_pretty_options(options):

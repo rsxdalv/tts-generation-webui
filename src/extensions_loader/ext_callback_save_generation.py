@@ -60,12 +60,12 @@ def load_ext_callback_save_generation():
                 )
 
 
-print("  ", end="")
-print(f"Loaded {len(callbacks_save_generation)} callback_save_generation extensions.")
-print("  ", end="")
-print(
-    f"Loaded {len(callbacks_save_generation_musicgen)} callback_save_generation_musicgen extensions."
-)
+    print("  ", end="")
+    print(f"Loaded {len(callbacks_save_generation)} callback_save_generation extensions.")
+    print("  ", end="")
+    print(
+        f"Loaded {len(callbacks_save_generation_musicgen)} callback_save_generation_musicgen extensions."
+    )
 
 
 def ext_callback_save_generation(

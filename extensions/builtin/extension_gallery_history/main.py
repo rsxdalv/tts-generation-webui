@@ -16,6 +16,25 @@ import glob
 import os
 
 
+def extension__tts_generation_webui():
+    history_content(directory="outputs", show_collections=True)
+    return {
+        "package_name": "extension_gallery_history",
+        "name": "Gallery History",
+        "version": "0.0.1",
+        "requirements": "git+https://github.com/rsxdalv/extension_gallery_history@main",
+        "description": "Gallery History allows selecting previously generated audio files by looking at their waveforms",
+        "extension_type": "interface",
+        "extension_class": "outputs",
+        "author": "rsxdalv",
+        "extension_author": "rsxdalv",
+        "license": "MIT",
+        "website": "https://github.com/rsxdalv/extension_gallery_history",
+        "extension_website": "https://github.com/rsxdalv/extension_gallery_history",
+        "extension_platform_version": "0.0.1",
+    }
+
+
 audio_list_img = []
 
 
@@ -36,25 +55,6 @@ def clear_audio():
 def save_to_voices_cb(npz_filename: str):
     shutil.copy(npz_filename, "voices/")
     return gr.Button.update(value="Saved")
-
-
-def extension__tts_generation_webui():
-    history_content(directory="outputs", show_collections=True)
-    return {
-        "package_name": "extension_gallery_history",
-        "name": "Gallery History",
-        "version": "0.0.1",
-        "requirements": "git+https://github.com/rsxdalv/extension_gallery_history@main",
-        "description": "Gallery History allows selecting previously generated audio files by looking at their waveforms",
-        "extension_type": "interface",
-        "extension_class": "outputs",
-        "author": "rsxdalv",
-        "extension_author": "rsxdalv",
-        "license": "MIT",
-        "website": "https://github.com/rsxdalv/extension_gallery_history",
-        "extension_website": "https://github.com/rsxdalv/extension_gallery_history",
-        "extension_platform_version": "0.0.1",
-    }
 
 
 def history_content(directory, show_collections):
@@ -206,6 +206,7 @@ def history_content(directory, show_collections):
         inputs=[directory_dropdown],
         outputs=[history_list_as_gallery],
     )
+
 
 def save_to_collection_ui(
     directory: str,
