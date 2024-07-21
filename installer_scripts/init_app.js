@@ -19,6 +19,8 @@ const updateConda = async () => {
   await $("conda update -y -n base -c defaults conda");
 };
 
+const DEBUG_ALWAYS_RETURN_UPDATED = process.env.FORCE_REINSTALL ? true : false;
+
 const syncRepo = async () => {
   if (!fs.existsSync(".git")) {
     displayMessage("Linking to tts-generation-webui repository");
