@@ -1,5 +1,6 @@
 # %%
 import os
+import traceback
 import src.utils.setup_or_recover as setup_or_recover
 import src.utils.dotenv_init as dotenv_init
 import gradio as gr
@@ -52,6 +53,10 @@ def generic_error_tab(e, name="", id=""):
     with gr.Tab(name + " (!)", id=id):
         gr.Markdown(f"""Failed to load {name} tab. Please check your configuration.""")
         gr.Markdown(f"""Error: {e}""")
+        gr.Markdown(f"""Stacktrace: {traceback.format_exc()}""")
+        print(f"Failed to load {name} tab. Please check your configuration.")
+        print(f"Error: {e}")
+        print(f"Stacktrace: {traceback.format_exc()}")
 
 
 with gr.Blocks(
