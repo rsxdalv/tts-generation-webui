@@ -72,6 +72,7 @@ async function main() {
   try {
     await checkConda();
     // await updateConda();
+    // check if there are any packages actually installed inside of conda
     const isUpdated = await syncRepo();
     if (!isUpdated) {
       return;
