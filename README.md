@@ -20,6 +20,7 @@ List of models: Bark, MusicGen + AudioGen, Tortoise, RVC, Vocos, Demucs, Seamles
 
 July 26:
 * Whisper extension
+* Experimental AMD ROCM install support. (Linux only)
 
 July 25:
 * Add diagnostic scripts for MacOS and Linux.
