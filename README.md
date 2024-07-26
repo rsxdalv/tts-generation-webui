@@ -18,6 +18,14 @@ List of models: Bark, MusicGen + AudioGen, Tortoise, RVC, Vocos, Demucs, Seamles
 
 ## Changelog
 
+July 26:
+* Whisper extension
+
+July 25:
+* Add diagnostic scripts for MacOS and Linux.
+* Add better error details for tabs.
+* Fix .sh script execution permissions for the installers on Linux and MacOS.
+
 July 21:
 * Add Gallery History extension (adapted from the old gallery view)
 * Convert Simple Remixer to extension

@@ -26,6 +26,7 @@ config.json
 /data/models/stable-audio/*/
 /data/models/tortoise/
 /data/models/vall-e-x/
+/data/models/whisper/cache/
 
 # Ignore temporary files
 temp/

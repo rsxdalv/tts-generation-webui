@@ -40,8 +40,7 @@ def get_extension_list_json():
     try:
         return json.load(open("extensions.json"))["tabs"]
     except Exception as e:
-        print(e)
-        print("Failed to load extensions.json")
+        print("\n! Failed to load extensions.json:", e)
         return []
 
 
