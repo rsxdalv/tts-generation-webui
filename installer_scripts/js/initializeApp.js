@@ -14,7 +14,7 @@ const cudaVersion = "11.8";
 // xformers==xformers-0.0.22.post7 # For torch==2.1.0 project plane
 const pythonVersion = `3.10.11`;
 const pythonPackage = `python=${pythonVersion}`;
-const ffmpegPackage = `pytorch::ffmpeg`;
+const ffmpegPackage = `conda-forge::ffmpeg=4.4.2[build=lgpl*]`;
 const cudaChannels = [
   "",
   "pytorch",
