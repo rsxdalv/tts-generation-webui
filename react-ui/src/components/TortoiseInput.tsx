@@ -277,11 +277,12 @@ const CVVPAmount = ({
   <GenericSlider
     params={tortoiseGenerationParams}
     handleChange={handleChange}
-    label="CVVP Amount"
+    label="CVVP Amount (Deprecated, always 0)"
     name="cvvp_amount"
     min="0.0"
     max="1.0"
     step="0.01"
+    disabled
   />
 );
 const SplitPrompt = ({
