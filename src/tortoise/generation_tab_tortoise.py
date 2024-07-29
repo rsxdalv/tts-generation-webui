@@ -86,7 +86,12 @@ def tortoise_core_ui():
 
         with gr.Column():
             cvvp_amount = gr.Slider(
-                label="CVVP Amount", value=0.0, minimum=0.0, maximum=1.0, step=0.1
+                label="CVVP Amount (Deprecated, always 0)",
+                value=0.0,
+                minimum=0.0,
+                maximum=1.0,
+                step=0.1,
+                interactive=False,
             )
             with gr.Box():
                 seed, _, link_seed_cache = setup_seed_ui_musicgen()

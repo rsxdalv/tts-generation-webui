@@ -16,6 +16,7 @@ export const GenericSlider = <
   format = (x) => x.toString(),
   border = false,
   horizontal = false,
+  disabled = false,
 }: {
   params: T;
   handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
@@ -28,6 +29,7 @@ export const GenericSlider = <
   format?: (value: number) => string;
   border?: boolean;
   horizontal?: boolean;
+  disabled?: boolean;
 }) => {
   const value = params[name] as number;
   return (
@@ -48,6 +50,7 @@ export const GenericSlider = <
         min={min}
         max={max}
         step={step}
+        disabled={disabled}
       />
     </div>
   );
