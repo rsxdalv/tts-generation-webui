@@ -18,6 +18,10 @@ List of models: Bark, MusicGen + AudioGen, Tortoise, RVC, Vocos, Demucs, Seamles
 
 ## Changelog
 
+July 31:
+* Fix React UI's MusicGen after the Gradio changes.
+* Add unload button to Whisper extension.
+
 July 29:
 * Change FFMpeg to 4.4.2 from conda-forge in order to support more platforms, including Mac M1.
 * Disable tortoise CVVP.

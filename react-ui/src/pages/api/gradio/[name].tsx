@@ -93,11 +93,16 @@ async function musicgen({ melody, ...params }) {
       Object // result_json
     ]
   >("/musicgen", [
-    {
-      melody: null,
-      ...params,
-    },
+    params.text,
     melodyBlob, // blob in 'Melody (optional)' Audio component
+    params.model, // string (Option from: ['facebook/musicgen-small', 'facebook/musicgen-medium', 'facebook/musicgen-large', 'facebook/musicgen-large-v2', 'facebook/musicgen-large-v2-melody']) in 'Model'
+    params.duration, // number in 'Duration' Slider component
+    params.topk, // number in 'Top K' Slider component
+    params.topp, // number in 'Top P' Slider component
+    params.temperature, // number in 'Temperature' Slider component
+    params.cfg_coef, // number in 'CFG Coefficient' Slider component
+    params.seed, // number in 'Seed' Slider component
+    params.use_multi_band_diffusion, // boolean  in 'Use Multi-Band Diffusion' Checkbox component
   ]);
   const [audio, history_bundle_name_data, , , json] = result?.data;
   return {
