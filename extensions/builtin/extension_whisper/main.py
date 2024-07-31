@@ -31,13 +31,22 @@ pipe = None
 last_model_name = None
 
 
+def unload_models():
+    global pipe, last_model_name
+    pipe = None
+    last_model_name = None
+    gc.collect()
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
+    return "Unloaded"
+
+
 def get_pipe(model_name, device="cuda:0") -> Pipeline:
     global pipe, last_model_name
     if pipe is not None:
         if model_name == last_model_name:
             return pipe
-    gc.collect()
-    torch.cuda.empty_cache()
+    unload_models()
     pipe = pipeline(
         "automatic-speech-recognition",
         model_name,
@@ -98,14 +107,24 @@ def transcribe_ui():
             text = gr.Textbox(label="Transcription", interactive=False)
 
     with gr.Row():
-        with gr.Column():
-            transcribe_button = gr.Button("Transcribe", variant="primary")
+        unload_models_button = gr.Button("Unload models")
+
+        transcribe_button = gr.Button("Transcribe", variant="primary")
 
     transcribe_button.click(
         fn=transcribe,
         inputs=[audio, model_dropdown],
         outputs=[text],
         api_name="whisper_transcribe",
+    ).then(
+        fn=lambda: gr.Button.update(value="Unload models"),
+        outputs=[unload_models_button],
+    )
+
+    unload_models_button.click(
+        fn=unload_models,
+        outputs=[unload_models_button],
+        api_name="whisper_unload_models",
     )
 
 
