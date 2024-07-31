@@ -399,6 +399,14 @@ def generation_tab_musicgen():
             melody_in=melody,
         ),
         outputs=[output, history_bundle_name_data, image, seed_cache, result_json],
+        api_name="musicgen_new",
+    )
+
+    invisible_api_button = gr.Button(visible=False)
+    invisible_api_button.click(
+        inputs=inputs,
+        fn=generate,
+        outputs=[output, history_bundle_name_data, image, seed_cache, result_json],
         api_name="musicgen",
     )
 
