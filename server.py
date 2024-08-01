@@ -295,7 +295,14 @@ if __name__ == "__main__":
     import subprocess
     import webbrowser
 
-    subprocess.Popen("npm start --prefix react-ui", shell=True)
+    subprocess.Popen(
+        "npm start --prefix react-ui",
+        env={
+            **os.environ,
+            "GRADIO_BACKEND_AUTOMATIC": f"http://127.0.0.1:{gradio_interface_options['server_port']}",
+        },
+        shell=True,
+    )
     if gradio_interface_options["inbrowser"]:
         webbrowser.open("http://localhost:3000")
 

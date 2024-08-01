@@ -24,7 +24,7 @@ default_config = {
         "prevent_thread_lock": False,
         "show_error": False,
         "server_name": "0.0.0.0",
-        "server_port": None,
+        "server_port": 7770,
         "show_tips": False,
         "height": 500,
         "width": "100%",

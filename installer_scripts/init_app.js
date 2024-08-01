@@ -19,7 +19,10 @@ const updateConda = async () => {
   await $("conda update -y -n base -c defaults conda");
 };
 
-const DEBUG_ALWAYS_RETURN_UPDATED = process.env.FORCE_REINSTALL ? true : false;
+const FORCE_REINSTALL = process.env.FORCE_REINSTALL ? true : false;
+const DEBUG_ALWAYS_RETURN_UPDATED = FORCE_REINSTALL || process.env.DEBUG_ALWAYS_RETURN_UPDATED
+  ? true
+  : false;
 
 const syncRepo = async () => {
   if (!fs.existsSync(".git")) {
@@ -62,7 +65,7 @@ async function main() {
   //     });
   //   })
   //   .listen(8080);
-  const version = "0.0.5";
+  const version = "0.0.6";
   displayMessage("\n\nStarting init app (version: " + version + ")...\n\n");
 
   if (process.env.DEBUG_ALWAYS_RETURN_UPDATED) {
