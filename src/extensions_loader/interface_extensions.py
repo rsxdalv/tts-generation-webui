@@ -1,6 +1,7 @@
 import json
 import importlib
 import importlib.util
+from importlib.metadata import version
 
 import gradio as gr
 
@@ -17,8 +18,12 @@ def _handle_package(package_name, title_name, requirements):
     if check_if_package_installed(package_name):
         try:
             module = importlib.import_module(f"{package_name}.main")
+            if "builtin" in package_name:
+                package_version = "0.0.1"
+            else:
+                package_version = version(package_name)
             main_tab = getattr(module, "extension__tts_generation_webui")
-            with gr.Tab(title_name + " Extension"):
+            with gr.Tab(f"{title_name} (v{package_version}) Extension"):
                 if "builtin" in package_name:
                     gr.Markdown(f"{title_name} Extension is up to date")
                 else:
@@ -65,9 +70,8 @@ def handle_extension_class(extension_class):
             x["extension_type"] == "interface"
             and x["extension_class"] == extension_class
         ):
-            _handle_package(
-                x["package_name"], f"{x['name']} (v{x['version']})", x["requirements"]
-            )
+            # x["package_name"], f"{x['name']} (v{x['version']})", x["requirements"]
+            _handle_package(x["package_name"], x["name"], x["requirements"])
 
 
 def extension_list_tab():
@@ -76,7 +80,8 @@ def extension_list_tab():
         table_string = """| Title | Description |\n| --- | --- |\n"""
         for x in extension_list_json:
             table_string += (
-                f"| {x['name']} (v{x['version']}) "
+                # f"| {x['name']} (v{x['version']}) "
+                f"| {x['name']} "
                 + f"| {x['description']} (website: {x['website']}) (extension_website: {x['extension_website']}) |\n"
             )
         gr.Markdown(table_string)
