@@ -103,7 +103,7 @@ const pipPackagesFile = "./installer_scripts/.pip_packages";
 const majorVersion = "2";
 
 const versions = JSON.parse(fs.readFileSync("./installer_scripts/versions.json"));
-const newPipPackagesVersion = versions.pip_packages;
+const newPipPackagesVersion = String(versions.pip_packages);
 
 const readGeneric = (file) => {
   if (fs.existsSync(file)) {
