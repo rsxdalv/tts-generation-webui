@@ -18,6 +18,9 @@ List of models: Bark, MusicGen + AudioGen, Tortoise, RVC, Vocos, Demucs, Seamles
 
 ## Changelog
 
+Aug 1:
+* Add "Attempt Update" button for external extensions.
+
 July 31:
 * Fix React UI's MusicGen after the Gradio changes.
 * Add unload button to Whisper extension.

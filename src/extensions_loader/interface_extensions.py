@@ -19,6 +19,18 @@ def _handle_package(package_name, title_name, requirements):
             module = importlib.import_module(f"{package_name}.main")
             main_tab = getattr(module, "extension__tts_generation_webui")
             with gr.Tab(title_name + " Extension"):
+                if "builtin" in package_name:
+                    gr.Markdown(f"{title_name} Extension is up to date")
+                else:
+                    if hasattr(module, "update_button"):
+                        update_button = getattr(module, "update_button")
+                        update_button()
+                    else:
+                        # universal update button
+                        gr.Button("Attempt Update [May already be up to date]").click(
+                            pip_install_wrapper(requirements, title_name),
+                            outputs=[gr.HTML()],
+                        )
                 main_tab()
         except Exception as e:
             generic_error_tab_advanced(
