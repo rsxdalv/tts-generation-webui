@@ -24,7 +24,7 @@ export default async function handler(
   res.status(200).json(result);
 }
 
-const defaultBackend = process.env.GRADIO_BACKEND || "http://127.0.0.1:7860/";
+const defaultBackend = process.env.GRADIO_BACKEND || process.env.GRADIO_BACKEND_AUTOMATIC || "http://127.0.0.1:7860/";
 const getClient = () => client(defaultBackend, {});
 
 type GradioChoices = {
