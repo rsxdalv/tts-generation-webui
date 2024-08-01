@@ -59,9 +59,13 @@ const installDependencies = async (gpuchoice) => {
     } else if (gpuchoice === "Apple M Series Chip" || gpuchoice === "CPU") {
       await $(pytorchCPUInstall$);
     } else if (gpuchoice === "AMD GPU (ROCM, Linux only, potentially broken)") {
-      displayMessage("ROCM is experimental and not well supported yet, installing...");
+      displayMessage(
+        "ROCM is experimental and not well supported yet, installing..."
+      );
       displayMessage("Linux only!");
-      await $(`pip install torch==${torchVersion} torchvision==0.18.1 torchaudio==${torchVersion} --index-url https://download.pytorch.org/whl/rocm6.0`);
+      await $(
+        `pip install torch==${torchVersion} torchvision==0.18.1 torchaudio==${torchVersion} --index-url https://download.pytorch.org/whl/rocm6.0`
+      );
     } else {
       displayMessage("Unsupported or cancelled. Exiting...");
       removeGPUChoice();
@@ -95,34 +99,34 @@ Select the device (GPU/CPU) you are using to run the application:
 
 const gpuFile = "./installer_scripts/.gpu";
 const majorVersionFile = "./installer_scripts/.major_version";
+const pipPackagesFile = "./installer_scripts/.pip_packages";
 const majorVersion = "2";
 
-const saveGPUChoice = (gpuchoice) => {
-  fs.writeFileSync(gpuFile, gpuchoice.toString());
+const versions = JSON.parse(fs.readFileSync("./installer_scripts/versions.json"));
+const newPipPackagesVersion = versions.pip_packages;
+
+const readGeneric = (file) => {
+  if (fs.existsSync(file)) {
+    return fs.readFileSync(file, "utf8");
+  }
+  return -1;
 };
+
+const saveGeneric = (file, data) => {
+  fs.writeFileSync(file, data.toString());
+};
+
+const readMajorVersion = () => readGeneric(majorVersionFile);
+const saveMajorVersion = (data) => saveGeneric(majorVersionFile, data);
+const readPipPackagesVersion = () => readGeneric(pipPackagesFile);
+const savePipPackagesVersion = (data) => saveGeneric(pipPackagesFile, data);
+const readGPUChoice = () => readGeneric(gpuFile);
+const saveGPUChoice = (data) => saveGeneric(gpuFile, data);
 
 const removeGPUChoice = () => {
   if (fs.existsSync(gpuFile)) {
     fs.unlinkSync(gpuFile);
   }
-};
-
-const readGPUChoice = () => {
-  if (fs.existsSync(gpuFile)) {
-    return fs.readFileSync(gpuFile, "utf8");
-  }
-  return -1;
-};
-
-const readMajorVersion = () => {
-  if (fs.existsSync(majorVersionFile)) {
-    return fs.readFileSync(majorVersionFile, "utf8");
-  }
-  return -1;
-};
-
-const saveMajorVersion = (majorVersion) => {
-  fs.writeFileSync(majorVersionFile, majorVersion.toString());
 };
 
 const dry_run_flag = DEBUG_DRY_RUN ? "--dry-run " : "";
@@ -140,6 +144,10 @@ function tryInstall(requirements, name = "") {
 }
 
 async function updateDependencies(optional = true) {
+  if (readPipPackagesVersion() === newPipPackagesVersion) {
+    displayMessage("Dependencies are already up to date, skipping pip installs...");
+    return;
+  }
   if (optional) {
     if (
       (await menu(
@@ -167,6 +175,7 @@ async function updateDependencies(optional = true) {
   tryInstall("-r requirements_stable_audio.txt", "Stable Audio");
   // reinstall hydra-core==1.3.2 because of fairseq
   tryInstall("hydra-core==1.3.2", "hydra-core fix due to fairseq");
+  savePipPackagesVersion(newPipPackagesVersion);
 }
 
 const checkIfTorchInstalled = async () => {
