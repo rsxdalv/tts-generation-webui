@@ -28,6 +28,12 @@ Aug 1:
 * Synchronize Gradio Port with React UI.
 * Change default Gradio port to 7770 from 7860.
 
+
+## July 2024
+
+<details>
+<summary>Click to expand</summary>
+
 July 31:
 * Fix React UI's MusicGen after the Gradio changes.
 * Add unload button to Whisper extension.
@@ -106,6 +112,7 @@ July 1:
 * Remove unnecessary conda git reinstall.
 * Update to lastest Stable Audio which has mps support (requires newer torch versions).
 
+</details>
 
 ## June 2024
 
