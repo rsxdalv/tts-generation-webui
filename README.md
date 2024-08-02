@@ -18,11 +18,21 @@ List of models: Bark, MusicGen + AudioGen, Tortoise, RVC, Vocos, Demucs, Seamles
 
 ## Changelog
 
+Aug 2:
+* Add deprecation warning to old installer.
+* Unify error handling and simplify tab loading.
+
 Aug 1:
 * Add "Attempt Update" button for external extensions.
 * Skip reinstalling packages when pip_packages version is not changed.
 * Synchronize Gradio Port with React UI.
 * Change default Gradio port to 7770 from 7860.
+
+
+## July 2024
+
+<details>
+<summary>Click to expand</summary>
 
 July 31:
 * Fix React UI's MusicGen after the Gradio changes.
@@ -102,6 +112,7 @@ July 1:
 * Remove unnecessary conda git reinstall.
 * Update to lastest Stable Audio which has mps support (requires newer torch versions).
 
+</details>
 
 ## June 2024
 

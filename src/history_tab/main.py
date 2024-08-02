@@ -243,7 +243,7 @@ def history_content(directory, history_tab, show_collections):
         fn=lambda x: gr.Dataframe.update(value=get_wav_files(x)),
         inputs=[directory_dropdown],
         outputs=[history_list],
-        api_name=f"{directory}_refresh_history",
+        api_name=f"{'collections' if show_collections else directory}_refresh_history",
     )
 
 
