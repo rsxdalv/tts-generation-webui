@@ -2,6 +2,7 @@ import json
 import importlib
 import importlib.util
 from importlib.metadata import version
+import time
 
 import gradio as gr
 
@@ -16,6 +17,8 @@ def check_if_package_installed(package_name):
 
 def _handle_package(package_name, title_name, requirements):
     if check_if_package_installed(package_name):
+        print(f"Loading {title_name} Extension...")
+        start_time = time.time()
         try:
             module = importlib.import_module(f"{package_name}.main")
             if "builtin" in package_name:
@@ -41,6 +44,9 @@ def _handle_package(package_name, title_name, requirements):
             generic_error_tab_advanced(
                 e, name=title_name + " Extension", requirements=requirements
             )
+        finally:
+            elapsed_time = time.time() - start_time
+            print(f"{title_name} Extension loaded in {elapsed_time:.2f} seconds.")
     else:
         with gr.Tab(f"[Available] {title_name} Extension"):
             gr.Markdown(f"{title_name} Extension not installed")
