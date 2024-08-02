@@ -58,6 +58,7 @@ def generic_error_tab(e, name="", id=""):
         print(f"Error: {e}")
         print(f"Stacktrace: {traceback.format_exc()}")
 
+
 def main_ui():
     with gr.Blocks(
         css=full_css,
@@ -72,11 +73,20 @@ def main_ui():
         )
         with gr.Tabs():
             all_tabs()
-    
+
     return blocks
 
 
 def all_tabs():
+    text_to_speech_tab()
+    audio_music_generation_tab()
+    audio_conversion_tab()
+    outputs_tab()
+    tools_tab()
+    settings_tab()
+
+
+def text_to_speech_tab():
     with gr.Tab("Text-to-Speech"), gr.Tabs():
         from src.bark.generation_tab_bark import generation_tab_bark
 
@@ -142,6 +152,8 @@ def all_tabs():
 
         handle_extension_class("text-to-speech")
 
+
+def audio_music_generation_tab():
     with gr.Tab("Audio/Music Generation"), gr.Tabs():
 
         try:
@@ -173,6 +185,8 @@ def all_tabs():
 
         handle_extension_class("audio-music-generation")
 
+
+def audio_conversion_tab():
     with gr.Tab("Audio Conversion"), gr.Tabs():
         try:
             from src.rvc_tab.rvc_tab import rvc_conversion_tab
@@ -211,6 +225,8 @@ def all_tabs():
 
         handle_extension_class("audio-conversion")
 
+
+def outputs_tab():
     with gr.Tab("Outputs"), gr.Tabs():
         from src.history_tab.main import history_tab
 
@@ -227,6 +243,8 @@ def all_tabs():
 
         handle_extension_class("outputs")
 
+
+def tools_tab():
     with gr.Tab("Tools"), gr.Tabs():
         # from src.studio.studio_tab import simple_remixer_tab
 
@@ -234,6 +252,8 @@ def all_tabs():
 
         handle_extension_class("tools")
 
+
+def settings_tab():
     with gr.Tab("Settings"), gr.Tabs():
         from src.settings_tab_gradio import settings_tab_gradio
 
