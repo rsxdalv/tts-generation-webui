@@ -18,6 +18,10 @@ List of models: Bark, MusicGen + AudioGen, Tortoise, RVC, Vocos, Demucs, Seamles
 
 ## Changelog
 
+Aug 2:
+* Add deprecation warning to old installer.
+* Unify error handling and simplify tab loading.
+
 Aug 1:
 * Add "Attempt Update" button for external extensions.
 * Skip reinstalling packages when pip_packages version is not changed.

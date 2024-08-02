@@ -59,6 +59,14 @@ def check_if_torch_has_cuda():
 
 
 def main():
+    print("Legacy installer is almost guaranteed to break installation, including torch+cuda")
+    print("For this reason, it is disabled")
+    print("It is recommended to use the new installer in a new directory, and leave the existing installation intact")
+    print("The new installer can be downloaded from https://github.com/rsxdalv/tts-generation-webui/")
+    if input("Do you still want to risk upgrading? [y/N] ").lower() != "y":
+        print("Skipping dependencies update")
+        return
+
     print("Updating dependencies... (legacy installer, might break)")
     try_install("-r requirements.txt", "Core Packages, Bark, Tortoise")
     try_install(
