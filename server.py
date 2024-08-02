@@ -58,243 +58,250 @@ def generic_error_tab(e, name="", id=""):
         print(f"Error: {e}")
         print(f"Stacktrace: {traceback.format_exc()}")
 
+def main_ui():
+    with gr.Blocks(
+        css=full_css,
+        title="TTS Generation WebUI",
+        analytics_enabled=False,  # it broke too many times
+    ) as blocks:
+        gr.Markdown(
+            """
+    # TTS Generation WebUI (Legacy - Gradio) [React UI](http://localhost:3000) [Feedback / Bug reports](https://forms.gle/2L62owhBsGFzdFBC8) [Discord Server](https://discord.gg/V8BKTVRtJ9)
+    ### _(Text To Speech, Audio & Music Generation, Conversion)_
+    """
+        )
+        with gr.Tabs():
+            all_tabs()
+    
+    return blocks
 
-with gr.Blocks(
-    css=full_css,
-    title="TTS Generation WebUI",
-    analytics_enabled=False,  # it broke too many times
-) as demo:
-    gr.Markdown(
-        """
-# TTS Generation WebUI (Legacy - Gradio) [React UI](http://localhost:3000) [Feedback / Bug reports](https://forms.gle/2L62owhBsGFzdFBC8) [Discord Server](https://discord.gg/V8BKTVRtJ9)
-### _(Text To Speech, Audio & Music Generation, Conversion)_
-"""
-    )
-    with gr.Tabs():
-        with gr.Tab("Text-to-Speech"), gr.Tabs():
-            from src.bark.generation_tab_bark import generation_tab_bark
 
-            generation_tab_bark()
+def all_tabs():
+    with gr.Tab("Text-to-Speech"), gr.Tabs():
+        from src.bark.generation_tab_bark import generation_tab_bark
 
-            try:
-                from src.bark.clone.tab_voice_clone import tab_voice_clone
+        generation_tab_bark()
 
-                tab_voice_clone()
-            except Exception as e:
-                from src.bark.clone.tab_voice_clone_error import tab_voice_clone_error
+        try:
+            from src.bark.clone.tab_voice_clone import tab_voice_clone
 
-                tab_voice_clone_error(e)
-                print("Failed to load voice clone demo")
-                print(e)
+            tab_voice_clone()
+        except Exception as e:
+            from src.bark.clone.tab_voice_clone_error import tab_voice_clone_error
 
-            try:
-                from src.tortoise.generation_tab_tortoise import generation_tab_tortoise
+            tab_voice_clone_error(e)
+            print("Failed to load voice clone demo")
+            print(e)
 
-                generation_tab_tortoise()
-            except Exception as e:
-                generic_error_tab(e, name="Tortoise TTS", id="tortoise")
+        try:
+            from src.tortoise.generation_tab_tortoise import generation_tab_tortoise
 
-            try:
-                from src.seamlessM4T.seamless_tab import seamless_tab
+            generation_tab_tortoise()
+        except Exception as e:
+            generic_error_tab(e, name="Tortoise TTS", id="tortoise")
 
-                seamless_tab()
+        try:
+            from src.seamlessM4T.seamless_tab import seamless_tab
 
-            except Exception as e:
-                generic_error_tab(e, name="SeamlessM4Tv2Model", id="seamless")
+            seamless_tab()
 
-            try:
-                from src.vall_e_x.vall_e_x_tab import valle_x_tab
+        except Exception as e:
+            generic_error_tab(e, name="SeamlessM4Tv2Model", id="seamless")
 
-                valle_x_tab()
+        try:
+            from src.vall_e_x.vall_e_x_tab import valle_x_tab
 
-            except Exception as e:
-                generic_error_tab(e, name="Valle-X", id="vall_e_x")
+            valle_x_tab()
 
-            try:
-                from src.mms.mms_tab import mms_tab
+        except Exception as e:
+            generic_error_tab(e, name="Valle-X", id="vall_e_x")
 
-                mms_tab()
+        try:
+            from src.mms.mms_tab import mms_tab
 
-            except Exception as e:
-                generic_error_tab(e, name="MMS", id="mms")
+            mms_tab()
 
-            try:
-                from src.maha_tts.maha_tts_tab import maha_tts_tab
+        except Exception as e:
+            generic_error_tab(e, name="MMS", id="mms")
 
-                maha_tts_tab()
+        try:
+            from src.maha_tts.maha_tts_tab import maha_tts_tab
 
-            except Exception as e:
-                generic_error_tab(e, name="MahaTTS", id="maha_tts")
+            maha_tts_tab()
 
-            try:
-                from src.styletts2.styletts2_tab import style_tts2_tab
+        except Exception as e:
+            generic_error_tab(e, name="MahaTTS", id="maha_tts")
 
-                style_tts2_tab()
+        try:
+            from src.styletts2.styletts2_tab import style_tts2_tab
 
-            except Exception as e:
-                generic_error_tab(e, name="StyleTTS2", id="style_tts2")
+            style_tts2_tab()
 
-            handle_extension_class("text-to-speech")
+        except Exception as e:
+            generic_error_tab(e, name="StyleTTS2", id="style_tts2")
 
-        with gr.Tab("Audio/Music Generation"), gr.Tabs():
+        handle_extension_class("text-to-speech")
 
-            try:
-                from src.stable_audio.stable_audio import stable_audio_ui_tab
+    with gr.Tab("Audio/Music Generation"), gr.Tabs():
 
-                stable_audio_ui_tab()
+        try:
+            from src.stable_audio.stable_audio import stable_audio_ui_tab
 
-            except Exception as e:
-                generic_error_tab(e, name="Stable Audio", id="stable_audio")
+            stable_audio_ui_tab()
 
-            try:
-                from src.magnet.magnet_tab import generation_tab_magnet
+        except Exception as e:
+            generic_error_tab(e, name="Stable Audio", id="stable_audio")
 
-                generation_tab_magnet()
+        try:
+            from src.magnet.magnet_tab import generation_tab_magnet
 
-            except Exception as e:
-                generic_error_tab(e, name="MAGNeT", id="magnet")
+            generation_tab_magnet()
 
-            try:
-                from src.musicgen.musicgen_tab import generation_tab_musicgen
+        except Exception as e:
+            generic_error_tab(e, name="MAGNeT", id="magnet")
 
-                generation_tab_musicgen()
-            except Exception as e:
-                from src.musicgen.musicgen_tab_error import musicgen_tab_error
+        try:
+            from src.musicgen.musicgen_tab import generation_tab_musicgen
 
-                musicgen_tab_error(e)
-                print("Failed to load musicgen demo")
-                print(e)
+            generation_tab_musicgen()
+        except Exception as e:
+            from src.musicgen.musicgen_tab_error import musicgen_tab_error
 
-            handle_extension_class("audio-music-generation")
+            musicgen_tab_error(e)
+            print("Failed to load musicgen demo")
+            print(e)
 
-        with gr.Tab("Audio Conversion"), gr.Tabs():
-            try:
-                from src.rvc_tab.rvc_tab import rvc_conversion_tab
+        handle_extension_class("audio-music-generation")
 
-                rvc_conversion_tab()
-            except Exception as e:
-                generic_error_tab_advanced(
-                    e, name="RVC", requirements="-r requirements_rvc.txt"
-                )
+    with gr.Tab("Audio Conversion"), gr.Tabs():
+        try:
+            from src.rvc_tab.rvc_tab import rvc_conversion_tab
 
-            try:
-                from src.rvc_tab.uvr5_tab import uvr5_tab
-
-                uvr5_tab()
-            except Exception as e:
-                from src.rvc_tab.rvc_tab_error import rvc_tab_error
-
-                rvc_tab_error(e, name="UVR5")
-                print("Failed to load rvc demo")
-                print(e)
-
-            try:
-                from src.demucs.demucs_tab import demucs_tab
-
-                demucs_tab()
-            except Exception as e:
-                from src.demucs.demucs_tab_error import demucs_tab_error
-
-                demucs_tab_error(e)
-                print("Failed to load demucs demo")
-                print(e)
-
-            from src.vocos.vocos_tabs import vocos_tabs
-
-            vocos_tabs()
-
-            handle_extension_class("audio-conversion")
-
-        with gr.Tab("Outputs"), gr.Tabs():
-            from src.history_tab.main import history_tab
-
-            collections_directories_atom.render()
-            history_tab()
-            history_tab(directory="favorites")
-            history_tab(
-                directory="outputs",
-                show_collections=True,
-            )
-            from src.history_tab.voices_tab import voices_tab
-
-            voices_tab()
-
-            handle_extension_class("outputs")
-
-        with gr.Tab("Tools"), gr.Tabs():
-            # from src.studio.studio_tab import simple_remixer_tab
-
-            # simple_remixer_tab()
-
-            handle_extension_class("tools")
-
-        with gr.Tab("Settings"), gr.Tabs():
-            from src.settings_tab_gradio import settings_tab_gradio
-
-            settings_tab_gradio(reload_config_and_restart_ui, gradio_interface_options)
-
-            from src.bark.settings_tab_bark import settings_tab_bark
-
-            settings_tab_bark()
-            from src.utils.model_location_settings_tab import (
-                model_location_settings_tab,
+            rvc_conversion_tab()
+        except Exception as e:
+            generic_error_tab_advanced(
+                e, name="RVC", requirements="-r requirements_rvc.txt"
             )
 
-            model_location_settings_tab()
-            from src.utils.gpu_info_tab import gpu_info_tab
+        try:
+            from src.rvc_tab.uvr5_tab import uvr5_tab
 
-            gpu_info_tab()
-            from src.utils.pip_list_tab import pip_list_tab
+            uvr5_tab()
+        except Exception as e:
+            from src.rvc_tab.rvc_tab_error import rvc_tab_error
 
-            pip_list_tab()
+            rvc_tab_error(e, name="UVR5")
+            print("Failed to load rvc demo")
+            print(e)
 
-            handle_extension_class("settings")
+        try:
+            from src.demucs.demucs_tab import demucs_tab
 
-            extension_list_tab()
+            demucs_tab()
+        except Exception as e:
+            from src.demucs.demucs_tab_error import demucs_tab_error
+
+            demucs_tab_error(e)
+            print("Failed to load demucs demo")
+            print(e)
+
+        from src.vocos.vocos_tabs import vocos_tabs
+
+        vocos_tabs()
+
+        handle_extension_class("audio-conversion")
+
+    with gr.Tab("Outputs"), gr.Tabs():
+        from src.history_tab.main import history_tab
+
+        collections_directories_atom.render()
+        history_tab()
+        history_tab(directory="favorites")
+        history_tab(
+            directory="outputs",
+            show_collections=True,
+        )
+        from src.history_tab.voices_tab import voices_tab
+
+        voices_tab()
+
+        handle_extension_class("outputs")
+
+    with gr.Tab("Tools"), gr.Tabs():
+        # from src.studio.studio_tab import simple_remixer_tab
+
+        # simple_remixer_tab()
+
+        handle_extension_class("tools")
+
+    with gr.Tab("Settings"), gr.Tabs():
+        from src.settings_tab_gradio import settings_tab_gradio
+
+        settings_tab_gradio(reload_config_and_restart_ui, gradio_interface_options)
+
+        from src.bark.settings_tab_bark import settings_tab_bark
+
+        settings_tab_bark()
+        from src.utils.model_location_settings_tab import (
+            model_location_settings_tab,
+        )
+
+        model_location_settings_tab()
+        from src.utils.gpu_info_tab import gpu_info_tab
+
+        gpu_info_tab()
+        from src.utils.pip_list_tab import pip_list_tab
+
+        pip_list_tab()
+
+        handle_extension_class("settings")
+
+        extension_list_tab()
 
 
-def print_pretty_options(options):
-    print(" Gradio interface options:")
-    max_key_length = max(len(key) for key in options.keys())
-    for key, value in options.items():
-        if key == "auth" and value is not None:
-            print(f"  {key}:{' ' * (max_key_length - len(key))} {value[0]}:******")
-        else:
-            print(f"  {key}:{' ' * (max_key_length - len(key))} {value}")
+def start_gradio_server():
+    def print_pretty_options(options):
+        print(" Gradio interface options:")
+        max_key_length = max(len(key) for key in options.keys())
+        for key, value in options.items():
+            if key == "auth" and value is not None:
+                print(f"  {key}:{' ' * (max_key_length - len(key))} {value[0]}:******")
+            else:
+                print(f"  {key}:{' ' * (max_key_length - len(key))} {value}")
 
+    # detect if --share is passed
+    if "--share" in os.sys.argv:
+        print("Gradio share mode enabled")
+        gradio_interface_options["share"] = True
 
-# detect if --share is passed
-if "--share" in os.sys.argv:
-    print("Gradio share mode enabled")
-    gradio_interface_options["share"] = True
+    print("Starting Gradio server...")
+    if "enable_queue" in gradio_interface_options:
+        del gradio_interface_options["enable_queue"]
+    if gradio_interface_options["auth"] is not None:
+        # split username:password into (username, password)
+        gradio_interface_options["auth"] = tuple(
+            gradio_interface_options["auth"].split(":")
+        )
+        print("Gradio server authentication enabled")
+    print_pretty_options(gradio_interface_options)
 
-
-print("Starting Gradio server...")
-if "enable_queue" in gradio_interface_options:
-    del gradio_interface_options["enable_queue"]
-if gradio_interface_options["auth"] is not None:
-    # split username:password into (username, password)
-    gradio_interface_options["auth"] = tuple(
-        gradio_interface_options["auth"].split(":")
-    )
-    print("Gradio server authentication enabled")
-print_pretty_options(gradio_interface_options)
-if gradio_interface_options["server_name"] == "0.0.0.0":
-    print(
-        f"Gradio server will be available on http://localhost:{gradio_interface_options['server_port']}"
-    )
-
-
-def start_server():
+    demo = main_ui()
     demo.queue(
         concurrency_count=gradio_interface_options.get("concurrency_count", 5),
     ).launch(**gradio_interface_options)
+
+    if gradio_interface_options["server_name"] == "0.0.0.0":
+        print("Notice: Server is open to the internet")
+        print(
+            f"Gradio server will be available on http://localhost:{gradio_interface_options['server_port']}"
+        )
 
 
 if __name__ == "__main__":
     import subprocess
     import webbrowser
 
+    print("Starting React UI...")
     subprocess.Popen(
         "npm start --prefix react-ui",
         env={
@@ -306,4 +313,4 @@ if __name__ == "__main__":
     if gradio_interface_options["inbrowser"]:
         webbrowser.open("http://localhost:3000")
 
-    start_server()
+    start_gradio_server()
