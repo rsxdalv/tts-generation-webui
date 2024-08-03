@@ -18,6 +18,9 @@ List of models: Bark, MusicGen + AudioGen, Tortoise, RVC, Vocos, Demucs, Seamles
 
 ## Changelog
 
+Aug 3:
+* Riffusion extension
+
 Aug 2:
 * Add deprecation warning to old installer.
 * Unify error handling and simplify tab loading.

@@ -1,6 +1,10 @@
 $logFile = Join-Path -Path $PSScriptRoot -ChildPath "output.log"
 Start-Transcript -Path $logFile
 
+# enable long paths on Windows
+# requires admin
+# Set-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem' -Name 'LongPathsEnabled' -Value 1
+
 & "$PSScriptRoot\init_mamba.bat"
 if ($LASTEXITCODE -ne 0) {
     Write-Host "Failed to init mamba, exiting..."
