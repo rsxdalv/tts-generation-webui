@@ -41,3 +41,6 @@ node_modules/
 
 # Ignore temporary Jupiter notebooks
 *.temp.ipynb
+
+# Temporary file used by some modules
+output.wav

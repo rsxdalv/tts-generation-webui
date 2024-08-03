@@ -59,6 +59,21 @@
             "website": "https://github.com/rsxdalv/extension_whisper",
             "extension_website": "https://github.com/rsxdalv/extension_whisper",
             "extension_platform_version": "0.0.1"
+        },
+        {
+            "package_name": "extensions.builtin.extension_riffusion",
+            "name": "Riffusion",
+            "version": "0.0.1",
+            "requirements": "git+https://github.com/rsxdalv/extension_riffusion@main",
+            "description": "Riffusion allows generating music from text.",
+            "extension_type": "interface",
+            "extension_class": "audio-music-generation",
+            "author": "rsxdalv",
+            "extension_author": "rsxdalv",
+            "license": "MIT",
+            "website": "https://github.com/rsxdalv/extension_riffusion",
+            "extension_website": "https://github.com/rsxdalv/extension_riffusion",
+            "extension_platform_version": "0.0.1"
         }
     ],
     "post_generation_extensions": [
