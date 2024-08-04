@@ -27,6 +27,9 @@ config.json
 /data/models/tortoise/
 /data/models/vall-e-x/
 /data/models/whisper/cache/
+/data/models/xtts/
+/data/models/hubert_base.pt
+/data/models/rmvpe.pt
 
 # Ignore temporary files
 temp/
