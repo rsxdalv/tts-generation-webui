@@ -73,11 +73,23 @@ def load_tabs(list_of_tabs):
         run_tab(module_name, function_name, name, requirements)
 
 
-def main_ui():
+def main_ui(theme_choice = "Base"):    
+    themes = {
+        "Base": gr.themes.Base,
+        "Default": gr.themes.Default,
+        "Monochrome": gr.themes.Monochrome,
+    }
+    theme = themes[theme_choice](
+        primary_hue="orange",
+        secondary_hue="amber",
+        neutral_hue="stone",
+    )
+
     with gr.Blocks(
         css=full_css,
         title="TTS Generation WebUI",
         analytics_enabled=False,  # it broke too many times
+        theme=theme,
     ) as blocks:
         gr.Markdown(
             """

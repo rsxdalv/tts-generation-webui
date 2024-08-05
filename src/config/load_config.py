@@ -25,7 +25,7 @@ default_config = {
         "show_error": False,
         "server_name": "0.0.0.0",
         "server_port": 7770,
-        "show_tips": False,
+        # "show_tips": False, # DEPRECATED
         "height": 500,
         "width": "100%",
         "favicon_path": None,
@@ -39,6 +39,9 @@ default_config = {
         "_frontend": True,
     },
     "load_models_on_startup": False,
+    "extensions": {
+        "disabled": [],
+    },
 }
 
 

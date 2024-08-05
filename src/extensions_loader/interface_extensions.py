@@ -15,7 +15,14 @@ def check_if_package_installed(package_name):
     return spec is not None
 
 
+# disabled_extensions = ["extension_xtts_rvc_ui"]
+disabled_extensions = []
+
+
 def _handle_package(package_name, title_name, requirements):
+    if package_name in disabled_extensions:
+        print(f"Skipping disabled {title_name} Extension...")
+        return
     if check_if_package_installed(package_name):
         print(f"Loading {title_name} Extension...")
         start_time = time.time()
