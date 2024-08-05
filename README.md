@@ -20,6 +20,8 @@ List of models: Bark, MusicGen + AudioGen, Tortoise, RVC, Vocos, Demucs, Seamles
 
 Aug 5:
 * Fix Bark in React UI, add Max Generation Duration.
+* Change AudioCraft Plus extension models directory to ./data/models/audiocraft_plus/
+* Improve model unloading for MusicGen and AudioGen. Add unload models button to MusicGen and AudioGen.
 
 Aug 4:
 * Add XTTS-RVC-UI extension, XTTS Fine-tuning demo extension.

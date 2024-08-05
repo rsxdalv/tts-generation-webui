@@ -2,12 +2,7 @@ import { GradioFile } from "../types/GradioFile";
 
 export type BarkResult = {
   audio: GradioFile;
-  image: string;
-  save_button: Object;
-  continue_button: Object;
-  buttons_row: Object;
   npz: string;
-  seed: null;
   json_text: {
     _version: string;
     _hash_version: string;

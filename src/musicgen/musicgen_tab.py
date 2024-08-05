@@ -138,6 +138,17 @@ def log_generation_musicgen(
         print(key, ":", value)
 
 
+def unload_models():
+    global MODEL
+    MODEL = None
+    import gc
+
+    gc.collect()
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
+    return "Unloaded"
+
+
 def generate(params: MusicGenGeneration, melody_in: Optional[Tuple[int, np.ndarray]]):
     model = params["model"]
     text = params["text"]
@@ -147,6 +158,7 @@ def generate(params: MusicGenGeneration, melody_in: Optional[Tuple[int, np.ndarr
 
     global MODEL
     if MODEL is None or MODEL.name != model:
+        unload_models()
         MODEL = load_model(model)
 
     MODEL.set_generation_params(
@@ -307,6 +319,13 @@ def generation_tab_musicgen():
                     value=False,
                 )
                 seed, set_old_seed_button, _ = setup_seed_ui_musicgen()
+
+                unload_models_button = gr.Button("Unload models")
+                unload_models_button.click(
+                    fn=unload_models,
+                    outputs=[unload_models_button],
+                    api_name="musicgen_audiogen_unload_models",
+                )
 
         with gr.Column():
             output = gr.Audio(

@@ -24,7 +24,10 @@ export default async function handler(
   res.status(200).json(result);
 }
 
-const defaultBackend = process.env.GRADIO_BACKEND || process.env.GRADIO_BACKEND_AUTOMATIC || "http://127.0.0.1:7860/";
+const defaultBackend =
+  process.env.GRADIO_BACKEND ||
+  process.env.GRADIO_BACKEND_AUTOMATIC ||
+  "http://127.0.0.1:7770/";
 const getClient = () => client(defaultBackend, {});
 
 type GradioChoices = {
@@ -156,7 +159,8 @@ async function bark({
 }) {
   const result = await gradioPredict<
     [
-      GradioFile, // audio
+      // GradioFile, // audio
+      { value: GradioFile; label: string }, // npz
       string, // image
       Object, // save_button
       Object, // continue_button
@@ -184,26 +188,16 @@ async function bark({
     max_gen_duration_s,
   ]);
 
-  const [
-    audio,
-    image,
-    save_button,
-    continue_button,
-    buttons_row,
-    npz,
-    seed,
-    json_text,
-    history_bundle_name_data,
-  ] = result?.data;
+  const [audio_update, npz, json_text, history_bundle_name_data] = result?.data;
 
+  const audio = audio_update.value;
+  const fixedAudio = {
+    ...audio,
+    data: `http://127.0.0.1:7770/file=${audio.name}`,
+  };
   return {
-    audio,
-    image,
-    save_button,
-    continue_button,
-    buttons_row,
+    audio: fixedAudio,
     npz,
-    seed,
     json_text,
     history_bundle_name_data,
   };
