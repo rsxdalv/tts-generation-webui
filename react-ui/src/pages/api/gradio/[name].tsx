@@ -610,6 +610,14 @@ const vall_e_x_tokenize = ({ text, language }) =>
     language, // string (Option from: ['eng', 'deu', 'fra', 'ita', 'por', 'spa', 'zho']) in 'Language' Dropdown component
   ]).then((result) => ({ tokens: result?.data?.[0] }));
 
+const scan_huggingface_cache_api = () =>
+  gradioPredict<any[]>("/scan_huggingface_cache_api").then(
+    (result) => result?.data?.[0]
+  );
+
+const delete_huggingface_cache_revisions = ({ commit_hash }) =>
+  gradioPredict<[]>("/delete_huggingface_cache_revisions", [commit_hash]);
+
 const endpoints = {
   maha,
   maha_tts_refresh_voices,
@@ -655,4 +663,7 @@ const endpoints = {
   vall_e_x_generate,
   vall_e_x_split_text_into_sentences,
   vall_e_x_tokenize,
+
+  scan_huggingface_cache_api,
+  delete_huggingface_cache_revisions,
 };

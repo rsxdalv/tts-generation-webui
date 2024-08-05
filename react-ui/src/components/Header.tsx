@@ -97,6 +97,10 @@ const routes: Route[] = [
     href: "/history/favorites",
     text: "Favorites",
   },
+  {
+    href: "/extensions/huggingface_cache_manager",
+    text: "Huggingface Cache Manager",
+  },
   // {
   //   href: "/history/collections",
   //   text: "History Collections",
