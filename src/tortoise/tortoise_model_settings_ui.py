@@ -20,7 +20,7 @@ def tortoise_model_settings_ui_inner():
             TORTOISE_LOCAL_MODELS_DIR, api_name="tortoise_open_models"
         )
         gr_reload_button().click(
-            fn=lambda: gr.Dropdown.update(choices=get_model_list()),
+            fn=lambda: gr.Dropdown(choices=get_model_list()),
             outputs=[model],
             api_name="tortoise_refresh_models",
         )
@@ -67,7 +67,7 @@ def tortoise_model_settings_ui_inner():
 
 
 def tortoise_model_settings_ui():
-    with gr.Box():
+    with gr.Column():
         gr.Markdown("Model")
         with gr.Column():
             return tortoise_model_settings_ui_inner()

@@ -44,7 +44,7 @@ def tortoise_core_ui():
     with gr.Row():
         with gr.Column():
             model = tortoise_model_settings_ui()
-            with gr.Box():
+            with gr.Column():
                 gr.Markdown("Voice")
                 with gr.Row():
                     voice = gr.Dropdown(
@@ -57,11 +57,11 @@ def tortoise_core_ui():
                         TORTOISE_VOICE_DIR_ABS, api_name="tortoise_open_voices"
                     )
                     gr_reload_button().click(
-                        fn=lambda: gr.Dropdown.update(choices=get_voice_list()),
+                        fn=lambda: gr.Dropdown(choices=get_voice_list()),
                         outputs=[voice],
                         api_name="tortoise_refresh_voices",
                     )
-            with gr.Box():
+            with gr.Column():
                 gr.Markdown("Preset")
                 preset = gr.Dropdown(
                     show_label=False,
@@ -93,7 +93,7 @@ def tortoise_core_ui():
                 step=0.1,
                 interactive=False,
             )
-            with gr.Box():
+            with gr.Column():
                 seed, _, link_seed_cache = setup_seed_ui_musicgen()
 
             split_prompt = gr.Checkbox(label="Split prompt by lines", value=False)
@@ -109,11 +109,9 @@ def tortoise_core_ui():
 
     preset.change(
         fn=lambda x: [
-            num_autoregressive_samples.update(presets[x]["num_autoregressive_samples"]),
-            diffusion_iterations.update(presets[x]["diffusion_iterations"]),
-            cond_free.update(
-                presets[x]["cond_free"] if "cond_free" in presets[x] else True
-            ),
+            gr.Slider(value=presets[x]["num_autoregressive_samples"]),
+            gr.Slider(value=presets[x]["diffusion_iterations"]),
+            gr.Checkbox(value=presets[x]["cond_free"] if "cond_free" in presets[x] else True),
         ],
         inputs=[preset],
         outputs=[num_autoregressive_samples, diffusion_iterations, cond_free],
@@ -158,13 +156,11 @@ def generate_button(text, count, variant, inputs, output_rows, total_columns):
     get_all_outs = lambda count: [
         TortoiseOutputRow.from_list(i) for i in get_all_components(count)
     ]
-    show = lambda count: [
-        gr.Column.update(visible=count > i) for i in range(total_columns)
-    ]
+    show = lambda count: [gr.Column(visible=count > i) for i in range(total_columns)]
 
     def hide_all_save_buttons(list_of_outs: list[TortoiseOutputRow]):
         return lambda: {
-            outs.save_button: gr.Button.update(visible=False) for outs in list_of_outs
+            outs.save_button: gr.Button(visible=False) for outs in list_of_outs
         }
 
     output_cols: list[Any] = [col for _, col, _ in output_rows]
@@ -193,9 +189,11 @@ def generate_button(text, count, variant, inputs, output_rows, total_columns):
 
 
 if __name__ == "__main__":
+    if "demo" in locals():
+        demo.close()  # type: ignore
     with gr.Blocks(css=full_css) as demo:
         generation_tab_tortoise()
 
     demo.launch(
-        enable_queue=True,
+        server_port=7770,
     )

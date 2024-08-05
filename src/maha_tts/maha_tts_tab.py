@@ -197,12 +197,12 @@ def maha_tts_ui():
     )
     model_language.change(
         fn=lambda choice: choice == "Smolie-en"
-        and gr.Radio.update(
+        and gr.Radio(
             value="english",
             visible=False,
             interactive=False,
         )
-        or gr.Radio.update(
+        or gr.Radio(
             interactive=True,
             visible=True,
         ),
@@ -210,7 +210,7 @@ def maha_tts_ui():
         outputs=[maha_tts_language],
     )
 
-    with gr.Box():
+    with gr.Column():
         gr.Markdown("Speaker Name")
         with gr.Row():
             voices = get_voice_list()
@@ -223,7 +223,7 @@ def maha_tts_ui():
             )
             gr_open_button_simple("voices-tortoise", api_name="maha_tts_open_voices")
             gr_reload_button().click(
-                fn=lambda: gr.Dropdown.update(choices=get_voice_list()),  # type: ignore
+                fn=lambda: gr.Dropdown(choices=get_voice_list()),  # type: ignore
                 outputs=[speaker_name],
                 api_name="maha_tts_refresh_voices",
             )

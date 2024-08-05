@@ -99,10 +99,10 @@ def style_tts2_ui():
         reset_params_button = gr.Button("Reset params")
         reset_params_button.click(
             fn=lambda: [
-                alpha.update(0.3),
-                beta.update(0.7),
-                diffusion_steps.update(5),
-                embedding_scale.update(1.0),
+                gr.Slider(value=0.3),
+                gr.Slider(value=0.7),
+                gr.Slider(value=5),
+                gr.Slider(value=1.0),
             ],
             outputs=[
                 alpha,

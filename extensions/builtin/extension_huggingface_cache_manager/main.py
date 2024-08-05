@@ -78,11 +78,8 @@ def scan_cache_ui():
         api_name="scan_huggingface_cache",
     )
 
-    # scan_cache_json_api = gr.JSON(visible=False)
-    # scan_cache_button_api = gr.Button("API_SCAN_CACHE", visible=False)
-    # visible 
-    scan_cache_json_api = gr.JSON(visible=True)
-    scan_cache_button_api = gr.Button("API_SCAN_CACHE_JSON", visible=True)
+    scan_cache_json_api = gr.JSON(visible=False)
+    scan_cache_button_api = gr.Button("API_SCAN_CACHE", visible=False)
     scan_cache_button_api.click(
         fn=scan_cache_json,
         outputs=[scan_cache_json_api],
@@ -91,10 +88,9 @@ def scan_cache_ui():
 
     gr.Markdown("Delete revisions")
 
-    # delete_revision_id = gr.Textbox(label="Revision ID", value="")
     delete_revision_id = gr.Dropdown(
         label="Revision ID",
-        choices=[],
+        choices=[""],
         value="",
         show_label=True,
         interactive=True,
@@ -110,7 +106,7 @@ def scan_cache_ui():
             for repo in hf_cache_info.repos
             for revision in repo.revisions
         ]
-        return gr.Dropdown.update(choices=revision_ids)
+        return gr.Dropdown(choices=revision_ids)
         
 
     refresh_revision_id_button.click(

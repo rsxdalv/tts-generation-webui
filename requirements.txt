@@ -1,6 +1,7 @@
 safetensors==0.3.1 # Until they fix it
 ffmpeg-python # Apache 2.0
-gradio==3.48.0
+# gradio==3.48.0
+gradio>=4.1.0 # MIT License
 python-dotenv==1.0.0
 soundfile==0.12.1; sys_platform == 'win32' # torchaudio
 # sox # torchaudio for linux

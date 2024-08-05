@@ -71,7 +71,7 @@ def get_extension_list_json():
 extension_list_json = get_extension_list_json()
 
 
-def handle_extension_class(extension_class):
+def handle_extension_class(extension_class, config):
     for x in extension_list_json:
         if (
             x["extension_type"] == "interface"

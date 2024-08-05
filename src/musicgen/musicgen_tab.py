@@ -278,7 +278,7 @@ def generation_tab_musicgen():
                     value="facebook/musicgen-small",
                 )
                 melody = gr.Audio(
-                    source="upload",
+                    sources="upload",
                     type="numpy",
                     label="Melody (optional)",
                     elem_classes="tts-audio",
@@ -334,7 +334,7 @@ def generation_tab_musicgen():
                 interactive=False,
                 elem_classes="tts-audio",
             )
-            image = gr.Image(label="Waveform", shape=(None, 100), elem_classes="tts-image")  # type: ignore
+            image = gr.Image(label="Waveform", elem_classes="tts-image")  # type: ignore
             with gr.Row():
                 history_bundle_name_data = gr.Textbox(visible=False)
                 save_button = gr.Button("Save to favorites", visible=True)
@@ -395,7 +395,7 @@ def generation_tab_musicgen():
     )
 
     set_old_seed_button.click(
-        fn=lambda x: gr.Number.update(value=x),
+        fn=lambda x: gr.Number(value=x),
         inputs=seed_cache,
         outputs=seed,
     )

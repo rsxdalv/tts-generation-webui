@@ -129,7 +129,7 @@ def all_tabs():
         ]
         load_tabs(tts_tabs)
 
-        handle_extension_class("text-to-speech")
+        handle_extension_class("text-to-speech", config)
     with gr.Tab("Audio/Music Generation"), gr.Tabs():
         audio_music_generation_tabs = [
             (
@@ -153,7 +153,7 @@ def all_tabs():
         ]
         load_tabs(audio_music_generation_tabs)
 
-        handle_extension_class("audio-music-generation")
+        handle_extension_class("audio-music-generation", config)
     with gr.Tab("Audio Conversion"), gr.Tabs():
         audio_conversion_tabs = [
             (
@@ -173,17 +173,20 @@ def all_tabs():
         ]
         load_tabs(audio_conversion_tabs)
 
-        handle_extension_class("audio-conversion")
+        handle_extension_class("audio-conversion", config)
     with gr.Tab("Outputs"), gr.Tabs():
         from src.history_tab.main import history_tab
 
         collections_directories_atom.render()
-        history_tab()
-        history_tab(directory="favorites")
-        history_tab(
-            directory="outputs",
-            show_collections=True,
-        )
+        try:
+            history_tab()
+            history_tab(directory="favorites")
+            history_tab(
+                directory="outputs",
+                show_collections=True,
+            )
+        except Exception as e:
+            generic_error_tab_advanced(e, name="History", requirements=None)
 
         outputs_tabs = [
             # voices
@@ -191,13 +194,13 @@ def all_tabs():
         ]
         load_tabs(outputs_tabs)
 
-        handle_extension_class("outputs")
+        handle_extension_class("outputs", config)
 
     with gr.Tab("Tools"), gr.Tabs():
         tools_tabs = []
         load_tabs(tools_tabs)
 
-        handle_extension_class("tools")
+        handle_extension_class("tools", config)
     with gr.Tab("Settings"), gr.Tabs():
         from src.settings_tab_gradio import settings_tab_gradio
 
@@ -217,7 +220,7 @@ def all_tabs():
 
         extension_list_tab()
 
-        handle_extension_class("settings")
+        handle_extension_class("settings", config)
 
 
 def start_gradio_server():
@@ -244,6 +247,12 @@ def start_gradio_server():
             gradio_interface_options["auth"].split(":")
         )
         print("Gradio server authentication enabled")
+    # delete show_tips option
+    if "show_tips" in gradio_interface_options:
+        del gradio_interface_options["show_tips"]
+    # TypeError: Blocks.launch() got an unexpected keyword argument 'file_directories'
+    if "file_directories" in gradio_interface_options:
+        del gradio_interface_options["file_directories"]
     print_pretty_options(gradio_interface_options)
 
     demo = main_ui()
@@ -257,8 +266,8 @@ def start_gradio_server():
         )
 
     demo.queue(
-        concurrency_count=gradio_interface_options.get("concurrency_count", 5),
-    ).launch(**gradio_interface_options)
+        # concurrency_count=gradio_interface_options.get("concurrency_count", 5),
+    ).launch(**gradio_interface_options, allowed_paths=["."])
 
 
 if __name__ == "__main__":

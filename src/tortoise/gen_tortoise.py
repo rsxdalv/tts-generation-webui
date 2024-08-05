@@ -58,7 +58,7 @@ def switch_model(
         tokenizer_path=tokenizer.name if tokenizer else None,
         tokenizer_basic=use_basic_cleaners,
     )
-    return gr.Dropdown.update()
+    return gr.Dropdown()
 
 
 def get_voice_list():
@@ -170,10 +170,10 @@ def _process_gen(candidates, audio_array, id, params: TortoiseParameters):
     return TortoiseOutputUpdate(
         audio=(SAMPLE_RATE, audio_array),
         image=filename_png,
-        save_button=gr.Button.update(value="Save to favorites", visible=True),
+        save_button=gr.Button(value="Save to favorites", visible=True),
         seed=params.seed,
         bundle_name=history_bundle_name_data,
-        params=gr.JSON.update(
+        params=gr.JSON(
             value=metadata
         ),  # broken because gradio returns only __type__
     )

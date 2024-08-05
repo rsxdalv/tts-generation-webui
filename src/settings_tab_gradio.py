@@ -166,5 +166,5 @@ def settings_tab_gradio(
         )
 
         reload_config_and_restart_ui_button.click(
-            fn=reload_config_and_restart_ui, _js="window.location.reload();"
+            fn=reload_config_and_restart_ui, js="window.location.reload();"
         )
