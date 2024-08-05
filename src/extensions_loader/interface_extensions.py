@@ -39,7 +39,8 @@ def _handle_package(package_name, title_name, requirements):
                             pip_install_wrapper(requirements, title_name),
                             outputs=[gr.HTML()],
                         )
-                main_tab()
+                with gr.Tabs():
+                    main_tab()
         except Exception as e:
             generic_error_tab_advanced(
                 e, name=title_name + " Extension", requirements=requirements

@@ -20,6 +20,7 @@ const inputs = {
   seed: "123",
   history_prompt_semantic_dropdown:
     "voices\\2023-06-18_21-51-07__bark__continued_generation.npz",
+  max_gen_duration_s: 15,
 };
 
 export type BarkGenerationParams = {
@@ -36,13 +37,14 @@ export type BarkGenerationParams = {
   old_generation_dropdown: string; // string
   seed: string; // string  in 'parameter_40' Textbox component
   history_prompt_semantic_dropdown: string; // string
+  max_gen_duration_s: number; // number  in 'Max generation duration (s)' Number component
 };
 
 export const initialState: BarkGenerationParams = {
   ...inputs,
 };
 
-export const barkGenerationId = "bark_generation-tab";
+export const barkGenerationId = "bark_generation-tab.v2";
 
 export const sendToBarkAsVoice = (old_generation_dropdown?: string) => {
   if (!old_generation_dropdown) return;

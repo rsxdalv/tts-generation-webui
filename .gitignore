@@ -30,6 +30,7 @@ config.json
 /data/models/xtts/
 /data/models/hubert_base.pt
 /data/models/rmvpe.pt
+/data/models/audiocraft_plus/
 
 # Ignore temporary files
 temp/
