@@ -152,6 +152,7 @@ async function bark({
   old_generation_dropdown,
   seed: seed_input,
   history_prompt_semantic_dropdown,
+  max_gen_duration_s,
 }) {
   const result = await gradioPredict<
     [
@@ -180,6 +181,7 @@ async function bark({
     old_generation_dropdown,
     seed_input,
     history_prompt_semantic_dropdown,
+    max_gen_duration_s,
   ]);
 
   const [

@@ -18,8 +18,14 @@ List of models: Bark, MusicGen + AudioGen, Tortoise, RVC, Vocos, Demucs, Seamles
 
 ## Changelog
 
+Aug 5:
+* Fix Bark in React UI, add Max Generation Duration.
+
+Aug 4:
+* Add XTTS-RVC-UI extension, XTTS Fine-tuning demo extension.
+
 Aug 3:
-* Riffusion extension
+* Add Riffusion extension, AudioCraft Mac extension, Bark Legacy extension.
 
 Aug 2:
 * Add deprecation warning to old installer.

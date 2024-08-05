@@ -12,6 +12,24 @@ import {
 } from "./BarkRadios";
 import { SeedInput } from "./SeedInput";
 import { HandleChange } from "../types/HandleChange";
+import { GenericSlider } from "./GenericSlider";
+
+const MaxGenDuration = ({
+  barkGenerationParams,
+  handleChange,
+}: {
+  barkGenerationParams: BarkGenerationParams;
+  handleChange: HandleChange;
+}) =>
+  <GenericSlider
+    label="Max generation duration (s)"
+    name="max_gen_duration_s"
+    min="0.1"
+    max="18"
+    step="0.1"
+    params={barkGenerationParams}
+    handleChange={handleChange}
+  />
 
 export const BarkInputs = ({
   barkGenerationParams,
@@ -62,6 +80,10 @@ export const BarkInputs = ({
             handleChange={handleChange}
           />
           <ForEachSubsequentGeneration
+            barkGenerationParams={barkGenerationParams}
+            handleChange={handleChange}
+          />
+          <MaxGenDuration
             barkGenerationParams={barkGenerationParams}
             handleChange={handleChange}
           />
