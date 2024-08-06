@@ -1,4 +1,5 @@
 import useLocalStorage, {
+  readLocalStorage,
   updateLocalStorageWithFunction,
 } from "../hooks/useLocalStorage";
 import router from "next/router";
@@ -81,3 +82,6 @@ export const useMagnetParams = () =>
 
 export const useMagnetResult = () =>
   useLocalStorage<MagnetResult | null>(magnetId + ".output", null);
+
+export const getMagnetParams = (): MagnetParams =>
+  readLocalStorage(magnetId) ?? initialMagnetParams;

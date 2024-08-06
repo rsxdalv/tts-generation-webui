@@ -1,4 +1,5 @@
 import useLocalStorage, {
+  readLocalStorage,
   updateLocalStorageWithFunction,
 } from "../hooks/useLocalStorage";
 import router from "next/router";
@@ -53,3 +54,6 @@ export const useMahaParams = () =>
 
 export const useMahaResult = () =>
   useLocalStorage<MahaResult | null>(mahaId + ".output", null);
+
+export const getMahaParams = (): MahaParams =>
+  readLocalStorage(mahaId) ?? initialMahaParams;

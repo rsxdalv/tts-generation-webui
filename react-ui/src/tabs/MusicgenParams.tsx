@@ -1,4 +1,5 @@
 import useLocalStorage, {
+  readLocalStorage,
   updateLocalStorageWithFunction,
 } from "../hooks/useLocalStorage";
 import router from "next/router";
@@ -74,3 +75,6 @@ export const useMusicgenParams = () =>
 
 export const useMusicgenResult = () =>
   useLocalStorage<MusicgenResult | null>(musicgenId + ".output", null);
+
+export const getMusicgenParams = (): MusicgenParams =>
+  readLocalStorage(musicgenId) ?? initialMusicgenParams;

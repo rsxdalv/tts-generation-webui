@@ -9,39 +9,42 @@ import { splitWithDemucs } from "../functions/splitWithDemucs";
 import { generateWithBark } from "../functions/generateWithBark";
 import { BarkInputs } from "../components/BarkInputs";
 import {
+  getBarkGenerationParams,
   useBarkGenerationParams,
-  useBarkResult,
 } from "../tabs/BarkGenerationParams";
 import { RVCInputs } from "../components/RVCInputs";
-import { useRVCGenerationParams } from "../tabs/RVCParams";
+import {
+  getRVCGenerationParams,
+  useRVCGenerationParams,
+} from "../tabs/RVCParams";
 import { applyRVC } from "../functions/applyRVC";
 import { TortoiseInput } from "../components/TortoiseInput";
 import { generateWithTortoise } from "../functions/generateWithTortoise";
 import {
+  getTortoiseGenerationParams,
   useTortoiseGenerationParams,
-  useTortoiseResult,
 } from "../tabs/TortoiseGenerationParams";
 import { parseFormChange } from "../data/parseFormChange";
-import { useMagnetParams, useMagnetResult } from "../tabs/MagnetParams";
+import { getMagnetParams, useMagnetParams } from "../tabs/MagnetParams";
 import { generateWithMagnet } from "../functions/generateWithMagnet";
 import { MagnetInputs } from "../components/MagnetInputs";
-import { useMusicgenParams, useMusicgenResult } from "../tabs/MusicgenParams";
+import { getMusicgenParams, useMusicgenParams } from "../tabs/MusicgenParams";
 import { generateWithMusicgen } from "../functions/generateWithMusicgen";
 import { MusicgenInputs } from "../components/MusicgenInputs";
 import { VocosWavInputs } from "../components/VocosWavInputs";
-import { useVocosParams } from "../tabs/VocosParams";
+import { getVocosParams, useVocosParams } from "../tabs/VocosParams";
 import { applyVocosWav } from "../functions/applyVocosWav";
 import { EncodecParamsNPZ } from "../tabs/VocosParamsNPZ";
 import { applyVocosNPZ } from "../functions/applyVocosNPZ";
 import { BarkResult } from "../tabs/BarkResult";
 import { getWebuiURLWithHost } from "../data/getWebuiURL";
-import { useMahaParams, useMahaResult } from "../tabs/MahaParams";
+import { getMahaParams, useMahaParams } from "../tabs/MahaParams";
 import { generateWithMaha } from "../functions/generateWithMaha";
 import { MahaInputs } from "../components/MahaInputs";
-import { useMMSParams, useMMSResult } from "../tabs/MMSParams";
+import { getMMSParams, useMMSParams } from "../tabs/MMSParams";
 import { generateWithMMS } from "../functions/generateWithMMS";
 import { MMSInputs } from "../components/MMSInputs";
-import { useVallexParams, useVallexResult } from "../tabs/VallexParams";
+import { getVallexParams, useVallexParams } from "../tabs/VallexParams";
 import { generateWithVallex } from "../functions/generateWithVallex";
 import { VallexInputs } from "../components/VallexInputs";
 
@@ -57,6 +60,27 @@ const initialState: PipelineParams = {
 
 const pipelineId = "pipeline";
 
+function getResult(model: string) {
+  switch (model) {
+    case "bark":
+      return generateWithBark(getBarkGenerationParams());
+    case "tortoise":
+      return generateWithTortoise(getTortoiseGenerationParams());
+    case "musicgen":
+      return generateWithMusicgen(getMusicgenParams());
+    case "magnet":
+      return generateWithMagnet(getMagnetParams());
+    case "maha":
+      return generateWithMaha(getMahaParams());
+    case "mms":
+      return generateWithMMS(getMMSParams());
+    case "vallex":
+      return generateWithVallex(getVallexParams());
+    default:
+      return null;
+  }
+}
+
 const GenerateButton = ({
   status,
   onClick,
@@ -64,7 +88,10 @@ const GenerateButton = ({
   status: string;
   onClick: () => void;
 }) => (
-  <button className="border border-gray-300 p-2 rounded font-medium" onClick={onClick}>
+  <button
+    className="border border-gray-300 p-2 rounded font-medium"
+    onClick={onClick}
+  >
     {status === "generating" && "Generating..."}
     {status === "postprocessing" && "Postprocessing..."}
     {status === "idle" && "Run Pipeline"}
@@ -81,71 +108,9 @@ const PipelinePage = () => {
     initialState
   );
 
-  const [barkGenerationParams, setBarkVoiceGenerationParams] =
-    useBarkGenerationParams();
-  const [barkResult, setBarkResult] = useBarkResult();
-  const [tortoiseGenerationParams, setTortoiseGenerationParams] =
-    useTortoiseGenerationParams();
-  const [tortoiseResult, setTortoiseResult] = useTortoiseResult();
-  const [musicgenParams, setMusicgenParams] = useMusicgenParams();
-  const [musicgenResult, setMusicgenResult] = useMusicgenResult();
-  const [magnetParams, setMagnetParams] = useMagnetParams();
-  const [magnetResult, setMagnetResult] = useMagnetResult();
-  const [mahaParams, setMahaParams] = useMahaParams();
-  const [mahaResult, setMahaResult] = useMahaResult();
-  const [mmsParams, setMmsParams] = useMMSParams();
-  const [mmsResult, setMmsResult] = useMMSResult();
-
-  const [rvcGenerationParams, setRvcGenerationParams] =
-    useRVCGenerationParams();
-  const [vocosParams, setVocosParams] = useVocosParams();
-
-  const [vallexParams, setVallexParams] = useVallexParams();
-  const [vallexResult, setVallexResult] = useVallexResult();
-
   const [status, setStatus] = React.useState("idle");
 
   async function pipeline() {
-    async function getResult() {
-      switch (pipelineParams.generation) {
-        case "bark": {
-          const result = await generateWithBark(barkGenerationParams);
-          setBarkResult(result);
-          return result;
-        }
-        case "tortoise": {
-          const result = await generateWithTortoise(tortoiseGenerationParams);
-          setTortoiseResult(result);
-          return result;
-        }
-        case "musicgen": {
-          const result = await generateWithMusicgen(musicgenParams);
-          setMusicgenResult(result);
-          return result;
-        }
-        case "magnet": {
-          const result = await generateWithMagnet(magnetParams);
-          setMagnetResult(result);
-          return result;
-        }
-        case "maha": {
-          const result = await generateWithMaha(mahaParams);
-          setMahaResult(result);
-          return result;
-        }
-        case "mms": {
-          const result = await generateWithMMS(mmsParams);
-          setMmsResult(result);
-          return result;
-        }
-        case "vallex": {
-          const result = await generateWithVallex(vallexParams);
-          setVallexResult(result);
-          return result;
-        }
-      }
-    }
-
     async function postProcessAudio(audio: GradioFile, npz_file?: string) {
       if (pipelineParams.postprocess === "none") {
         setOutput([audio]);
@@ -158,6 +123,7 @@ const PipelinePage = () => {
         setOutput([audio, ...result2]);
       } else if (pipelineParams.postprocess === "rvc") {
         setOutput([audio]);
+        const rvcGenerationParams = getRVCGenerationParams();
         const result3 = await applyRVC({
           ...rvcGenerationParams,
           original_audio: audio.url,
@@ -165,6 +131,7 @@ const PipelinePage = () => {
         setOutput([audio, result3.audio]);
       } else if (pipelineParams.postprocess === "vocos wav") {
         setOutput([audio]);
+        const vocosParams = getVocosParams();
         const result4 = await applyVocosWav({
           ...vocosParams,
           audio: audio.url,
@@ -182,7 +149,7 @@ const PipelinePage = () => {
     }
 
     setStatus("generating");
-    const result = await getResult();
+    const result = await getResult(pipelineParams.generation);
     if (!result) return;
     setStatus("postprocessing");
     await postProcessAudio(
@@ -216,6 +183,10 @@ const PipelinePage = () => {
   };
 
   const PostProcessInputs = ({ model }: { model: string }) => {
+    const [rvcGenerationParams, setRvcGenerationParams] =
+      useRVCGenerationParams();
+    const [vocosParams, setVocosParams] = useVocosParams();
+
     switch (model) {
       case "rvc":
         return (
@@ -238,6 +209,16 @@ const PipelinePage = () => {
   };
 
   const GenerationInputs = ({ model }: { model: string }) => {
+    const [barkGenerationParams, setBarkVoiceGenerationParams] =
+      useBarkGenerationParams();
+    const [tortoiseGenerationParams, setTortoiseGenerationParams] =
+      useTortoiseGenerationParams();
+    const [musicgenParams, setMusicgenParams] = useMusicgenParams();
+    const [magnetParams, setMagnetParams] = useMagnetParams();
+    const [mahaParams, setMahaParams] = useMahaParams();
+    const [mmsParams, setMmsParams] = useMMSParams();
+    const [vallexParams, setVallexParams] = useVallexParams();
+
     switch (model) {
       case "bark":
         return (
@@ -245,7 +226,6 @@ const PipelinePage = () => {
             barkGenerationParams={barkGenerationParams}
             setBarkVoiceGenerationParams={setBarkVoiceGenerationParams}
             handleChange={parseFormChange(setBarkVoiceGenerationParams)}
-            data={barkResult}
           />
         );
       case "tortoise":
@@ -254,7 +234,6 @@ const PipelinePage = () => {
             tortoiseGenerationParams={tortoiseGenerationParams}
             setTortoiseGenerationParams={setTortoiseGenerationParams}
             handleChange={parseFormChange(setTortoiseGenerationParams)}
-            data={tortoiseResult}
           />
         );
       case "musicgen":
@@ -263,7 +242,6 @@ const PipelinePage = () => {
             musicgenParams={musicgenParams}
             handleChange={parseFormChange(setMusicgenParams)}
             setMusicgenParams={setMusicgenParams}
-            musicgenResult={musicgenResult}
           />
         );
       case "magnet":
@@ -272,7 +250,6 @@ const PipelinePage = () => {
             magnetParams={magnetParams}
             setMagnetParams={setMagnetParams}
             handleChange={parseFormChange(setMagnetParams)}
-            data={magnetResult}
           />
         );
       case "maha":
@@ -281,7 +258,6 @@ const PipelinePage = () => {
             mahaParams={mahaParams}
             handleChange={parseFormChange(setMahaParams)}
             setMahaParams={setMahaParams}
-            data={mahaResult}
           />
         );
       case "mms":
@@ -290,7 +266,6 @@ const PipelinePage = () => {
             mmsParams={mmsParams}
             handleChange={parseFormChange(setMmsParams)}
             setMmsParams={setMmsParams}
-            data={mmsResult}
           />
         );
       case "vallex":
@@ -299,7 +274,6 @@ const PipelinePage = () => {
             vallexParams={vallexParams}
             handleChange={parseFormChange(setVallexParams)}
             setVallexParams={setVallexParams}
-            data={vallexResult}
           />
         );
       default:

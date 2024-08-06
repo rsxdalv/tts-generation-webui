@@ -1,4 +1,5 @@
 import useLocalStorage, {
+  readLocalStorage,
   updateLocalStorageWithFunction,
 } from "../hooks/useLocalStorage";
 import router from "next/router";
@@ -47,3 +48,6 @@ export const sendToRVCGeneration = (audio?: string) => {
 
 export const useRVCGenerationParams = () =>
   useLocalStorage<RVCParams>(RVCId, initialState);
+
+export const getRVCGenerationParams = (): RVCParams =>
+  readLocalStorage(RVCId) ?? initialState;

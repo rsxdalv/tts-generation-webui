@@ -15,7 +15,7 @@ export const MagnetInputs = ({
   magnetParams: MagnetParams;
   handleChange: HandleChange;
   setMagnetParams: React.Dispatch<React.SetStateAction<MagnetParams>>;
-  data: MagnetResult | null;
+  data?: MagnetResult | null;
 }) => (
   <div className="flex gap-x-6 w-full justify-center">
     <div className="flex flex-col gap-y-2 w-1/2">

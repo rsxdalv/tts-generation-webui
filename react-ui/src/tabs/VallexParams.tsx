@@ -1,4 +1,5 @@
 import useLocalStorage, {
+  readLocalStorage,
   updateLocalStorageWithFunction,
 } from "../hooks/useLocalStorage";
 import router from "next/router";
@@ -51,3 +52,6 @@ export const useVallexParams = () =>
 
 export const useVallexResult = () =>
   useLocalStorage<VallexResult | null>(vallex_ID + ".output", null);
+
+export const getVallexParams = (): VallexParams =>
+  readLocalStorage(vallex_ID) ?? initialVallexParams;

@@ -1,4 +1,5 @@
 import useLocalStorage, {
+  readLocalStorage,
   updateLocalStorageWithFunction,
 } from "../hooks/useLocalStorage";
 import router from "next/router";
@@ -33,3 +34,6 @@ export const useVocosParams = () =>
 
 export const useVocosResults = () =>
   useLocalStorage<VocosResult | null>(vocosId + ".output", null);
+
+export const getVocosParams = (): VocosParams =>
+  readLocalStorage(vocosId) ?? initialState;

@@ -1,4 +1,5 @@
 import useLocalStorage, {
+  readLocalStorage,
   updateLocalStorageWithFunction,
 } from "../hooks/useLocalStorage";
 import router from "next/router";
@@ -67,3 +68,6 @@ export const useBarkGenerationParams = () =>
 
 export const useBarkResult = () =>
   useLocalStorage<BarkResult | null>(barkGenerationId + ".output", null);
+
+export const getBarkGenerationParams = (): BarkGenerationParams =>
+  readLocalStorage(barkGenerationId) ?? initialState;
