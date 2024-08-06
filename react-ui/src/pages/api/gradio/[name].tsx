@@ -322,8 +322,8 @@ async function rvc({
   pitch_collection_method,
   model,
   search_feature_ratio,
-  device,
-  use_half_precision_model,
+  // device,
+  // use_half_precision_model,
   filter_radius_pitch,
   resample_sample_rate,
   voice_envelope_normalizaiton,
@@ -338,8 +338,8 @@ async function rvc({
     pitch_collection_method, // string (Option from: ['harvest', 'reaper', 'melodia']) in 'Pitch Collection Method' Radio component
     model, // string in 'Model' Dropdown component
     search_feature_ratio, // number (numeric value between 0.0 and 1.0) in 'Search Feature Ratio' Slider component
-    device, // string (Option from: ['cuda:0', 'cpu', 'mps']) in 'Device' Dropdown component
-    use_half_precision_model, // boolean  in 'Use half precision model (Depends on GPU support)' Checkbox component
+    // device, // string (Option from: ['cuda:0', 'cpu', 'mps']) in 'Device' Dropdown component
+    // use_half_precision_model, // boolean  in 'Use half precision model (Depends on GPU support)' Checkbox component
     filter_radius_pitch, // number (numeric value between 0 and 10) in 'Filter Radius (Pitch)' Slider component
     resample_sample_rate, // number (numeric value between 0 and 48000) in 'Resample Sample-rate (Bug)' Slider component
     voice_envelope_normalizaiton, // number (numeric value between 0.0 and 1.0) in 'Voice Envelope Normalizaiton' Slider component

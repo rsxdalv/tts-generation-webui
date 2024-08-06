@@ -246,8 +246,8 @@ export const RVCInputs = ({
       <label className="text-sm">Core:</label>
       <Model rvcParams={rvcParams} handleChange={handleChange} />
       <Index rvcParams={rvcParams} handleChange={handleChange} />
-      <Device rvcParams={rvcParams} handleChange={handleChange} />
-      <div className="flex gap-2">
+      {/* <Device rvcParams={rvcParams} handleChange={handleChange} /> */}
+      {/* <div className="flex gap-2">
         <label className="text-sm">Use half precision model:</label>
         <input
           type="checkbox"
@@ -256,7 +256,7 @@ export const RVCInputs = ({
           onChange={handleChange}
           className="border border-gray-300 p-2 rounded"
         />
-      </div>
+      </div> */}
     </div>
     {!hideAudioInput && (
       <AudioInput
