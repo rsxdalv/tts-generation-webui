@@ -87,7 +87,11 @@ def get_tts(
 ):
     global MODEL
     if MODEL is None or force_reload:
+        print("Loading tortoise model: ", models_dir)
+        print("Clearing memory...")
         unload_tortoise_model()
+        print("Memory cleared")
+        print("Loading model...")
         MODEL = TextToSpeech(
             models_dir=models_dir,
             kv_cache=kv_cache,
@@ -97,6 +101,7 @@ def get_tts(
             tokenizer_vocab_file=tokenizer_path,
             tokenizer_basic=tokenizer_basic,
         )
+        print("Model loaded")
     return MODEL
 
 
