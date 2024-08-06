@@ -152,7 +152,7 @@ const PipelinePage = () => {
       } else if (pipelineParams.postprocess === "demucs") {
         setOutput([audio]);
         const demucsParams: DemucsParams = {
-          file: audio.data,
+          file: audio.url,
         };
         const result2 = await splitWithDemucs(demucsParams);
         setOutput([audio, ...result2]);
@@ -160,14 +160,14 @@ const PipelinePage = () => {
         setOutput([audio]);
         const result3 = await applyRVC({
           ...rvcGenerationParams,
-          original_audio: audio.data,
+          original_audio: audio.url,
         });
         setOutput([audio, result3.audio]);
       } else if (pipelineParams.postprocess === "vocos wav") {
         setOutput([audio]);
         const result4 = await applyVocosWav({
           ...vocosParams,
-          audio: audio.data,
+          audio: audio.url,
         });
         setOutput([audio, result4]);
       } else if (pipelineParams.postprocess === "vocos npz (bark only)") {
