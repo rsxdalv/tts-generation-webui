@@ -80,9 +80,29 @@ def main_ui(theme_choice = "Base"):
         "Monochrome": gr.themes.Monochrome,
     }
     theme = themes[theme_choice](
-        primary_hue="orange",
-        secondary_hue="amber",
-        neutral_hue="stone",
+        # primary_hue="blue",
+        primary_hue="sky",
+        secondary_hue="sky",
+        neutral_hue="neutral",
+        font=[gr.themes.GoogleFont('Inter'), 'ui-sans-serif', 'system-ui', 'sans-serif'],
+    ).set(
+        embed_radius='*radius_sm',
+        block_label_radius='*radius_sm',
+        block_label_right_radius='*radius_sm',
+        block_radius='*radius_sm',
+        block_title_radius='*radius_sm',
+        container_radius='*radius_sm',
+        checkbox_border_radius='*radius_sm',
+        input_radius='*radius_sm',
+        table_radius='*radius_sm',
+        button_large_radius='*radius_sm',
+        button_small_radius='*radius_sm',
+
+        
+        button_primary_background_fill_hover='*primary_300',
+        button_primary_background_fill_hover_dark='*primary_600',
+        button_secondary_background_fill_hover='*secondary_200',
+        button_secondary_background_fill_hover_dark='*secondary_600',
     )
 
     with gr.Blocks(
