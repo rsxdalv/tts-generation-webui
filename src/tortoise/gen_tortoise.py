@@ -58,7 +58,7 @@ def switch_model(
         tokenizer_path=tokenizer.name if tokenizer else None,
         tokenizer_basic=use_basic_cleaners,
     )
-    return gr.Dropdown.update()
+    return gr.Dropdown()
 
 
 def get_voice_list():
@@ -87,7 +87,11 @@ def get_tts(
 ):
     global MODEL
     if MODEL is None or force_reload:
+        print("Loading tortoise model: ", models_dir)
+        print("Clearing memory...")
         unload_tortoise_model()
+        print("Memory cleared")
+        print("Loading model...")
         MODEL = TextToSpeech(
             models_dir=models_dir,
             kv_cache=kv_cache,
@@ -97,6 +101,7 @@ def get_tts(
             tokenizer_vocab_file=tokenizer_path,
             tokenizer_basic=tokenizer_basic,
         )
+        print("Model loaded")
     return MODEL
 
 
@@ -170,10 +175,10 @@ def _process_gen(candidates, audio_array, id, params: TortoiseParameters):
     return TortoiseOutputUpdate(
         audio=(SAMPLE_RATE, audio_array),
         image=filename_png,
-        save_button=gr.Button.update(value="Save to favorites", visible=True),
+        save_button=gr.Button(value="Save to favorites", visible=True),
         seed=params.seed,
         bundle_name=history_bundle_name_data,
-        params=gr.JSON.update(
+        params=gr.JSON(
             value=metadata
         ),  # broken because gradio returns only __type__
     )

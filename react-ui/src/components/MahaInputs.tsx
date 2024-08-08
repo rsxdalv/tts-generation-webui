@@ -85,7 +85,7 @@ export const MahaInputs = ({
   mahaParams: MahaParams;
   handleChange: HandleChange;
   setMahaParams: React.Dispatch<React.SetStateAction<MahaParams>>;
-  data: MahaResult | null;
+  data?: MahaResult | null;
 }) => (
   <div className="flex gap-x-6 w-full justify-center">
     <div className="flex flex-col gap-y-2 w-1/2">

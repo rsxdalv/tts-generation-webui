@@ -53,7 +53,7 @@ export const AudioOutput = ({
       <p className="text-sm">{label}</p>
       {audioOutput && (
         <AudioPlayerHelper
-          url={audioOutput.data}
+          url={audioOutput.url}
           funcs={funcs}
           filter={filter}
           metadata={metadata}

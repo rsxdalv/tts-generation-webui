@@ -9,7 +9,6 @@ material_symbols_css = """
     line-height: 1 !important;
     letter-spacing: normal;
     text-transform: none;
-    display: inline-block;
     white-space: nowrap;
     word-wrap: normal;
     direction: ltr;
@@ -17,3 +16,4 @@ material_symbols_css = """
     -webkit-font-smoothing: antialiased;
 }
 """
+# display: inline-block;

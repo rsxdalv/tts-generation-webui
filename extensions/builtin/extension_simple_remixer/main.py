@@ -48,7 +48,7 @@ def simple_remixer_ui():
 
             audio.change(
                 fn=lambda x: (
-                    image.update(
+                    image(
                         plot_waveform_as_image(x[1]),
                     )
                     if x is not None
@@ -60,15 +60,15 @@ def simple_remixer_ui():
             with gr.Row():
                 clear = gr_mini_button("delete").click(
                     fn=lambda: [
-                        audio.update(None),
-                        image.update(None),
+                        audio(None),
+                        image(None),
                     ],
                     outputs=[audio, image],
                 )
                 copy_from_input = gr_mini_button("keyboard_return").click(
                     fn=lambda input_value: [
-                        audio.update(input_value),
-                        image.update(plot_waveform_as_image(input_value[1])),
+                        audio(input_value),
+                        image(plot_waveform_as_image(input_value[1])),
                     ],
                     inputs=[input_audio],
                     # outputs=[audio],
@@ -131,11 +131,11 @@ def simple_remixer_ui():
 
         merged_audios = [mix_audio(x) for x in stacked_audios]
         if non_null_audios := [x for x in merged_audios if x is not None]:
-            return output_audio.update(
+            return output_audio(
                 (sample_rate, torch.cat(non_null_audios).cpu().numpy())
             )
         else:
-            return output_audio.update(None)
+            return output_audio(None)
 
     def resample_from_to(in_sr: int, out_sr: int, in_wav):
         return torchaudio.transforms.Resample(in_sr, out_sr)(
@@ -151,7 +151,7 @@ def simple_remixer_ui():
     send_to_input = gr.Button("Send to input")
 
     send_to_input.click(
-        fn=lambda x: input_audio.update(x),
+        fn=lambda x: input_audio(x),
         inputs=output_audio,
         outputs=input_audio,
     )

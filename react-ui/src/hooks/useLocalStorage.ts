@@ -8,14 +8,14 @@ import {
 
 export const defaultNamespace = "tts-generation-webui__";
 
-const readLocalStorage = (key: string) => {
-  const prefixedKey = defaultNamespace + key;
+export const readLocalStorage = (key: string, namespace = defaultNamespace) => {
+  const prefixedKey = namespace + key;
   const item = localStorage.getItem(prefixedKey);
   return item ? (JSON.parse(item) as any) : undefined;
 };
 
-const updateLocalStorage = (key: string, value: any) => {
-  const prefixedKey = defaultNamespace + key;
+const updateLocalStorage = (key: string, value: any, namespace = defaultNamespace) => {
+  const prefixedKey = namespace + key;
   localStorage.setItem(prefixedKey, JSON.stringify(value));
 };
 

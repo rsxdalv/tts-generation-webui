@@ -13,7 +13,7 @@
     "@emotion/css": "^11.10.8",
     "@emotion/react": "^11.10.8",
     "@emotion/styled": "^11.10.8",
-    "@gradio/client": "^0.6.0",
+    "@gradio/client": "^1.4.0",
     "@material-design-icons/svg": "^0.14.7",
     "@types/node": "20.0.0",
     "@types/react": "18.2.5",

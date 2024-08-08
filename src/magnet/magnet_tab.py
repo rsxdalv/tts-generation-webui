@@ -282,7 +282,7 @@ def generation_tab_magnet():
                     value=initial_params["model"],
                 )
                 gr_reload_button().click(
-                    fn=lambda: gr.Radio.update(choices=get_models()),  # type: ignore
+                    fn=lambda: gr.Radio(choices=get_models()),  # type: ignore
                     outputs=[model],
                     api_name="magnet_get_models",
                 )
@@ -357,7 +357,7 @@ def generation_tab_magnet():
                 #     )
 
                 #     set_random_seed_button.click(
-                #         fn=lambda: gr.Number.update(value=-1), outputs=[seed_input]
+                #         fn=lambda: gr.Number(value=-1), outputs=[seed_input]
                 #     )
 
                 #     set_old_seed_button = gr.Button(
@@ -366,7 +366,7 @@ def generation_tab_magnet():
 
                 #     def link_seed_cache(seed_cache):
                 #         set_old_seed_button.click(
-                #             fn=lambda x: gr.Number.update(value=x),
+                #             fn=lambda x: gr.Number(value=x),
                 #             inputs=seed_cache,
                 #             outputs=seed_input,
                 #         )

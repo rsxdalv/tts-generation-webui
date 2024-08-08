@@ -171,7 +171,7 @@ export const VallexInputs = ({
   vallexParams: VallexParams;
   handleChange: HandleChange;
   setVallexParams: React.Dispatch<React.SetStateAction<VallexParams>>;
-  data: VallexResult | null;
+  data?: VallexResult | null;
 }) => (
   <div className="flex gap-x-6 w-full justify-center">
     <div className="flex flex-col gap-y-2 w-1/2">

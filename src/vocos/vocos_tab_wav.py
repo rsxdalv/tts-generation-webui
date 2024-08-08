@@ -36,7 +36,7 @@ def vocos_tab_wav():
         file_input = gr.Audio(
             label="Input Audio",
             type="filepath",
-            source="upload",
+            sources="upload",
             interactive=True,
         )
 

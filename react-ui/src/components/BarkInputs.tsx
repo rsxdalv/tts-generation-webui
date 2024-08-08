@@ -42,7 +42,7 @@ export const BarkInputs = ({
     React.SetStateAction<BarkGenerationParams>
   >;
   handleChange: HandleChange;
-  data: BarkResult | null;
+  data?: BarkResult | null;
 }) => (
   <div className="flex flex-col space-y-2">
     <div className="space-y-2">

@@ -1,4 +1,5 @@
 import useLocalStorage, {
+  readLocalStorage,
   updateLocalStorageWithFunction,
 } from "../hooks/useLocalStorage";
 import router from "next/router";
@@ -79,4 +80,10 @@ export const useTortoiseGenerationParams = () =>
   useLocalStorage<TortoiseGenerationParams>(tortoiseGenerationId, initialState);
 
 export const useTortoiseResult = () =>
-  useLocalStorage<TortoiseResult | null>(tortoiseGenerationId + ".output", null);
+  useLocalStorage<TortoiseResult | null>(
+    tortoiseGenerationId + ".output",
+    null
+  );
+
+export const getTortoiseGenerationParams = (): TortoiseGenerationParams =>
+  readLocalStorage(tortoiseGenerationId) ?? initialState;

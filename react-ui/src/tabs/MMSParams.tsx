@@ -1,4 +1,5 @@
 import useLocalStorage, {
+  readLocalStorage,
   updateLocalStorageWithFunction,
 } from "../hooks/useLocalStorage";
 import router from "next/router";
@@ -51,3 +52,6 @@ export const useMMSParams = () =>
 
 export const useMMSResult = () =>
   useLocalStorage<MMSResult | null>(MMS_ID + ".output", null);
+
+export const getMMSParams = (): MMSParams =>
+  readLocalStorage(MMS_ID) ?? initialMMSParams;
