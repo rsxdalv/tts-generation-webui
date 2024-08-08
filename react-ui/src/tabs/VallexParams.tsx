@@ -13,6 +13,9 @@ export type VallexParams = {
   language: string;
   accent: string;
   mode: string;
+
+  seed: number;
+  use_random_seed: boolean;
 };
 
 export const initialVallexParams: VallexParams = {
@@ -21,6 +24,9 @@ export const initialVallexParams: VallexParams = {
   language: "Mix",
   accent: "no-accent",
   mode: "short",
+
+  seed: 0,
+  use_random_seed: true,
 };
 
 export type VallexResult = {

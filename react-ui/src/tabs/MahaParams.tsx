@@ -8,21 +8,23 @@ import { GradioFile } from "../types/GradioFile";
 const mahaId = "mahaParams";
 
 export type MahaParams = {
-  maha_tts_input: string;
+  text: string;
   model_language: string;
   maha_tts_language: string;
   speaker_name: string;
   seed: number;
   device: string;
+  use_random_seed: boolean;
 };
 
 export const initialMahaParams: MahaParams = {
-  maha_tts_input: "",
+  text: "",
   model_language: "Smolie-in",
   maha_tts_language: "english",
   speaker_name: "",
-  seed: -1,
+  seed: 0,
   device: "auto",
+  use_random_seed: true,
 };
 
 export type MahaResult = {

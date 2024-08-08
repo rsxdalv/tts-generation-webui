@@ -18,6 +18,7 @@ export type MusicgenParams = {
   cfg_coef: number;
   seed: number;
   use_multi_band_diffusion: boolean;
+  use_random_seed: boolean;
 };
 
 export const initialMusicgenParams: MusicgenParams = {
@@ -31,8 +32,9 @@ export const initialMusicgenParams: MusicgenParams = {
   topp: 0,
   temperature: 1.0,
   cfg_coef: 3.0,
-  seed: -1,
+  seed: 0,
   use_multi_band_diffusion: false,
+  use_random_seed: true,
 };
 
 export type MusicgenResult = {

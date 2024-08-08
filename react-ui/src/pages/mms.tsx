@@ -10,22 +10,10 @@ import {
   useMMSResult,
 } from "../tabs/MMSParams";
 import { HyperParameters } from "../components/HyperParameters";
-import {
-  extractTexts,
-  getMax,
-  incrementNonRandomSeed,
-  initialHyperParams,
-} from "../data/hyperParamsUtils";
-import { useInterrupt } from "../hooks/useInterrupt";
-import { manageProgress } from "../components/Progress";
 import { parseFormChange } from "../data/parseFormChange";
-import { barkFavorite } from "../functions/barkFavorite";
 import { MMSInputs } from "../components/MMSInputs";
 import { generateWithMMS } from "../functions/generateWithMMS";
-import {
-  GenerationHistory,
-  GenerationHistorySimple,
-} from "../components/GenerationHistory";
+import { GenerationHistorySimple } from "../components/GenerationHistory";
 
 const DETAILS = (
   <details>
@@ -65,59 +53,14 @@ const MMSPage = () => {
     initialHistory
   );
   const [mmsParams, setMMSParams] = useMMSParams();
-  const [hyperParams, setHyperParams] = useLocalStorage<
-    typeof initialHyperParams
-  >("mmsHyperParams", initialHyperParams);
 
-  const { interrupted, resetInterrupt, interrupt } = useInterrupt();
-  const [progress, setProgress] = React.useState({ current: 0, max: 0 });
-
-  function mmsWithProgress() {
-    const texts = extractTexts(mmsParams.text, hyperParams);
-    const { iterations } = hyperParams;
-
-    return manageProgress(
-      ({ incrementProgress }) =>
-        mmsConsumer(
-          mmsGenerator(texts, iterations, mmsParams),
-          incrementProgress
-        ),
-      getMax(texts, iterations),
-      setProgress
-    );
+  async function mmsConsumer(params: MMSParams) {
+    const data = await generateWithMMS(params);
+    setData(data);
+    setHistoryData((x) => [data, ...x]);
+    return data;
   }
 
-  async function* mmsGenerator(
-    texts: string[],
-    iterations: number,
-    mmsParams: MMSParams
-  ) {
-    for (let iteration = 0; iteration < iterations; iteration++) {
-      for (const text of texts) {
-        if (interrupted.current) {
-          return;
-        }
-        yield generateWithMMS({
-          ...mmsParams,
-          text,
-          //   seed: incrementNonRandomSeed(mmsParams.seed, iteration),
-        });
-      }
-    }
-  }
-
-  async function mmsConsumer(
-    generator: AsyncGenerator<MMSResult, void, unknown>,
-    callback: (result: MMSResult) => void
-  ) {
-    for await (const result of generator) {
-      setData(result);
-      setHistoryData((x) => [result, ...x]);
-      callback(result);
-    }
-  }
-
-  const mms = resetInterrupt(mmsWithProgress);
   const handleChange = parseFormChange(setMMSParams);
 
   //   const useSeed = (_url: string, data?: MMSResult) => {
@@ -169,19 +112,10 @@ const MMSPage = () => {
           />
           <div className="flex flex-col gap-2">
             <HyperParameters
-              params={hyperParams}
-              setParams={setHyperParams}
-              interrupt={interrupt}
-              isInterrupted={interrupted.current}
-              progress={progress.current}
-              progressMax={progress.max}
+              genParams={mmsParams}
+              consumer={mmsConsumer}
+              prefix="mms"
             />
-            <button
-              className="border border-gray-300 p-2 rounded font-medium"
-              onClick={mms}
-            >
-              Generate
-            </button>
           </div>
         </div>
 

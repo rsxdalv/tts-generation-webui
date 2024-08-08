@@ -10,13 +10,6 @@ import {
   useVallexResult,
 } from "../tabs/VallexParams";
 import { HyperParameters } from "../components/HyperParameters";
-import {
-  extractTexts,
-  getMax,
-  initialHyperParams,
-} from "../data/hyperParamsUtils";
-import { useInterrupt } from "../hooks/useInterrupt";
-import { manageProgress } from "../components/Progress";
 import { parseFormChange } from "../data/parseFormChange";
 import { VallexInputs } from "../components/VallexInputs";
 import { generateWithVallex } from "../functions/generateWithVallex";
@@ -30,59 +23,14 @@ const VallexPage = () => {
     initialHistory
   );
   const [vallexParams, setVallexParams] = useVallexParams();
-  const [hyperParams, setHyperParams] = useLocalStorage<
-    typeof initialHyperParams
-  >("vallexHyperParams", initialHyperParams);
 
-  const { interrupted, resetInterrupt, interrupt } = useInterrupt();
-  const [progress, setProgress] = React.useState({ current: 0, max: 0 });
-
-  function vallexWithProgress() {
-    const texts = extractTexts(vallexParams.text, hyperParams);
-    const { iterations } = hyperParams;
-
-    return manageProgress(
-      ({ incrementProgress }) =>
-        vallexConsumer(
-          vallexGenerator(texts, iterations, vallexParams),
-          incrementProgress
-        ),
-      getMax(texts, iterations),
-      setProgress
-    );
+  async function vallexConsumer(params: VallexParams) {
+    const data = await generateWithVallex(params);
+    setData(data);
+    setHistoryData((x) => [data, ...x]);
+    return data;
   }
 
-  async function* vallexGenerator(
-    texts: string[],
-    iterations: number,
-    vallexParams: VallexParams
-  ) {
-    for (let iteration = 0; iteration < iterations; iteration++) {
-      for (const text of texts) {
-        if (interrupted.current) {
-          return;
-        }
-        yield generateWithVallex({
-          ...vallexParams,
-          text,
-          //   seed: incrementNonRandomSeed(vallexParams.seed, iteration),
-        });
-      }
-    }
-  }
-
-  async function vallexConsumer(
-    generator: AsyncGenerator<VallexResult, void, unknown>,
-    callback: (result: VallexResult) => void
-  ) {
-    for await (const result of generator) {
-      setData(result);
-      setHistoryData((x) => [result, ...x]);
-      callback(result);
-    }
-  }
-
-  const vallex = resetInterrupt(vallexWithProgress);
   const handleChange = parseFormChange(setVallexParams);
 
   //   const useSeed = (_url: string, data?: VallexResult) => {
@@ -146,19 +94,10 @@ const VallexPage = () => {
           />
           <div className="flex flex-col gap-2">
             <HyperParameters
-              params={hyperParams}
-              setParams={setHyperParams}
-              interrupt={interrupt}
-              isInterrupted={interrupted.current}
-              progress={progress.current}
-              progressMax={progress.max}
+              genParams={vallexParams}
+              consumer={vallexConsumer}
+              prefix="vallex"
             />
-            <button
-              className="border border-gray-300 p-2 rounded font-semibold"
-              onClick={vallex}
-            >
-              Generate
-            </button>
           </div>
         </div>
 

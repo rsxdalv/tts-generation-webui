@@ -10,14 +10,6 @@ import {
   useMahaResult,
 } from "../tabs/MahaParams";
 import { HyperParameters } from "../components/HyperParameters";
-import {
-  extractTexts,
-  getMax,
-  incrementNonRandomSeed,
-  initialHyperParams,
-} from "../data/hyperParamsUtils";
-import { useInterrupt } from "../hooks/useInterrupt";
-import { manageProgress } from "../components/Progress";
 import { parseFormChange } from "../data/parseFormChange";
 import { barkFavorite } from "../functions/barkFavorite";
 import { MahaInputs } from "../components/MahaInputs";
@@ -32,59 +24,14 @@ const MahaPage = () => {
     initialHistory
   );
   const [mahaParams, setMahaParams] = useMahaParams();
-  const [hyperParams, setHyperParams] = useLocalStorage<
-    typeof initialHyperParams
-  >("mahaHyperParams", initialHyperParams);
 
-  const { interrupted, resetInterrupt, interrupt } = useInterrupt();
-  const [progress, setProgress] = React.useState({ current: 0, max: 0 });
-
-  function mahaWithProgress() {
-    const texts = extractTexts(mahaParams.maha_tts_input, hyperParams);
-    const { iterations } = hyperParams;
-
-    return manageProgress(
-      ({ incrementProgress }) =>
-        mahaConsumer(
-          mahaGenerator(texts, iterations, mahaParams),
-          incrementProgress
-        ),
-      getMax(texts, iterations),
-      setProgress
-    );
+  async function mahaConsumer(params: MahaParams) {
+    const data = await generateWithMaha(params);
+    setData(data);
+    setHistoryData((x) => [data, ...x]);
+    return data;
   }
 
-  async function* mahaGenerator(
-    texts: string[],
-    iterations: number,
-    mahaParams: MahaParams
-  ) {
-    for (let iteration = 0; iteration < iterations; iteration++) {
-      for (const text of texts) {
-        if (interrupted.current) {
-          return;
-        }
-        yield generateWithMaha({
-          ...mahaParams,
-          maha_tts_input: text,
-          seed: incrementNonRandomSeed(mahaParams.seed, iteration),
-        });
-      }
-    }
-  }
-
-  async function mahaConsumer(
-    generator: AsyncGenerator<MahaResult, void, unknown>,
-    callback: (result: MahaResult) => void
-  ) {
-    for await (const result of generator) {
-      setData(result);
-      setHistoryData((x) => [result, ...x]);
-      callback(result);
-    }
-  }
-
-  const maha = resetInterrupt(mahaWithProgress);
   const handleChange = parseFormChange(setMahaParams);
 
   const useSeed = (_url: string, data?: MahaResult) => {
@@ -134,20 +81,10 @@ const MahaPage = () => {
           />
           <div className="flex flex-col gap-2">
             <HyperParameters
-              params={hyperParams}
-              setParams={setHyperParams}
-              interrupt={interrupt}
-              isInterrupted={interrupted.current}
-              progress={progress.current}
-              progressMax={progress.max}
+              genParams={mahaParams}
+              consumer={mahaConsumer}
+              prefix="maha"
             />
-
-            <button
-              className="border border-gray-300 p-2 rounded font-medium"
-              onClick={maha}
-            >
-              Generate
-            </button>
           </div>
         </div>
 

@@ -30,6 +30,8 @@ export type TortoiseGenerationParams = {
   half: boolean; // boolean  in 'parameter_2495' Checkbox component
   use_basic_cleaners: boolean; // boolean  in 'parameter_2497' Checkbox component
   tokenizer: string; // string
+
+  use_random_seed: boolean; // boolean  in 'Use random seed' Checkbox component
 };
 
 export const initialState: TortoiseGenerationParams = {
@@ -52,7 +54,7 @@ export const initialState: TortoiseGenerationParams = {
   prompt: "Howdy!", // string  in 'Prompt' Textbox component
   speaker: "random", // string (Option from: ['random', 'angie', 'applejack', 'cond_latent_example', 'daniel', 'deniro', 'emma', 'freeman', 'geralt', 'halle', 'jlaw', 'lj', 'mol', 'myself', 'pat', 'pat2', 'rainbow', 'snakes', 'tim_reynolds', 'tom', 'train_atkins', 'train_daws', 'train_dotrice', 'train_dreams', 'train_empire', 'train_grace', 'train_kennard', 'train_lescault', 'train_mouse', 'weaver', 'william', 'freeman_2a', 'freeman_3', 'pat4']) in 'parameter_2502' Dropdown component
   preset: "ultra_fast", // string (Option from: ['ultra_fast', 'fast', 'standard', 'high_quality']) in 'parameter_2507' Dropdown component
-  seed: -1, // number  in 'parameter_2521' Number component
+  seed: 0, // number  in 'parameter_2521' Number component
   cvvp_amount: 0, // number (numeric value between 0.0 and 1.0) in 'CVVP Amount' Slider component
   split_prompt: true, // boolean  in 'Split prompt by lines' Checkbox component
   generation_name: "", // string  in 'Generation Name' Textbox component
@@ -62,6 +64,8 @@ export const initialState: TortoiseGenerationParams = {
   half: false, // boolean  in 'parameter_2495' Checkbox component
   use_basic_cleaners: false, // boolean  in 'parameter_2497' Checkbox component
   tokenizer: "", // string
+
+  use_random_seed: true, // boolean  in 'Use random seed' Checkbox component
 };
 
 export const tortoiseGenerationId = "tortoise_generation-tab";

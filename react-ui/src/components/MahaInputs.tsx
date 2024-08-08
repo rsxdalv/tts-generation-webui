@@ -93,7 +93,7 @@ export const MahaInputs = ({
         params={mahaParams}
         handleChange={handleChange}
         label="Text"
-        name="maha_tts_input"
+        name="text"
       />
     </div>
     <div className="flex flex-col gap-y-2 w-1/2">

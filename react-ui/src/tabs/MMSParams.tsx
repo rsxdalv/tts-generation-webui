@@ -13,6 +13,8 @@ export type MMSParams = {
   speaking_rate: number;
   noise_scale: number;
   noise_scale_duration: number;
+  seed: number;
+  use_random_seed: boolean;
 };
 
 export const initialMMSParams: MMSParams = {
@@ -21,6 +23,8 @@ export const initialMMSParams: MMSParams = {
   speaking_rate: 1.0,
   noise_scale: 0.667,
   noise_scale_duration: 0.8,
+  seed: 0,
+  use_random_seed: true,
 };
 
 export type MMSResult = {

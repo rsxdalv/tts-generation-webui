@@ -22,6 +22,7 @@ export type MagnetParams = {
   decoding_steps_3: number;
   decoding_steps_4: number;
   span_arrangement: string;
+  use_random_seed: boolean;
 };
 
 export const initialMagnetParams: MagnetParams = {
@@ -39,6 +40,7 @@ export const initialMagnetParams: MagnetParams = {
   decoding_steps_3: 40,
   decoding_steps_4: 40,
   span_arrangement: "nonoverlap",
+  use_random_seed: true,
 };
 
 export type MagnetResult = {
