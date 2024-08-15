@@ -509,11 +509,6 @@ Before:
 * Once the server starts, check if it works.
 * With caution: if the new server works, within the one-click-installers directory, delete the old installer_files.
 
-### Upgrading from v5 to v6 installer
-* Download and run the new installer
-* Replace the "tts-generation-webui" directory in the newly installed directory
-* Run update_*platform*
-
 #### *Is there any more optimal way to do this?*
 
 Not exactly, the dependencies clash, especially between conda and python (and dependencies are already in a critical state, moving them to conda is ways off). Therefore, while it might be possible to just replace the old installer with the new one and running the update, the problems are unpredictable and **unfixable**. Making an update to installer requires a lot of testing so it's not done lightly.
@@ -628,7 +623,7 @@ https://github.com/rsxdalv/tts-generation-webui/discussions/186#discussioncommen
 <summary>This project utilizes the following open source libraries:</summary>
 
 - **suno-ai/bark** - [MIT License](https://github.com/suno-ai/bark/blob/main/LICENSE)
-  - Description: A powerful library for XYZ.
+  - Description: Inference code for Bark model.
   - Repository: [suno/bark](https://github.com/suno-ai/bark)
 
 - **tortoise-tts** - [Apache-2.0 License](https://github.com/neonbjb/tortoise-tts/blob/master/LICENSE)
