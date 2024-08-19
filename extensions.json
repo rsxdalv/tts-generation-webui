@@ -149,6 +149,21 @@
             "website": "https://github.com/rsxdalv/extension_huggingface_cache_manager",
             "extension_website": "https://github.com/rsxdalv/extension_huggingface_cache_manager",
             "extension_platform_version": "0.0.1"
+        },
+        {
+            "package_name": "extension_xtts_simple",
+            "name": "XTTS-Simple",
+            "version": "0.0.1",
+            "requirements": "git+https://github.com/rsxdalv/extension_xtts_rvc_ui@simple",
+            "description": "XTTS-Simple is a Gradio UI for XTTSv2",
+            "extension_type": "interface",
+            "extension_class": "text-to-speech",
+            "author": "rsxdalv",
+            "extension_author": "rsxdalv",
+            "license": "MIT",
+            "website": "https://github.com/rsxdalv/extension_xtts_rvc_ui",
+            "extension_website": "https://github.com/rsxdalv/extension_xtts_rvc_ui",
+            "extension_platform_version": "0.0.1"
         }
     ],
     "post_generation_extensions": [
