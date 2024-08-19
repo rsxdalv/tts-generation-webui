@@ -1,6 +1,6 @@
 {
     "version": "0.0.2",
-    "pip_packages": 2,
-    "npm_packages": 1,
-    "react_ui": 1
+    "pip_packages": 3,
+    "npm_packages": 2,
+    "react_ui": 2
 }

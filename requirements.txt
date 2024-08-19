@@ -1,14 +1,15 @@
-safetensors==0.3.1 # Until they fix it
+safetensors
+# safetensors==0.3.1 # Until they fix it
 ffmpeg-python # Apache 2.0
 # gradio==3.48.0
 gradio>=4.1.0 # MIT License
 python-dotenv==1.0.0
 soundfile==0.12.1; sys_platform == 'win32' # torchaudio
 # sox # torchaudio for linux
-suno-bark @ git+https://github.com/rsxdalv/bark@0d91823ead3d87c317f12d01d325fca9408c669e#egg=suno-bark # MIT License
+suno-bark @ git+https://github.com/rsxdalv/bark@main#egg=suno-bark # MIT License
 vocos==0.1.0 # MIT License
-tortoise-tts @ git+https://github.com/rsxdalv/tortoise-tts@e4711433b12bcd1086840649e1830ad5c3fa1a76#egg=tortoise-tts # Apache 2.0
+tortoise-tts @ git+https://github.com/rsxdalv/tortoise-tts@main#egg=tortoise-tts # Apache 2.0
 beartype>=0.16.1 # workaround for a bug
-transformers==4.36.1 # cross-compatibility
+# no longer required directly # transformers==4.36.1 # cross-compatibility
 iso639-lang==2.2.3
 pillow==10.3.0 # for gradio, conda fix
