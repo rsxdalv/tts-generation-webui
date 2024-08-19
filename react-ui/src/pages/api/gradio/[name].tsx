@@ -2,7 +2,7 @@ import { Client } from "@gradio/client";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getFile } from "../../../backend-utils/getFile";
 import { GradioFile } from "../../../types/GradioFile";
-import { PredictFunction } from "@gradio/client/dist/types";
+import { PayloadMessage, PredictFunction } from "@gradio/client/dist/types";
 
 type Data = { data: any };
 
@@ -288,8 +288,8 @@ async function tortoise({
 
   const events = await Array__fromAsync(job);
   const results = events
-    .filter((x) => x.type === "data")
-    .map((x) => {
+    .filter<PayloadMessage>((x): x is PayloadMessage => x.type === "data")
+    .map((x: PayloadMessage) => {
       const [audio, bundle_name, metadata] = x.data;
       return {
         audio,

@@ -32,7 +32,7 @@ export function getBarkFuncs(
     if (!seed_input) return;
     setBarkVoiceGenerationParams({
       ...barkGenerationParams,
-      seed: seed_input,
+      seed: Number(seed_input),
     });
   };
 
@@ -53,7 +53,7 @@ export function getBarkFuncs(
       history_prompt_semantic_dropdown: semantic_prompt,
       burn_in_prompt: coarse_prompt,
       long_prompt_radio: "Short prompt (<15s)",
-      seed: data?.metadata?.seed ?? "-1",
+      seed: Number(data?.metadata?.seed ?? "-1"),
       useV2: data?.metadata?.history_prompt?.includes("v2") ?? true,
     });
   };

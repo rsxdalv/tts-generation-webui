@@ -36,7 +36,11 @@ import { getVocosParams, useVocosParams } from "../tabs/VocosParams";
 import { applyVocosWav } from "../functions/applyVocosWav";
 import { applyVocosNPZ } from "../functions/applyVocosNPZ";
 import { getWebuiURLWithHost } from "../data/getWebuiURL";
-import { getMahaParams, useMahaParams } from "../tabs/MahaParams";
+import {
+  getMahaParams,
+  initialMahaParams,
+  useMahaParams,
+} from "../tabs/MahaParams";
 import { generateWithMaha } from "../functions/generateWithMaha";
 import { MahaInputs } from "../components/MahaInputs";
 import { getMMSParams, useMMSParams } from "../tabs/MMSParams";
@@ -60,7 +64,7 @@ const initialState: PipelineParams = {
 const pipelineId = "pipeline";
 
 async function getResult(model: string) {
-  const params = {
+  const paramsMap = {
     bark: getBarkGenerationParams,
     tortoise: getTortoiseGenerationParams,
     musicgen: getMusicgenParams,
@@ -68,8 +72,8 @@ async function getResult(model: string) {
     maha: getMahaParams,
     mms: getMMSParams,
     vallex: getVallexParams,
-  }[model as keyof typeof params]();
-  const newParams = applySeed(params);
+  };
+  const newParams = applySeed(paramsMap[model as keyof typeof paramsMap]());
 
   const fns = {
     bark: generateWithBark,
@@ -128,8 +132,8 @@ const GenerationInputs = ({ model, seed }: { model: string; seed: number }) => {
       maha: setMahaParams,
       mms: setMmsParams,
       vallex: setVallexParams,
-    }[model as keyof typeof fn];
-    fn((x) => ({ ...x, seed }));
+    };
+    fn[model as keyof typeof fn]((x) => ({ ...x, seed }));
   }, [seed]);
 
   switch (model) {
@@ -168,7 +172,9 @@ const GenerationInputs = ({ model, seed }: { model: string; seed: number }) => {
         <MahaInputs
           mahaParams={mahaParams}
           handleChange={parseFormChange(setMahaParams)}
-          setMahaParams={setMahaParams}
+          resetParams={() =>
+            setMahaParams({ ...mahaParams, ...initialMahaParams })
+          }
         />
       );
     case "mms":
