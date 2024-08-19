@@ -1,6 +1,5 @@
 import React from "react";
 import { BarkGenerationParams } from "../tabs/BarkGenerationParams";
-import { BarkResult } from "../tabs/BarkResult";
 import { BarkVoice } from "./BarkVoice";
 import { BurnInPrompt, BarkPrompt } from "./BarkPrompt";
 import { TextTemperature, WaveformTemperature } from "./BarkTemperatureSlider";
@@ -20,7 +19,7 @@ const MaxGenDuration = ({
 }: {
   barkGenerationParams: BarkGenerationParams;
   handleChange: HandleChange;
-}) =>
+}) => (
   <GenericSlider
     label="Max generation duration (s)"
     name="max_gen_duration_s"
@@ -30,19 +29,14 @@ const MaxGenDuration = ({
     params={barkGenerationParams}
     handleChange={handleChange}
   />
+);
 
 export const BarkInputs = ({
   barkGenerationParams,
-  setBarkVoiceGenerationParams,
   handleChange,
-  data,
 }: {
   barkGenerationParams: BarkGenerationParams;
-  setBarkVoiceGenerationParams: React.Dispatch<
-    React.SetStateAction<BarkGenerationParams>
-  >;
   handleChange: HandleChange;
-  data: BarkResult | null;
 }) => (
   <div className="flex flex-col space-y-2">
     <div className="space-y-2">
@@ -96,12 +90,7 @@ export const BarkInputs = ({
             handleChange={handleChange}
           />
         </div>
-        <SeedInput
-          params={barkGenerationParams}
-          handleChange={handleChange}
-          setParams={setBarkVoiceGenerationParams}
-          seed={data?.json_text?.seed}
-        />
+        <SeedInput params={barkGenerationParams} handleChange={handleChange} />
       </div>
     </div>
     <BurnInPrompt

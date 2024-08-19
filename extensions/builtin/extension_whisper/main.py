@@ -90,7 +90,7 @@ def transcribe_ui():
             audio = gr.Audio(
                 label="Audio",
                 type="filepath",
-                source="upload",
+                sources="upload",
                 elem_classes="tts-audio",
             )
             model_dropdown = gr.Dropdown(
@@ -117,7 +117,7 @@ def transcribe_ui():
         outputs=[text],
         api_name="whisper_transcribe",
     ).then(
-        fn=lambda: gr.Button.update(value="Unload models"),
+        fn=lambda: gr.Button(value="Unload models"),
         outputs=[unload_models_button],
     )
 

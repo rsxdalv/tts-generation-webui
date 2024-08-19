@@ -20,7 +20,7 @@ export const MusicgenInputs = ({
   musicgenParams: MusicgenParams;
   handleChange: HandleChange;
   setMusicgenParams: React.Dispatch<React.SetStateAction<MusicgenParams>>;
-  musicgenResult: MusicgenResult | null;
+  musicgenResult?: MusicgenResult | null;
 }) => (
   <div className="flex gap-x-6 w-full justify-center">
     <div className="flex flex-col gap-y-2 w-1/2">
@@ -107,9 +107,7 @@ export const MusicgenInputs = ({
 
       <SeedInput
         params={musicgenParams}
-        setParams={setMusicgenParams}
         handleChange={handleChange}
-        seed={musicgenResult?.json?.seed}
       />
 
       <div className="flex gap-x-2 items-center">

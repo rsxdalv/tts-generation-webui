@@ -1,16 +1,19 @@
 import React from "react";
 import { MagnetParams } from "../tabs/MagnetParams";
+import { HandleChange } from "../types/HandleChange";
 
 const modelMap = {
   Small: { size: "small", 10: true, 30: true },
   Medium: { size: "medium", 10: true, 30: true },
   Audio: { size: "audio", 10: true, 30: false },
 };
+
 const canUseDuration = (type: string, isAudio: boolean, duration: string) => {
   const subType = isAudio ? "Audio" : type;
   const { [duration]: canUse } = modelMap[subType];
   return canUse;
 };
+
 const modelToType = {
   "facebook/magnet-small-10secs": "Small",
   "facebook/magnet-medium-10secs": "Medium",
@@ -19,6 +22,7 @@ const modelToType = {
   "facebook/audio-magnet-small": "Small",
   "facebook/audio-magnet-medium": "Medium",
 };
+
 const computeModel = (type: string, isAudio: boolean, duration: number) => {
   const lowerType = type.toLowerCase();
   const durationSuffix = duration === 30 ? "-30secs" : "-10secs";
@@ -27,36 +31,65 @@ const computeModel = (type: string, isAudio: boolean, duration: number) => {
     ? `facebook/audio-magnet-${lowerType}`
     : `facebook/magnet-${lowerType}${durationSuffix}`;
 };
+
 const getType = (model: string) => {
   return modelToType[model] || "Small";
 };
+
 const decomputeModel = (
   model: string
-): { type: string; isAudio: boolean; duration: number; } => {
+): { type: string; isAudio: boolean; duration: number } => {
   const type = getType(model);
   const duration = model.includes("-30secs") ? 30 : 10;
   const isAudio = model.includes("audio");
   return { type, isAudio, duration };
 };
+
 export const MagnetModelSelector = ({
-  magnetParams, setMagnetParams,
+  magnetParams,
+  handleChange,
 }: {
   magnetParams: MagnetParams;
-  setMagnetParams: React.Dispatch<React.SetStateAction<MagnetParams>>;
+  handleChange: HandleChange;
 }) => {
   const {
-    type: modelType, isAudio, duration,
+    type: modelType,
+    isAudio,
+    duration,
   } = decomputeModel(magnetParams.model);
+
+  const handleSize = (event: React.ChangeEvent<HTMLInputElement>): void =>
+    handleChange({
+      target: {
+        name: "model",
+        value: computeModel(event.target.value, isAudio, duration),
+      },
+    });
+
+  const handleAudio = (event: React.ChangeEvent<HTMLInputElement>): void =>
+    handleChange({
+      target: {
+        name: "model",
+        value: computeModel(
+          modelType,
+          event.target.value === "Audio",
+          duration
+        ),
+      },
+    });
+
+  const handleDuration = (event: React.ChangeEvent<HTMLInputElement>): void =>
+    handleChange({
+      target: {
+        name: "model",
+        value: computeModel(modelType, isAudio, Number(event.target.value)),
+      },
+    });
 
   return (
     <div className="flex flex-col border border-gray-300 p-2 rounded text-md gap-2">
       <div className="text-md">Model:</div>
-      <Model
-        params={magnetParams}
-        handleChange={(event) => setMagnetParams({
-          ...magnetParams,
-          model: event.target.value,
-        })} />
+      <Model params={magnetParams} handleChange={handleChange} />
       <div className="flex gap-2">
         <label className="text-md">Size:</label>
         <div className="flex gap-x-2">
@@ -68,11 +101,9 @@ export const MagnetModelSelector = ({
                 id={type}
                 value={type}
                 checked={modelType === type}
-                onChange={(event) => setMagnetParams({
-                  ...magnetParams,
-                  model: computeModel(event.target.value, isAudio, duration),
-                })}
-                className="border border-gray-300 p-2 rounded" />
+                onChange={handleSize}
+                className="border border-gray-300 p-2 rounded"
+              />
               <label className="ml-1 select-none" htmlFor={type}>
                 {type}
               </label>
@@ -80,23 +111,6 @@ export const MagnetModelSelector = ({
           ))}
         </div>
       </div>
-      {/* <div className="flex gap-2 items-center">
-              <label className="text-md">Audio:</label>
-              <input
-                type="checkbox"
-                name="isAudio"
-                id="isAudio"
-                checked={isAudio}
-                onChange={(event) =>
-                  setMagnetParams({
-                    ...magnetParams,
-                    model: computeModel(modelType, event.target.checked, duration),
-                  })
-                }
-                className="border border-gray-300 p-2 rounded"
-              />
-            </div> */}
-      {/* Instead of a checkbox make it a radio between Audio and Music */}
       <div className="flex gap-2">
         <label className="text-md">Audio:</label>
         <div className="flex gap-x-2">
@@ -108,15 +122,9 @@ export const MagnetModelSelector = ({
                 id={type}
                 value={type}
                 checked={isAudio === (type === "Audio")}
-                onChange={(event) => setMagnetParams({
-                  ...magnetParams,
-                  model: computeModel(
-                    modelType,
-                    event.target.value === "Audio",
-                    duration
-                  ),
-                })}
-                className="border border-gray-300 p-2 rounded" />
+                onChange={handleAudio}
+                className="border border-gray-300 p-2 rounded"
+              />
               <label className="ml-1 select-none" htmlFor={type}>
                 {type}
               </label>
@@ -135,16 +143,10 @@ export const MagnetModelSelector = ({
                 id={d}
                 value={d}
                 checked={d === String(duration)}
-                onChange={(event) => setMagnetParams({
-                  ...magnetParams,
-                  model: computeModel(
-                    modelType,
-                    isAudio,
-                    Number(event.target.value)
-                  ),
-                })}
+                onChange={handleDuration}
                 className="border border-gray-300 p-2 rounded"
-                disabled={!canUseDuration(modelType, isAudio, d)} />
+                disabled={!canUseDuration(modelType, isAudio, d)}
+              />
               <label className="ml-1 select-none" htmlFor={d}>
                 {d}s
               </label>
@@ -155,15 +157,13 @@ export const MagnetModelSelector = ({
     </div>
   );
 };
+
 const Model = ({
-  params, handleChange,
+  params,
+  handleChange,
 }: {
   params: MagnetParams;
-  handleChange: (
-    event: React.ChangeEvent<HTMLInputElement> |
-      React.ChangeEvent<HTMLTextAreaElement> |
-      React.ChangeEvent<HTMLSelectElement>
-  ) => void;
+  handleChange: HandleChange;
 }) => {
   const [options, setOptions] = React.useState<string[]>([]);
   const [loading, setLoading] = React.useState<boolean>(false);

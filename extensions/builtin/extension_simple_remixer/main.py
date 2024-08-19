@@ -40,42 +40,16 @@ def simple_remixer_ui():
             elem_classes="tts-slot",
         ):
             audio = gr.Audio(label=f"Slot {str(id)}", elem_classes="tts-audio")
-            image = gr.Image(
-                show_label=False,
-                elem_classes="tts-image-tiny",
-                interactive=False,
-            )
 
-            audio.change(
-                fn=lambda x: (
-                    image.update(
-                        plot_waveform_as_image(x[1]),
-                    )
-                    if x is not None
-                    else None
-                ),
-                inputs=[audio],
-                outputs=[image],
-            )
             with gr.Row():
                 clear = gr_mini_button("delete").click(
-                    fn=lambda: [
-                        audio.update(None),
-                        image.update(None),
-                    ],
-                    outputs=[audio, image],
+                    fn=lambda: [gr.Audio(None)],
+                    outputs=[audio],
                 )
                 copy_from_input = gr_mini_button("keyboard_return").click(
-                    fn=lambda input_value: [
-                        audio.update(input_value),
-                        image.update(plot_waveform_as_image(input_value[1])),
-                    ],
+                    fn=lambda input_value: [gr.Audio(input_value)],
                     inputs=[input_audio],
-                    # outputs=[audio],
-                    outputs=[
-                        audio,
-                        image,
-                    ],
+                    outputs=[audio],
                 )
         return audio
 
@@ -131,11 +105,11 @@ def simple_remixer_ui():
 
         merged_audios = [mix_audio(x) for x in stacked_audios]
         if non_null_audios := [x for x in merged_audios if x is not None]:
-            return output_audio.update(
+            return gr.Audio(
                 (sample_rate, torch.cat(non_null_audios).cpu().numpy())
             )
         else:
-            return output_audio.update(None)
+            return gr.Audio(None)
 
     def resample_from_to(in_sr: int, out_sr: int, in_wav):
         return torchaudio.transforms.Resample(in_sr, out_sr)(
@@ -151,7 +125,7 @@ def simple_remixer_ui():
     send_to_input = gr.Button("Send to input")
 
     send_to_input.click(
-        fn=lambda x: input_audio.update(x),
+        fn=lambda x: gr.Audio(x),
         inputs=output_audio,
         outputs=input_audio,
     )

@@ -17,8 +17,8 @@ def edit_metadata_ui(voice_file_name, metadata_display):
                 "semantic_prompt": full_generation["semantic_prompt"],
             }, metadata=metadata)
             return {
-                metadata_display: gr.JSON.update(value=metadata),
-                save_metadata_button: gr.Button.update(value="Saved"),
+                metadata_display: gr.JSON(value=metadata),
+                save_metadata_button: gr.Button(value="Saved"),
             }
 
         save_metadata_button.click(
@@ -28,7 +28,7 @@ def edit_metadata_ui(voice_file_name, metadata_display):
         )
 
         metadata_input.change(
-            fn=lambda: save_metadata_button.update(value="Save Metadata"),
+            fn=lambda: gr.Button(value="Save Metadata"),
             outputs=[save_metadata_button]
         )
 

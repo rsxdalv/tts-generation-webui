@@ -1,26 +1,34 @@
 import useLocalStorage, {
+  readLocalStorage,
   updateLocalStorageWithFunction,
 } from "../hooks/useLocalStorage";
 import router from "next/router";
 import { GradioFile } from "../types/GradioFile";
+import { parseFormChange } from "../data/parseFormChange";
+import { favorite } from "../functions/favorite";
+import { generateWithMaha } from "../functions/generateWithMaha";
+import { useHistory } from "../hooks/useHistory";
+import { useSeedHelper } from "../functions/results/useSeedHelper";
+import { Seeded } from "../types/Seeded";
 
 const mahaId = "mahaParams";
 
-export type MahaParams = {
-  maha_tts_input: string;
+export type MahaParams = Seeded & {
+  text: string;
   model_language: string;
   maha_tts_language: string;
   speaker_name: string;
-  seed: number;
   device: string;
 };
 
 export const initialMahaParams: MahaParams = {
-  maha_tts_input: "",
+  seed: 0,
+  use_random_seed: true,
+
+  text: "",
   model_language: "Smolie-in",
   maha_tts_language: "english",
   speaker_name: "",
-  seed: -1,
   device: "auto",
 };
 
@@ -53,3 +61,45 @@ export const useMahaParams = () =>
 
 export const useMahaResult = () =>
   useLocalStorage<MahaResult | null>(mahaId + ".output", null);
+
+export const getMahaParams = (): MahaParams =>
+  readLocalStorage(mahaId) ?? initialMahaParams;
+
+export const useMahaPage = () => {
+  const [mahaParams, setMahaParams] = useMahaParams();
+
+  const [historyData, setHistoryData] = useHistory<MahaResult>("maha");
+
+  const consumer = async (params: MahaParams) => {
+    const data = await generateWithMaha(params);
+    if (params.use_random_seed)
+      setMahaParams((x) => ({ ...x, seed: params.seed }));
+    setHistoryData((x) => [data, ...x]);
+    return data;
+  };
+
+  const funcs = {
+    favorite,
+    useSeed: useSeedHelper(setMahaParams),
+    useParameters: (_url: string, data?: MahaResult) => {
+      const params = data?.metadata;
+      if (!params) return;
+      setMahaParams({
+        ...mahaParams,
+        ...params,
+        seed: Number(params.seed),
+      });
+    },
+  };
+
+  return {
+    mahaParams,
+    setMahaParams,
+    resetParams: () => setMahaParams({ ...mahaParams, ...initialMahaParams }),
+    historyData,
+    setHistoryData,
+    consumer,
+    handleChange: parseFormChange(setMahaParams),
+    funcs,
+  };
+};

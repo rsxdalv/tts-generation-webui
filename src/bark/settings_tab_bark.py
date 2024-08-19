@@ -26,7 +26,7 @@ def settings_tab_bark() -> None:
                 )
 
             with gr.Row(variant="panel"):
-                gr.Markdown("### Coarse-to-fine inference:", scale=2)
+                gr.Markdown("### Coarse-to-fine inference:")
                 coarse_use_gpu = gr.Checkbox(
                     label="Use GPU",
                     value=config["model"]["coarse_use_gpu"],
@@ -151,7 +151,7 @@ def settings_tab_bark() -> None:
 
             def sync_ui():
                 def checkbox_update_helper(key: str):
-                    return gr.Checkbox.update(value=config["model"][key])
+                    return gr.Checkbox(value=config["model"][key])
 
                 return [
                     checkbox_update_helper("text_use_gpu"),
@@ -161,13 +161,13 @@ def settings_tab_bark() -> None:
                     checkbox_update_helper("fine_use_gpu"),
                     checkbox_update_helper("fine_use_small"),
                     checkbox_update_helper("codec_use_gpu"),
-                    gr.Checkbox.update(value=config["load_models_on_startup"]),
+                    gr.Checkbox(value=config["load_models_on_startup"]),
                 ]
 
             settings_tab.select(fn=sync_ui, outputs=inputs, api_name="get_config_bark")
 
             def set_to_reload():
-                return gr.Button.update(value="Loading...", interactive=False)
+                return gr.Button(value="Loading...", interactive=False)
 
         with gr.Column():
             gr.Markdown(
@@ -226,7 +226,7 @@ def load_models(
     )
     try:
         model_manager.reload_models(config)
-        return gr.Button.update(value="Reload models", interactive=True)
+        return gr.Button(value="Reload models", interactive=True)
     except Exception as e:
         print(e)
-        return gr.Button.update(value="Failed to load models", interactive=True)
+        return gr.Button(value="Failed to load models", interactive=True)

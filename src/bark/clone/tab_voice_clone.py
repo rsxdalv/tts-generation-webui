@@ -183,7 +183,7 @@ def tab_voice_clone():
             file_input = gr.Audio(
                 label="Input Audio",
                 type="filepath",
-                source="upload",
+                sources="upload",
                 interactive=True,
             )
             with gr.Row():
@@ -199,7 +199,7 @@ def tab_voice_clone():
                     hubert_model = None
                     tokenizer = None
                     torch.cuda.empty_cache()
-                    return gr.Button.update(
+                    return gr.Button(
                         value="Models cleared",
                     )
 

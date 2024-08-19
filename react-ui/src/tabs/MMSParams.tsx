@@ -1,12 +1,14 @@
 import useLocalStorage, {
+  readLocalStorage,
   updateLocalStorageWithFunction,
 } from "../hooks/useLocalStorage";
 import router from "next/router";
 import { GradioFile } from "../types/GradioFile";
+import { Seeded } from "../types/Seeded";
 
 const MMS_ID = "MMSParams";
 
-export type MMSParams = {
+export type MMSParams = Seeded & {
   text: string;
   language: string;
   speaking_rate: number;
@@ -15,6 +17,9 @@ export type MMSParams = {
 };
 
 export const initialMMSParams: MMSParams = {
+  seed: 0,
+  use_random_seed: true,
+
   text: "",
   language: "eng",
   speaking_rate: 1.0,
@@ -51,3 +56,6 @@ export const useMMSParams = () =>
 
 export const useMMSResult = () =>
   useLocalStorage<MMSResult | null>(MMS_ID + ".output", null);
+
+export const getMMSParams = (): MMSParams =>
+  readLocalStorage(MMS_ID) ?? initialMMSParams;

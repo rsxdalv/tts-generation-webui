@@ -1,12 +1,17 @@
 import useLocalStorage, {
+  readLocalStorage,
   updateLocalStorageWithFunction,
 } from "../hooks/useLocalStorage";
 import router from "next/router";
 import { GradioFile } from "../types/GradioFile";
+import { Seeded } from "../types/Seeded";
+import { useHistory } from "../hooks/useHistory";
+import { generateWithVallex } from "../functions/generateWithVallex";
+import { parseFormChange } from "../data/parseFormChange";
 
 const vallex_ID = "vallexParams";
 
-export type VallexParams = {
+export type VallexParams = Seeded & {
   text: string;
   prompt: string;
   language: string;
@@ -15,6 +20,9 @@ export type VallexParams = {
 };
 
 export const initialVallexParams: VallexParams = {
+  seed: 0,
+  use_random_seed: true,
+
   text: "",
   prompt: "",
   language: "Mix",
@@ -51,3 +59,41 @@ export const useVallexParams = () =>
 
 export const useVallexResult = () =>
   useLocalStorage<VallexResult | null>(vallex_ID + ".output", null);
+
+export const getVallexParams = (): VallexParams =>
+  readLocalStorage(vallex_ID) ?? initialVallexParams;
+
+export const useVallexPage = () => {
+  const [vallexParams, setVallexParams] = useVallexParams();
+
+  const [historyData, setHistoryData] = useHistory<VallexResult>("vallex");
+
+  const consumer = async (params: VallexParams) => {
+    const data = await generateWithVallex(params);
+    if (params.use_random_seed)
+      setVallexParams((x) => ({ ...x, seed: params.seed }));
+    setHistoryData((x) => [data, ...x]);
+    return data;
+  };
+
+  const funcs = {
+    useParameters: (_url: string, data?: VallexResult) => {
+      const params = data?.metadata;
+      if (!params) return;
+      setVallexParams({
+        ...vallexParams,
+        ...params,
+      });
+    },
+  };
+
+  return {
+    vallexParams,
+    setVallexParams,
+    historyData,
+    setHistoryData,
+    consumer,
+    funcs,
+    handleChange: parseFormChange(setVallexParams),
+  };
+};

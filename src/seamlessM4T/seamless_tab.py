@@ -91,7 +91,7 @@ def seamless_ui():
                 button = gr.Button("Translate Text to Speech")
             with gr.Tab(label="Audio to Speech"):
                 input_audio = gr.Audio(
-                    source="upload",
+                    sources="upload",
                     type="numpy",
                     label="Input Audio",
                     elem_classes="tts-audio",

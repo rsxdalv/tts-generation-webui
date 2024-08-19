@@ -37,7 +37,7 @@ export const MMSInputs = ({
   mmsParams: MMSParams;
   handleChange: HandleChange;
   setMmsParams: React.Dispatch<React.SetStateAction<MMSParams>>;
-  data: MMSResult | null;
+  data?: MMSResult | null;
 }) => (
   <div className="flex gap-x-6 w-full justify-center">
     <div className="flex flex-col gap-y-2 w-1/2">

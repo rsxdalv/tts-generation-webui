@@ -92,7 +92,7 @@ class TortoiseParameterComponents:
         text: gr.Textbox,
         voice: gr.Dropdown,
         preset: gr.Dropdown,
-        seed: gr.Number,
+        seed: gr.Textbox,
         cvvp_amount: gr.Slider,
         split_prompt: gr.Checkbox,
         num_autoregressive_samples: gr.Slider,
@@ -207,7 +207,7 @@ if __name__ == "__main__":
                 ],
                 value="ultra_fast",
             ),
-            seed=gr.Number(label="Seed", value=None, step=1),
+            seed=gr.Textbox(label="Seed", value=None),
             cvvp_amount=gr.Slider(
                 label="CVVP Amount", value=0.0, minimum=0.0, maximum=1.0, step=0.1
             ),

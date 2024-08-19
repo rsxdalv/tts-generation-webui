@@ -33,6 +33,7 @@ from src.bark.generation_settings import (
 )
 from src.magnet.utils import Timer
 from src.utils.prompt_to_title import prompt_to_title
+from src.utils.randomize_seed import randomize_seed
 
 FREEZE_SEMANTIC = False
 
@@ -192,7 +193,7 @@ def gen_helper(
         )
 
         yield yield_generation(
-            audio=gr.Audio.update(
+            audio=gr.Audio(
                 value=filename,
                 label=f"Generated audio fragment... `{prompt_piece}`",
             ),
@@ -217,7 +218,7 @@ def gen_helper(
     )
 
     yield yield_generation(
-        audio=gr.Audio.update(value=filename, label="Generated audio"),
+        audio=gr.Audio(value=filename, label="Generated audio"),
         npz=filename_npz,
         json_text=metadata,
         history_bundle_name_data=os.path.dirname(filename),
@@ -255,7 +256,7 @@ def bark_ui():
 
         def unload_models():
             model_manager.unload_models()
-            return gr.Button.update(value="Unloaded")
+            return gr.Button(value="Unloaded")
 
         unload_models_button = gr.Button("Unload models")
         unload_models_button.click(
@@ -272,7 +273,7 @@ def bark_ui():
 
     # Show the language and speakerId radios only when useHistory is checked
     history_setting.change(
-        fn=lambda choice: gr.Column.update(visible=(choice == HistorySettings.VOICE)),
+        fn=lambda choice: gr.Column(visible=(choice == HistorySettings.VOICE)),
         inputs=[history_setting],
         outputs=[column],  # type: ignore
     )
@@ -291,9 +292,9 @@ def bark_ui():
 
     history_setting.change(
         fn=lambda choice: [
-            gr.Dropdown.update(visible=(choice == HistorySettings.NPZ_FILE)),
-            gr.Button.update(visible=(choice == HistorySettings.NPZ_FILE)),
-            gr.Button.update(visible=(choice == HistorySettings.NPZ_FILE)),
+            gr.Dropdown(visible=(choice == HistorySettings.NPZ_FILE)),
+            gr.Button(visible=(choice == HistorySettings.NPZ_FILE)),
+            gr.Button(visible=(choice == HistorySettings.NPZ_FILE)),
         ],
         inputs=[history_setting],
         outputs=[
@@ -305,9 +306,9 @@ def bark_ui():
 
     history_setting.change(
         fn=lambda choice: [
-            gr.Dropdown.update(visible=(choice == HistorySettings.NPZ_FILE)),
-            gr.Button.update(visible=(choice == HistorySettings.NPZ_FILE)),
-            gr.Button.update(visible=(choice == HistorySettings.NPZ_FILE)),
+            gr.Dropdown(visible=(choice == HistorySettings.NPZ_FILE)),
+            gr.Button(visible=(choice == HistorySettings.NPZ_FILE)),
+            gr.Button(visible=(choice == HistorySettings.NPZ_FILE)),
         ],
         inputs=[history_setting],
         outputs=[
@@ -394,13 +395,6 @@ def bark_ui():
                     label="Randomize seed", value=True
                 )
 
-
-                def randomize_seed(seed, randomize_seed):
-                    if randomize_seed:
-                        return np.random.randint(0, 2**32 - 1, dtype=np.uint32)
-                    else:
-                        return int(seed)
-
     burn_in_prompt = gr.Textbox(
         label="Burn In Prompt (Optional)", lines=3, placeholder="Enter text here..."
     )
@@ -460,9 +454,9 @@ def bark_ui():
 
         # yield yield_generation(
         #     audio=None,
-        #     save_button=gr.Button.update(value="Save"),
-        #     continue_button=gr.Button.update(),
-        #     buttons_row=gr.Row.update(visible=False),
+        #     save_button=gr.Button(value="Save"),
+        #     continue_button=gr.Button(),
+        #     buttons_row=gr.Row(visible=False),
         #     npz=None,
         #     json_text=None,
         #     history_bundle_name_data=None,
@@ -527,7 +521,7 @@ def old_generation_dropdown_ui(label):
         )
 
         reload_old_generation_dropdown.click(
-            fn=lambda: gr.Dropdown.update(choices=get_npz_files()),  # type: ignore
+            fn=lambda: gr.Dropdown(choices=get_npz_files()),  # type: ignore
             outputs=old_generation_dropdown,
             api_name=f"reload_old_generation_dropdown{ '' if label == 'Audio Voice' else '_semantic'}",
         )
@@ -573,6 +567,6 @@ def setup_bark_voice_prompt_ui():
 
 def insert_npz_file(npz_filename):
     return [
-        gr.Dropdown.update(value=npz_filename),
-        gr.Radio.update(value=HistorySettings.NPZ_FILE),
+        gr.Dropdown(value=npz_filename),
+        gr.Radio(value=HistorySettings.NPZ_FILE),
     ]

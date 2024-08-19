@@ -124,7 +124,7 @@ def get_rvc_index_list():
 def rvc_ui_model_or_index_path_ui(label: str):
     get_list_fn = get_rvc_model_list if label == "Model" else get_rvc_index_list
 
-    with gr.Box():
+    with gr.Column():
         gr.Markdown(f"{label}")
         with gr.Row():
             file_path_dropdown = gr.Dropdown(
@@ -137,9 +137,7 @@ def rvc_ui_model_or_index_path_ui(label: str):
                 RVC_LOCAL_MODELS_DIR, api_name=f"rvc_{label.lower()}_open"
             )
             gr_reload_button().click(
-                lambda: file_path_dropdown.update(
-                    choices=get_list_fn(),  # type: ignore
-                ),
+                fn=lambda: gr.Dropdown(choices=get_list_fn()),
                 outputs=[file_path_dropdown],
                 api_name=f"rvc_{label.lower()}_reload",
             )

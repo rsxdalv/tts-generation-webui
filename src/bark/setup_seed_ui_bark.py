@@ -11,7 +11,7 @@ def setup_seed_ui_bark():
         )
 
         set_random_seed_button.click(
-            fn=lambda: gr.Textbox.update(value="-1"), outputs=[seed_input]
+            fn=lambda: gr.Textbox(value="-1"), outputs=[seed_input]
         )
 
         set_old_seed_button = gr.Button(

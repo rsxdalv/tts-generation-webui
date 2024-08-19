@@ -1,13 +1,12 @@
 import os
-from src.bark.split_text_functions import split_by_lines
 import numpy as np
+import gradio as gr
+from src.bark.split_text_functions import split_by_lines
 from src.utils.create_base_filename import create_base_filename
 from src.utils.date import get_date_string
 from src.utils.save_waveform_plot import middleware_save_waveform_plot
 from tortoise.api import TextToSpeech, MODELS_DIR
 from tortoise.utils.audio import load_voices, get_voices
-import gradio as gr
-from src.tortoise.TortoiseOutputRow import TortoiseOutputRow, TortoiseOutputUpdate
 from src.tortoise.save_json import save_json
 from scipy.io.wavfile import write as write_wav
 from src.tortoise.TortoiseParameters import TortoiseParameters
@@ -23,6 +22,18 @@ TORTOISE_VOICE_DIR = "voices-tortoise"
 
 TORTOISE_VOICE_DIR_ABS = get_path_from_root("voices-tortoise")
 TORTOISE_LOCAL_MODELS_DIR = get_path_from_root("data", "models", "tortoise")
+
+
+class TortoiseOutputUpdate:
+    def __init__(
+        self,
+        audio,
+        bundle_name,
+        params,
+    ):
+        self.audio = audio
+        self.bundle_name = bundle_name
+        self.params = params
 
 
 def get_model_list():
@@ -58,7 +69,7 @@ def switch_model(
         tokenizer_path=tokenizer.name if tokenizer else None,
         tokenizer_basic=use_basic_cleaners,
     )
-    return gr.Dropdown.update()
+    return gr.Dropdown()
 
 
 def get_voice_list():
@@ -68,12 +79,14 @@ def get_voice_list():
 def save_wav_tortoise(audio_array, filename):
     write_wav(filename, SAMPLE_RATE, audio_array)
 
+
 def unload_tortoise_model():
     global MODEL
     if MODEL is not None:
         del MODEL
         torch_clear_memory()
         MODEL = None
+
 
 def get_tts(
     models_dir=MODELS_DIR,
@@ -87,7 +100,11 @@ def get_tts(
 ):
     global MODEL
     if MODEL is None or force_reload:
+        print("Loading tortoise model: ", models_dir)
+        print("Clearing memory...")
         unload_tortoise_model()
+        print("Memory cleared")
+        print("Loading model...")
         MODEL = TextToSpeech(
             models_dir=models_dir,
             kv_cache=kv_cache,
@@ -97,7 +114,29 @@ def get_tts(
             tokenizer_vocab_file=tokenizer_path,
             tokenizer_basic=tokenizer_basic,
         )
+        print("Model loaded")
     return MODEL
+
+
+last_voices = None
+voice_samples = None
+conditioning_latents = None
+
+
+def get_voices_cached(voice):
+    global last_voices, voice_samples, conditioning_latents
+
+    if voice == last_voices:
+        last_voices = voice
+        return voice_samples, conditioning_latents
+
+    voices = voice.split("&") if "&" in voice else [voice]
+
+    voice_samples, conditioning_latents = load_voices(
+        voices, extra_voice_dirs=[TORTOISE_VOICE_DIR]
+    )
+    last_voices = voices
+    return voice_samples, conditioning_latents
 
 
 def generate_tortoise(
@@ -105,14 +144,9 @@ def generate_tortoise(
     text: str,
     candidates: int,
 ):
-    voice = params.voice
-
     os.makedirs(OUTPUT_PATH, exist_ok=True)
 
-    voice_sel = voice.split("&") if "&" in voice else [voice]
-    voice_samples, conditioning_latents = load_voices(
-        voice_sel, extra_voice_dirs=[TORTOISE_VOICE_DIR]
-    )
+    voice_samples, conditioning_latents = get_voices_cached(params.voice)
 
     tts = get_tts()
     result, state = tts.tts_with_preset(
@@ -160,6 +194,7 @@ def _process_gen(candidates, audio_array, id, params: TortoiseParameters):
         "_type": model,
         "date": date,
         "candidates": candidates,
+        "index": id if isinstance(id, int) else 0,
         **params.to_metadata(),
     }
 
@@ -169,13 +204,8 @@ def _process_gen(candidates, audio_array, id, params: TortoiseParameters):
 
     return TortoiseOutputUpdate(
         audio=(SAMPLE_RATE, audio_array),
-        image=filename_png,
-        save_button=gr.Button.update(value="Save to favorites", visible=True),
-        seed=params.seed,
         bundle_name=history_bundle_name_data,
-        params=gr.JSON.update(
-            value=metadata
-        ),  # broken because gradio returns only __type__
+        params=gr.JSON(value=metadata),  # broken because gradio returns only __type__
     )
 
 
@@ -194,9 +224,7 @@ def get_filenames(base_filename):
     return filename, filename_png, filename_json
 
 
-def generate_tortoise_long(
-    outs: list[TortoiseOutputRow], count: int, params: TortoiseParameters
-):
+def generate_tortoise_long(count: int, params: TortoiseParameters):
     print("Generating tortoise with params:")
     print(params)
     prompt_raw = params.text
@@ -211,14 +239,8 @@ def generate_tortoise_long(
             text=prompt,
             candidates=count,
         )
-        for i, data in enumerate(datas):
-            yield {
-                outs[i].audio: data.audio,
-                outs[i].image: data.image,
-                outs[i].save_button: data.save_button,
-                outs[i].seed: data.seed,
-                outs[i].bundle_name: data.bundle_name,
-            }
+        for data in datas:
+            yield [data.audio, data.bundle_name, data.params]
 
         for i in range(count):
             audio_array = datas[i].audio[1]
@@ -226,18 +248,14 @@ def generate_tortoise_long(
 
     # if there is only one prompt, then we don't need to concatenate
     if len(prompts) == 1:
+        # return [None, None, None]
         return {}
 
     for i in range(count):
         res = _process_gen(
             count, np.concatenate(audio_pieces[i]), id=f"_long_{str(i)}", params=params
         )
-        yield {
-            outs[i].audio: res.audio,
-            outs[i].image: res.image,
-            outs[i].save_button: res.save_button,
-            outs[i].seed: res.seed,
-            outs[i].bundle_name: res.bundle_name,
-        }
+        yield [res.audio, res.bundle_name, res.params]
 
+    # return [None, None, None]
     return {}

@@ -15,7 +15,7 @@ from src.tortoise.gr_reload_button import gr_reload_button
 
 
 def update_voices_tab():
-    return gr.List.update(value=get_npz_files_voices())
+    return gr.List(value=get_npz_files_voices())
 
 
 def voices_tab(directory="voices"):
@@ -52,7 +52,6 @@ def voices_tab(directory="voices"):
                 interactive=False,
                 datatype=datatypes,
                 col_count=len(datatypes),
-                max_cols=len(datatypes),
                 headers=headers,
                 height=800,
                 #  elem_classes="file-list"
@@ -86,7 +85,7 @@ def voices_tab(directory="voices"):
     def delete_voice(voice_file_name):
         os.remove(voice_file_name)
         return {
-            delete_voice_button: gr.Button.update(value="Deleted"),
+            delete_voice_button: gr.Button(value="Deleted"),
             voices_list: update_voices_tab(),
         }
 
@@ -96,9 +95,9 @@ def voices_tab(directory="voices"):
         if os.path.exists(png_file):
             shutil.move(png_file, new_voice_file_name.replace(".npz", ".png"))
         return {
-            rename_voice_button: gr.Button.update(value="Renamed"),
+            rename_voice_button: gr.Button(value="Renamed"),
             voices_list: update_voices_tab(),
-            voice_file_name: gr.Textbox.update(value=new_voice_file_name),
+            voice_file_name: gr.Textbox(value=new_voice_file_name),
         }
 
     def crop_voice(voice_file_name, audio_in):
@@ -176,18 +175,18 @@ def voices_tab(directory="voices"):
             resolved_photo = None
 
         return {
-            voice_file_name: gr.Textbox.update(value=filename_npz),
-            new_voice_file_name: gr.Textbox.update(value=filename_npz),
-            delete_voice_button: gr.Button.update(value="Delete"),
-            rename_voice_button: gr.Button.update(value="Rename"),
-            audio: gr.Audio.update(value=get_audio_from_full_generation(full_generation)),  # type: ignore
-            metadata: gr.JSON.update(value=full_generation.get("metadata", {})),
-            metadata_input: gr.Textbox.update(
+            voice_file_name: gr.Textbox(value=filename_npz),
+            new_voice_file_name: gr.Textbox(value=filename_npz),
+            delete_voice_button: gr.Button(value="Delete"),
+            rename_voice_button: gr.Button(value="Rename"),
+            audio: gr.Audio(value=get_audio_from_full_generation(full_generation)),  # type: ignore
+            metadata: gr.JSON(value=full_generation.get("metadata", {})),
+            metadata_input: gr.Textbox(
                 value=json.dumps(full_generation.get("metadata", {}), indent=2)
             ),
-            photo: gr.Image.update(value=resolved_photo),
-            voice_hash: gr.Textbox.update(value=history_to_hash(full_generation)),  # type: ignore
-            file_list: gr.Files.update(
+            photo: gr.Image(value=resolved_photo),
+            voice_hash: gr.Textbox(value=history_to_hash(full_generation)),  # type: ignore
+            file_list: gr.Files(
                 value=get_file_list(filename_npz, resolved_photo),
                 label="Files",
             ),

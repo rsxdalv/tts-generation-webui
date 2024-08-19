@@ -7,6 +7,7 @@ import { HandleChange } from "../types/HandleChange";
 import { PromptTextArea } from "./PromptTextArea";
 import { SeedInput } from "./SeedInput";
 import { splitAndRecombineText } from "../data/split-and-recombine";
+import { SimpleGroup } from "./SimpleGroup";
 
 const presets = {
   ultra_fast: {
@@ -27,12 +28,6 @@ const presets = {
     diffusion_iterations: 400,
   },
 };
-
-const SimpleGroup = ({ children }: { children: React.ReactNode }) => (
-  <div className="flex flex-col space-y-2 border border-gray-300 p-2 rounded">
-    {children}
-  </div>
-);
 
 export const TortoiseInput = ({
   tortoiseGenerationParams,
@@ -91,11 +86,17 @@ export const TortoiseInput = ({
             tortoiseGenerationParams={tortoiseGenerationParams}
             handleChange={handleChange}
           />
+          <label className="text-sm">Candidates:</label>
+          <input
+            type="number"
+            name="candidates"
+            value={tortoiseGenerationParams.candidates}
+            onChange={handleChange}
+            className="border border-gray-300 p-2 rounded"
+          />
           <SeedInput
             params={tortoiseGenerationParams}
-            setParams={setTortoiseGenerationParams}
             handleChange={handleChange}
-            seed={data?.seed}
           />
         </SimpleGroup>
         <SimpleGroup>
@@ -107,7 +108,7 @@ export const TortoiseInput = ({
       </div>
     </div>
     <PromptTextArea
-      name="prompt"
+      name="text"
       label="Prompt"
       handleChange={handleChange}
       params={tortoiseGenerationParams}
@@ -127,8 +128,8 @@ const SplitPromptManually = ({
     onClick={() => {
       handleChange({
         target: {
-          name: "prompt",
-          value: splitAndRecombineText(tortoiseGenerationParams.prompt).join(
+          name: "text",
+          value: splitAndRecombineText(tortoiseGenerationParams.text).join(
             "\n"
           ),
         },
@@ -469,6 +470,16 @@ const Model = ({
           onClick={applyModelSettings}
         >
           {applyModelSettingsLoading ? "Applying..." : "Apply Model Settings"}
+        </button>
+        <button
+          className="border border-gray-300 p-2 rounded"
+          onClick={async () => {
+            await fetch("/api/gradio/tortoise_unload_model", {
+              method: "POST",
+            });
+          }}
+        >
+          Unload Model
         </button>
       </div>
     </div>

@@ -2,7 +2,9 @@ import React from "react";
 import { commonBorder } from "./commonBorder";
 
 export const ResetButton = <T extends {}>({
-  params, setParams, initialParams,
+  params,
+  setParams,
+  initialParams,
 }: {
   params: T;
   setParams: React.Dispatch<React.SetStateAction<T>>;
@@ -10,10 +12,12 @@ export const ResetButton = <T extends {}>({
 }) => (
   <button
     className={commonBorder}
-    onClick={() => setParams({
-      ...params,
-      ...initialParams,
-    })}
+    onClick={() =>
+      setParams({
+        ...params,
+        ...initialParams,
+      })
+    }
   >
     Reset Parameters
   </button>
