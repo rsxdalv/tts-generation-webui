@@ -24,7 +24,7 @@ import { parseMetadataDate } from "./parseMetadataDate";
 import { Metadata, Row } from "./Metadata";
 import { sendToBarkAsVoice } from "../tabs/BarkGenerationParams";
 import { NPZ, NPZOptional } from "../types/NPZ";
-import { barkFavorite } from "../functions/barkFavorite";
+import { favorite } from "../functions/favorite";
 import { saveToVoices } from "../functions/saveToVoices";
 
 const ActionButton = ({
@@ -223,7 +223,7 @@ export const HistoryCard = ({
   };
 
   const addFavorite = () =>
-    barkFavorite("", {
+    favorite("", {
       history_bundle_name_data,
     });
 

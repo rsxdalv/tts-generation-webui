@@ -1,9 +1,20 @@
-import { client } from "@gradio/client";
+import { Client } from "@gradio/client";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getFile } from "../../../backend-utils/getFile";
 import { GradioFile } from "../../../types/GradioFile";
+import { PredictFunction } from "@gradio/client/dist/types";
 
 type Data = { data: any };
+
+// import { Client, handle_file } from "@gradio/client";
+
+// const response = await fetch(
+// 	"https://audio-samples.github.io/samples/mp3/blizzard_unconditional/sample-0.mp3"
+// );
+// const audio_file = await response.blob();
+
+// const app = await Client.connect("abidlabs/whisper");
+// const result = await app.predict("/predict", [handle_file(audio_file)]);
 
 export default async function handler(
   req: NextApiRequest,
@@ -28,7 +39,8 @@ const defaultBackend =
   process.env.GRADIO_BACKEND ||
   process.env.GRADIO_BACKEND_AUTOMATIC ||
   "http://127.0.0.1:7770/";
-const getClient = () => client(defaultBackend, {});
+
+const getClient = () => Client.connect(defaultBackend, {});
 
 type GradioChoices = {
   choices: string[];
@@ -37,9 +49,11 @@ type GradioChoices = {
 
 const extractChoices = ({ choices }: GradioChoices) => choices.map((x) => x[0]);
 
-const gradioPredict = <T extends any[]>(
-  ...args: Parameters<Awaited<ReturnType<typeof getClient>>["predict"]>
-) => getClient().then((app) => app.predict(...args)) as Promise<{ data: T }>;
+const gradioPredict = <T extends any[]>(...args: Parameters<PredictFunction>) =>
+  getClient().then((app) => app.predict(...args)) as Promise<{ data: T }>;
+
+const gradioSubmit = <T extends any[]>(...args: Parameters<PredictFunction>) =>
+  getClient().then((app) => app.submit(...args));
 
 async function demucs({ file }: { file: string }) {
   const audioBlob = await getFile(file);
@@ -107,11 +121,11 @@ async function musicgen({ melody, ...params }) {
     params.seed, // number in 'Seed' Slider component
     params.use_multi_band_diffusion, // boolean  in 'Use Multi-Band Diffusion' Checkbox component
   ]);
-  const [audio, history_bundle_name_data, , , json] = result?.data;
+  const [audio, history_bundle_name_data, , , metadata] = result?.data;
   return {
     audio,
     history_bundle_name_data,
-    json,
+    metadata,
   };
 }
 
@@ -143,7 +157,7 @@ async function bark_voice_generate({ audio, use_gpu }) {
 
 async function bark({
   burn_in_prompt,
-  prompt,
+  text,
   history_setting,
   languageRadio,
   speakerIdRadio,
@@ -167,13 +181,13 @@ async function bark({
       Object, // buttons_row
       null, // npz
       null, // seed
-      null, // json_text
+      null, // json_text -> metadata
       null // history_bundle_name_data
       // note - ignore other 8 rows of data
     ]
   >("/bark", [
     burn_in_prompt,
-    prompt,
+    text,
     history_setting,
     languageRadio,
     speakerIdRadio,
@@ -188,7 +202,7 @@ async function bark({
     max_gen_duration_s,
   ]);
 
-  const [audio_update, npz, json_text, history_bundle_name_data] = result?.data;
+  const [audio_update, npz, metadata, history_bundle_name_data] = result?.data;
 
   const audio = audio_update.value;
   const fixedAudio = {
@@ -198,7 +212,7 @@ async function bark({
   return {
     audio: fixedAudio,
     npz,
-    json_text,
+    metadata,
     history_bundle_name_data,
   };
 }
@@ -213,8 +227,18 @@ const bark_favorite = async ({ history_bundle_name_data }) =>
     (result) => result?.data
   );
 
+async function Array__fromAsync<T>(gen: AsyncIterable<T>): Promise<T[]> {
+  let out: T[] = [];
+  for await (const x of gen) {
+    // Oh how I love you V8 with your bugs. This prevents invalid memory deduplication when adding the output to an array in a complicated system.
+    let y = JSON.parse(JSON.stringify(x));
+    out.push(y as any);
+  }
+  return out;
+}
+
 async function tortoise({
-  prompt,
+  text,
   speaker,
   preset,
   seed,
@@ -232,18 +256,17 @@ async function tortoise({
   diffusion_temperature,
   model,
   generation_name,
+  // use_random_seed,
+  candidates,
 }) {
-  const result = await gradioPredict<
+  const job = await gradioSubmit<
     [
       GradioFile, // audio
-      string, // image
-      Object, // save_button
-      string, // seed
       string, // bundle_name
       Object // metadata
     ]
-  >("/generate_tortoise_1", [
-    prompt, // string  in 'Prompt' Textbox component
+  >("/generate_tortoise_" + candidates, [
+    text, // string  in 'Prompt' Textbox component
     speaker, // string (Option from: ['random', 'angie', 'applejack', 'cond_latent_example', 'daniel', 'deniro', 'emma', 'freeman', 'geralt', 'halle', 'jlaw', 'lj', 'mol', 'myself', 'pat', 'pat2', 'rainbow', 'snakes', 'tim_reynolds', 'tom', 'train_atkins', 'train_daws', 'train_dotrice', 'train_dreams', 'train_empire', 'train_grace', 'train_kennard', 'train_lescault', 'train_mouse', 'weaver', 'william', 'freeman_2a', 'freeman_3', 'pat4']) in 'parameter_2502' Dropdown component
     preset, // string (Option from: ['ultra_fast', 'fast', 'standard', 'high_quality']) in 'parameter_2507' Dropdown component
     seed, // number  in 'parameter_2521' Number component
@@ -263,17 +286,45 @@ async function tortoise({
     generation_name, // string  in 'Generation Name' Textbox component
   ]);
 
-  const [audio, image, save_button, seed2, bundle_name, metadata] =
-    result?.data;
-
-  return {
-    audio,
-    image,
-    save_button,
-    seed: seed2,
-    bundle_name,
-    metadata,
-  };
+  const events = await Array__fromAsync(job);
+  const results = events
+    .filter((x) => x.type === "data")
+    .map((x) => {
+      const [audio, bundle_name, metadata] = x.data;
+      return {
+        audio,
+        seed,
+        bundle_name,
+        metadata,
+        // metadata: {
+        //   _version: "",
+        //   _hash_version: "",
+        //   _type: "",
+        //   text,
+        //   speaker,
+        //   preset,
+        //   seed,
+        //   cvvp_amount,
+        //   split_prompt,
+        //   samples,
+        //   diffusion_iterations,
+        //   temperature,
+        //   length_penalty,
+        //   repetition_penalty,
+        //   top_p,
+        //   max_mel_tokens,
+        //   cond_free,
+        //   cond_free_k,
+        //   diffusion_temperature,
+        //   model,
+        //   generation_name,
+        //   // use_random_seed,
+        //   candidates,
+        // },
+      };
+    });
+  // remove last element due to return {} in generate_tortoise_long
+  return results.slice(0, -1);
 }
 
 const tortoise_refresh_models = () =>
@@ -488,11 +539,11 @@ async function magnet({
     span_arrangement,
   ]);
 
-  const [audio, history_bundle_name_data, , , json] = result?.data;
+  const [audio, history_bundle_name_data, , , metadata] = result?.data;
   return {
     audio,
     history_bundle_name_data,
-    json,
+    metadata,
   };
 }
 
@@ -504,7 +555,7 @@ const magnet_get_models = () =>
 const magnet_open_model_dir = () => gradioPredict<[]>("/magnet_open_model_dir");
 
 const maha = ({
-  maha_tts_input,
+  text,
   model_language,
   maha_tts_language,
   speaker_name,
@@ -512,7 +563,7 @@ const maha = ({
   device,
 }) =>
   gradioPredict<[GradioFile, Object]>("/maha_tts", [
-    maha_tts_input, // string  in 'Input' Textbox component
+    text, // string  in 'Input' Textbox component
     model_language, // string (Option from: ['en', 'de', 'es', 'fr', 'it', 'nl', 'pl', 'pt', 'ru', 'tr', 'zh']) in 'Model language' Dropdown component
     maha_tts_language, // string (Option from: ['en', 'de', 'es', 'fr', 'it', 'nl', 'pl', 'pt', 'ru', 'tr', 'zh']) in 'TTS language' Dropdown component
     speaker_name, // string  in 'Speaker name' Textbox component
@@ -618,6 +669,8 @@ const scan_huggingface_cache_api = () =>
 const delete_huggingface_cache_revisions = ({ commit_hash }) =>
   gradioPredict<[]>("/delete_huggingface_cache_revisions", [commit_hash]);
 
+const tortoise_unload_model = () => gradioPredict<[]>("/tortoise_unload_model");
+
 const endpoints = {
   maha,
   maha_tts_refresh_voices,
@@ -666,4 +719,6 @@ const endpoints = {
 
   scan_huggingface_cache_api,
   delete_huggingface_cache_revisions,
+
+  tortoise_unload_model,
 };

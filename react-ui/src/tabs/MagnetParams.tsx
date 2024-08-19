@@ -4,13 +4,18 @@ import useLocalStorage, {
 } from "../hooks/useLocalStorage";
 import router from "next/router";
 import { GradioFile } from "../types/GradioFile";
+import { parseFormChange } from "../data/parseFormChange";
+import { useHistory } from "../hooks/useHistory";
+import { generateWithMagnet } from "../functions/generateWithMagnet";
+import { favorite } from "../functions/favorite";
+import { Seeded } from "../types/Seeded";
+import { useSeedHelper } from "../functions/results/useSeedHelper";
 
 export const magnetId = "magnetParams";
 
-export type MagnetParams = {
+export type MagnetParams = Seeded & {
   model: string;
   text: string;
-  seed: number;
   use_sampling: boolean;
   top_k: number;
   top_p: number;
@@ -22,7 +27,6 @@ export type MagnetParams = {
   decoding_steps_3: number;
   decoding_steps_4: number;
   span_arrangement: string;
-  use_random_seed: boolean;
 };
 
 export const initialMagnetParams: MagnetParams = {
@@ -46,7 +50,7 @@ export const initialMagnetParams: MagnetParams = {
 export type MagnetResult = {
   audio: GradioFile;
   history_bundle_name_data: string;
-  json: {
+  metadata: {
     _version: string;
     _hash_version: string;
     _type: string;
@@ -87,3 +91,46 @@ export const useMagnetResult = () =>
 
 export const getMagnetParams = (): MagnetParams =>
   readLocalStorage(magnetId) ?? initialMagnetParams;
+
+export const useMagnetPage = () => {
+  const [magnetParams, setMagnetParams] = useMagnetParams();
+
+  const [historyData, setHistoryData] = useHistory<MagnetResult>("magnet");
+
+  const consumer = async (params: MagnetParams) => {
+    const data = await generateWithMagnet(params);
+    if (params.use_random_seed)
+      setMagnetParams((x) => ({ ...x, seed: params.seed }));
+    setHistoryData((x) => [data, ...x]);
+    return data;
+  };
+
+  const funcs = {
+    favorite,
+    useSeed: useSeedHelper(setMagnetParams),
+    useParameters: (_url: string, data?: MagnetResult) => {
+      const params = data?.metadata;
+      if (!params) return;
+      setMagnetParams({
+        ...magnetParams,
+        ...params,
+        seed: Number(params.seed),
+        model: params.model || initialMagnetParams.model,
+        decoding_steps_1: params.decoding_steps[0],
+        decoding_steps_2: params.decoding_steps[1],
+        decoding_steps_3: params.decoding_steps[2],
+        decoding_steps_4: params.decoding_steps[3],
+      });
+    },
+  };
+
+  return {
+    magnetParams,
+    setMagnetParams,
+    historyData,
+    setHistoryData,
+    consumer,
+    handleChange: parseFormChange(setMagnetParams),
+    funcs,
+  };
+};

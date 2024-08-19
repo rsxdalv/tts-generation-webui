@@ -66,10 +66,7 @@ const BarkVoiceGenerationPage = () => {
   };
 
   return (
-    <Template>
-      <Head>
-        <title>Bark Voice Generation - TTS Generation Webui</title>
-      </Head>
+    <Template title="Bark Voice Generation">
       <div className="space-y-2">
         <label className="text-sm">Tokenizer:</label>
         <select
@@ -134,7 +131,7 @@ const BarkVoiceGenerationPage = () => {
         <div className="flex flex-col space-y-4">
           {/* Print voice filename */}
           <div className="space-y-2">
-            <label className="text-sm">Voice file name:</label>
+            <label className="text-sm">Voice file name (read only):</label>
             <input
               type="text"
               name="filename"

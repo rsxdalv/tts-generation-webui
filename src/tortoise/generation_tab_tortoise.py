@@ -1,9 +1,5 @@
-from typing import Any
-from src.musicgen.setup_seed_ui_musicgen import setup_seed_ui_musicgen
 from src.css.css import full_css
 import gradio as gr
-from src.tortoise.TortoiseOutputRow import TortoiseOutputRow
-from src.tortoise.create_tortoise_output_row_ui import create_tortoise_output_row_ui
 from src.tortoise.gen_tortoise import (
     generate_tortoise_long,
     get_voice_list,
@@ -18,26 +14,14 @@ from src.tortoise.diffusion_params import diffusion_params
 from src.tortoise.presets import presets
 from src.tortoise.gr_reload_button import gr_open_button_simple, gr_reload_button
 from src.tortoise.tortoise_model_settings_ui import tortoise_model_settings_ui
+from src.utils.randomize_seed import randomize_seed
 
 MAX_OUTPUTS = 9
 
 
 def generation_tab_tortoise():
     with gr.Tab("Tortoise TTS"):
-        inputs, output_rows = tortoise_core_ui()
-        total_columns = len(output_rows)
-
-        with gr.Row():
-            for i in range(total_columns):
-                target_count = total_columns - i
-                generate_button(
-                    text=f"Generate {target_count if target_count > 1 else ''}",
-                    count=target_count,
-                    variant="primary" if target_count == 1 else "secondary",
-                    inputs=inputs,
-                    output_rows=output_rows,
-                    total_columns=total_columns,
-                )
+        tortoise_core_ui()
 
 
 def tortoise_core_ui():
@@ -93,8 +77,11 @@ def tortoise_core_ui():
                 step=0.1,
                 interactive=False,
             )
-            with gr.Column():
-                seed, _, link_seed_cache = setup_seed_ui_musicgen()
+            with gr.Row():
+                seed = gr.Textbox(label="Seed", value="-1")
+                CUSTOM_randomize_seed_checkbox = gr.Checkbox(
+                    label="Randomize seed", value=True
+                )
 
             split_prompt = gr.Checkbox(label="Split prompt by lines", value=False)
 
@@ -111,7 +98,9 @@ def tortoise_core_ui():
         fn=lambda x: [
             gr.Slider(value=presets[x]["num_autoregressive_samples"]),
             gr.Slider(value=presets[x]["diffusion_iterations"]),
-            gr.Checkbox(value=presets[x]["cond_free"] if "cond_free" in presets[x] else True),
+            gr.Checkbox(
+                value=presets[x]["cond_free"] if "cond_free" in presets[x] else True
+            ),
         ],
         inputs=[preset],
         outputs=[num_autoregressive_samples, diffusion_iterations, cond_free],
@@ -142,50 +131,54 @@ def tortoise_core_ui():
         )
     )
 
+    with gr.Column():
+        audio = gr.Audio(
+            type="filepath", label="Generated audio", elem_classes="tts-audio"
+        )
+        bundle_name = gr.Textbox(
+            visible=False,
+        )
+        params = gr.JSON(
+            visible=False,
+        )
+        with gr.Row():
+            from src.history_tab.save_to_favorites import save_to_favorites
+
+            gr.Button("Save to favorites").click(
+                fn=save_to_favorites,
+                inputs=[bundle_name],
+            )
+
+    def generate_button(count):
+
+        def gen(*args):
+            yield from generate_tortoise_long(
+                count,
+                TortoiseParameters.from_list(list(args)),
+            )
+
+        return (
+            gr.Button(
+                value=f"Generate {count if count > 1 else ''}",
+                variant="primary" if count == 1 else "secondary",
+            )
+            .click(
+                fn=randomize_seed,
+                inputs=[seed, CUSTOM_randomize_seed_checkbox],
+                outputs=[seed],
+            )
+            .then(
+                fn=gen,
+                inputs=inputs,
+                outputs=[audio, bundle_name, params],
+                api_name=f"generate_tortoise_{count}",
+            )
+        )
+
     with gr.Row():
-        output_rows = [create_tortoise_output_row_ui(i) for i in range(MAX_OUTPUTS)]
-
-    link_seed_cache(seed_cache=output_rows[0][2])
-
-    return inputs, output_rows
-
-
-def generate_button(text, count, variant, inputs, output_rows, total_columns):
-    get_all_components = lambda count: [i for i, _, _ in output_rows[:count]]
-    get_output_list = lambda count: sum(get_all_components(count), [])
-    get_all_outs = lambda count: [
-        TortoiseOutputRow.from_list(i) for i in get_all_components(count)
-    ]
-    show = lambda count: [gr.Column(visible=count > i) for i in range(total_columns)]
-
-    def hide_all_save_buttons(list_of_outs: list[TortoiseOutputRow]):
-        return lambda: {
-            outs.save_button: gr.Button(visible=False) for outs in list_of_outs
-        }
-
-    output_cols: list[Any] = [col for _, col, _ in output_rows]
-
-    def gen(*args):
-        yield from generate_tortoise_long(
-            get_all_outs(count),
-            count,
-            TortoiseParameters.from_list(list(args)),
-        )
-
-    return (
-        gr.Button(text, variant=variant)
-        .click(fn=lambda: show(count), outputs=output_cols)
-        .then(
-            fn=hide_all_save_buttons(get_all_outs(count)),
-            outputs=get_output_list(count),
-        )
-        .then(
-            fn=gen,
-            inputs=inputs,
-            outputs=get_output_list(count),
-            api_name=f"generate_tortoise_{count}",
-        )
-    )
+        total_columns = MAX_OUTPUTS
+        for i in range(total_columns):
+            generate_button(total_columns - i)
 
 
 if __name__ == "__main__":

@@ -4,7 +4,6 @@ import useLocalStorage from "../hooks/useLocalStorage";
 import { AudioOutput } from "../components/AudioComponents";
 import Head from "next/head";
 import { GradioFile } from "../types/GradioFile";
-import { DemucsParams } from "../tabs/DemucsParams";
 import { splitWithDemucs } from "../functions/splitWithDemucs";
 import { generateWithBark } from "../functions/generateWithBark";
 import { BarkInputs } from "../components/BarkInputs";
@@ -22,6 +21,7 @@ import { TortoiseInput } from "../components/TortoiseInput";
 import { generateWithTortoise } from "../functions/generateWithTortoise";
 import {
   getTortoiseGenerationParams,
+  TortoiseGenerationParams,
   useTortoiseGenerationParams,
 } from "../tabs/TortoiseGenerationParams";
 import { parseFormChange } from "../data/parseFormChange";
@@ -34,9 +34,7 @@ import { MusicgenInputs } from "../components/MusicgenInputs";
 import { VocosWavInputs } from "../components/VocosWavInputs";
 import { getVocosParams, useVocosParams } from "../tabs/VocosParams";
 import { applyVocosWav } from "../functions/applyVocosWav";
-import { EncodecParamsNPZ } from "../tabs/VocosParamsNPZ";
 import { applyVocosNPZ } from "../functions/applyVocosNPZ";
-import { BarkResult } from "../tabs/BarkResult";
 import { getWebuiURLWithHost } from "../data/getWebuiURL";
 import { getMahaParams, useMahaParams } from "../tabs/MahaParams";
 import { generateWithMaha } from "../functions/generateWithMaha";
@@ -47,6 +45,7 @@ import { MMSInputs } from "../components/MMSInputs";
 import { getVallexParams, useVallexParams } from "../tabs/VallexParams";
 import { generateWithVallex } from "../functions/generateWithVallex";
 import { VallexInputs } from "../components/VallexInputs";
+import { applySeed } from "../data/applySeed";
 
 interface PipelineParams {
   generation: string;
@@ -60,25 +59,36 @@ const initialState: PipelineParams = {
 
 const pipelineId = "pipeline";
 
-function getResult(model: string) {
-  switch (model) {
-    case "bark":
-      return generateWithBark(getBarkGenerationParams());
-    case "tortoise":
-      return generateWithTortoise(getTortoiseGenerationParams());
-    case "musicgen":
-      return generateWithMusicgen(getMusicgenParams());
-    case "magnet":
-      return generateWithMagnet(getMagnetParams());
-    case "maha":
-      return generateWithMaha(getMahaParams());
-    case "mms":
-      return generateWithMMS(getMMSParams());
-    case "vallex":
-      return generateWithVallex(getVallexParams());
-    default:
-      return null;
-  }
+async function getResult(model: string) {
+  const params = {
+    bark: getBarkGenerationParams,
+    tortoise: getTortoiseGenerationParams,
+    musicgen: getMusicgenParams,
+    magnet: getMagnetParams,
+    maha: getMahaParams,
+    mms: getMMSParams,
+    vallex: getVallexParams,
+  }[model as keyof typeof params]();
+  const newParams = applySeed(params);
+
+  const fns = {
+    bark: generateWithBark,
+    tortoise: (x: TortoiseGenerationParams) =>
+      generateWithTortoise({
+        ...x,
+        candidates: 1,
+      })[0],
+    musicgen: generateWithMusicgen,
+    magnet: generateWithMagnet,
+    maha: generateWithMaha,
+    mms: generateWithMMS,
+    vallex: generateWithVallex,
+  };
+
+  return {
+    result: await fns[model](newParams),
+    newSeed: newParams.use_random_seed ? newParams.seed : undefined,
+  };
 }
 
 const GenerateButton = ({
@@ -98,6 +108,118 @@ const GenerateButton = ({
   </button>
 );
 
+const GenerationInputs = ({ model, seed }: { model: string; seed: number }) => {
+  const [barkGenerationParams, setBarkVoiceGenerationParams] =
+    useBarkGenerationParams();
+  const [tortoiseGenerationParams, setTortoiseGenerationParams] =
+    useTortoiseGenerationParams();
+  const [musicgenParams, setMusicgenParams] = useMusicgenParams();
+  const [magnetParams, setMagnetParams] = useMagnetParams();
+  const [mahaParams, setMahaParams] = useMahaParams();
+  const [mmsParams, setMmsParams] = useMMSParams();
+  const [vallexParams, setVallexParams] = useVallexParams();
+
+  React.useEffect(() => {
+    const fn = {
+      bark: setBarkVoiceGenerationParams,
+      tortoise: setTortoiseGenerationParams,
+      musicgen: setMusicgenParams,
+      magnet: setMagnetParams,
+      maha: setMahaParams,
+      mms: setMmsParams,
+      vallex: setVallexParams,
+    }[model as keyof typeof fn];
+    fn((x) => ({ ...x, seed }));
+  }, [seed]);
+
+  switch (model) {
+    case "bark":
+      return (
+        <BarkInputs
+          barkGenerationParams={barkGenerationParams}
+          handleChange={parseFormChange(setBarkVoiceGenerationParams)}
+        />
+      );
+    case "tortoise":
+      return (
+        <TortoiseInput
+          tortoiseGenerationParams={tortoiseGenerationParams}
+          setTortoiseGenerationParams={setTortoiseGenerationParams}
+          handleChange={parseFormChange(setTortoiseGenerationParams)}
+        />
+      );
+    case "musicgen":
+      return (
+        <MusicgenInputs
+          musicgenParams={musicgenParams}
+          handleChange={parseFormChange(setMusicgenParams)}
+          setMusicgenParams={setMusicgenParams}
+        />
+      );
+    case "magnet":
+      return (
+        <MagnetInputs
+          magnetParams={magnetParams}
+          handleChange={parseFormChange(setMagnetParams)}
+        />
+      );
+    case "maha":
+      return (
+        <MahaInputs
+          mahaParams={mahaParams}
+          handleChange={parseFormChange(setMahaParams)}
+          setMahaParams={setMahaParams}
+        />
+      );
+    case "mms":
+      return (
+        <MMSInputs
+          mmsParams={mmsParams}
+          handleChange={parseFormChange(setMmsParams)}
+          setMmsParams={setMmsParams}
+        />
+      );
+    case "vallex":
+      return (
+        <VallexInputs
+          vallexParams={vallexParams}
+          handleChange={parseFormChange(setVallexParams)}
+          setVallexParams={setVallexParams}
+        />
+      );
+    default:
+      return null;
+  }
+};
+
+async function postProcessAudio(
+  model: string,
+  { url }: GradioFile,
+  npz_file?: string
+): Promise<GradioFile[]> {
+  switch (model) {
+    case "demucs":
+      return splitWithDemucs({ file: url });
+    case "rvc":
+      return [
+        (
+          await applyRVC({
+            ...getRVCGenerationParams(),
+            original_audio: url,
+          })
+        ).audio,
+      ];
+    case "vocos wav":
+      return [await applyVocosWav({ ...getVocosParams(), audio: url })];
+    case "vocos npz (bark only)":
+      if (!npz_file) return [];
+      return [await applyVocosNPZ({ npz_file: getWebuiURLWithHost(npz_file) })];
+    case "none":
+    default:
+      return [];
+  }
+}
+
 const PipelinePage = () => {
   const [output, setOutput] = useLocalStorage<GradioFile[] | null>(
     "pipelineOutput",
@@ -110,54 +232,25 @@ const PipelinePage = () => {
 
   const [status, setStatus] = React.useState("idle");
 
-  async function pipeline() {
-    async function postProcessAudio(audio: GradioFile, npz_file?: string) {
-      if (pipelineParams.postprocess === "none") {
-        setOutput([audio]);
-      } else if (pipelineParams.postprocess === "demucs") {
-        setOutput([audio]);
-        const demucsParams: DemucsParams = {
-          file: audio.url,
-        };
-        const result2 = await splitWithDemucs(demucsParams);
-        setOutput([audio, ...result2]);
-      } else if (pipelineParams.postprocess === "rvc") {
-        setOutput([audio]);
-        const rvcGenerationParams = getRVCGenerationParams();
-        const result3 = await applyRVC({
-          ...rvcGenerationParams,
-          original_audio: audio.url,
-        });
-        setOutput([audio, result3.audio]);
-      } else if (pipelineParams.postprocess === "vocos wav") {
-        setOutput([audio]);
-        const vocosParams = getVocosParams();
-        const result4 = await applyVocosWav({
-          ...vocosParams,
-          audio: audio.url,
-        });
-        setOutput([audio, result4]);
-      } else if (pipelineParams.postprocess === "vocos npz (bark only)") {
-        setOutput([audio]);
-        if (!npz_file) return;
-        const vocosParamsNPZ: EncodecParamsNPZ = {
-          npz_file: getWebuiURLWithHost(npz_file),
-        };
-        const result5 = await applyVocosNPZ(vocosParamsNPZ);
-        setOutput([audio, result5]);
-      }
-    }
+  const [seed, setSeed] = React.useState<number>(0);
 
+  async function pipeline() {
+    const { generation, postprocess } = pipelineParams;
     setStatus("generating");
-    const result = await getResult(pipelineParams.generation);
+    const { result, newSeed } = await getResult(generation);
+    if (newSeed) {
+      setSeed(newSeed);
+    }
     if (!result) return;
+    const { audio } = result;
+    setOutput([audio]);
     setStatus("postprocessing");
-    await postProcessAudio(
-      result.audio,
-      pipelineParams.generation === "bark"
-        ? (result as BarkResult).npz
-        : undefined
+    const postProcessed = await postProcessAudio(
+      postprocess,
+      audio,
+      result?.npz
     );
+    setOutput([audio, ...postProcessed]);
     setStatus("idle");
   }
 
@@ -208,79 +301,6 @@ const PipelinePage = () => {
     }
   };
 
-  const GenerationInputs = ({ model }: { model: string }) => {
-    const [barkGenerationParams, setBarkVoiceGenerationParams] =
-      useBarkGenerationParams();
-    const [tortoiseGenerationParams, setTortoiseGenerationParams] =
-      useTortoiseGenerationParams();
-    const [musicgenParams, setMusicgenParams] = useMusicgenParams();
-    const [magnetParams, setMagnetParams] = useMagnetParams();
-    const [mahaParams, setMahaParams] = useMahaParams();
-    const [mmsParams, setMmsParams] = useMMSParams();
-    const [vallexParams, setVallexParams] = useVallexParams();
-
-    switch (model) {
-      case "bark":
-        return (
-          <BarkInputs
-            barkGenerationParams={barkGenerationParams}
-            setBarkVoiceGenerationParams={setBarkVoiceGenerationParams}
-            handleChange={parseFormChange(setBarkVoiceGenerationParams)}
-          />
-        );
-      case "tortoise":
-        return (
-          <TortoiseInput
-            tortoiseGenerationParams={tortoiseGenerationParams}
-            setTortoiseGenerationParams={setTortoiseGenerationParams}
-            handleChange={parseFormChange(setTortoiseGenerationParams)}
-          />
-        );
-      case "musicgen":
-        return (
-          <MusicgenInputs
-            musicgenParams={musicgenParams}
-            handleChange={parseFormChange(setMusicgenParams)}
-            setMusicgenParams={setMusicgenParams}
-          />
-        );
-      case "magnet":
-        return (
-          <MagnetInputs
-            magnetParams={magnetParams}
-            setMagnetParams={setMagnetParams}
-            handleChange={parseFormChange(setMagnetParams)}
-          />
-        );
-      case "maha":
-        return (
-          <MahaInputs
-            mahaParams={mahaParams}
-            handleChange={parseFormChange(setMahaParams)}
-            setMahaParams={setMahaParams}
-          />
-        );
-      case "mms":
-        return (
-          <MMSInputs
-            mmsParams={mmsParams}
-            handleChange={parseFormChange(setMmsParams)}
-            setMmsParams={setMmsParams}
-          />
-        );
-      case "vallex":
-        return (
-          <VallexInputs
-            vallexParams={vallexParams}
-            handleChange={parseFormChange(setVallexParams)}
-            setVallexParams={setVallexParams}
-          />
-        );
-      default:
-        return null;
-    }
-  };
-
   const postProcessingModels = [
     "none",
     "rvc",
@@ -290,10 +310,7 @@ const PipelinePage = () => {
   ];
 
   return (
-    <Template>
-      <Head>
-        <title>Pipeline - TTS Generation Webui</title>
-      </Head>
+    <Template title="Pipeline">
       <div className="flex flex-col gap-y-4 p-4">
         <div className="flex flex-col gap-y-2">
           <p className="font-semibold">
@@ -322,7 +339,7 @@ const PipelinePage = () => {
               </div>
             ))}
           </div>
-          <GenerationInputs model={pipelineParams.generation} />
+          <GenerationInputs model={pipelineParams.generation} seed={seed} />
           <div className="flex flex-row gap-x-2 border border-gray-300 p-2 rounded mb-4">
             <label>Choose a postprocessing model:</label>
             {postProcessingModels.map((model) => (

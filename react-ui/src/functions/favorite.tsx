@@ -1,4 +1,4 @@
-export const barkFavorite = async (
+export const favorite = async (
   _url: string,
   data?: {
     history_bundle_name_data?: string;

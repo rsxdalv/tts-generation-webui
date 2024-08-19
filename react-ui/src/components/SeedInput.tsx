@@ -1,17 +1,18 @@
 import React from "react";
 import { HandleChange } from "../types/HandleChange";
 
-export const SeedInput = <T extends { seed: number | string | undefined }>({
+export const SeedInput = <
+  T extends {
+    use_random_seed: boolean;
+    seed: number | string | undefined;
+  }
+>({
   params,
   handleChange,
-  setParams,
-  seed,
   className,
 }: {
   params: T;
   handleChange: HandleChange;
-  setParams: React.Dispatch<React.SetStateAction<T>>;
-  seed: number | string | undefined;
   className?: string;
 }) => (
   <div className={`flex gap-x-2 items-center w-full ${className}`}>
@@ -24,17 +25,13 @@ export const SeedInput = <T extends { seed: number | string | undefined }>({
       maxLength={10}
       className="border border-gray-300 p-2 rounded text-base w-36"
     />
-    <button
+    <label className="text-base">Randomize seed:</label>
+    <input
+      type="checkbox"
+      name="use_random_seed"
+      checked={params.use_random_seed}
+      onChange={handleChange}
       className="border border-gray-300 p-2 rounded text-base"
-      onClick={() => setParams({ ...params, seed: Number(seed) || -1 })}
-    >
-      Restore&nbsp;Last
-    </button>
-    <button
-      className="border border-gray-300 p-2 rounded text-base"
-      onClick={() => setParams({ ...params, seed: -1 })}
-    >
-      Randomize
-    </button>
+    />
   </div>
 );

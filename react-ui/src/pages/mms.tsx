@@ -47,7 +47,6 @@ const DETAILS = (
 
 const initialHistory = []; // prevent infinite loop
 const MMSPage = () => {
-  const [data, setData] = useMMSResult();
   const [historyData, setHistoryData] = useLocalStorage<MMSResult[]>(
     "mmsHistory",
     initialHistory
@@ -56,7 +55,8 @@ const MMSPage = () => {
 
   async function mmsConsumer(params: MMSParams) {
     const data = await generateWithMMS(params);
-    setData(data);
+    if (params.use_random_seed)
+      setMMSParams((x) => ({ ...x, seed: params.seed }));
     setHistoryData((x) => [data, ...x]);
     return data;
   }
@@ -89,34 +89,28 @@ const MMSPage = () => {
   };
 
   return (
-    <Template>
-      <Head>
-        <title>MMS - TTS Generation Webui</title>
-      </Head>
+    <Template title="MMS">
       <div className="gap-y-4 p-4 flex w-full flex-col">
         {DETAILS}
         <MMSInputs
           mmsParams={mmsParams}
           handleChange={handleChange}
           setMmsParams={setMMSParams}
-          data={data}
         />
 
         <div className="flex flex-row gap-2">
           <AudioOutput
-            audioOutput={data?.audio}
+            audioOutput={historyData[0]?.audio}
             label="MMS Output"
             funcs={funcs}
-            metadata={data}
+            metadata={historyData[0]}
             filter={["sendToMMS"]}
           />
-          <div className="flex flex-col gap-2">
-            <HyperParameters
-              genParams={mmsParams}
-              consumer={mmsConsumer}
-              prefix="mms"
-            />
-          </div>
+          <HyperParameters
+            genParams={mmsParams}
+            consumer={mmsConsumer}
+            prefix="mms"
+          />
         </div>
 
         <GenerationHistorySimple

@@ -1,7 +1,7 @@
 import React from "react";
 import { BarkGenerationParams } from "../tabs/BarkGenerationParams";
 import { BarkResult } from "../tabs/BarkResult";
-import { barkFavorite } from "../functions/barkFavorite";
+import { favorite } from "../functions/favorite";
 
 export function getBarkFuncs(
   setBarkVoiceGenerationParams: React.Dispatch<
@@ -28,7 +28,7 @@ export function getBarkFuncs(
   };
 
   const useSeed = (_url: string, data?: BarkResult) => {
-    const seed_input = data?.json_text?.seed;
+    const seed_input = data?.metadata?.seed;
     if (!seed_input) return;
     setBarkVoiceGenerationParams({
       ...barkGenerationParams,
@@ -39,11 +39,11 @@ export function getBarkFuncs(
   const useParametersTest = (_url: string, data?: BarkResult) => {
     const {
       prompt, language, speaker_id, text_temp, waveform_temp, history_prompt, history_prompt_npz, semantic_prompt, coarse_prompt,
-    } = (data?.json_text)!;
+    } = (data?.metadata)!;
     if (!prompt) return;
     setBarkVoiceGenerationParams({
       ...barkGenerationParams,
-      prompt,
+      text: prompt,
       languageRadio: language,
       speakerIdRadio: speaker_id,
       text_temp,
@@ -53,8 +53,8 @@ export function getBarkFuncs(
       history_prompt_semantic_dropdown: semantic_prompt,
       burn_in_prompt: coarse_prompt,
       long_prompt_radio: "Short prompt (<15s)",
-      seed: data?.json_text?.seed ?? "-1",
-      useV2: data?.json_text?.history_prompt?.includes("v2") ?? true,
+      seed: data?.metadata?.seed ?? "-1",
+      useV2: data?.metadata?.history_prompt?.includes("v2") ?? true,
     });
   };
 
@@ -62,7 +62,7 @@ export function getBarkFuncs(
     useAsHistory,
     useAsHistoryPromptSemantic,
     useSeed,
-    favorite: barkFavorite,
+    favorite: favorite,
     useParametersTest,
   };
 }

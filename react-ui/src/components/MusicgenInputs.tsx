@@ -107,9 +107,7 @@ export const MusicgenInputs = ({
 
       <SeedInput
         params={musicgenParams}
-        setParams={setMusicgenParams}
         handleChange={handleChange}
-        seed={musicgenResult?.json?.seed}
       />
 
       <div className="flex gap-x-2 items-center">

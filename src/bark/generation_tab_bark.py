@@ -33,6 +33,7 @@ from src.bark.generation_settings import (
 )
 from src.magnet.utils import Timer
 from src.utils.prompt_to_title import prompt_to_title
+from src.utils.randomize_seed import randomize_seed
 
 FREEZE_SEMANTIC = False
 
@@ -393,13 +394,6 @@ def bark_ui():
                 CUSTOM_randomize_seed_checkbox = gr.Checkbox(
                     label="Randomize seed", value=True
                 )
-
-
-                def randomize_seed(seed, randomize_seed):
-                    if randomize_seed:
-                        return np.random.randint(0, 2**32 - 1, dtype=np.uint32)
-                    else:
-                        return int(seed)
 
     burn_in_prompt = gr.Textbox(
         label="Burn In Prompt (Optional)", lines=3, placeholder="Enter text here..."

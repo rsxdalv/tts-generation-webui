@@ -4,27 +4,27 @@ import useLocalStorage, {
 } from "../hooks/useLocalStorage";
 import router from "next/router";
 import { GradioFile } from "../types/GradioFile";
+import { Seeded } from "../types/Seeded";
 
 const MMS_ID = "MMSParams";
 
-export type MMSParams = {
+export type MMSParams = Seeded & {
   text: string;
   language: string;
   speaking_rate: number;
   noise_scale: number;
   noise_scale_duration: number;
-  seed: number;
-  use_random_seed: boolean;
 };
 
 export const initialMMSParams: MMSParams = {
+  seed: 0,
+  use_random_seed: true,
+
   text: "",
   language: "eng",
   speaking_rate: 1.0,
   noise_scale: 0.667,
   noise_scale_duration: 0.8,
-  seed: 0,
-  use_random_seed: true,
 };
 
 export type MMSResult = {

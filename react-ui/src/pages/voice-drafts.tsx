@@ -16,7 +16,7 @@ export default function Home({
   npzData: any[];
 }) {
   return (
-    <Template>
+    <Template title="Voice Drafts">
       {/* <div className="grid gap-4 grid-cols-1 w-full"> */}
       <div className="flex flex-col gap-4 w-full">
         {/* {npzData.map((npz) => (

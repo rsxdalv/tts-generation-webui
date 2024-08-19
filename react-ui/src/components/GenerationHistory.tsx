@@ -22,7 +22,7 @@ export const GenerationHistorySimple = ({
 
   return (
     <GenerationHistory
-      clearHistory={() => setHistoryData([])}
+      clearHistory={() => setHistoryData(x => x.slice(0, 1))}
       showLast={showLast}
       setShowLast={setShowLast}
       {...props}

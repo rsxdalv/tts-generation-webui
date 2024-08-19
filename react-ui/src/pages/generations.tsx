@@ -15,10 +15,7 @@ export default function Home({
   generations: GenerationRaw[];
 }) {
   return (
-    <Template>
-      <Head>
-        <title>Favorites - TTS Generation Webui</title>
-      </Head>
+    <Template title="Favorites">
       <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
         {generations.map((generation) => (
           <CardGeneration key={generation.date} metadata={generation} />

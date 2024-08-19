@@ -79,13 +79,11 @@ const Speaker = ({
 export const MahaInputs = ({
   mahaParams,
   handleChange,
-  setMahaParams,
-  data,
+  resetParams,
 }: {
   mahaParams: MahaParams;
   handleChange: HandleChange;
-  setMahaParams: React.Dispatch<React.SetStateAction<MahaParams>>;
-  data?: MahaResult | null;
+  resetParams: () => void;
 }) => (
   <div className="flex gap-x-6 w-full justify-center">
     <div className="flex flex-col gap-y-2 w-1/2">
@@ -114,9 +112,11 @@ export const MahaInputs = ({
                 onChange={(event) => {
                   console.log(event.target.value);
                   if (event.target.value === "Smolie-en") {
-                    setMahaParams({
-                      ...mahaParams,
-                      maha_tts_language: "english",
+                    handleChange({
+                      target: {
+                        name: "maha_tts_language",
+                        value: "english",
+                      },
                     });
                   }
                   handleChange(event);
@@ -170,12 +170,7 @@ export const MahaInputs = ({
 
       <Speaker mahaParams={mahaParams} handleChange={handleChange} />
 
-      <SeedInput
-        params={mahaParams}
-        handleChange={handleChange}
-        setParams={setMahaParams}
-        seed={data?.metadata?.seed}
-      />
+      <SeedInput params={mahaParams} handleChange={handleChange} />
 
       <div className="flex gap-2 items-center">
         <label className="text-sm">Device:</label>
@@ -199,15 +194,7 @@ export const MahaInputs = ({
         </div>
       </div>
 
-      <button
-        className={commonBorder}
-        onClick={() =>
-          setMahaParams({
-            ...mahaParams,
-            ...initialMahaParams,
-          })
-        }
-      >
+      <button className={commonBorder} onClick={resetParams}>
         Reset Parameters
       </button>
     </div>
