@@ -10,7 +10,7 @@ def create_tortoise_output_row_ui(index):
         audio = gr.Audio(
             type="filepath", label="Generated audio", elem_classes="tts-audio"
         )
-        image = gr.Image(label="Waveform", elem_classes="tts-image")  # type: ignore
+        image = gr.Image(label="Waveform", elem_classes="tts-image", visible=False)  # type: ignore
         with gr.Row():
             save_button = gr.Button("Save to favorites", visible=False)
         seed = gr.Textbox(

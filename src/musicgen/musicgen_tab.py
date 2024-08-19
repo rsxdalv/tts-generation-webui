@@ -334,7 +334,7 @@ def generation_tab_musicgen():
                 interactive=False,
                 elem_classes="tts-audio",
             )
-            image = gr.Image(label="Waveform", elem_classes="tts-image")  # type: ignore
+            image = gr.Image(label="Waveform", elem_classes="tts-image", visible=False)  # type: ignore
             with gr.Row():
                 history_bundle_name_data = gr.Textbox(visible=False)
                 save_button = gr.Button("Save to favorites", visible=True)
