@@ -1,10 +1,6 @@
 import os
 
 
-def dummy():
-    pass
-
-
 def env_entry(name, value, comment, null=False):
     return f"# {comment}\n{'# ' if null else ''}{name}={value}\n"
 
@@ -155,6 +151,3 @@ def setup_or_recover():
     if not os.path.exists(".env"):
         print("Env file not found. Creating default env.")
         write_env(generate_env())
-
-
-setup_or_recover()

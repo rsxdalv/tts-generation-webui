@@ -8,8 +8,6 @@ except ImportError:
     )
     exit(1)
 
-load_dotenv()
-
 
 def init():
-    pass
+    load_dotenv()

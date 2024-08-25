@@ -16,7 +16,7 @@ from src.utils.torch_clear_memory import torch_clear_memory
 from src.utils.prompt_to_title import prompt_to_title
 
 LOCAL_DIR_BASE = os.path.join("data", "models", "stable-audio")
-LOCAL_DIR_BASE_ABSOLUTE = get_path_from_root(*LOCAL_DIR_BASE.split("/"))
+LOCAL_DIR_BASE_ABSOLUTE = get_path_from_root(*LOCAL_DIR_BASE.split(os.path.sep))
 OUTPUT_DIR = os.path.join("outputs-rvc", "Stable Audio")
 
 

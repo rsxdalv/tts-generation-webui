@@ -1,7 +1,13 @@
 # %%
-import os
 import src.utils.setup_or_recover as setup_or_recover
+
+setup_or_recover.setup_or_recover()
+
 import src.utils.dotenv_init as dotenv_init
+
+dotenv_init.init()
+
+import os
 import gradio as gr
 from src.utils.suppress_warnings import suppress_warnings
 
@@ -15,14 +21,14 @@ from src.history_tab.collections_directories_atom import collections_directories
 
 print("Starting server...\n")
 
-setup_or_recover.dummy()
-dotenv_init.init()
-
 
 from src.utils.generic_error_tab_advanced import generic_error_tab_advanced
 from src.extensions_loader.interface_extensions import (
     extension_list_tab,
     handle_extension_class,
+)
+from src.extensions_loader.decorator_extensions import (
+    extension_decorator_list_tab,
 )
 from src.extensions_loader.ext_callback_save_generation import (
     load_ext_callback_save_generation,
@@ -73,7 +79,7 @@ def load_tabs(list_of_tabs):
         run_tab(module_name, function_name, name, requirements)
 
 
-def main_ui(theme_choice = "Base"):    
+def main_ui(theme_choice="Base"):
     themes = {
         "Base": gr.themes.Base,
         "Default": gr.themes.Default,
@@ -84,25 +90,28 @@ def main_ui(theme_choice = "Base"):
         primary_hue="sky",
         secondary_hue="sky",
         neutral_hue="neutral",
-        font=[gr.themes.GoogleFont('Inter'), 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        font=[
+            gr.themes.GoogleFont("Inter"),
+            "ui-sans-serif",
+            "system-ui",
+            "sans-serif",
+        ],
     ).set(
-        embed_radius='*radius_sm',
-        block_label_radius='*radius_sm',
-        block_label_right_radius='*radius_sm',
-        block_radius='*radius_sm',
-        block_title_radius='*radius_sm',
-        container_radius='*radius_sm',
-        checkbox_border_radius='*radius_sm',
-        input_radius='*radius_sm',
-        table_radius='*radius_sm',
-        button_large_radius='*radius_sm',
-        button_small_radius='*radius_sm',
-
-        
-        button_primary_background_fill_hover='*primary_300',
-        button_primary_background_fill_hover_dark='*primary_600',
-        button_secondary_background_fill_hover='*secondary_200',
-        button_secondary_background_fill_hover_dark='*secondary_600',
+        embed_radius="*radius_sm",
+        block_label_radius="*radius_sm",
+        block_label_right_radius="*radius_sm",
+        block_radius="*radius_sm",
+        block_title_radius="*radius_sm",
+        container_radius="*radius_sm",
+        checkbox_border_radius="*radius_sm",
+        input_radius="*radius_sm",
+        table_radius="*radius_sm",
+        button_large_radius="*radius_sm",
+        button_small_radius="*radius_sm",
+        button_primary_background_fill_hover="*primary_300",
+        button_primary_background_fill_hover_dark="*primary_600",
+        button_secondary_background_fill_hover="*secondary_200",
+        button_secondary_background_fill_hover_dark="*secondary_600",
     )
 
     with gr.Blocks(
@@ -251,6 +260,7 @@ def all_tabs():
         load_tabs(settings_tabs)
 
         extension_list_tab()
+        extension_decorator_list_tab()
 
         handle_extension_class("settings", config)
 

@@ -5,8 +5,13 @@ import useLocalStorage, {
 import router from "next/router";
 import { GradioFile } from "../types/GradioFile";
 import { Seeded } from "../types/Seeded";
+import { parseFormChange } from "../data/parseFormChange";
+import { generateWithMMS } from "../functions/generateWithMMS";
+import { useHistory } from "../hooks/useHistory";
+import { useSeedHelper } from "../functions/results/useSeedHelper";
+import { favorite } from "../functions/favorite";
 
-const MMS_ID = "MMSParams";
+const MMS_ID = "MMSParams.v2";
 
 export type MMSParams = Seeded & {
   text: string;
@@ -59,3 +64,40 @@ export const useMMSResult = () =>
 
 export const getMMSParams = (): MMSParams =>
   readLocalStorage(MMS_ID) ?? initialMMSParams;
+
+export const useMMSPage = () => {
+  const [mmsParams, setMMSParams] = useMMSParams();
+
+  const [historyData, setHistoryData] = useHistory<MMSResult>("mms");
+
+  const consumer = async (params: MMSParams) => {
+    const data = await generateWithMMS(params);
+    if (params.use_random_seed)
+      setMMSParams((x) => ({ ...x, seed: params.seed }));
+    setHistoryData((x) => [data, ...x]);
+    return data;
+  };
+
+  const funcs = {
+    favorite,
+    useSeed: useSeedHelper(setMMSParams),
+    useParameters: (_url: string, data?: MMSResult) => {
+      const params = data?.metadata;
+      if (!params) return;
+      setMMSParams({
+        ...mmsParams,
+        ...params,
+      });
+    },
+  };
+
+  return {
+    mmsParams,
+    setMMSParams,
+    historyData,
+    setHistoryData,
+    consumer,
+    handleChange: parseFormChange(setMMSParams),
+    funcs,
+  };
+};

@@ -12,7 +12,9 @@ def _get_typed_dict_name(typed_dict: dict) -> Optional[str]:
         return "BarkParams"
     elif typed_dict.keys() == OtherParams.__annotations__.keys():
         return "OtherParams"
-    return "UnknownTypedDict"
+    elif typed_dict.get("_type", None):
+        return typed_dict["_type"].capitalize()
+    return "Params"
 
 def custom_repr(value):
     if isinstance(value, dict):

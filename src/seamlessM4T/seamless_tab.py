@@ -10,29 +10,44 @@ from src.seamlessM4T.language_code_to_name import (
     speech_target_codes,
 )
 
-model = None
+from src.decorators.gradio_dict_decorator import gradio_dict_decorator
+from src.utils.randomize_seed import randomize_seed_ui
+from src.utils.manage_model_state import manage_model_state
+from src.utils.list_dir_models import unload_model_button
+from src.decorators.decorator_apply_torch_seed import decorator_apply_torch_seed
+from src.decorators.decorator_log_generation import decorator_log_generation
+from src.decorators.decorator_save_metadata import decorator_save_metadata
+from src.decorators.decorator_save_wav import decorator_save_wav
+from src.decorators.decorator_add_base_filename import decorator_add_base_filename
+from src.decorators.decorator_add_date import decorator_add_date
+from src.decorators.decorator_add_model_type import decorator_add_model_type
+from src.decorators.log_function_time import log_function_time
+from src.extensions_loader.decorator_extensions import (
+    decorator_extension_outer,
+    decorator_extension_inner,
+)
 
 
-def get_model():
-    global model
-    if not model:
-        model = SeamlessM4Tv2Model.from_pretrained("facebook/seamless-m4t-v2-large")
-    return model
+@manage_model_state("seamless")
+def get_model(model_name=""):
+    # todo - add device setting
+    return SeamlessM4Tv2Model.from_pretrained(
+        model_name
+    ), AutoProcessor.from_pretrained(model_name)
 
 
-processor = None
-
-
-def get_processor():
-    global processor
-    if not processor:
-        processor = AutoProcessor.from_pretrained("facebook/seamless-m4t-v2-large")
-    return processor
-
-
-def seamless_translate(text, src_lang_name, tgt_lang_name):
-    model = get_model()
-    processor = get_processor()
+@decorator_extension_outer
+@decorator_apply_torch_seed
+@decorator_save_metadata
+@decorator_save_wav
+@decorator_add_model_type("seamless")
+@decorator_add_base_filename
+@decorator_add_date
+@decorator_log_generation
+@decorator_extension_inner
+@log_function_time
+def seamless_translate(text, src_lang_name, tgt_lang_name, **kwargs):
+    model, processor = get_model("facebook/seamless-m4t-v2-large")
     src_lang = text_source_codes[text_source_languages.index(src_lang_name)]
     tgt_lang = speech_target_codes[speech_target_languages.index(tgt_lang_name)]
     text_inputs = processor(text=text, src_lang=src_lang, return_tensors="pt")
@@ -40,12 +55,22 @@ def seamless_translate(text, src_lang_name, tgt_lang_name):
         model.generate(**text_inputs, tgt_lang=tgt_lang)[0].cpu().squeeze()
     )
     sample_rate = model.config.sampling_rate
-    return sample_rate, audio_array_from_text.numpy()
+
+    return {"audio_out": (sample_rate, audio_array_from_text.numpy())}
 
 
+@decorator_extension_outer
+@decorator_apply_torch_seed
+@decorator_save_metadata
+@decorator_save_wav
+@decorator_add_model_type("seamless")
+@decorator_add_base_filename
+@decorator_add_date
+@decorator_log_generation
+@decorator_extension_inner
+@log_function_time
 def seamless_translate_audio(audio, tgt_lang_name):
-    model = get_model()
-    processor = get_processor()
+    model, processor = get_model("facebook/seamless-m4t-v2-large")
     # audio, orig_freq = torchaudio.load(audio)
     orig_freq, audio = audio
     sample_rate = model.config.sampling_rate
@@ -57,8 +82,8 @@ def seamless_translate_audio(audio, tgt_lang_name):
     audio_array_from_audio = (
         model.generate(**audio_inputs, tgt_lang=tgt_lang)[0].cpu().squeeze()
     )
-    return sample_rate, audio_array_from_audio.numpy()
-    # return audio_array_from_audio.numpy()
+
+    return {"audio_out": (sample_rate, audio_array_from_audio.numpy())}
 
 
 def seamless_ui():
@@ -73,8 +98,6 @@ def seamless_ui():
     with gr.Row(equal_height=False):
         with gr.Column():
             with gr.Tab(label="Text to Speech"):
-                # seamless_input = Joutai.singleton.seamless_input
-                # seamless_input.render()
                 seamless_input = gr.Textbox(lines=2, label="Input Text")
                 source_language = gr.Dropdown(
                     choices=text_source_languages,  # type: ignore
@@ -105,27 +128,50 @@ def seamless_ui():
                 button2 = gr.Button("Translate Audio to Speech")
 
         with gr.Column():
-            # seamless_output = Joutai.singleton.seamless_output
-            # seamless_output.render()
-            seamless_output = gr.Audio(label="Output Audio")
+            audio_out = gr.Audio(label="Output Audio")
+
+            seed, randomize_seed_callback = randomize_seed_ui()
+            unload_model_button("seamless")
+
+    input_dict = {
+        seamless_input: "text",
+        source_language: "src_lang_name",
+        target_language: "tgt_lang_name",
+        seed: "seed",
+    }
+
+    input_dict2 = {
+        input_audio: "audio",
+        target_language_audio: "tgt_lang_name",
+    }
+
+    output_dict = {
+        "audio_out": audio_out,
+    }
+
     button.click(
-        inputs=[
-            seamless_input,
-            source_language,
-            target_language,
-        ],
-        outputs=seamless_output,
-        fn=seamless_translate,
+        **randomize_seed_callback,
+    ).then(
+        fn=gradio_dict_decorator(
+            fn=seamless_translate,
+            gradio_fn_input_dictionary=input_dict,
+            outputs=output_dict,
+        ),
+        inputs={*input_dict},
+        outputs=list(output_dict.values()),
         api_name="seamless",
     )
 
     button2.click(
-        inputs=[
-            input_audio,
-            target_language_audio,
-        ],
-        outputs=seamless_output,
-        fn=seamless_translate_audio,
+        **randomize_seed_callback,
+    ).then(
+        fn=gradio_dict_decorator(
+            fn=seamless_translate_audio,
+            gradio_fn_input_dictionary=input_dict2,
+            outputs=output_dict,
+        ),
+        inputs={*input_dict2},
+        outputs=list(output_dict.values()),
         api_name="seamless_audio",
     )
 
@@ -133,3 +179,12 @@ def seamless_ui():
 def seamless_tab():
     with gr.Tab("Seamless M4Tv2", id="seamless"):
         seamless_ui()
+
+
+if __name__ == "__main__":
+    if "demo" in locals():
+        demo.close()  # type: ignore
+    with gr.Blocks() as demo:
+        seamless_tab()
+
+    demo.launch()

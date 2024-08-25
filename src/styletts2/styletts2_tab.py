@@ -1,21 +1,37 @@
 import gradio as gr
 from styletts2 import tts
-from nltk.tokenize import word_tokenize
+
+from src.decorators.gradio_dict_decorator import gradio_dict_decorator
+from src.utils.randomize_seed import randomize_seed_ui
+from src.utils.manage_model_state import manage_model_state
+from src.utils.list_dir_models import unload_model_button
+from src.decorators.decorator_apply_torch_seed import decorator_apply_torch_seed
+from src.decorators.decorator_log_generation import decorator_log_generation
+from src.decorators.decorator_save_metadata import decorator_save_metadata
+from src.decorators.decorator_save_wav import decorator_save_wav
+from src.decorators.decorator_add_base_filename import decorator_add_base_filename
+from src.decorators.decorator_add_date import decorator_add_date
+from src.decorators.decorator_add_model_type import decorator_add_model_type
+from src.decorators.log_function_time import log_function_time
+from src.extensions_loader.decorator_extensions import (
+    decorator_extension_outer,
+    decorator_extension_inner,
+)
 
 SAMPLE_RATE = 24_000
-style_tts2_model: tts.StyleTTS2 = None  # type: ignore
 
 
-def preload_models_if_needed():
-    global style_tts2_model
-    if style_tts2_model is None:
-        style_tts2_model = tts.StyleTTS2()
-        # style_tts2_model.load_model()
-    return style_tts2_model
+@manage_model_state("style_tts2")
+def get_model(model_name=""):
+    return tts.StyleTTS2(
+        model_checkpoint_path=None if model_name == "" else model_name,
+        config_path=None,
+    )
 
 
 def preview_phonemization(text):
-    style_tts2_model = preload_models_if_needed()
+    from nltk.tokenize import word_tokenize
+    style_tts2_model = get_model("")
     text = text.strip()
     text = text.replace('"', "")
     phonemized_text = style_tts2_model.phoneme_converter.phonemize(text)
@@ -24,36 +40,37 @@ def preview_phonemization(text):
     return phoneme_string
 
 
+# How to deal with yield in function? I can write yield/non yield functions, but how to combine them in one
+@decorator_extension_outer
+@decorator_apply_torch_seed
+@decorator_save_metadata
+@decorator_save_wav
+@decorator_add_model_type("style_tts2")
+@decorator_add_base_filename
+@decorator_add_date
+@decorator_log_generation
+@decorator_extension_inner
+@log_function_time
 def generate_audio_styleTTS2(
     text,
     alpha=0.3,
     beta=0.7,
     diffusion_steps=5,
     embedding_scale=1,
+    **kwargs,
 ):
-    params_dict = {
-        "text": text,
-        "alpha": alpha,
-        "beta": beta,
-        "diffusion_steps": diffusion_steps,
-        "embedding_scale": embedding_scale,
-        # "target_voice_path": target_voice_path,
-        # "ref_s": None,
-        # "phonemize": True,
-    }
-    style_tts2_model = preload_models_if_needed()
-    audio_array = style_tts2_model.inference(
-        # text=text,
-        # alpha=alpha,
-        # beta=beta,
-        # diffusion_steps=diffusion_steps,
-        # embedding_scale=embedding_scale,
-        **params_dict,
+    model = get_model("")
+    audio_array = model.inference(
+        text=text,
+        alpha=alpha,
+        beta=beta,
+        diffusion_steps=diffusion_steps,
+        embedding_scale=embedding_scale,
         # target_voice_path=target_voice_path,
         # ref_s=None,
         # phonemize=True
     )
-    return (SAMPLE_RATE, audio_array)
+    return {"audio_out": (SAMPLE_RATE, audio_array)}
 
 
 def style_tts2_ui():
@@ -76,7 +93,9 @@ def style_tts2_ui():
     text = gr.Textbox(label="Text", lines=3, placeholder="Enter text here...")
 
     preview_phonemized_text_button = gr.Button("Preview phonemized text")
-    phonemized_text = gr.Textbox(label="Phonemized text (what the model will see)", interactive=False)
+    phonemized_text = gr.Textbox(
+        label="Phonemized text (what the model will see)", interactive=False
+    )
 
     preview_phonemized_text_button.click(
         fn=preview_phonemization,
@@ -94,6 +113,7 @@ def style_tts2_ui():
         embedding_scale = gr.Slider(
             label="Embedding Scale (emotion)", minimum=0.5, maximum=1.5, value=1.0
         )
+        unload_model_button("style_tts2")
 
     with gr.Row():
         reset_params_button = gr.Button("Reset params")
@@ -113,12 +133,35 @@ def style_tts2_ui():
         )
         generate_button = gr.Button("Generate", variant="primary")
 
-    audio = gr.Audio(label="Generated audio", elem_classes="tts-audio")
+    audio_out = gr.Audio(label="Generated audio", elem_classes="tts-audio")
+
+    seed, randomize_seed_callback = randomize_seed_ui()
+
+    input_dict = {
+        text: "text",
+        alpha: "alpha",
+        beta: "beta",
+        diffusion_steps: "diffusion_steps",
+        embedding_scale: "embedding_scale",
+        seed: "seed",
+    }
+
+    output_dict = {
+        "audio_out": audio_out,
+        "metadata": gr.JSON(label="Metadata", visible=False),
+        "folder_root": gr.Textbox(label="Folder root", visible=False),
+    }
 
     generate_button.click(
-        fn=generate_audio_styleTTS2,
-        inputs=[text, alpha, beta, diffusion_steps, embedding_scale],
-        outputs=[audio],
+        **randomize_seed_callback,
+    ).then(
+        fn=gradio_dict_decorator(
+            fn=generate_audio_styleTTS2,
+            gradio_fn_input_dictionary=input_dict,
+            outputs=output_dict,
+        ),
+        inputs={*input_dict},
+        outputs=list(output_dict.values()),
         api_name="style_tts2_generate",
     )
 

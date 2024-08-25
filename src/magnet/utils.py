@@ -1,25 +1,19 @@
 import time
-import os
 from src.utils.set_seed import set_seed
+from contextlib import contextmanager
 
 
-class Timer:
-    def __enter__(self):
-        self.start_time = time.time()
-        return self
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        self.end_time = time.time()
-        elapsed_time = self.end_time - self.start_time
-        print("Generated in", "{:.3f}".format(elapsed_time), "seconds")
+@contextmanager
+def Timer():
+    start_time = time.time()
+    yield
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    print("Generated in", "{:.3f}".format(elapsed_time), "seconds")
 
 
-class Seed:
-    def __init__(self, seed):
-        self.seed = seed
-
-    def __enter__(self):
-        set_seed(self.seed)
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        set_seed(-1)
+@contextmanager
+def Seed(seed):
+    original_seed = set_seed(seed)
+    yield
+    set_seed(original_seed)

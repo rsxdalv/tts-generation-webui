@@ -8,7 +8,6 @@ from scipy.io.wavfile import write as write_wav
 from bark.generation import SUPPORTED_LANGS
 
 from src.bark.ICON_ELEM_CLASS import ICON_ELEM_CLASS
-from src.bark.setup_seed_ui_bark import setup_seed_ui_bark
 from src.bark.BarkParams import BarkParams
 from src.extensions_loader.ext_callback_save_generation import (
     ext_callback_save_generation,
@@ -35,18 +34,36 @@ from src.magnet.utils import Timer
 from src.utils.prompt_to_title import prompt_to_title
 from src.utils.randomize_seed import randomize_seed
 
+from src.decorators.gradio_dict_decorator import gradio_dict_decorator
+from src.utils.randomize_seed import randomize_seed_ui
+from src.utils.manage_model_state import manage_model_state
+from src.utils.list_dir_models import unload_model_button
+from src.decorators.decorator_apply_torch_seed import decorator_apply_torch_seed
+from src.decorators.decorator_log_generation import decorator_log_generation
+from src.decorators.decorator_save_metadata import decorator_save_metadata
+from src.decorators.decorator_save_wav import decorator_save_wav
+from src.decorators.decorator_add_base_filename import decorator_add_base_filename
+from src.decorators.decorator_add_date import decorator_add_date
+from src.decorators.decorator_add_model_type import decorator_add_model_type
+from src.decorators.log_function_time import log_function_time
+from src.extensions_loader.decorator_extensions import (
+    decorator_extension_outer,
+    decorator_extension_inner,
+)
+
 FREEZE_SEMANTIC = False
 
 
+@decorator_apply_torch_seed
+@log_function_time
 def generate(params: BarkParams):
     if not model_manager.models_loaded:
         model_manager.reload_models(config)
 
-    with Timer():
-        full_generation, audio_array = custom_generate_audio(
-            **params,
-            cache_semantic=FREEZE_SEMANTIC,
-        )
+    full_generation, audio_array = custom_generate_audio(
+        **params,
+        cache_semantic=FREEZE_SEMANTIC,
+    )
 
     return [audio_array, full_generation]
 
@@ -570,3 +587,12 @@ def insert_npz_file(npz_filename):
         gr.Dropdown(value=npz_filename),
         gr.Radio(value=HistorySettings.NPZ_FILE),
     ]
+
+
+if __name__ == "__main__":
+    if "demo" in locals():
+        demo.close()  # type: ignore
+    with gr.Blocks() as demo:
+        generation_tab_bark()
+
+    demo.launch()

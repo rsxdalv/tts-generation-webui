@@ -5,6 +5,7 @@ def prompt_to_title(prompt):
         .replace("'", "_")
         .replace('"', "_")
         .replace("\\", "_")
+        .replace(".", "_")
         .replace(",", "_")
         .replace("(", "_")
         .replace(")", "_")

@@ -1,28 +1,67 @@
 import os
 import gradio as gr
+import glob
+from pathlib import Path
+
+from huggingface_hub import hf_hub_download
 from src.history_tab.open_folder import open_folder
 from src.utils.get_path_from_root import get_path_from_root
-import glob
 from src.tortoise.gr_reload_button import gr_reload_button, gr_open_button_simple
 
 # from src.rvc_tab.infer_rvc import infer_rvc as infer_rvc
 from src.rvc_tab.get_and_load_hubert import download_rmvpe
-
-from pathlib import Path
-
 from rvc.modules.vc.modules import VC
 
-from huggingface_hub import hf_hub_download
+from src.decorators.gradio_dict_decorator import gradio_dict_decorator
+from src.utils.randomize_seed import randomize_seed_ui
+from src.utils.manage_model_state import manage_model_state
+from src.utils.list_dir_models import unload_model_button
+from src.decorators.decorator_apply_torch_seed import decorator_apply_torch_seed
+from src.decorators.decorator_log_generation import decorator_log_generation
+from src.decorators.decorator_save_metadata import decorator_save_metadata
+from src.decorators.decorator_save_wav import decorator_save_wav
+from src.decorators.decorator_add_base_filename import decorator_add_base_filename
+from src.decorators.decorator_add_date import decorator_add_date
+from src.decorators.decorator_add_model_type import decorator_add_model_type
+from src.decorators.log_function_time import log_function_time
+from src.extensions_loader.decorator_extensions import (
+    decorator_extension_outer,
+    decorator_extension_inner,
+)
+
 
 hubert_path = hf_hub_download(
     repo_id="lj1995/VoiceConversionWebUI", filename="hubert_base.pt"
 )
 
-last_model_path = None
-vc = None
+
+@manage_model_state("rvc")
+def get_vc(model_path):
+    vc = VC()
+    vc.get_vc(model_path)
+    return vc
+
+
+def decorator_rvc_use_model_name_as_text(fn):
+    def wrapper(*args, **kwargs):
+        kwargs["text"] = kwargs["model_path"]
+        return fn(*args, **kwargs)
+
+    return wrapper
 
 
 # add f0_file
+@decorator_extension_outer
+@decorator_rvc_use_model_name_as_text
+@decorator_apply_torch_seed
+@decorator_save_metadata
+@decorator_save_wav
+@decorator_add_model_type("rvc")
+@decorator_add_base_filename
+@decorator_add_date
+@decorator_log_generation
+@decorator_extension_inner
+@log_function_time
 def run_rvc(
     f0up_key: str,
     original_audio_path: str,
@@ -34,33 +73,9 @@ def run_rvc(
     resample_sr: int,
     rms_mix_rate: float,
     protect: float,
+    **kwargs,
 ):
-    print("Starting RVC...")
-    print("RVCParameters(")
-    print(f'  "f0up_key": {f0up_key}')
-    print(f'  "original_audio_path": {original_audio_path}')
-    print(f'  "index_path": {index_path}')
-    print(f'  "f0method": {f0method}')
-    print(f'  "model_path": {model_path}')
-    print(f'  "index_rate": {index_rate}')
-    print(f'  "filter_radius": {filter_radius}')
-    print(f'  "resample_sr": {resample_sr}')
-    print(f'  "rms_mix_rate": {rms_mix_rate}')
-    print(f'  "protect": {protect}')
-    print(")")
-    global vc, last_model_path
-    # load_dotenv()
-    # with hide_argv():
-    #     config = Config()
-    # config.device = device if device else config.device
-    # config.is_half = is_half if is_half else config.is_half
-    if vc is None:
-        vc = VC()
-        # if vc.hubert_model is None:
-        #     vc.hubert_model = get_and_load_hubert_new(config)
-    if last_model_path != model_path:
-        vc.get_vc(model_path + ".pth")
-        last_model_path = model_path
+    vc = get_vc(model_path + ".pth")
     if f0method == "rmvpe":
         download_rmvpe()
     tgt_sr, audio_opt, times, _ = vc.vc_inference(
@@ -78,18 +93,7 @@ def run_rvc(
         hubert_path=hubert_path,
         # hubert_path="data/models/hubert/hubert_base.pt",
     )
-    return (tgt_sr, audio_opt), {
-        "original_audio_path": original_audio_path,
-        "index_path": index_path,
-        "model_path": model_path,
-        "f0method": f0method,
-        "f0up_key": f0up_key,
-        "index_rate": index_rate,
-        "filter_radius": filter_radius,
-        "resample_sr": resample_sr,
-        "rms_mix_rate": rms_mix_rate,
-        "protect": protect,
-    }
+    return {"audio_out": (tgt_sr, audio_opt)}
 
 
 RVC_LOCAL_MODELS_DIR = get_path_from_root("data", "models", "rvc", "checkpoints")
@@ -157,6 +161,7 @@ def rvc_ui():
                     model_path = rvc_ui_model_or_index_path_ui("Model")
                 with gr.Column():
                     index_path = rvc_ui_model_or_index_path_ui("Index")
+            unload_model_button("rvc")
             with gr.Row():
                 f0up_key = gr.Textbox(label="Semitone shift", value="0")
                 f0method = gr.Radio(
@@ -204,37 +209,41 @@ def rvc_ui():
         with gr.Column():
             original_audio = gr.Audio(label="Original Audio", type="filepath")
             button = gr.Button(value="Convert", variant="primary")
-            result = gr.Audio(label="result", interactive=False)
+            audio_out = gr.Audio(label="result", interactive=False)
             open_folder_button = gr.Button(
                 value="Open outputs folder", variant="secondary"
             )
             open_folder_button.click(lambda: open_folder("outputs-rvc"))
 
-        metadata = gr.JSON(
-            label="Metadata",
-            visible=False,
-        )
+    inputs_dict = {
+        f0up_key: "f0up_key",
+        original_audio: "original_audio_path",
+        index_path: "index_path",
+        f0method: "f0method",
+        model_path: "model_path",
+        index_rate: "index_rate",
+        filter_radius: "filter_radius",
+        resample_sr: "resample_sr",
+        rms_mix_rate: "rms_mix_rate",
+        protect: "protect",
+    }
 
-        button.click(
-            run_rvc,
-            inputs=[
-                f0up_key,
-                original_audio,
-                index_path,
-                f0method,
-                model_path,
-                index_rate,
-                filter_radius,
-                resample_sr,
-                rms_mix_rate,
-                protect,
-            ],
-            outputs=[
-                result,
-                metadata,
-            ],
-            api_name="rvc",
-        )
+    outputs_dict = {
+        "audio_out": audio_out,
+        "metadata": gr.JSON(label="Metadata", visible=False),
+        "folder_root": gr.Textbox(label="Folder root", visible=False),
+    }
+
+    button.click(
+        fn=gradio_dict_decorator(
+            fn=run_rvc,
+            gradio_fn_input_dictionary=inputs_dict,
+            outputs=outputs_dict,
+        ),
+        inputs={*inputs_dict},
+        outputs=list(outputs_dict.values()),
+        api_name="rvc",
+    )
 
     return original_audio
 
@@ -245,6 +254,8 @@ def rvc_conversion_tab():
 
 
 if __name__ == "__main__":
+    if "demo" in locals():
+        demo.close()  # type: ignore
     with gr.Blocks(analytics_enabled=False) as demo:
         rvc_conversion_tab()
 

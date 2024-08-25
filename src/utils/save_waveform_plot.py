@@ -14,6 +14,16 @@ def plot_waveform(audio_array: np.ndarray):
     plt.axis("off")
     return fig
 
+
+def figure_to_image(fig: mpl_fig.Figure):
+    with io.BytesIO() as buff:
+        fig.savefig(buff, format="raw")
+        buff.seek(0)
+        data = np.frombuffer(buff.getvalue(), dtype=np.uint8)
+    w, h = fig.canvas.get_width_height()
+    return data.reshape((int(h), int(w), -1))
+
+
 def plot_waveform_as_image(audio_array: np.ndarray):
     fig = plot_waveform(audio_array)
     plt.close()
@@ -31,15 +41,6 @@ def middleware_save_waveform_plot(audio_array: np.ndarray, filename_png: str):
     plt.savefig(filename_png)
     plt.close()
     return figure_to_image(fig)
-
-
-def figure_to_image(fig: mpl_fig.Figure):
-    with io.BytesIO() as buff:
-        fig.savefig(buff, format="raw")
-        buff.seek(0)
-        data = np.frombuffer(buff.getvalue(), dtype=np.uint8)
-    w, h = fig.canvas.get_width_height()
-    return data.reshape((int(h), int(w), -1))
 
 
 if __name__ == "__main__":

@@ -4,6 +4,7 @@ import { HandleChange } from "../types/HandleChange";
 import { PromptTextArea } from "./PromptTextArea";
 import { GenericSlider } from "./GenericSlider";
 import { MMS_LANGUAGE_DATA } from "./MMS_LANGUAGE_DATA";
+import { SeedInput } from "./SeedInput";
 
 const commonBorder = "border border-gray-300 p-2 rounded";
 
@@ -37,7 +38,6 @@ export const MMSInputs = ({
   mmsParams: MMSParams;
   handleChange: HandleChange;
   setMmsParams: React.Dispatch<React.SetStateAction<MMSParams>>;
-  data?: MMSResult | null;
 }) => (
   <div className="flex gap-x-6 w-full justify-center">
     <div className="flex flex-col gap-y-2 w-1/2">
@@ -100,6 +100,8 @@ export const MMSInputs = ({
           step="0.05"
         />
       </div>
+
+      <SeedInput params={mmsParams} handleChange={handleChange} />
 
       <ResetButton
         params={mmsParams}

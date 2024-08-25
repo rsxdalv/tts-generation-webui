@@ -1,37 +1,54 @@
 import os
 from iso639 import Lang
 import torch
-from transformers import VitsTokenizer, VitsModel, set_seed
+from transformers import VitsTokenizer, VitsModel
 import gradio as gr
 
-model: VitsModel = None  # type: ignore
-tokenizer: VitsTokenizer = None  # type: ignore
-last_language = None
+from src.decorators.gradio_dict_decorator import gradio_dict_decorator
+from src.utils.manage_model_state import manage_model_state
+from src.utils.list_dir_models import unload_model_button
+from src.decorators.decorator_apply_torch_seed import decorator_apply_torch_seed
+from src.decorators.decorator_log_generation import decorator_log_generation
+from src.decorators.decorator_save_metadata import decorator_save_metadata
+from src.decorators.decorator_save_wav import decorator_save_wav
+from src.decorators.decorator_add_base_filename import decorator_add_base_filename
+from src.decorators.decorator_add_date import decorator_add_date
+from src.decorators.decorator_add_model_type import decorator_add_model_type
+from src.decorators.log_function_time import log_function_time
+from src.extensions_loader.decorator_extensions import (
+    decorator_extension_outer,
+    decorator_extension_inner,
+)
 
 
-def preload_models_if_needed(language="eng"):
-    global model, tokenizer, last_language
-    if language != last_language:
-        model = None  # type: ignore
-        tokenizer = None  # type: ignore
-        last_language = language
-    if model is None:
-        model = VitsModel.from_pretrained(f"facebook/mms-tts-{language}")  # type: ignore
-        tokenizer = VitsTokenizer.from_pretrained(f"facebook/mms-tts-{language}")
-
-    return model, tokenizer
+@manage_model_state("mms")
+def preload_models_if_needed(language="eng") -> tuple[VitsModel, VitsTokenizer]:
+    return VitsModel.from_pretrained(
+        f"facebook/mms-tts-{language}"
+    ), VitsTokenizer.from_pretrained(  # type: ignore
+        f"facebook/mms-tts-{language}"
+    )  # type: ignore
 
 
+# How to deal with yield in function? I can write yield/non yield functions, but how to combine them in one
+@decorator_extension_outer
+@decorator_apply_torch_seed
+@decorator_save_metadata
+@decorator_save_wav
+@decorator_add_model_type("mms")
+@decorator_add_base_filename
+@decorator_add_date
+@decorator_log_generation
+@decorator_extension_inner
+@log_function_time
 def generate_audio_with_mms(
     text,
     language="eng",
     speaking_rate=1.0,
     noise_scale=0.667,
     noise_scale_duration=0.8,
-    seed=None,
+    **kwargs,
 ):
-    if seed is not None:
-        set_seed(seed)
     model, tokenizer = preload_models_if_needed(language)
     model.speaking_rate = speaking_rate
     model.noise_scale = noise_scale
@@ -40,7 +57,9 @@ def generate_audio_with_mms(
     with torch.no_grad():
         outputs = model(**inputs)  # type: ignore
     waveform = outputs.waveform[0].numpy().squeeze()
-    return (model.config.sampling_rate, waveform)  # type: ignore
+    return {
+        "audio_out": (model.config.sampling_rate, waveform),
+    }
 
 
 def get_mms_languages():
@@ -52,7 +71,7 @@ def get_mms_languages():
 def mms_ui():
     gr.Markdown(
         """
-    # MMS Demo
+    # MMS
     To use it, simply enter your text, and click "Generate".
     The model will generate speech from the text.
     It uses the [MMS](https://huggingface.co/facebook/mms-tts) model from HuggingFace.
@@ -97,20 +116,39 @@ def mms_ui():
             value=0.8,
         )
 
+    from src.utils.randomize_seed import randomize_seed_ui
+
+    seed, randomize_seed_callback = randomize_seed_ui()
+
+    unload_model_button("mms")
+
+    audio_out = gr.Audio(label="Output Audio")
+
     mms_generate_button = gr.Button("Generate")
 
-    mms_output = gr.Audio(label="Output Audio")
+    input_dict = {
+        mms_input: "text",
+        mms_language: "language",
+        speaking_rate: "speaking_rate",
+        noise_scale: "noise_scale",
+        noise_scale_duration: "noise_scale_duration",
+        seed: "seed",
+    }
+
+    output_dict = {
+        "audio_out": audio_out,
+    }
 
     mms_generate_button.click(
-        fn=generate_audio_with_mms,
-        inputs=[
-            mms_input,
-            mms_language,
-            speaking_rate,
-            noise_scale,
-            noise_scale_duration,
-        ],
-        outputs=[mms_output],
+        **randomize_seed_callback,
+    ).then(
+        fn=gradio_dict_decorator(
+            fn=generate_audio_with_mms,
+            gradio_fn_input_dictionary=input_dict,
+            outputs=output_dict,
+        ),
+        inputs={*input_dict},
+        outputs=list(output_dict.values()),
         api_name="mms",
     )
 
@@ -125,4 +163,6 @@ if __name__ == "__main__":
         demo.close()
     with gr.Blocks() as demo:
         mms_tab()
-    demo.launch()
+    demo.launch(
+        server_port=7770,
+    )

@@ -4,9 +4,24 @@ import torch
 import gradio as gr
 from importlib.metadata import version
 from maha_tts import load_models, infer_tts, config
-from src.bark.parse_or_set_seed import parse_or_generate_seed
-from src.magnet.utils import Seed, Timer
 from src.tortoise.gr_reload_button import gr_open_button_simple, gr_reload_button
+from src.utils.randomize_seed import randomize_seed_ui
+from src.utils.manage_model_state import manage_model_state
+from src.decorators.gradio_dict_decorator import gradio_dict_decorator
+from src.decorators.decorator_apply_torch_seed import decorator_apply_torch_seed
+from src.decorators.decorator_log_generation import decorator_log_generation
+from src.decorators.decorator_save_metadata import decorator_save_metadata
+from src.decorators.decorator_save_wav import decorator_save_wav
+from src.decorators.decorator_add_base_filename import decorator_add_base_filename
+from src.decorators.decorator_add_date import decorator_add_date
+from src.decorators.decorator_add_model_type import decorator_add_model_type
+from src.decorators.log_function_time import log_function_time
+from src.extensions_loader.decorator_extensions import (
+    decorator_extension_outer,
+    decorator_extension_inner,
+)
+
+MAHA_VERSION = version("maha_tts")
 
 
 def get_ref_clips(speaker_name):
@@ -18,141 +33,46 @@ def get_voice_list():
     dirs = [f for f in files if os.path.isdir(os.path.join("./voices-tortoise/", f))]
     return dirs
 
-MAHA_VERSION = version("maha_tts")
 
-# class MahaTTSParams(TypedDict):
-#     text: str
-#     model_language: str
-#     text_language: str
-#     speaker_name: str
-#     seed: int
-#     device: str
-
-# def generate(
-#     model: str,
-#     text: str,
-#     seed: int,
-#     use_sampling: bool,
-#     top_k: int,
-#     top_p: float,
-#     temperature: float,
-#     max_cfg_coef: float,
-#     min_cfg_coef: float,
-#     decoding_step_1: int,
-#     decoding_step_2: int,
-#     decoding_step_3: int,
-#     decoding_step_4: int,
-#     span_arrangement: Literal["nonoverlap", "stride1"],
-# ):
-#     MODEL = get_model(model)
-
-#     seed2 = parse_or_generate_seed(seed, 0)
-
-#     params = MagnetParams(
-#         model=model,
-#         text=text,
-#         seed=seed2,
-#         use_sampling=use_sampling,
-#         top_k=top_k,
-#         top_p=top_p,
-#         temperature=temperature,
-#         max_cfg_coef=max_cfg_coef,
-#         min_cfg_coef=min_cfg_coef,
-#         decoding_steps=[
-#             decoding_step_1,
-#             decoding_step_2,
-#             decoding_step_3,
-#             decoding_step_4,
-#         ],
-#         span_arrangement=span_arrangement,
-#     )
-
-#     MODEL.set_generation_params(
-#         **just_generation(params),
-#     )
-
-#     tokens = None
-
-#     with Timer(), Seed(seed2):
-#         log_generation_musicgen(params)
-#         output, tokens = MODEL.generate(
-#             descriptions=[text],
-#             progress=True,
-#             return_tokens=True,
-#         )
-
-#     output = output.detach().cpu().numpy().squeeze()
-
-#     filename, plot, _metadata = save_generation(
-#         audio_array=output,
-#         SAMPLE_RATE=MODEL.sample_rate,
-#         params=params,
-#         tokens=tokens,
-#     )
-
-#     return [
-#         (MODEL.sample_rate, output.transpose()),
-#         os.path.dirname(filename),
-#         plot,
-#         params["seed"],
-#         _metadata,
-#     ]
+@manage_model_state("maha_tts")
+def preload_models_if_needed(model_name, device):
+    return load_models(name=model_name, device=device)
 
 
+# How to deal with yield in function? I can write yield/non yield functions, but how to combine them in one
+@decorator_extension_outer
+@decorator_apply_torch_seed
+@decorator_save_metadata
+@decorator_save_wav
+@decorator_add_model_type("maha_tts")
+@decorator_add_base_filename
+@decorator_add_date
+@decorator_log_generation
+@decorator_extension_inner
+@log_function_time
 def generate_audio_maha_tts(
     text,
-    model_language,
+    model_name,
     text_language,
     speaker_name,
-    seed=0,
     device="auto",
+    **kwargs,
 ):
     device = torch.device(
         device == "auto" and "cuda" if torch.cuda.is_available() else "cpu" or device
     )
-    diff_model, ts_model, vocoder, diffuser = load_models(
-        name=model_language,
-        device=device,
+    diff_model, ts_model, vocoder, diffuser = preload_models_if_needed(
+        model_name=model_name, device=device
     )
-    print(maha_tts_params_to_string(text, model_language, text_language, speaker_name))
 
-    seed2 = parse_or_generate_seed(seed, 0)
-
-    with Timer(), Seed(seed2):
-        ref_clips = get_ref_clips(speaker_name)
-        text_language = (
-            torch.tensor(config.lang_index[text_language]).to(device).unsqueeze(0)
-        )
-        audio, sr = infer_tts(
-            text, ref_clips, diffuser, diff_model, ts_model, vocoder, text_language
-        )
-    metadata = {
-        "_version": "0.0.1",
-        "_hash_version": "0.0.2",
-        "_type": "maha_tts",
-        "text": text,
-        "model_language": model_language,
-        "text_language": text_language,
-        "speaker_name": speaker_name,
-        "seed": str(seed2),
-    }
-    return [(sr, audio), metadata]
-
-
-def maha_tts_params_to_string(text, model_language, text_language, speaker_name):
-    return "MahaTTS Params(\n{}\n)".format(
-        "    \n".join(
-            [
-                f"{k}={v}"
-                for k, v in {
-                    "text": text,
-                    "model_language": model_language,
-                    "language": text_language,
-                    "speaker_name": speaker_name,
-                }.items()
-            ]
-        )
+    ref_clips = get_ref_clips(speaker_name)
+    text_language = (
+        torch.tensor(config.lang_index[text_language]).to(device).unsqueeze(0)
     )
+    audio, sr = infer_tts(
+        text, ref_clips, diffuser, diff_model, ts_model, vocoder, text_language
+    )
+    return {"audio_out": (sr, audio)}
 
 
 def maha_tts_ui():
@@ -172,9 +92,9 @@ def maha_tts_ui():
     """
     )
     gr.Markdown(f"MahaTTS version: {MAHA_VERSION}")
-    maha_tts_input = gr.Textbox(lines=2, label="Input Text")
+    text = gr.Textbox(lines=2, label="Input Text")
     with gr.Row():
-        model_language = gr.Radio(
+        model_name = gr.Radio(
             choices=[
                 ("English", "Smolie-en"),
                 ("Indian", "Smolie-in"),
@@ -195,7 +115,7 @@ def maha_tts_ui():
         value="english",
         type="value",
     )
-    model_language.change(
+    model_name.change(
         fn=lambda choice: choice == "Smolie-en"
         and gr.Radio(
             value="english",
@@ -206,7 +126,7 @@ def maha_tts_ui():
             interactive=True,
             visible=True,
         ),
-        inputs=[model_language],
+        inputs=[model_name],
         outputs=[maha_tts_language],
     )
 
@@ -228,25 +148,36 @@ def maha_tts_ui():
                 api_name="maha_tts_refresh_voices",
             )
 
-    seed = gr.Number(label="Seed", value=0)
+    seed, randomize_seed_callback = randomize_seed_ui()
 
+    audio_out = gr.Audio(label="Output Audio")
     button = gr.Button("Generate")
-    maha_tts_output = gr.Audio(label="Output Audio")
-    metadata = gr.JSON(
-        label="Metadata",
-        visible=False,
-    )
+
+    input_dict = {
+        text: "text",
+        model_name: "model_name",
+        maha_tts_language: "text_language",
+        speaker_name: "speaker_name",
+        seed: "seed",
+        device: "device",
+    }
+
+    output_dict = {
+        "audio_out": audio_out,
+        "metadata": gr.JSON(label="Metadata", visible=False),
+        "folder_root": gr.Textbox(label="Folder root", visible=False),
+    }
+
     button.click(
-        fn=generate_audio_maha_tts,
-        inputs=[
-            maha_tts_input,
-            model_language,
-            maha_tts_language,
-            speaker_name,
-            seed,
-            device,
-        ],
-        outputs=[maha_tts_output, metadata],
+        **randomize_seed_callback,
+    ).then(
+        fn=gradio_dict_decorator(
+            fn=generate_audio_maha_tts,
+            gradio_fn_input_dictionary=input_dict,
+            outputs=output_dict,
+        ),
+        inputs={*input_dict},
+        outputs=list(output_dict.values()),
         api_name="maha_tts",
     )
 

@@ -48,6 +48,8 @@ type GradioChoices = {
 };
 
 const extractChoices = ({ choices }: GradioChoices) => choices.map((x) => x[0]);
+const extractChoicesTuple = ({ choices }: GradioChoices) =>
+  choices.map((x) => x[1]);
 
 const gradioPredict = <T extends any[]>(...args: Parameters<PredictFunction>) =>
   getClient().then((app) => app.predict(...args)) as Promise<{ data: T }>;
@@ -549,7 +551,7 @@ async function magnet({
 
 const magnet_get_models = () =>
   gradioPredict<[GradioChoices]>("/magnet_get_models").then((result) =>
-    extractChoices(result?.data[0])
+    extractChoicesTuple(result?.data[0])
   );
 
 const magnet_open_model_dir = () => gradioPredict<[]>("/magnet_open_model_dir");
@@ -562,7 +564,7 @@ const maha = ({
   seed,
   device,
 }) =>
-  gradioPredict<[GradioFile, Object]>("/maha_tts", [
+  gradioPredict<[GradioFile, Object, string]>("/maha_tts", [
     text, // string  in 'Input' Textbox component
     model_language, // string (Option from: ['en', 'de', 'es', 'fr', 'it', 'nl', 'pl', 'pt', 'ru', 'tr', 'zh']) in 'Model language' Dropdown component
     maha_tts_language, // string (Option from: ['en', 'de', 'es', 'fr', 'it', 'nl', 'pl', 'pt', 'ru', 'tr', 'zh']) in 'TTS language' Dropdown component
@@ -570,11 +572,8 @@ const maha = ({
     seed, // number  in 'Seed' Number component
     device, // string (Option from: ['cpu', 'cuda']) in 'Device' Dropdown component
   ]).then((result) => {
-    const [audio, metadata] = result?.data;
-    return {
-      audio,
-      metadata,
-    };
+    const [audio, metadata, folder_root] = result?.data;
+    return { audio, folder_root, metadata };
   });
 
 // maha_tts_refresh_voices
@@ -593,12 +592,14 @@ const mms = ({
   speaking_rate,
   noise_scale,
   noise_scale_duration,
+  seed,
 }: {
   text: string;
   language: string;
   speaking_rate: number;
   noise_scale: number;
   noise_scale_duration: number;
+  seed: number;
 }) =>
   gradioPredict<[GradioFile]>("/mms", [
     text, // string  in 'Input Text' Textbox component
@@ -606,6 +607,7 @@ const mms = ({
     speaking_rate, // number  in 'Speaking Rate' Number component
     noise_scale, // number  in 'Noise Scale' Number component
     noise_scale_duration, // number  in 'Noise Scale Duration' Number component
+    seed, // number  in 'Seed' Number component
   ]).then((result) => {
     const [audio] = result?.data;
     return {
@@ -619,21 +621,19 @@ const mms = ({
         speaking_rate,
         noise_scale,
         noise_scale_duration,
+        seed,
       },
     };
   });
 
 const vall_e_x_generate = ({ text, prompt, language, accent, mode }) =>
-  gradioPredict<[GradioFile]>(
-    mode === "short" ? "/vall_e_x_generate" : "/vall_e_x_generate_long_text",
-    [
-      text, // string  in 'Input Text' Textbox component
-      prompt, // string  in 'Prompt' Textbox component
-      language, // string (Option from: ["English", "中文", "日本語", "Mix"]) in 'Language' Dropdown component
-      accent, // string (Option from: ['English', '中文', '日本語', 'no-accent']) in in 'Accent' Dropdown component
-      mode === "short" ? undefined : mode, // string (Option from: ['fixed-prompt', 'sliding-window']) in 'Mode' Dropdown component
-    ]
-  ).then((result) => {
+  gradioPredict<[GradioFile]>("/vall_e_x_generate", [
+    text, // string  in 'Input Text' Textbox component
+    prompt, // string  in 'Prompt' Textbox component
+    language, // string (Option from: ["English", "中文", "日本語", "Mix"]) in 'Language' Dropdown component
+    accent, // string (Option from: ['English', '中文', '日本語', 'no-accent']) in in 'Accent' Dropdown component
+    mode === "short" ? undefined : mode, // string (Option from: ['fixed-prompt', 'sliding-window']) in 'Mode' Dropdown component
+  ]).then((result) => {
     const [audio] = result?.data;
     return {
       audio,
