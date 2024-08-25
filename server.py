@@ -1,36 +1,36 @@
 # %%
-import src.utils.setup_or_recover as setup_or_recover
+import tts_webui.utils.setup_or_recover as setup_or_recover
 
 setup_or_recover.setup_or_recover()
 
-import src.utils.dotenv_init as dotenv_init
+import tts_webui.utils.dotenv_init as dotenv_init
 
 dotenv_init.init()
 
 import os
 import gradio as gr
-from src.utils.suppress_warnings import suppress_warnings
+from tts_webui.utils.suppress_warnings import suppress_warnings
 
 suppress_warnings()
 
-from src.config.load_config import default_config
-from src.config.config import config
+from tts_webui.config.load_config import default_config
+from tts_webui.config.config import config
 
-from src.css.css import full_css
-from src.history_tab.collections_directories_atom import collections_directories_atom
+from tts_webui.css.css import full_css
+from tts_webui.history_tab.collections_directories_atom import collections_directories_atom
 
 print("Starting server...\n")
 
 
-from src.utils.generic_error_tab_advanced import generic_error_tab_advanced
-from src.extensions_loader.interface_extensions import (
+from tts_webui.utils.generic_error_tab_advanced import generic_error_tab_advanced
+from tts_webui.extensions_loader.interface_extensions import (
     extension_list_tab,
     handle_extension_class,
 )
-from src.extensions_loader.decorator_extensions import (
+from tts_webui.extensions_loader.decorator_extensions import (
     extension_decorator_list_tab,
 )
-from src.extensions_loader.ext_callback_save_generation import (
+from tts_webui.extensions_loader.ext_callback_save_generation import (
     load_ext_callback_save_generation,
 )
 
@@ -216,7 +216,7 @@ def all_tabs():
 
         handle_extension_class("audio-conversion", config)
     with gr.Tab("Outputs"), gr.Tabs():
-        from src.history_tab.main import history_tab
+        from tts_webui.history_tab.main import history_tab
 
         collections_directories_atom.render()
         try:
@@ -243,7 +243,7 @@ def all_tabs():
 
         handle_extension_class("tools", config)
     with gr.Tab("Settings"), gr.Tabs():
-        from src.settings_tab_gradio import settings_tab_gradio
+        from tts_webui.settings_tab_gradio import settings_tab_gradio
 
         settings_tab_gradio(reload_config_and_restart_ui, gradio_interface_options)
 

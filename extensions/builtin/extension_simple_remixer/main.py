@@ -1,4 +1,4 @@
-from src.utils.save_waveform_plot import plot_waveform_as_image
+from tts_webui.utils.save_waveform_plot import plot_waveform_as_image
 import gradio as gr
 import torchaudio
 import torch

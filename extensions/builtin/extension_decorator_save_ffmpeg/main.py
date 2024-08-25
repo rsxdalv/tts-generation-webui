@@ -6,7 +6,7 @@ import subprocess
 import ffmpeg
 import os
 
-from src.utils.outputs.path import get_relative_output_path_ext
+from tts_webui.utils.outputs.path import get_relative_output_path_ext
 
 
 def extension__tts_generation_webui():
