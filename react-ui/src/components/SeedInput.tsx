@@ -3,7 +3,7 @@ import { HandleChange } from "../types/HandleChange";
 
 export const SeedInput = <
   T extends {
-    use_random_seed: boolean;
+    use_random_seed?: boolean;
     seed: number | string | undefined;
   }
 >({

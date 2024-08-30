@@ -3,33 +3,11 @@ import { BarkGenerationParams } from "../tabs/BarkGenerationParams";
 import { BarkVoice } from "./BarkVoice";
 import { BurnInPrompt, BarkPrompt } from "./BarkPrompt";
 import { TextTemperature, WaveformTemperature } from "./BarkTemperatureSlider";
-import { OldGeneration, HistoryPromptSemantic } from "./BarkOldGeneration";
-import {
-  HistoryPromptVoiceSetting,
-  PromptType,
-  ForEachSubsequentGeneration,
-} from "./BarkRadios";
+import { NPZVoiceDropdown } from "./BarkOldGeneration";
+import { PromptType, ForEachSubsequentGeneration } from "./BarkRadios";
 import { SeedInput } from "./SeedInput";
 import { HandleChange } from "../types/HandleChange";
 import { GenericSlider } from "./GenericSlider";
-
-const MaxGenDuration = ({
-  barkGenerationParams,
-  handleChange,
-}: {
-  barkGenerationParams: BarkGenerationParams;
-  handleChange: HandleChange;
-}) => (
-  <GenericSlider
-    label="Max generation duration (s)"
-    name="max_gen_duration_s"
-    min="0.1"
-    max="18"
-    step="0.1"
-    params={barkGenerationParams}
-    handleChange={handleChange}
-  />
-);
 
 export const BarkInputs = ({
   barkGenerationParams,
@@ -38,55 +16,51 @@ export const BarkInputs = ({
   barkGenerationParams: BarkGenerationParams;
   handleChange: HandleChange;
 }) => (
-  <div className="flex flex-col space-y-2">
-    <div className="space-y-2">
-      <HistoryPromptVoiceSetting
-        barkGenerationParams={barkGenerationParams}
-        handleChange={handleChange}
-      />
-    </div>
-    <div className="flex flex-row space-x-2">
-      <div className="space-y-2 flex flex-col w-1/2">
-        {barkGenerationParams.history_setting === "or Use a voice:" && (
-          <BarkVoice
-            barkGenerationParams={barkGenerationParams}
-            handleChange={handleChange}
-          />
-        )}
-        {barkGenerationParams.history_setting ===
-          "or Use old generation as history:" && (
-          <div className="flex flex-col border border-gray-300 p-2 rounded space-y-2">
-            <OldGeneration
-              barkGenerationParams={barkGenerationParams}
-              handleChange={handleChange}
-            />
-            <HistoryPromptSemantic
-              barkGenerationParams={barkGenerationParams}
-              handleChange={handleChange}
-            />
-          </div>
-        )}
+  <div className="flex flex-col gap-y-2">
+    <div className="flex flex-row gap-x-2">
+      <div className="gap-y-2 flex flex-col w-1/2">
+        <NPZVoiceDropdown
+          barkGenerationParams={barkGenerationParams}
+          handleChange={handleChange}
+          name="history_prompt_semantic"
+          label="History Prompt Semantic"
+        />
+        <NPZVoiceDropdown
+          barkGenerationParams={barkGenerationParams}
+          handleChange={handleChange}
+          name="history_prompt"
+          label="History Prompt"
+        />
+        <BarkVoice
+          barkGenerationParams={barkGenerationParams}
+          handleChange={handleChange}
+        />
       </div>
-      <div className="space-y-2 w-1/2">
-        <div className="flex flex-col space-y-2 border border-gray-300 p-2 rounded">
-          <PromptType
-            barkGenerationParams={barkGenerationParams}
-            handleChange={handleChange}
-          />
-          <ForEachSubsequentGeneration
-            barkGenerationParams={barkGenerationParams}
-            handleChange={handleChange}
-          />
-          <MaxGenDuration
-            barkGenerationParams={barkGenerationParams}
-            handleChange={handleChange}
-          />
+      <div className="gap-y-2 w-1/2">
+        <PromptType
+          barkGenerationParams={barkGenerationParams}
+          handleChange={handleChange}
+        />
+        <ForEachSubsequentGeneration
+          barkGenerationParams={barkGenerationParams}
+          handleChange={handleChange}
+        />
+        <div className="flex gap-2">
           <TextTemperature
             barkGenerationParams={barkGenerationParams}
             handleChange={handleChange}
           />
           <WaveformTemperature
             barkGenerationParams={barkGenerationParams}
+            handleChange={handleChange}
+          />
+          <GenericSlider
+            label="Max generation duration (s)"
+            name="max_length"
+            min="0.1"
+            max="18"
+            step="0.1"
+            params={barkGenerationParams}
             handleChange={handleChange}
           />
         </div>

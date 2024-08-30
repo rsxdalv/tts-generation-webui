@@ -31,7 +31,7 @@ const ResetButton = <T extends {}>({
 );
 
 export const MMSInputs = ({
-  mmsParams,
+  mmsParams: params,
   handleChange,
   setMmsParams,
 }: {
@@ -42,7 +42,7 @@ export const MMSInputs = ({
   <div className="flex gap-x-6 w-full justify-center">
     <div className="flex flex-col gap-y-2 w-1/2">
       <PromptTextArea
-        params={mmsParams}
+        params={params}
         handleChange={handleChange}
         label="Text"
         name="text"
@@ -54,7 +54,7 @@ export const MMSInputs = ({
         <label className="text-sm">Language:</label>
         <select
           name="language"
-          value={mmsParams.language}
+          value={params.language}
           onChange={handleChange}
           className={commonBorder}
         >
@@ -68,7 +68,7 @@ export const MMSInputs = ({
 
       <div className="flex flex-row gap-2">
         <GenericSlider
-          params={mmsParams}
+          params={params}
           handleChange={handleChange}
           label="Speaking Rate"
           format={(x) => x.toFixed(1)}
@@ -79,7 +79,7 @@ export const MMSInputs = ({
         />
 
         <GenericSlider
-          params={mmsParams}
+          params={params}
           handleChange={handleChange}
           label="Noise Scale"
           format={(x) => x.toFixed(2)}
@@ -90,7 +90,7 @@ export const MMSInputs = ({
         />
 
         <GenericSlider
-          params={mmsParams}
+          params={params}
           handleChange={handleChange}
           label="Noise Scale Duration"
           format={(x) => x.toFixed(2)}
@@ -101,10 +101,10 @@ export const MMSInputs = ({
         />
       </div>
 
-      <SeedInput params={mmsParams} handleChange={handleChange} />
+      <SeedInput params={params} handleChange={handleChange} />
 
       <ResetButton
-        params={mmsParams}
+        params={params}
         setParams={setMmsParams}
         initialParams={initialMMSParams}
       />

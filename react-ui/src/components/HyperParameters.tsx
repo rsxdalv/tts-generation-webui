@@ -77,30 +77,12 @@ const batchRunner2 = (interrupted, consume, paramsList, setProgress) =>
     logMiddleware()
   );
 
-// export const HyperParameters = <
-//   T extends {
-//     iterations: number;
-//     splitByLines: boolean;
-//   }
-// >({
 export const HyperParameters = ({
-  // params,
-  // setParams,
-  // progress,
-  // progressMax,
-  // isInterrupted: interrupted,
-  // interrupt,
   consumer,
   prefix,
   genParams,
 }: {
-  // params: T;
-  // setParams: React.Dispatch<React.SetStateAction<T>>;
-  // progress: number;
-  // progressMax: number;
-  // isInterrupted: boolean;
-  // interrupt: () => void;
-  genParams: { text: string; seed: number; use_random_seed: boolean };
+  genParams: { text: string; seed: number; use_random_seed?: boolean };
   consumer: (x: any) => Promise<any>;
   prefix?: string;
 }) => {

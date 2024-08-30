@@ -56,12 +56,12 @@ export const MagnetModelSelector = ({
     type: modelType,
     isAudio,
     duration,
-  } = decomputeModel(magnetParams.model);
+  } = decomputeModel(magnetParams.model_name);
 
   const handleSize = (event: React.ChangeEvent<HTMLInputElement>): void =>
     handleChange({
       target: {
-        name: "model",
+        name: "model_name",
         value: computeModel(event.target.value, isAudio, duration),
       },
     });
@@ -69,7 +69,7 @@ export const MagnetModelSelector = ({
   const handleAudio = (event: React.ChangeEvent<HTMLInputElement>): void =>
     handleChange({
       target: {
-        name: "model",
+        name: "model_name",
         value: computeModel(
           modelType,
           event.target.value === "Audio",
@@ -81,7 +81,7 @@ export const MagnetModelSelector = ({
   const handleDuration = (event: React.ChangeEvent<HTMLInputElement>): void =>
     handleChange({
       target: {
-        name: "model",
+        name: "model_name",
         value: computeModel(modelType, isAudio, Number(event.target.value)),
       },
     });
@@ -189,13 +189,13 @@ const Model = ({
     fetchOptions();
   }, []);
 
-  const selected = params?.model;
+  const selected = params?.model_name;
   return (
     <div className="flex flex-col space-y-2">
       <div className="flex gap-2">
         <select
-          name="model"
-          id="model"
+          name="model_name"
+          id="model_name"
           className="border border-gray-300 p-2 rounded text-black w-full"
           value={selected}
           onChange={handleChange}

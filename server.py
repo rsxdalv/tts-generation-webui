@@ -135,34 +135,34 @@ def main_ui(theme_choice="Base"):
 def all_tabs():
     with gr.Tab("Text-to-Speech"), gr.Tabs():
         tts_tabs = [
-            ("src.bark.generation_tab_bark", "generation_tab_bark", "Bark TTS"),
+            ("tts_webui.bark.generation_tab_bark", "generation_tab_bark", "Bark TTS"),
             (
-                "src.bark.clone.tab_voice_clone",
+                "tts_webui.bark.clone.tab_voice_clone",
                 "tab_voice_clone",
                 "Bark Voice Clone",
                 "-r requirements_bark_hubert_quantizer.txt",
             ),
             (
-                "src.tortoise.generation_tab_tortoise",
+                "tts_webui.tortoise.generation_tab_tortoise",
                 "generation_tab_tortoise",
                 "Tortoise TTS",
             ),
-            ("src.seamlessM4T.seamless_tab", "seamless_tab", "SeamlessM4Tv2Model"),
+            ("tts_webui.seamlessM4T.seamless_tab", "seamless_tab", "SeamlessM4Tv2Model"),
             (
-                "src.vall_e_x.vall_e_x_tab",
+                "tts_webui.vall_e_x.vall_e_x_tab",
                 "valle_x_tab",
                 "Valle-X",
                 "-r requirements_vall_e.txt",
             ),
-            ("src.mms.mms_tab", "mms_tab", "MMS"),
+            ("tts_webui.mms.mms_tab", "mms_tab", "MMS"),
             (
-                "src.maha_tts.maha_tts_tab",
+                "tts_webui.maha_tts.maha_tts_tab",
                 "maha_tts_tab",
                 "MahaTTS",
                 "-r requirements_maha_tts.txt",
             ),
             (
-                "src.styletts2.styletts2_tab",
+                "tts_webui.styletts2.styletts2_tab",
                 "style_tts2_tab",
                 "StyleTTS2",
                 "-r requirements_styletts2.txt",
@@ -174,19 +174,19 @@ def all_tabs():
     with gr.Tab("Audio/Music Generation"), gr.Tabs():
         audio_music_generation_tabs = [
             (
-                "src.stable_audio.stable_audio",
+                "tts_webui.stable_audio.stable_audio",
                 "stable_audio_ui_tab",
                 "Stable Audio",
                 "-r requirements_stable_audio.txt",
             ),
             (
-                "src.magnet.magnet_tab",
+                "tts_webui.magnet.magnet_tab",
                 "generation_tab_magnet",
                 "MAGNeT",
                 "-r requirements_audiocraft.txt",
             ),
             (
-                "src.musicgen.musicgen_tab",
+                "tts_webui.musicgen.musicgen_tab",
                 "generation_tab_musicgen",
                 "MusicGen",
                 "-r requirements_audiocraft.txt",
@@ -198,19 +198,19 @@ def all_tabs():
     with gr.Tab("Audio Conversion"), gr.Tabs():
         audio_conversion_tabs = [
             (
-                "src.rvc_tab.rvc_tab",
+                "tts_webui.rvc_tab.rvc_tab",
                 "rvc_conversion_tab",
                 "RVC",
                 "-r requirements_rvc.txt",
             ),
-            ("src.rvc_tab.uvr5_tab", "uvr5_tab", "UVR5", "-r requirements_rvc.txt"),
+            ("tts_webui.rvc_tab.uvr5_tab", "uvr5_tab", "UVR5", "-r requirements_rvc.txt"),
             (
-                "src.demucs.demucs_tab",
+                "tts_webui.demucs.demucs_tab",
                 "demucs_tab",
                 "Demucs",
                 "-r requirements_audiocraft.txt",
             ),
-            ("src.vocos.vocos_tabs", "vocos_tabs", "Vocos"),
+            ("tts_webui.vocos.vocos_tabs", "vocos_tabs", "Vocos"),
         ]
         load_tabs(audio_conversion_tabs)
 
@@ -231,7 +231,7 @@ def all_tabs():
 
         outputs_tabs = [
             # voices
-            ("src.history_tab.voices_tab", "voices_tab", "Voices"),
+            ("tts_webui.history_tab.voices_tab", "voices_tab", "Voices"),
         ]
         load_tabs(outputs_tabs)
 
@@ -248,14 +248,14 @@ def all_tabs():
         settings_tab_gradio(reload_config_and_restart_ui, gradio_interface_options)
 
         settings_tabs = [
-            ("src.bark.settings_tab_bark", "settings_tab_bark", "Settings (Bark)"),
+            ("tts_webui.bark.settings_tab_bark", "settings_tab_bark", "Settings (Bark)"),
             (
-                "src.utils.model_location_settings_tab",
+                "tts_webui.utils.model_location_settings_tab",
                 "model_location_settings_tab",
                 "Model Location Settings",
             ),
-            ("src.utils.gpu_info_tab", "gpu_info_tab", "GPU Info"),
-            ("src.utils.pip_list_tab", "pip_list_tab", "Installed Packages"),
+            ("tts_webui.utils.gpu_info_tab", "gpu_info_tab", "GPU Info"),
+            ("tts_webui.utils.pip_list_tab", "pip_list_tab", "Installed Packages"),
         ]
         load_tabs(settings_tabs)
 

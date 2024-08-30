@@ -42,7 +42,7 @@ export const initialMusicgenParams: MusicgenParams = {
 
 export type MusicgenResult = {
   audio: GradioFile;
-  history_bundle_name_data: string;
+  folder_root: string;
   metadata: {
     _version: string;
     _hash_version: string;

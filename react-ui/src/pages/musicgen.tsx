@@ -46,7 +46,7 @@ const MusicgenPage = () => {
           setHistoryData={setHistoryData}
           historyData={historyData}
           funcs={funcs}
-          nameKey="history_bundle_name_data"
+          nameKey="folder_root"
           filter={["sendToMusicgen"]}
         />
       </div>

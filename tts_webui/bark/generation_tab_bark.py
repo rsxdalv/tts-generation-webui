@@ -1,260 +1,185 @@
 import os
 import shutil
+import json
 
 import numpy as np
 import gradio as gr
 from bark import SAMPLE_RATE
-from scipy.io.wavfile import write as write_wav
 from bark.generation import SUPPORTED_LANGS
 
-from tts_webui.bark.ICON_ELEM_CLASS import ICON_ELEM_CLASS
-from tts_webui.bark.BarkParams import BarkParams
-from tts_webui.extensions_loader.ext_callback_save_generation import (
-    ext_callback_save_generation,
-)
-from tts_webui.utils.create_base_filename import create_base_filename
+from tts_webui.bark.create_voice_string import create_voice_string
+from tts_webui.bark.get_speaker_gender import get_speaker_gender
 from tts_webui.history_tab.save_to_favorites import save_to_favorites
-from tts_webui.bark.generate_and_save_metadata import generate_and_save_metadata
-from tts_webui.bark.generate_choice_string import generate_choice_string
-from tts_webui.bark.get_filenames import get_filenames
-from tts_webui.bark.get_history_prompt import get_history_prompt
-from tts_webui.bark.log_generation import middleware_log_generation
-from tts_webui.bark.npz_tools import get_npz_files, load_npz, save_npz
+from tts_webui.bark.generate_and_save_metadata import generate_bark_metadata
+from tts_webui.bark.npz_tools import get_npz_files, save_npz
 from tts_webui.bark.split_text_functions import split_by_length_simple, split_by_lines
 from tts_webui.bark.extended_generate import custom_generate_audio
-from tts_webui.utils.date import get_date_string
-from tts_webui.model_manager import model_manager
+from tts_webui.bark.BarkModelManager import bark_model_manager
 from tts_webui.config.config import config
 from tts_webui.bark.generation_settings import (
-    HistorySettings,
     PromptSplitSettings,
     LongPromptHistorySettings,
 )
-from tts_webui.magnet.utils import Timer
-from tts_webui.utils.prompt_to_title import prompt_to_title
-from tts_webui.utils.randomize_seed import randomize_seed
-
-from tts_webui.decorators.gradio_dict_decorator import gradio_dict_decorator
+from tts_webui.decorators.gradio_dict_decorator import dictionarize
+from tts_webui.utils.get_dict_props import get_dict_props
 from tts_webui.utils.randomize_seed import randomize_seed_ui
-from tts_webui.utils.manage_model_state import manage_model_state
-from tts_webui.utils.list_dir_models import unload_model_button
-from tts_webui.decorators.decorator_apply_torch_seed import decorator_apply_torch_seed
-from tts_webui.decorators.decorator_log_generation import decorator_log_generation
-from tts_webui.decorators.decorator_save_metadata import decorator_save_metadata
-from tts_webui.decorators.decorator_save_wav import decorator_save_wav
-from tts_webui.decorators.decorator_add_base_filename import decorator_add_base_filename
-from tts_webui.decorators.decorator_add_date import decorator_add_date
-from tts_webui.decorators.decorator_add_model_type import decorator_add_model_type
-from tts_webui.decorators.log_function_time import log_function_time
-from tts_webui.extensions_loader.decorator_extensions import (
-    decorator_extension_outer,
-    decorator_extension_inner,
+from tts_webui.decorators.decorator_apply_torch_seed import (
+    decorator_apply_torch_seed_generator,
 )
-
-FREEZE_SEMANTIC = False
-
-
-@decorator_apply_torch_seed
-@log_function_time
-def generate(params: BarkParams):
-    if not model_manager.models_loaded:
-        model_manager.reload_models(config)
-
-    full_generation, audio_array = custom_generate_audio(
-        **params,
-        cache_semantic=FREEZE_SEMANTIC,
-    )
-
-    return [audio_array, full_generation]
-
-
-def save_generation(
-    full_generation,
-    audio_array,
-    bark_params: BarkParams,
-    long_generation=False,
-):
-    date = get_date_string()
-    base_filename = create_base_filename(
-        prompt_to_title(bark_params["text"]) + ("_long" if long_generation else ""),
-        "outputs",
-        model="bark",
-        date=date,
-    )
-
-    filename, filename_png, filename_json, filename_npz = get_filenames(base_filename)
-    write_wav(filename, SAMPLE_RATE, audio_array)
-    # plot = middleware_save_waveform_plot(audio_array, filename_png)
-    filename_ogg = filename.replace(".wav", ".ogg")
-
-    metadata = generate_and_save_metadata(
-        date=date,
-        filename_json=filename_json,
-        full_generation=full_generation,
-        final_gen_params=bark_params,
-    )
-    save_npz(filename_npz, full_generation, metadata)
-
-    ext_callback_save_generation(
-        full_generation,
-        audio_array,
-        {
-            "wav": filename,
-            "png": filename_png,
-            "npz": filename_npz,
-            "ogg": filename_ogg,
-        },
-        metadata,
-    )
-
-    return filename, filename_npz, metadata
+from tts_webui.decorators.decorator_log_generation import (
+    decorator_log_generation_generator,
+)
+from tts_webui.decorators.decorator_save_wav import (
+    decorator_save_wav_generator,
+)
+from tts_webui.decorators.decorator_add_base_filename import (
+    decorator_add_base_filename_generator,
+    format_date_for_file,
+)
+from tts_webui.decorators.decorator_add_date import (
+    decorator_add_date_generator,
+)
+from tts_webui.decorators.decorator_add_model_type import (
+    decorator_add_model_type_generator,
+)
+from tts_webui.decorators.log_function_time import log_generator_time
+from tts_webui.extensions_loader.decorator_extensions import (
+    decorator_extension_inner_generator,
+    decorator_extension_outer_generator,
+)
+from tts_webui.utils.outputs.path import get_relative_output_path_ext
 
 
-def yield_generation(
-    audio,
-    npz,
-    json_text,
-    history_bundle_name_data,
-):
-    return [
-        audio,
-        npz,
-        json_text,
-        history_bundle_name_data,
-    ]
+def _save_json(result_dict, metadata):
+    with open(get_relative_output_path_ext(result_dict, ".json"), "w") as outfile:
+        json.dump(metadata, outfile, indent=2)
 
 
-def gen_helper(
-    burn_in_prompt,
-    prompt,
-    history_setting,
-    language=None,
-    speaker_id=0,
-    useV2=False,
-    text_temp=0.7,
-    waveform_temp=0.7,
-    long_prompt_radio=PromptSplitSettings.NONE,
-    long_prompt_history_radio=LongPromptHistorySettings.CONTINUE,
-    old_generation_filename=None,
-    seed=-1,
-    history_prompt_semantic=None,
-    max_gen_duration_s=15,
-):
-    history_prompt = None
-    if prompt is None or prompt == "":
+def _decorator_bark_save_metadata_generator(fn):
+    def _save_metadata_and_npz(kwargs, result_dict):
+        metadata = generate_bark_metadata(
+            date=format_date_for_file(result_dict["date"]),
+            full_generation=result_dict["full_generation"],
+            params=kwargs,
+        )
+
+        _save_json(result_dict, metadata)
+
+        npz_path = get_relative_output_path_ext(result_dict, ".npz")
+        save_npz(
+            filename=npz_path,
+            full_generation=result_dict["full_generation"],
+            metadata=metadata,
+        )
+        result_dict["metadata"] = metadata
+        result_dict["npz_path"] = npz_path
+        return result_dict
+
+    def wrapper(*args, **kwargs):
+        for result_dict in fn(*args, **kwargs):
+            if result_dict is None:
+                continue
+            yield _save_metadata_and_npz(kwargs, result_dict)
+
+    return wrapper
+
+
+def _bark_get_prompts(text, long_prompt_radio):
+    if text is None or text == "":
         raise ValueError("Prompt is empty")
-
-    if history_setting == HistorySettings.NPZ_FILE:
-        history_prompt_semantic = (
-            load_npz(history_prompt_semantic) if history_prompt_semantic else None
-        )
-        history_prompt = (
-            load_npz(old_generation_filename) if old_generation_filename else None
-        )
-
-    if history_setting == HistorySettings.VOICE:
-        history_prompt = get_history_prompt(
-            language,
-            speaker_id,
-            useV2,
-            history_prompt,
-            use_voice=True,
-        )
-
-        history_prompt_semantic = None
-
     if long_prompt_radio == PromptSplitSettings.NONE:
-        prompts = [prompt]
+        prompts = [text]
     else:
         prompts = (
-            split_by_lines(prompt)
+            split_by_lines(text)
             if long_prompt_radio == PromptSplitSettings.LINES
-            else split_by_length_simple(prompt)
+            else split_by_length_simple(text)
         )
 
+    return prompts
+
+
+def _get_long_gen_history_prompt(
+    long_prompt_history_radio,
+    last_generation,
+    original_history_prompt,
+):
+    switcher = {
+        LongPromptHistorySettings.CONTINUE: last_generation,
+        LongPromptHistorySettings.CONSTANT: original_history_prompt,
+        LongPromptHistorySettings.EMPTY: None,
+    }
+    return switcher.get(long_prompt_history_radio, None)
+
+
+@decorator_add_model_type_generator("bark")
+@decorator_extension_outer_generator
+@decorator_apply_torch_seed_generator
+@_decorator_bark_save_metadata_generator
+@decorator_save_wav_generator
+@decorator_add_base_filename_generator
+@decorator_add_date_generator
+@decorator_log_generation_generator
+@decorator_extension_inner_generator
+@log_generator_time
+def bark_generate_long(
+    text,
+    history_prompt,
+    long_prompt_radio,
+    long_prompt_history_radio,
+    **kwargs,
+):
     pieces = []
     original_history_prompt = history_prompt
-    # This will work when HistorySettings.NPZ_FILE is selected
-    # last_generation = (
-    #     history_prompt if history_setting == HistorySettings.NPZ_FILE else None
-    # )
     last_generation = history_prompt
-    for prompt_piece in prompts:
-        history_prompt = get_long_gen_history_prompt(
+    for prompt_piece in _bark_get_prompts(text, long_prompt_radio):
+        history_prompt = _get_long_gen_history_prompt(
             long_prompt_history_radio,
             last_generation,
             original_history_prompt,
         )
 
-        bark_params: BarkParams = {
-            "burn_in_prompt": burn_in_prompt,
-            "text": prompt_piece,
-            "history_prompt": history_prompt,
-            "history_prompt_semantic": history_prompt_semantic,
-            "text_temp": text_temp,
-            "waveform_temp": waveform_temp,
-            "output_full": True,
-            "seed": int(seed),
-            "max_gen_duration_s": max_gen_duration_s,
-        }
+        if not bark_model_manager.models_loaded:
+            bark_model_manager.reload_models(config)
 
-        middleware_log_generation(bark_params)
+        full_generation, audio_array = custom_generate_audio(
+            text=prompt_piece,
+            history_prompt=history_prompt,
+            **get_dict_props(
+                kwargs,
+                [
+                    "burn_in_prompt",
+                    "history_prompt_semantic",
+                    "text_temp",
+                    "waveform_temp",
+                    "max_length",
+                ],
+            ),
+            output_full=True,
+        )
+        last_generation = full_generation
 
-        audio_array, last_generation = generate(bark_params)
         pieces += [audio_array]
 
-        filename, filename_npz, metadata = save_generation(
-            full_generation=last_generation,
-            audio_array=audio_array,
-            bark_params=bark_params,
-        )
-
-        yield yield_generation(
-            audio=gr.Audio(
-                value=filename,
-                label=f"Generated audio fragment... `{prompt_piece}`",
-            ),
-            npz=filename_npz,
-            json_text=metadata,
-            history_bundle_name_data=os.path.dirname(filename),
-        )
+        yield {
+            "audio_out": (SAMPLE_RATE, audio_array),
+            "full_generation": full_generation,
+        }
 
     if len(pieces) == 1:
         return
 
-    audio_array = np.concatenate(pieces)
-
-    filename, filename_npz, metadata = save_generation(
-        full_generation=last_generation,
-        audio_array=audio_array,
-        bark_params={
-            **bark_params,
-            "history_prompt": original_history_prompt,
-        },  # type: ignore
-        long_generation=True,
-    )
-
-    yield yield_generation(
-        audio=gr.Audio(value=filename, label="Generated audio"),
-        npz=filename_npz,
-        json_text=metadata,
-        history_bundle_name_data=os.path.dirname(filename),
-    )
+    yield {
+        "audio_out": (SAMPLE_RATE, np.concatenate(pieces)),
+        "full_generation": full_generation,
+        "long": True,
+    }
     return
 
 
-def get_long_gen_history_prompt(
-    long_prompt_history_radio,
-    last_piece_history,
-    original_history_prompt,
-):
-    if long_prompt_history_radio == LongPromptHistorySettings.CONTINUE:
-        return last_piece_history
-    elif long_prompt_history_radio == LongPromptHistorySettings.CONSTANT:
-        return original_history_prompt
-    elif long_prompt_history_radio == LongPromptHistorySettings.EMPTY:
-        return None
-    return None
+def unload_models():
+    bark_model_manager.unload_models()
+    return gr.Button(value="Unloaded")
 
 
 def generation_tab_bark():
@@ -262,78 +187,87 @@ def generation_tab_bark():
         bark_ui()
 
 
-def bark_ui():
+def _npz_dropdown_ui(label):
+    npz_dropdown = gr.Dropdown(
+        label=label,
+        choices=get_npz_files(),  # type: ignore
+        type="value",
+        value=None,
+        allow_custom_value=True,
+        show_label=True,
+    )
+    btn_style = {
+        "size": "sm",
+        "elem_classes": "btn-sm material-symbols-outlined",
+    }
+    gr.Button("save", **btn_style).click(  # type: ignore
+        fn=lambda x: [
+            shutil.copy(x, os.path.join("voices", os.path.basename(x))),
+        ],
+        inputs=[npz_dropdown],
+    )
+    gr.Button("refresh", **btn_style).click(  # type: ignore
+        fn=lambda: gr.Dropdown(choices=get_npz_files()),  # type: ignore
+        outputs=npz_dropdown,
+        api_name=f"reload_old_generation_dropdown{ '' if label == 'Audio Voice' else '_semantic'}",
+    )
+    gr.Button("clear", **btn_style).click(  # type: ignore
+        fn=lambda: gr.Dropdown(value=None),
+        outputs=npz_dropdown,
+    )
+
+    return npz_dropdown
+
+
+def _voice_select_ui(history_prompt):
     with gr.Row():
-        history_setting = gr.Radio(
-            HistorySettings.choices,  # type: ignore
-            value=HistorySettings.EMPTY,
-            type="value",
-            label="History Prompt (voice) setting:",
+        use_v2 = gr.Checkbox(label="Use V2", value=False)
+        choice_string = gr.Markdown(
+            "Chosen voice: en_speaker_0, Gender: Unknown",
         )
 
-        def unload_models():
-            model_manager.unload_models()
-            return gr.Button(value="Unloaded")
+    language = gr.Radio(
+        [lang[0] for lang in SUPPORTED_LANGS],
+        type="index",
+        show_label=False,
+        value="English",
+    )
 
+    speaker_id = gr.Radio(
+        ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"],
+        type="value",
+        label="Speaker ID",
+        value="0",
+    )
+
+    voice_inputs = [language, speaker_id, use_v2]
+
+    for i in voice_inputs:
+        i.change(
+            fn=create_voice_string,
+            inputs=voice_inputs,
+            outputs=[history_prompt],
+        ).then(
+            fn=lambda x: f"Chosen voice: {x}, Gender: {get_speaker_gender(x)}",
+            inputs=history_prompt,
+            outputs=[choice_string],
+        )
+
+
+def bark_ui():
+    with gr.Row():
         unload_models_button = gr.Button("Unload models")
         unload_models_button.click(
             fn=unload_models,
             outputs=[unload_models_button],
         )
 
-    (
-        useV2,
-        languageRadio,
-        speakerIdRadio,
-        column,
-    ) = setup_bark_voice_prompt_ui()
-
-    # Show the language and speakerId radios only when useHistory is checked
-    history_setting.change(
-        fn=lambda choice: gr.Column(visible=(choice == HistorySettings.VOICE)),
-        inputs=[history_setting],
-        outputs=[column],  # type: ignore
-    )
-
-    (
-        history_prompt_semantic_dropdown,
-        copy_history_prompt_semantic_button,
-        reload_history_prompt_semantic_dropdown,
-    ) = old_generation_dropdown_ui("Semantic Voice (Optional)")
-
-    (
-        old_generation_dropdown,
-        copy_old_generation_button,
-        reload_old_generation_dropdown,
-    ) = old_generation_dropdown_ui("Audio Voice")
-
-    history_setting.change(
-        fn=lambda choice: [
-            gr.Dropdown(visible=(choice == HistorySettings.NPZ_FILE)),
-            gr.Button(visible=(choice == HistorySettings.NPZ_FILE)),
-            gr.Button(visible=(choice == HistorySettings.NPZ_FILE)),
-        ],
-        inputs=[history_setting],
-        outputs=[
-            old_generation_dropdown,
-            copy_old_generation_button,
-            reload_old_generation_dropdown,
-        ],
-    )
-
-    history_setting.change(
-        fn=lambda choice: [
-            gr.Dropdown(visible=(choice == HistorySettings.NPZ_FILE)),
-            gr.Button(visible=(choice == HistorySettings.NPZ_FILE)),
-            gr.Button(visible=(choice == HistorySettings.NPZ_FILE)),
-        ],
-        inputs=[history_setting],
-        outputs=[
-            history_prompt_semantic_dropdown,
-            copy_history_prompt_semantic_button,
-            reload_history_prompt_semantic_dropdown,
-        ],
-    )
+    with gr.Row():
+        history_prompt_semantic = _npz_dropdown_ui("Semantic Voice (Optional)")
+    with gr.Row():
+        history_prompt = _npz_dropdown_ui("Audio Voice")
+    with gr.Column():
+        _voice_select_ui(history_prompt)
 
     with gr.Row():
         with gr.Column():
@@ -358,37 +292,6 @@ def bark_ui():
                 maximum=18,
                 step=0.1,
             )
-
-            # freeze_cache_button = gr.Checkbox(
-            #     label="Freeze semantic",
-            #     value=False,
-            # )
-
-            # # def freeze_cache():
-            # #     global FREEZE_CACHE
-            # #     FREEZE_CACHE = True
-            # def freeze_cache(value):
-            #     global FREEZE_SEMANTIC
-            #     FREEZE_SEMANTIC = value
-
-            # freeze_cache_button.change(
-            #     fn=freeze_cache,
-            #     inputs=[freeze_cache_button],
-            # )
-
-            # clear_cache_button = gr.Button(
-            #     "Clear cache",
-            #     size="sm",
-            # )
-
-            # def clear_cache():
-            #     from tts_webui.bark.extended_generate import semantic_cache
-
-            #     semantic_cache.clear()
-
-            # clear_cache_button.click(
-            #     fn=clear_cache,
-            # )
         with gr.Column():
             # TODO: Add gradient temperature options (requires model changes)
             text_temp = gr.Slider(
@@ -406,33 +309,12 @@ def bark_ui():
                 step=0.05,
             )
             with gr.Column():
-                seed_input = gr.Textbox(label="Seed", value="-1")
-
-                CUSTOM_randomize_seed_checkbox = gr.Checkbox(
-                    label="Randomize seed", value=True
-                )
+                seed, randomize_seed_callback = randomize_seed_ui()
 
     burn_in_prompt = gr.Textbox(
         label="Burn In Prompt (Optional)", lines=3, placeholder="Enter text here..."
     )
-    prompt = gr.Textbox(label="Prompt", lines=3, placeholder="Enter text here...")
-
-    inputs = [
-        burn_in_prompt,
-        prompt,
-        history_setting,
-        languageRadio,
-        speakerIdRadio,
-        useV2,
-        text_temp,
-        waveform_temp,
-        long_prompt_radio,
-        long_prompt_history_radio,
-        old_generation_dropdown,
-        seed_input,
-        history_prompt_semantic_dropdown,
-        max_length,
-    ]
+    text = gr.Textbox(label="Prompt", lines=3, placeholder="Enter text here...")
 
     with gr.Column():
         audio = gr.Audio(
@@ -442,151 +324,61 @@ def bark_ui():
             save_button = gr.Button("Save", size="sm")
             continue_button = gr.Button("Use as history", size="sm")
             continue_semantic_button = gr.Button("Use as semantic history", size="sm")
-        npz = gr.Textbox(visible=False)
-        json_text = gr.JSON(visible=False)
-        history_bundle_name_data = gr.Textbox(visible=False)
+        full_generation = gr.Textbox(visible=False)
+        metadata = gr.JSON(visible=False)
+        folder_root = gr.Textbox(visible=False)
 
         save_button.click(
             fn=save_to_favorites,
-            inputs=[history_bundle_name_data],
+            inputs=[folder_root],
             outputs=[save_button],
             api_name="bark_favorite",
         )
 
         continue_button.click(
-            fn=insert_npz_file,
-            inputs=[npz],
-            outputs=[old_generation_dropdown, history_setting],
+            fn=lambda x: x,
+            inputs=[full_generation],
+            outputs=[history_prompt],
         )
 
         continue_semantic_button.click(
-            fn=insert_npz_file,
-            inputs=[npz],
-            outputs=[history_prompt_semantic_dropdown, history_setting],
+            fn=lambda x: x,
+            inputs=[full_generation],
+            outputs=[history_prompt_semantic],
         )
 
         # fix the bug where selecting No history does not work with burn in prompt
 
-        output_components = [audio, npz, json_text, history_bundle_name_data]
+    input_dict = {
+        seed: "seed",
+        text: "text",
+        burn_in_prompt: "burn_in_prompt",
+        text_temp: "text_temp",
+        waveform_temp: "waveform_temp",
+        max_length: "max_length",
+        history_prompt: "history_prompt",
+        history_prompt_semantic: "history_prompt_semantic",
+        long_prompt_radio: "long_prompt_radio",
+        long_prompt_history_radio: "long_prompt_history_radio",
+    }
 
-        # yield yield_generation(
-        #     audio=None,
-        #     save_button=gr.Button(value="Save"),
-        #     continue_button=gr.Button(),
-        #     buttons_row=gr.Row(visible=False),
-        #     npz=None,
-        #     json_text=None,
-        #     history_bundle_name_data=None,
-        # )
+    output_dict = {
+        "audio_out": audio,
+        "npz_path": full_generation,
+        "metadata": metadata,
+        "folder_root": folder_root,
+    }
 
-    with gr.Row():
-        btn = gr.Button("Generate", variant="primary")
-
-        btn.click(
-            fn=randomize_seed,
-            inputs=[seed_input, CUSTOM_randomize_seed_checkbox],
-            outputs=[seed_input],
-        ).then(
-            fn=gen_helper,
-            inputs=inputs,
-            outputs=output_components,
-            api_name="bark_legacy_1",
-        )
-
-    prompt.submit(
-        fn=randomize_seed,
-        inputs=[seed_input, CUSTOM_randomize_seed_checkbox],
-        outputs=[seed_input],
+    gr.Button("Generate", variant="primary").click(
+        **randomize_seed_callback,
     ).then(
-        fn=gen_helper,
-        inputs=inputs,
-        outputs=output_components,
+        **dictionarize(
+            fn=bark_generate_long,
+            inputs=input_dict,
+            outputs=output_dict,
+        ),
         api_name="bark",
     )
-
-
-def old_generation_dropdown_ui(label):
-    with gr.Row():
-        old_generation_dropdown = gr.Dropdown(
-            label=label,
-            choices=get_npz_files(),  # type: ignore
-            type="value",
-            value=None,
-            allow_custom_value=True,
-            visible=False,
-            # container=False,
-            show_label=True,
-        )
-        copy_old_generation_button = gr.Button(
-            "save",
-            visible=False,
-            elem_classes="btn-sm material-symbols-outlined",
-            size="sm",
-        )
-        copy_old_generation_button.click(
-            fn=lambda x: [
-                shutil.copy(x, os.path.join("voices", os.path.basename(x))),
-            ],
-            inputs=[old_generation_dropdown],
-        )
-
-        reload_old_generation_dropdown = gr.Button(
-            "refresh",
-            visible=False,
-            elem_classes=ICON_ELEM_CLASS,
-            size="sm",
-        )
-
-        reload_old_generation_dropdown.click(
-            fn=lambda: gr.Dropdown(choices=get_npz_files()),  # type: ignore
-            outputs=old_generation_dropdown,
-            api_name=f"reload_old_generation_dropdown{ '' if label == 'Audio Voice' else '_semantic'}",
-        )
-
-    return (
-        old_generation_dropdown,
-        copy_old_generation_button,
-        reload_old_generation_dropdown,
-    )
-
-
-def setup_bark_voice_prompt_ui():
-    with gr.Column(visible=False) as column:
-        with gr.Row():
-            useV2 = gr.Checkbox(label="Use V2", value=False)
-            choice_string = gr.Markdown(
-                "Chosen voice: en_speaker_0, Gender: Unknown",
-            )
-
-        languageRadio = gr.Radio(
-            [lang[0] for lang in SUPPORTED_LANGS],
-            type="index",
-            show_label=False,
-            value="English",
-        )
-
-        speakerIdRadio = gr.Radio(
-            ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"],
-            type="value",
-            label="Speaker ID",
-            value="0",
-        )
-
-        voice_inputs = [useV2, languageRadio, speakerIdRadio]
-
-        for i in voice_inputs:
-            i.change(
-                fn=generate_choice_string, inputs=voice_inputs, outputs=[choice_string]
-            )
-
-    return useV2, languageRadio, speakerIdRadio, column
-
-
-def insert_npz_file(npz_filename):
-    return [
-        gr.Dropdown(value=npz_filename),
-        gr.Radio(value=HistorySettings.NPZ_FILE),
-    ]
 
 
 if __name__ == "__main__":
@@ -595,4 +387,6 @@ if __name__ == "__main__":
     with gr.Blocks() as demo:
         generation_tab_bark()
 
-    demo.launch()
+    demo.launch(
+        server_port=7770,
+    )

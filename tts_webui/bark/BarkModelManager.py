@@ -2,43 +2,28 @@ from bark.generation import preload_models, clean_models
 
 
 class BarkModelManager:
-    def __init__(self, config):
+    def __init__(self):
         self.models_loaded = False
-        if config["load_models_on_startup"]:
-            try:
-                self.reload_models(config)
-            except Exception as e:
-                print(f"Failed to load Bark models: {e}")
 
     def reload_models(self, config):
-        print(f"{'Rel' if self.models_loaded else 'L'}oading Bark models")
         self.models_loaded = True
-        model_config = config["model"]
-        text_use_gpu = model_config["text_use_gpu"]
-        text_use_small = model_config["text_use_small"]
-        coarse_use_gpu = model_config["coarse_use_gpu"]
-        coarse_use_small = model_config["coarse_use_small"]
-        fine_use_gpu = model_config["fine_use_gpu"]
-        fine_use_small = model_config["fine_use_small"]
-        codec_use_gpu = model_config["codec_use_gpu"]
+        c = config["model"]
 
-        print(
-            f"""\t- Text Generation:\t\t GPU: {"Yes" if text_use_gpu else "No"}, Small Model: {"Yes" if text_use_small else "No"}
-\t- Coarse-to-Fine Inference:\t GPU: {"Yes" if coarse_use_gpu else "No"}, Small Model: {"Yes" if coarse_use_small else "No"}
-\t- Fine-tuning:\t\t\t GPU: {"Yes" if fine_use_gpu else "No"}, Small Model: {"Yes" if fine_use_small else "No"}
-\t- Codec:\t\t\t GPU: {"Yes" if codec_use_gpu else "No"}"""
-        )
+        def _print_prop(name: str, gpu: bool, small: bool):
+            def _yes_or_no(x: bool):
+                return "Yes" if x else "No"
 
-        preload_models(
-            text_use_gpu=text_use_gpu,
-            text_use_small=text_use_small,
-            coarse_use_gpu=coarse_use_gpu,
-            coarse_use_small=coarse_use_small,
-            fine_use_gpu=fine_use_gpu,
-            fine_use_small=fine_use_small,
-            codec_use_gpu=codec_use_gpu,
-            force_reload=True,
-        )
+            print(
+                f"\t- {name}:\t\t\t GPU: {_yes_or_no(gpu)}, Small Model: {_yes_or_no(small)}"
+            )
+
+        print(f"{'Reloading' if self.models_loaded else 'Loading'} Bark models")
+        _print_prop("Text-to-Semantic", c["text_use_gpu"], c["text_use_small"])
+        _print_prop("Semantic-to-Coarse", c["coarse_use_gpu"], c["coarse_use_small"])
+        _print_prop("Coarse-to-Fine", c["fine_use_gpu"], c["fine_use_small"])
+        _print_prop("Encodec", c["codec_use_gpu"], False)
+
+        preload_models(**c, force_reload=True)
 
     def unload_models(self):
         print("Unloading Bark models...")
@@ -50,3 +35,6 @@ class BarkModelManager:
         print(f"Unloading Bark model {model_key}")
         clean_models(model_key=model_key)
         print(f"Unloaded Bark model {model_key}")
+
+
+bark_model_manager = BarkModelManager()

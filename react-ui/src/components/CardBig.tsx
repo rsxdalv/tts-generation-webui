@@ -189,7 +189,7 @@ export const HistoryCard = ({
     history_hash,
     filename,
     date,
-    history_bundle_name_data,
+    folder_root,
     api_filename,
     ...rest
   },
@@ -208,15 +208,15 @@ export const HistoryCard = ({
   const deleteFavorite = async (
     _url: string,
     data?: {
-      history_bundle_name_data?: string;
+      folder_root?: string;
     }
   ) => {
-    const history_bundle_name_data = data?.history_bundle_name_data;
-    if (!history_bundle_name_data) return;
+    const folder_root = data?.folder_root;
+    if (!folder_root) return;
     const response = await fetch("/api/gradio/delete_generation", {
       method: "POST",
       body: JSON.stringify({
-        history_bundle_name_data,
+        folder_root,
       }),
     });
     return await response.json();
@@ -224,19 +224,19 @@ export const HistoryCard = ({
 
   const addFavorite = () =>
     favorite("", {
-      history_bundle_name_data,
+      folder_root,
     });
 
   const removeFavorite = () =>
     deleteFavorite("", {
-      history_bundle_name_data,
+      folder_root,
     });
 
   const openFolder = () => {
     fetch("/api/gradio/open_folder", {
       method: "POST",
       body: JSON.stringify({
-        folder: history_bundle_name_data,
+        folder: folder_root,
       }),
     });
   };
@@ -371,7 +371,7 @@ export const HistoryCard = ({
           _type={_type}
         />
         <div className="flex flex-col text-gray-500">
-          <p className="text-gray-500 text-sm">{history_bundle_name_data}</p>
+          <p className="text-gray-500 text-sm">{folder_root}</p>
           <Row label="Model" value={_type} />
         </div>
         <MetadataBlock

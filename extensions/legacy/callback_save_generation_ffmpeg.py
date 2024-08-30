@@ -45,8 +45,8 @@ def callback_save_generation(
     attach_generation_meta(full_generation, "coarse_prompt", metadata)
     filename = files.get("ogg")
     input_data = audio_array.tobytes()
-    metadata["prompt"] = double_escape_quotes(metadata["prompt"])
-    metadata["prompt"] = double_escape_newlines(metadata["prompt"])
+    metadata["text"] = double_escape_quotes(metadata["text"])
+    metadata["text"] = double_escape_newlines(metadata["text"])
     def double_escape_backslash(prompt):
         if prompt is None:
             return None
@@ -142,7 +142,7 @@ if __name__ == "__main__":
         "is_big_semantic_model": False,
         "is_big_coarse_model": False,
         "is_big_fine_model": True,
-        "prompt": """♪ これはテストです。
+        "text": """♪ これはテストです。
         "This is a test.""",
         "language": None,
         "speaker_id": None,
@@ -169,4 +169,4 @@ if __name__ == "__main__":
     print(x)
     b = json.loads(x)
     print(b)
-    print(b["prompt"])
+    print(b["text"])

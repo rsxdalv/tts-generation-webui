@@ -3,13 +3,20 @@ import json
 from typing import Union
 from tts_webui.bark.get_bark_voice_hash import get_hash_from_voice_name
 from tts_webui.bark.FullGeneration import FullGeneration
+from tts_webui.bark.npz_tools import load_npz
 
 
-def history_to_hash(npz: Union[None, str, FullGeneration]):
-    if npz is None:
+def history_to_hash(voice_name: Union[None, str, FullGeneration]):
+    if voice_name is None:
         return get_md5_hex(b"None")
-    if isinstance(npz, str):
-        return get_hash_from_voice_name(npz)
+    if isinstance(voice_name, str):
+        candidate = get_hash_from_voice_name(voice_name)
+        if candidate is not None:
+            return candidate
+        else:
+            npz = load_npz(voice_name)
+    else:
+        npz = voice_name
     npz_str = json.dumps(
         {
             "semantic_prompt": npz["semantic_prompt"].tolist(),

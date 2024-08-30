@@ -7,3 +7,11 @@ def decorator_apply_torch_seed(fn):
             return fn(*args, **kwargs)
 
     return wrapper
+
+
+def decorator_apply_torch_seed_generator(fn):
+    def wrapper(*args, **kwargs):
+        with Seed(int(kwargs.get("seed", -1))):
+            yield from fn(*args, **kwargs)
+
+    return wrapper

@@ -10,7 +10,7 @@ from tts_webui.utils.get_path_from_root import get_path_from_root
 from tts_webui.utils.list_dir_models import model_select_ui, unload_model_button
 from tts_webui.utils.randomize_seed import randomize_seed_ui
 from tts_webui.utils.manage_model_state import manage_model_state, unload_model
-from tts_webui.decorators.gradio_dict_decorator import gradio_dict_decorator
+from tts_webui.decorators.gradio_dict_decorator import dictionarize
 from tts_webui.decorators.decorator_apply_torch_seed import decorator_apply_torch_seed
 from tts_webui.decorators.decorator_log_generation import decorator_log_generation
 from tts_webui.decorators.decorator_save_metadata import decorator_save_metadata
@@ -198,11 +198,11 @@ def magnet_ui():
             elem_classes="tts-audio",
         )
         with gr.Row():
-            history_bundle_name_data = gr.Textbox(visible=False)
+            folder_root = gr.Textbox(visible=False)
             save_button = gr.Button("Save to favorites", visible=True)
         save_button.click(
             fn=save_to_favorites,
-            inputs=[history_bundle_name_data],
+            inputs=[folder_root],
             outputs=[save_button],
         )
 
@@ -226,37 +226,17 @@ def magnet_ui():
     outputs_dict = {
         "audio_out": audio_out,
         "metadata": gr.JSON(label="Metadata", visible=False),
-        "folder_root": history_bundle_name_data,
+        "folder_root": folder_root,
     }
 
     submit.click(
         **randomize_seed_callback,
     ).then(
-        # fn=generate,
-        # inputs=[
-        #     model_name,
-        #     text,
-        #     seed,
-        #     use_sampling,
-        #     top_k,
-        #     top_p,
-        #     temperature,
-        #     max_cfg_coef,
-        #     min_cfg_coef,
-        #     decoding_steps_1,
-        #     decoding_steps_2,
-        #     decoding_steps_3,
-        #     decoding_steps_4,
-        #     span_arrangement,
-        # ],
-        # outputs=[audio_out, history_bundle_name_data, result_json],
-        fn=gradio_dict_decorator(
+        **dictionarize(
             fn=generate,
-            gradio_fn_input_dictionary=inputs_dict,
+            inputs=inputs_dict,
             outputs=outputs_dict,
         ),
-        inputs={*inputs_dict},
-        outputs=list(outputs_dict.values()),
         api_name="magnet",
     )
 
@@ -265,21 +245,6 @@ if __name__ == "__main__":
     with gr.Blocks() as demo:
         generation_tab_magnet()
 
-    demo.launch()
-
-    generate(
-        model_name="facebook/musicgen-melody",
-        text="I am a robot",
-        seed=0,
-        use_sampling=True,
-        top_k=250,
-        top_p=0.0,
-        temperature=1.0,
-        max_cfg_coef=10.0,
-        min_cfg_coef=1.0,
-        decoding_steps_1=20,
-        decoding_steps_2=10,
-        decoding_steps_3=10,
-        decoding_steps_4=10,
-        span_arrangement="nonoverlap",
+    demo.launch(
+        server_port=7770,
     )

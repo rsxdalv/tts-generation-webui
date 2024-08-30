@@ -8,6 +8,7 @@ import { HandleChange } from "../types/HandleChange";
 import { PromptTextArea } from "./PromptTextArea";
 import { ResetButton } from "./ResetButton";
 import { commonBorder } from "./commonBorder";
+import { SeedInput } from "./SeedInput";
 
 const VALLEX_LANGUAGE_DATA: [string, string][] = [
   ["Mix", "Mix"],
@@ -164,7 +165,7 @@ const SplitTextIntoSentences = ({ params }: { params: VallexParams }) => {
 };
 
 export const VallexInputs = ({
-  vallexParams,
+  vallexParams: params,
   handleChange,
   setVallexParams,
 }: {
@@ -176,14 +177,14 @@ export const VallexInputs = ({
   <div className="flex gap-x-6 w-full justify-center">
     <div className="flex flex-col gap-y-2 w-1/2">
       <PromptTextArea
-        params={vallexParams}
+        params={params}
         handleChange={handleChange}
         label="Text"
         name="text"
       />
 
-      <TokenizeButton params={vallexParams} />
-      <SplitTextIntoSentences params={vallexParams} />
+      <TokenizeButton params={params} />
+      <SplitTextIntoSentences params={params} />
 
       {/* <PromptTextArea
         params={vallexParams}
@@ -198,7 +199,7 @@ export const VallexInputs = ({
         label="Language"
         name="language"
         choices={VALLEX_LANGUAGE_DATA}
-        checked={vallexParams.language}
+        checked={params.language}
         onChange={handleChange}
       />
 
@@ -206,7 +207,7 @@ export const VallexInputs = ({
         label="Accent"
         name="accent"
         choices={VALLEX_ACCENT_DATA}
-        checked={vallexParams.accent}
+        checked={params.accent}
         onChange={handleChange}
       />
 
@@ -231,12 +232,14 @@ export const VallexInputs = ({
         label="Long Audio Generation Mode"
         name="mode"
         choices={VALLEX_MODE_DATA}
-        checked={vallexParams.mode}
+        checked={params.mode}
         onChange={handleChange}
       />
 
+      <SeedInput params={params} handleChange={handleChange} />
+
       <ResetButton
-        params={vallexParams}
+        params={params}
         setParams={setVallexParams}
         initialParams={initialVallexParams}
       />

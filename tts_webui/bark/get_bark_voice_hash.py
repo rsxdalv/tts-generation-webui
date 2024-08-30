@@ -309,7 +309,7 @@ cached_hashes = _cached_hashes
 
 
 def get_hash_from_voice_name(voice_name):
-    return cached_hashes[voice_name.replace("\\", "/") + ".npz"]
+    return cached_hashes.get(voice_name.replace("\\", "/") + ".npz", None)
 
 
 if __name__ == "__main__":

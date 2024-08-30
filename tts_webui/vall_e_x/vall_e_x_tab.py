@@ -12,7 +12,7 @@ from valle_x.utils.generation import (
 )
 from valle_x.utils.sentence_cutter import split_text_into_sentences
 
-from tts_webui.decorators.gradio_dict_decorator import gradio_dict_decorator
+from tts_webui.decorators.gradio_dict_decorator import dictionarize, gradio_dict_decorator
 from tts_webui.utils.randomize_seed import randomize_seed_ui
 from tts_webui.utils.manage_model_state import manage_model_state
 from tts_webui.utils.list_dir_models import unload_model_button
@@ -43,7 +43,8 @@ def preprocess_text(text, language="auto"):
 
 @manage_model_state("valle_x")
 def preload_models_if_needed(checkpoints_dir):
-    return preload_models(checkpoints_dir=checkpoints_dir)
+    preload_models(checkpoints_dir=checkpoints_dir)
+    return "Loaded" # workaround because preload_models returns None
 
 
 def get_lang(language):
@@ -154,13 +155,11 @@ def valle_x_ui_generation():
     generate_button.click(
         **randomize_seed_callback,
     ).then(
-        fn=gradio_dict_decorator(
+        **dictionarize(
             fn=generate_audio_gradio,
-            gradio_fn_input_dictionary=input_dict,
+            inputs=input_dict,
             outputs=output_dict,
         ),
-        inputs={*input_dict},
-        outputs=list(output_dict.values()),
         api_name="vall_e_x_generate",
     )
 
@@ -190,4 +189,6 @@ if __name__ == "__main__":
         demo.close()
     with gr.Blocks() as demo:
         valle_x_tab()
-        demo.launch()
+        demo.launch(
+            server_port=7770,
+        )

@@ -5,9 +5,10 @@ import gradio as gr
 from importlib.metadata import version
 from maha_tts import load_models, infer_tts, config
 from tts_webui.tortoise.gr_reload_button import gr_open_button_simple, gr_reload_button
+from tts_webui.utils.list_dir_models import unload_model_button
 from tts_webui.utils.randomize_seed import randomize_seed_ui
 from tts_webui.utils.manage_model_state import manage_model_state
-from tts_webui.decorators.gradio_dict_decorator import gradio_dict_decorator
+from tts_webui.decorators.gradio_dict_decorator import dictionarize
 from tts_webui.decorators.decorator_apply_torch_seed import decorator_apply_torch_seed
 from tts_webui.decorators.decorator_log_generation import decorator_log_generation
 from tts_webui.decorators.decorator_save_metadata import decorator_save_metadata
@@ -109,7 +110,7 @@ def maha_tts_ui():
             value="auto",
             type="value",
         )
-    maha_tts_language = gr.Radio(
+    text_language = gr.Radio(
         choices=list(config.lang_index.keys()),
         label="Text Language",
         value="english",
@@ -127,7 +128,7 @@ def maha_tts_ui():
             visible=True,
         ),
         inputs=[model_name],
-        outputs=[maha_tts_language],
+        outputs=[text_language],
     )
 
     with gr.Column():
@@ -150,13 +151,15 @@ def maha_tts_ui():
 
     seed, randomize_seed_callback = randomize_seed_ui()
 
+    unload_model_button("maha_tts")
+
     audio_out = gr.Audio(label="Output Audio")
     button = gr.Button("Generate")
 
     input_dict = {
         text: "text",
         model_name: "model_name",
-        maha_tts_language: "text_language",
+        text_language: "text_language",
         speaker_name: "speaker_name",
         seed: "seed",
         device: "device",
@@ -171,13 +174,11 @@ def maha_tts_ui():
     button.click(
         **randomize_seed_callback,
     ).then(
-        fn=gradio_dict_decorator(
+        **dictionarize(
             fn=generate_audio_maha_tts,
-            gradio_fn_input_dictionary=input_dict,
+            inputs=input_dict,
             outputs=output_dict,
         ),
-        inputs={*input_dict},
-        outputs=list(output_dict.values()),
         api_name="maha_tts",
     )
 
@@ -193,4 +194,6 @@ if __name__ == "__main__":
     with gr.Blocks() as demo:
         maha_tts_tab()
 
-    demo.launch()
+    demo.launch(
+        server_port=7770,
+    )

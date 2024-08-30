@@ -12,6 +12,8 @@ full_css += material_symbols_css
 full_css += css_tortoise
 full_css += history_css
 full_css += bark_css
-full_css += load_css("src/musicgen/musicgen.css")
+full_css += load_css("tts_webui/musicgen/musicgen.css")
 
-# full_css += load_css("src/studio/studio_tab.css")
+# test new tailwind integration !!
+
+# full_css += load_css("tts_webui/studio/studio_tab.css")

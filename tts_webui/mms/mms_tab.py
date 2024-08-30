@@ -4,7 +4,7 @@ import torch
 from transformers import VitsTokenizer, VitsModel
 import gradio as gr
 
-from tts_webui.decorators.gradio_dict_decorator import gradio_dict_decorator
+from tts_webui.decorators.gradio_dict_decorator import dictionarize, gradio_dict_decorator
 from tts_webui.utils.manage_model_state import manage_model_state
 from tts_webui.utils.list_dir_models import unload_model_button
 from tts_webui.decorators.decorator_apply_torch_seed import decorator_apply_torch_seed
@@ -19,6 +19,7 @@ from tts_webui.extensions_loader.decorator_extensions import (
     decorator_extension_outer,
     decorator_extension_inner,
 )
+from tts_webui.utils.randomize_seed import randomize_seed_ui
 
 
 @manage_model_state("mms")
@@ -63,7 +64,7 @@ def generate_audio_with_mms(
 
 
 def get_mms_languages():
-    with open(os.path.join("./src/mms/", "mms-languages-iso639-3.txt")) as f:
+    with open(os.path.join("./tts_webui/mms/", "mms-languages-iso639-3.txt")) as f:
         for line in f:
             yield (Lang(line[:3]).name + line[3:].strip(), line[:3])
 
@@ -116,8 +117,6 @@ def mms_ui():
             value=0.8,
         )
 
-    from tts_webui.utils.randomize_seed import randomize_seed_ui
-
     seed, randomize_seed_callback = randomize_seed_ui()
 
     unload_model_button("mms")
@@ -142,13 +141,11 @@ def mms_ui():
     mms_generate_button.click(
         **randomize_seed_callback,
     ).then(
-        fn=gradio_dict_decorator(
+        **dictionarize(
             fn=generate_audio_with_mms,
-            gradio_fn_input_dictionary=input_dict,
+            inputs=input_dict,
             outputs=output_dict,
         ),
-        inputs={*input_dict},
-        outputs=list(output_dict.values()),
         api_name="mms",
     )
 

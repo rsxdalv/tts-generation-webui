@@ -162,6 +162,9 @@ def stable_audio_ui():
                     """
                     Stable Audio requires a manual download of a model.
                     Please download a model using the download tab or manually place it in the `data/models/stable-audio` folder.
+
+                    Note: Due to a [bug](https://github.com/Stability-AI/stable-audio-tools/issues/80) when using half precision
+                    the model will fail to generate with "init audio" or during "inpainting".
                     """
                 )
                 half_checkbox = gr.Checkbox(

@@ -12,7 +12,7 @@ from tts_webui.tortoise.gr_reload_button import gr_reload_button, gr_open_button
 from tts_webui.rvc_tab.get_and_load_hubert import download_rmvpe
 from rvc.modules.vc.modules import VC
 
-from tts_webui.decorators.gradio_dict_decorator import gradio_dict_decorator
+from tts_webui.decorators.gradio_dict_decorator import dictionarize
 from tts_webui.utils.randomize_seed import randomize_seed_ui
 from tts_webui.utils.manage_model_state import manage_model_state
 from tts_webui.utils.list_dir_models import unload_model_button
@@ -63,10 +63,10 @@ def decorator_rvc_use_model_name_as_text(fn):
 @decorator_extension_inner
 @log_function_time
 def run_rvc(
-    f0up_key: str,
+    pitch_up_key: str,
     original_audio_path: str,
     index_path: str,
-    f0method: str,
+    pitch_collection_method: str,
     model_path: str,
     index_rate: float,
     filter_radius: int,
@@ -76,13 +76,13 @@ def run_rvc(
     **kwargs,
 ):
     vc = get_vc(model_path + ".pth")
-    if f0method == "rmvpe":
+    if pitch_collection_method == "rmvpe":
         download_rmvpe()
     tgt_sr, audio_opt, times, _ = vc.vc_inference(
         sid=1,
         input_audio_path=Path(original_audio_path),
-        f0_up_key=int(f0up_key),
-        f0_method=f0method,
+        f0_up_key=int(pitch_up_key),
+        f0_method=pitch_collection_method,
         f0_file=None,
         index_file=Path(index_path + ".index"),
         index_rate=index_rate,
@@ -163,8 +163,8 @@ def rvc_ui():
                     index_path = rvc_ui_model_or_index_path_ui("Index")
             unload_model_button("rvc")
             with gr.Row():
-                f0up_key = gr.Textbox(label="Semitone shift", value="0")
-                f0method = gr.Radio(
+                pitch_up_key = gr.Textbox(label="Semitone shift", value="0")
+                pitch_collection_method = gr.Radio(
                     ["harvest", "pm", "crepe", "rmvpe", "fcpe"],
                     label="Pitch Collection Method",
                     value="harvest",
@@ -207,7 +207,7 @@ def rvc_ui():
                 )
 
         with gr.Column():
-            original_audio = gr.Audio(label="Original Audio", type="filepath")
+            original_audio_path = gr.Audio(label="Original Audio", type="filepath")
             button = gr.Button(value="Convert", variant="primary")
             audio_out = gr.Audio(label="result", interactive=False)
             open_folder_button = gr.Button(
@@ -216,10 +216,10 @@ def rvc_ui():
             open_folder_button.click(lambda: open_folder("outputs-rvc"))
 
     inputs_dict = {
-        f0up_key: "f0up_key",
-        original_audio: "original_audio_path",
+        pitch_up_key: "pitch_up_key",
+        original_audio_path: "original_audio_path",
         index_path: "index_path",
-        f0method: "f0method",
+        pitch_collection_method: "pitch_collection_method",
         model_path: "model_path",
         index_rate: "index_rate",
         filter_radius: "filter_radius",
@@ -235,17 +235,15 @@ def rvc_ui():
     }
 
     button.click(
-        fn=gradio_dict_decorator(
+        **dictionarize(
             fn=run_rvc,
-            gradio_fn_input_dictionary=inputs_dict,
+            inputs=inputs_dict,
             outputs=outputs_dict,
         ),
-        inputs={*inputs_dict},
-        outputs=list(outputs_dict.values()),
         api_name="rvc",
     )
 
-    return original_audio
+    return original_audio_path
 
 
 def rvc_conversion_tab():
@@ -259,4 +257,6 @@ if __name__ == "__main__":
     with gr.Blocks(analytics_enabled=False) as demo:
         rvc_conversion_tab()
 
-    demo.launch()
+    demo.launch(
+        server_port=7770,
+    )

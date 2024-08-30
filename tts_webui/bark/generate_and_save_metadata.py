@@ -1,52 +1,38 @@
-import json
-from tts_webui.bark.history_to_hash import history_to_hash
 from tts_webui.bark.FullGeneration import FullGeneration
 from tts_webui.bark.BarkParams import BarkParams
 from bark.generation import models
 
+from tts_webui.history_tab.get_hash_memoized import get_hash_memoized
 
-def generate_and_save_metadata(
+
+def _is_big_model(model):
+    return model.config.n_embd > 768
+
+
+def generate_bark_metadata(
     date: str,
-    filename_json: str,
     full_generation: FullGeneration,
-    final_gen_params: BarkParams,
+    params: BarkParams,
 ):
-    prompt = final_gen_params["text"]
-    text_temp = final_gen_params["text_temp"]
-    waveform_temp = final_gen_params["waveform_temp"]
-    seed = final_gen_params["seed"]
-    history_prompt = final_gen_params["history_prompt"]
-
-    history_hash = history_to_hash(history_prompt)
-    history_prompt_npz = history_prompt if isinstance(history_prompt, str) else None
-    history_prompt = history_prompt if isinstance(history_prompt, str) else None
-
-    is_big_semantic_model = models["text"]["model"].config.n_embd > 768
-    is_big_coarse_model = models["coarse"].config.n_embd > 768
-    is_big_fine_model = models["fine"].config.n_embd > 768
-
+    history_prompt = params["history_prompt"]
     metadata = {
-        "_version": "0.0.2",
+        "_version": "0.0.3",
         "_hash_version": "0.0.2",
-        "_type": "bark",
-        "is_big_semantic_model": is_big_semantic_model,
-        "is_big_coarse_model": is_big_coarse_model,
-        "is_big_fine_model": is_big_fine_model,
-        # "model_semantic_hash": model_semantic_hash,
-        # "model_coarse_hash": model_coarse_hash,
-        # "model_fine_hash": model_fine_hash,
-        "prompt": prompt,
-        "hash": history_to_hash(full_generation),
-        "history_prompt": history_prompt,
-        "history_prompt_npz": history_prompt_npz,
-        "history_hash": history_hash,
-        "text_temp": text_temp,
-        "waveform_temp": waveform_temp,
+        "_type": params["_type"],
+        "text": params["text"],
+        "text_temp": params["text_temp"],
+        "seed": params["seed"],
+        "max_length": params["max_length"],
+        "waveform_temp": params["waveform_temp"],
+        "is_big_semantic_model": _is_big_model(models["text"]["model"]),
+        "is_big_coarse_model": _is_big_model(models["coarse"]),
+        "is_big_fine_model": _is_big_model(models["fine"]),
         "date": date,
-        "seed": str(seed),
-        "max_gen_duration_s": final_gen_params["max_gen_duration_s"],
+        "hash": get_hash_memoized(full_generation),
+        "history_prompt": history_prompt if isinstance(history_prompt, str) else None,
+        "history_prompt_npz": (
+            history_prompt if isinstance(history_prompt, str) else None
+        ),
+        "history_hash": get_hash_memoized(history_prompt),
     }
-    with open(filename_json, "w") as outfile:
-        json.dump(metadata, outfile, indent=2)
-
     return metadata

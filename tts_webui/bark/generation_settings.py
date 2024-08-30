@@ -1,15 +1,3 @@
-class HistorySettings:
-    EMPTY = "Empty history"
-    VOICE = "or Use a voice:"
-    NPZ_FILE = "or Use old generation as history:"
-
-    choices = [
-        EMPTY,
-        VOICE,
-        NPZ_FILE,
-    ]
-
-
 class PromptSplitSettings:
     NONE = "Short prompt (<15s)"
     LINES = "Split prompt by lines"

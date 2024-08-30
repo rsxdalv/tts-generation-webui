@@ -18,12 +18,12 @@ const BarkGenerationPage = () => {
 
   return (
     <Template title="Bark">
-      <div className="flex w-full flex-col">
+      <div className="flex w-full flex-col gap-2">
         <BarkInputs
           barkGenerationParams={barkGenerationParams}
           handleChange={handleChange}
         />
-        <div className="flex flex-col space-y-4">
+        <div className="flex gap-4">
           <AudioOutput
             audioOutput={historyData[0]?.audio}
             label="Bark Output"
@@ -43,7 +43,7 @@ const BarkGenerationPage = () => {
           setHistoryData={setHistoryData}
           historyData={historyData}
           funcs={funcs}
-          nameKey="history_bundle_name_data"
+          nameKey="folder_root"
           filter={["sendToBark", "sendToBarkVoiceGeneration"]}
         />
       </div>

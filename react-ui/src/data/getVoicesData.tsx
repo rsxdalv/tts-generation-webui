@@ -140,6 +140,6 @@ const generateResult = (
 
   filename: getWebuiURL(collection, coreFilename),
 
-  history_bundle_name_data: path.join(collection, dirname),
+  folder_root: path.join(collection, dirname),
   api_filename: path.join(collection, coreFilename),
 });

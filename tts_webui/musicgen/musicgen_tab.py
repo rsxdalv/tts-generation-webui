@@ -18,7 +18,6 @@ from tts_webui.extensions_loader.ext_callback_save_generation import (
 )
 from tts_webui.utils.create_base_filename import create_base_filename
 from tts_webui.history_tab.save_to_favorites import save_to_favorites
-from tts_webui.bark.get_filenames import get_filenames
 from tts_webui.utils.date import get_date_string
 from scipy.io.wavfile import write as write_wav
 from tts_webui.utils.save_waveform_plot import middleware_save_waveform_plot
@@ -86,6 +85,13 @@ def save_generation(
     date = get_date_string()
     title = prompt[:20].replace(" ", "_")
     base_filename = create_base_filename(title, "outputs", model="musicgen", date=date)
+
+    def get_filenames(base_filename: str):
+        filename = f"{base_filename}.wav"
+        filename_png = f"{base_filename}.png"
+        filename_json = f"{base_filename}.json"
+        filename_npz = f"{base_filename}.npz"
+        return filename, filename_png, filename_json, filename_npz
 
     filename, filename_png, filename_json, filename_npz = get_filenames(base_filename)
     stereo = audio_array.shape[0] == 2
@@ -336,12 +342,12 @@ def generation_tab_musicgen():
             )
             image = gr.Image(label="Waveform", elem_classes="tts-image", visible=False)  # type: ignore
             with gr.Row():
-                history_bundle_name_data = gr.Textbox(visible=False)
+                folder_root = gr.Textbox(visible=False)
                 save_button = gr.Button("Save to favorites", visible=True)
                 melody_button = gr.Button("Use as melody", visible=True)
             save_button.click(
                 fn=save_to_favorites,
-                inputs=[history_bundle_name_data],
+                inputs=[folder_root],
                 outputs=[save_button],
             )
 
@@ -417,7 +423,7 @@ def generation_tab_musicgen():
             ),  # type: ignore
             melody_in=melody,
         ),
-        outputs=[output, history_bundle_name_data, image, seed_cache, result_json],
+        outputs=[output, folder_root, image, seed_cache, result_json],
         api_name="musicgen",
     )
 

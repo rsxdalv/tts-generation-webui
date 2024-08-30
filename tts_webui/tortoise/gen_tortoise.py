@@ -200,11 +200,11 @@ def _process_gen(candidates, audio_array, id, params: TortoiseParameters):
 
     save_json(filename_json, metadata)
 
-    history_bundle_name_data = os.path.dirname(filename)
+    folder_root = os.path.dirname(filename)
 
     return TortoiseOutputUpdate(
         audio=(SAMPLE_RATE, audio_array),
-        bundle_name=history_bundle_name_data,
+        bundle_name=folder_root,
         params=gr.JSON(value=metadata),  # broken because gradio returns only __type__
     )
 

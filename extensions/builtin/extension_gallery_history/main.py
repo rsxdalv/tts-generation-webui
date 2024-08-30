@@ -98,7 +98,7 @@ def history_content(directory, show_collections):
 
         with gr.Column():
             history_bundle_name = gr.Markdown(visible=True)
-            history_bundle_name_data = gr.Textbox(visible=False)
+            folder_root = gr.Textbox(visible=False)
             history_audio = gr.Audio(visible=True, type="filepath", show_label=False)
             history_image = gr.Image(show_label=False)
             history_json = gr.JSON()
@@ -118,11 +118,11 @@ def history_content(directory, show_collections):
                 open_folder_button = gr.Button(
                     value="Open folder", variant="secondary", visible=False
                 )
-                open_folder_button.click(open_folder, inputs=history_bundle_name_data)
+                open_folder_button.click(open_folder, inputs=folder_root)
 
                 save_to_favorites_history.click(
                     fn=save_to_favorites,
-                    inputs=history_bundle_name_data,
+                    inputs=folder_root,
                     outputs=save_to_favorites_history,
                 )
 
@@ -135,14 +135,14 @@ def history_content(directory, show_collections):
             save_to_collection_ui(
                 directory,
                 directories,
-                history_bundle_name_data,
+                folder_root,
                 collections_directories_atom,
             )
 
     def _select_audio_history(filename: str, json_text):
         return {
             history_bundle_name: gr.Textbox(value=os.path.dirname(filename)),
-            history_bundle_name_data: os.path.dirname(filename),
+            folder_root: os.path.dirname(filename),
             history_audio: gr.Audio(value=filename, label=filename),
             history_image: gr.Image(value=filename.replace(".wav", ".png")),
             history_json: gr.JSON(value=json_text),
@@ -162,7 +162,7 @@ def history_content(directory, show_collections):
 
     outputs = [
         history_bundle_name,
-        history_bundle_name_data,
+        folder_root,
         history_audio,
         history_image,
         history_json,
@@ -191,7 +191,7 @@ def history_content(directory, show_collections):
     )
     delete_from_history.click(
         fn=delete_generation_cb(update_history_tab),
-        inputs=[history_bundle_name_data, directory_dropdown],
+        inputs=[folder_root, directory_dropdown],
         outputs=[history_list_as_gallery],
     )
 
@@ -211,7 +211,7 @@ def history_content(directory, show_collections):
 def save_to_collection_ui(
     directory: str,
     directories: list[str],
-    history_bundle_name_data: gr.Textbox,
+    folder_root: gr.Textbox,
     directories_state: gr.JSON,
 ):
     with gr.Row():
@@ -223,7 +223,7 @@ def save_to_collection_ui(
 
     move_to_collection.select(
         fn=save_to_collection,
-        inputs=[history_bundle_name_data, move_to_collection],
+        inputs=[folder_root, move_to_collection],
         outputs=[move_to_collection],
     )
 

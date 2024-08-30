@@ -4,8 +4,7 @@ import { getWebuiURL, getWebuiURLWithHost } from "../data/getWebuiURL";
 import { encodecDecode } from "../functions/encodecDecode";
 import { saveToVoices } from "../functions/saveToVoices";
 
-// generic old generation dropdown for both OldGeneration and HistoryPromptSemantic
-const NPZVoiceDropdown = ({
+export const NPZVoiceDropdown = ({
   barkGenerationParams,
   handleChange,
   name,
@@ -86,34 +85,6 @@ const NPZVoiceDropdown = ({
     </div>
   );
 };
-export const OldGeneration = ({
-  barkGenerationParams,
-  handleChange,
-}: {
-  barkGenerationParams: BarkGenerationParams;
-  handleChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
-}) => (
-  <NPZVoiceDropdown
-    barkGenerationParams={barkGenerationParams}
-    handleChange={handleChange}
-    name="old_generation_dropdown"
-    label="Old generation"
-  />
-);
-export const HistoryPromptSemantic = ({
-  barkGenerationParams,
-  handleChange,
-}: {
-  barkGenerationParams: BarkGenerationParams;
-  handleChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
-}) => (
-  <NPZVoiceDropdown
-    barkGenerationParams={barkGenerationParams}
-    handleChange={handleChange}
-    name="history_prompt_semantic_dropdown"
-    label="History prompt semantic"
-  />
-);
 
 async function reloadOldGenerationDropdown() {
   const response = await fetch("/api/gradio/reload_old_generation_dropdown", {

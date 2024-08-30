@@ -14,7 +14,7 @@ export function getBarkFuncs(
     if (!npz) return;
     setBarkVoiceGenerationParams({
       ...barkGenerationParams,
-      old_generation_dropdown: npz,
+      history_prompt: npz,
     });
   };
 
@@ -23,7 +23,7 @@ export function getBarkFuncs(
     if (!npz) return;
     setBarkVoiceGenerationParams({
       ...barkGenerationParams,
-      history_prompt_semantic_dropdown: npz,
+      history_prompt_semantic: npz,
     });
   };
 
@@ -38,23 +38,24 @@ export function getBarkFuncs(
 
   const useParametersTest = (_url: string, data?: BarkResult) => {
     const {
-      prompt, language, speaker_id, text_temp, waveform_temp, history_prompt, history_prompt_npz, semantic_prompt, coarse_prompt,
-    } = (data?.metadata)!;
+      prompt,
+      text_temp,
+      waveform_temp,
+      history_prompt_npz,
+      semantic_prompt,
+      coarse_prompt,
+    } = data?.metadata!;
     if (!prompt) return;
     setBarkVoiceGenerationParams({
       ...barkGenerationParams,
       text: prompt,
-      languageRadio: language,
-      speakerIdRadio: speaker_id,
       text_temp,
       waveform_temp,
-      history_setting: history_prompt,
-      old_generation_dropdown: history_prompt_npz,
-      history_prompt_semantic_dropdown: semantic_prompt,
+      history_prompt: history_prompt_npz,
+      history_prompt_semantic: semantic_prompt,
       burn_in_prompt: coarse_prompt,
       long_prompt_radio: "Short prompt (<15s)",
       seed: Number(data?.metadata?.seed ?? "-1"),
-      useV2: data?.metadata?.history_prompt?.includes("v2") ?? true,
     });
   };
 

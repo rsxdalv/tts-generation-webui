@@ -3,6 +3,8 @@ import importlib
 import importlib.util
 from importlib.metadata import version
 import time
+from types import ModuleType
+from typing import Literal
 
 import gradio as gr
 
@@ -15,6 +17,7 @@ def check_if_package_installed(package_name):
     return spec is not None
 
 
+# A list of disabled extensions and decorators
 disabled_extensions = ["decorator_disabled"]
 
 
@@ -85,33 +88,79 @@ def extension_decorator_list_tab():
                 )
 
 
-def _load_decorators(class_name):
+def _load_decorators(class_name: Literal["outer", "inner"]):
+    """
+    Loads all decorators from extensions.
+
+    The decorators are loaded from the "main" module of the extension.
+    Decorators must be functions prefixed with "decorator_".
+    Generators are detected by the suffix "_generator".
+
+    For example:
+    def decorator_save_ogg(fn):
+        def wrapper(*args, **kwargs):
+            return fn(*args, **kwargs)
+        return wrapper
+
+    def decorator_save_ogg_generator(fn):
+        def wrapper(*args, **kwargs):
+            yield from fn(*args, **kwargs)
+        return wrapper
+
+    Args:
+        class_name (str): "outer" or "inner"
+
+    Returns:
+        wrappers (list): List of decorators.
+        gen_wrappers (list): List of decorators for generators.
+    """
     wrappers = []
-    for x in extension_list_json:
-        if x["extension_type"] == "decorator" and x["extension_class"] == class_name:
-            print(f"Loading decorator extension {x['name']}")
-            start_time = time.time()
-            try:
-                module = importlib.import_module(f"{x['package_name']}.main")
-                for name in dir(module):
-                    if name.startswith("decorator_"):
-                        if name in disabled_extensions:
-                            print(f"  Skipping disabled decorator extension {name}")
-                            continue
-                        wrappers.append(getattr(module, name))
-                        print(f"  Decorator {name} loaded")
-            except Exception as e:
-                print(f"Failed to load decorator extension {x['name']}: {e}")
-            finally:
-                elapsed_time = time.time() - start_time
-                print(
-                    f"Decorator extension {x['name']} loaded in {elapsed_time:.2f} seconds."
-                )
-    return wrappers
+    gen_wrappers = []
+
+    def _parse_module(module: ModuleType, name: str):
+        if name.startswith("decorator_"):
+            if name in disabled_extensions:
+                print(f"  Skipping disabled decorator extension {name}")
+                return
+            if name.endswith("_generator"):
+                gen_wrappers.append(getattr(module, name))
+                print(f"  Decorator {name} loaded")
+                return
+            wrappers.append(getattr(module, name))
+            print(f"  Decorator {name} loaded")
+
+    def _load(x: dict):
+        if x["package_name"] in disabled_extensions:
+            print(f"Skipping disabled decorator extension {x['name']}")
+            return
+        module = importlib.import_module(f"{x['package_name']}.main")
+        for name in dir(module):
+            _parse_module(module, name)
+
+    filtered_extensions = [
+        x
+        for x in extension_list_json
+        if x["extension_type"] == "decorator" and x["extension_class"] == class_name
+    ]
+
+    for x in filtered_extensions:
+        print(f"Loading decorator extension {x['name']}")
+        start_time = time.time()
+        try:
+            _load(x)
+        except Exception as e:
+            print(f"Failed to load decorator extension {x['name']}: {e}")
+        finally:
+            elapsed_time = time.time() - start_time
+            print(
+                f"Decorator extension {x['name']} loaded in {elapsed_time:.2f} seconds."
+            )
+
+    return wrappers, gen_wrappers
 
 
-OUTER_WRAPPERS = _load_decorators("outer")
-INNER_WRAPPERS = _load_decorators("inner")
+OUTER_WRAPPERS, OUTER_WRAPPERS_GEN = _load_decorators("outer")
+INNER_WRAPPERS, INNER_WRAPPERS_GEN = _load_decorators("inner")
 
 
 def decorator_extension_outer(fn0):
@@ -120,6 +169,14 @@ def decorator_extension_outer(fn0):
 
 def decorator_extension_inner(fn0):
     return _decorator_extension(INNER_WRAPPERS, fn0)
+
+
+def decorator_extension_outer_generator(fn0):
+    return _decorator_extension(OUTER_WRAPPERS_GEN, fn0)
+
+
+def decorator_extension_inner_generator(fn0):
+    return _decorator_extension(INNER_WRAPPERS_GEN, fn0)
 
 
 def _decorator_extension(wrappers, fn0):
