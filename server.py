@@ -1,35 +1,35 @@
 # %%
+import tts_webui.utils.setup_or_recover as setup_or_recover
+
+setup_or_recover.setup_or_recover()
+
+import tts_webui.utils.dotenv_init as dotenv_init
+
+dotenv_init.init()
+
 import os
-import src.utils.setup_or_recover as setup_or_recover
-import src.utils.dotenv_init as dotenv_init
 import gradio as gr
-from src.utils.suppress_warnings import suppress_warnings
+from tts_webui.utils.suppress_warnings import suppress_warnings
 
 suppress_warnings()
 
-from src.config.load_config import default_config
-from src.config.config import config
+from tts_webui.config.load_config import default_config
+from tts_webui.config.config import config
 
-from src.css.css import full_css
-from src.history_tab.collections_directories_atom import collections_directories_atom
+from tts_webui.css.css import full_css
+from tts_webui.history_tab.collections_directories_atom import collections_directories_atom
 
 print("Starting server...\n")
 
-setup_or_recover.dummy()
-dotenv_init.init()
 
-
-from src.utils.generic_error_tab_advanced import generic_error_tab_advanced
-from src.extensions_loader.interface_extensions import (
+from tts_webui.utils.generic_error_tab_advanced import generic_error_tab_advanced
+from tts_webui.extensions_loader.interface_extensions import (
     extension_list_tab,
     handle_extension_class,
 )
-from src.extensions_loader.ext_callback_save_generation import (
-    load_ext_callback_save_generation,
+from tts_webui.extensions_loader.decorator_extensions import (
+    extension_decorator_list_tab,
 )
-
-load_ext_callback_save_generation()
-
 
 def reload_config_and_restart_ui():
     os._exit(0)
@@ -73,7 +73,7 @@ def load_tabs(list_of_tabs):
         run_tab(module_name, function_name, name, requirements)
 
 
-def main_ui(theme_choice = "Base"):    
+def main_ui(theme_choice="Base"):
     themes = {
         "Base": gr.themes.Base,
         "Default": gr.themes.Default,
@@ -84,25 +84,28 @@ def main_ui(theme_choice = "Base"):
         primary_hue="sky",
         secondary_hue="sky",
         neutral_hue="neutral",
-        font=[gr.themes.GoogleFont('Inter'), 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        font=[
+            gr.themes.GoogleFont("Inter"),
+            "ui-sans-serif",
+            "system-ui",
+            "sans-serif",
+        ],
     ).set(
-        embed_radius='*radius_sm',
-        block_label_radius='*radius_sm',
-        block_label_right_radius='*radius_sm',
-        block_radius='*radius_sm',
-        block_title_radius='*radius_sm',
-        container_radius='*radius_sm',
-        checkbox_border_radius='*radius_sm',
-        input_radius='*radius_sm',
-        table_radius='*radius_sm',
-        button_large_radius='*radius_sm',
-        button_small_radius='*radius_sm',
-
-        
-        button_primary_background_fill_hover='*primary_300',
-        button_primary_background_fill_hover_dark='*primary_600',
-        button_secondary_background_fill_hover='*secondary_200',
-        button_secondary_background_fill_hover_dark='*secondary_600',
+        embed_radius="*radius_sm",
+        block_label_radius="*radius_sm",
+        block_label_right_radius="*radius_sm",
+        block_radius="*radius_sm",
+        block_title_radius="*radius_sm",
+        container_radius="*radius_sm",
+        checkbox_border_radius="*radius_sm",
+        input_radius="*radius_sm",
+        table_radius="*radius_sm",
+        button_large_radius="*radius_sm",
+        button_small_radius="*radius_sm",
+        button_primary_background_fill_hover="*primary_300",
+        button_primary_background_fill_hover_dark="*primary_600",
+        button_secondary_background_fill_hover="*secondary_200",
+        button_secondary_background_fill_hover_dark="*secondary_600",
     )
 
     with gr.Blocks(
@@ -126,34 +129,34 @@ def main_ui(theme_choice = "Base"):
 def all_tabs():
     with gr.Tab("Text-to-Speech"), gr.Tabs():
         tts_tabs = [
-            ("src.bark.generation_tab_bark", "generation_tab_bark", "Bark TTS"),
+            ("tts_webui.bark.generation_tab_bark", "generation_tab_bark", "Bark TTS"),
             (
-                "src.bark.clone.tab_voice_clone",
+                "tts_webui.bark.clone.tab_voice_clone",
                 "tab_voice_clone",
                 "Bark Voice Clone",
                 "-r requirements_bark_hubert_quantizer.txt",
             ),
             (
-                "src.tortoise.generation_tab_tortoise",
+                "tts_webui.tortoise.generation_tab_tortoise",
                 "generation_tab_tortoise",
                 "Tortoise TTS",
             ),
-            ("src.seamlessM4T.seamless_tab", "seamless_tab", "SeamlessM4Tv2Model"),
+            ("tts_webui.seamlessM4T.seamless_tab", "seamless_tab", "SeamlessM4Tv2Model"),
             (
-                "src.vall_e_x.vall_e_x_tab",
+                "tts_webui.vall_e_x.vall_e_x_tab",
                 "valle_x_tab",
                 "Valle-X",
                 "-r requirements_vall_e.txt",
             ),
-            ("src.mms.mms_tab", "mms_tab", "MMS"),
+            ("tts_webui.mms.mms_tab", "mms_tab", "MMS"),
             (
-                "src.maha_tts.maha_tts_tab",
+                "tts_webui.maha_tts.maha_tts_tab",
                 "maha_tts_tab",
                 "MahaTTS",
                 "-r requirements_maha_tts.txt",
             ),
             (
-                "src.styletts2.styletts2_tab",
+                "tts_webui.styletts2.styletts2_tab",
                 "style_tts2_tab",
                 "StyleTTS2",
                 "-r requirements_styletts2.txt",
@@ -165,19 +168,19 @@ def all_tabs():
     with gr.Tab("Audio/Music Generation"), gr.Tabs():
         audio_music_generation_tabs = [
             (
-                "src.stable_audio.stable_audio",
+                "tts_webui.stable_audio.stable_audio",
                 "stable_audio_ui_tab",
                 "Stable Audio",
                 "-r requirements_stable_audio.txt",
             ),
             (
-                "src.magnet.magnet_tab",
+                "tts_webui.magnet.magnet_tab",
                 "generation_tab_magnet",
                 "MAGNeT",
                 "-r requirements_audiocraft.txt",
             ),
             (
-                "src.musicgen.musicgen_tab",
+                "tts_webui.musicgen.musicgen_tab",
                 "generation_tab_musicgen",
                 "MusicGen",
                 "-r requirements_audiocraft.txt",
@@ -189,25 +192,25 @@ def all_tabs():
     with gr.Tab("Audio Conversion"), gr.Tabs():
         audio_conversion_tabs = [
             (
-                "src.rvc_tab.rvc_tab",
+                "tts_webui.rvc_tab.rvc_tab",
                 "rvc_conversion_tab",
                 "RVC",
                 "-r requirements_rvc.txt",
             ),
-            ("src.rvc_tab.uvr5_tab", "uvr5_tab", "UVR5", "-r requirements_rvc.txt"),
+            ("tts_webui.rvc_tab.uvr5_tab", "uvr5_tab", "UVR5", "-r requirements_rvc.txt"),
             (
-                "src.demucs.demucs_tab",
+                "tts_webui.demucs.demucs_tab",
                 "demucs_tab",
                 "Demucs",
                 "-r requirements_audiocraft.txt",
             ),
-            ("src.vocos.vocos_tabs", "vocos_tabs", "Vocos"),
+            ("tts_webui.vocos.vocos_tabs", "vocos_tabs", "Vocos"),
         ]
         load_tabs(audio_conversion_tabs)
 
         handle_extension_class("audio-conversion", config)
     with gr.Tab("Outputs"), gr.Tabs():
-        from src.history_tab.main import history_tab
+        from tts_webui.history_tab.main import history_tab
 
         collections_directories_atom.render()
         try:
@@ -222,7 +225,7 @@ def all_tabs():
 
         outputs_tabs = [
             # voices
-            ("src.history_tab.voices_tab", "voices_tab", "Voices"),
+            ("tts_webui.history_tab.voices_tab", "voices_tab", "Voices"),
         ]
         load_tabs(outputs_tabs)
 
@@ -234,23 +237,24 @@ def all_tabs():
 
         handle_extension_class("tools", config)
     with gr.Tab("Settings"), gr.Tabs():
-        from src.settings_tab_gradio import settings_tab_gradio
+        from tts_webui.settings_tab_gradio import settings_tab_gradio
 
         settings_tab_gradio(reload_config_and_restart_ui, gradio_interface_options)
 
         settings_tabs = [
-            ("src.bark.settings_tab_bark", "settings_tab_bark", "Settings (Bark)"),
+            ("tts_webui.bark.settings_tab_bark", "settings_tab_bark", "Settings (Bark)"),
             (
-                "src.utils.model_location_settings_tab",
+                "tts_webui.utils.model_location_settings_tab",
                 "model_location_settings_tab",
                 "Model Location Settings",
             ),
-            ("src.utils.gpu_info_tab", "gpu_info_tab", "GPU Info"),
-            ("src.utils.pip_list_tab", "pip_list_tab", "Installed Packages"),
+            ("tts_webui.utils.gpu_info_tab", "gpu_info_tab", "GPU Info"),
+            ("tts_webui.utils.pip_list_tab", "pip_list_tab", "Installed Packages"),
         ]
         load_tabs(settings_tabs)
 
         extension_list_tab()
+        extension_decorator_list_tab()
 
         handle_extension_class("settings", config)
 

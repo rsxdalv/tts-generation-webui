@@ -61,7 +61,7 @@ export const MusicgenModelSelector = ({
     type: modelType,
     stereo,
     melody,
-  } = decomputeModel(musicgenParams.model);
+  } = decomputeModel(musicgenParams.model_name);
 
   const { stereo: stereoAvailable, melody: melodyAvailable } =
     modelMap[modelType];
@@ -84,7 +84,7 @@ export const MusicgenModelSelector = ({
                   const newModel = event.target.value;
                   setMusicgenParams({
                     ...musicgenParams,
-                    model: computeModel(newModel, stereo, melody),
+                    model_name: computeModel(newModel, stereo, melody),
                   });
                 }}
                 className="border border-gray-300 p-2 rounded"
@@ -105,7 +105,7 @@ export const MusicgenModelSelector = ({
           onChange={() => {
             setMusicgenParams({
               ...musicgenParams,
-              model: computeModel(modelType, !stereo, melody),
+              model_name: computeModel(modelType, !stereo, melody),
             });
           }}
           className="border border-gray-300 p-2 rounded"
@@ -119,7 +119,7 @@ export const MusicgenModelSelector = ({
           onChange={() => {
             setMusicgenParams({
               ...musicgenParams,
-              model: computeModel(modelType, stereo, !melody),
+              model_name: computeModel(modelType, stereo, !melody),
             });
           }}
           className="border border-gray-300 p-2 rounded"

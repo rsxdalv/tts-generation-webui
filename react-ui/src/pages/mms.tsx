@@ -1,21 +1,12 @@
 import React from "react";
 import { Template } from "../components/Template";
-import Head from "next/head";
-import useLocalStorage from "../hooks/useLocalStorage";
 import { AudioOutput } from "../components/AudioComponents";
-import {
-  MMSParams,
-  MMSResult,
-  useMMSParams,
-  useMMSResult,
-} from "../tabs/MMSParams";
+import { useMMSPage } from "../tabs/MMSParams";
 import { HyperParameters } from "../components/HyperParameters";
-import { parseFormChange } from "../data/parseFormChange";
 import { MMSInputs } from "../components/MMSInputs";
-import { generateWithMMS } from "../functions/generateWithMMS";
 import { GenerationHistorySimple } from "../components/GenerationHistory";
 
-const DETAILS = (
+const MMSDescription = ({}) => (
   <details>
     <summary>Description</summary>
     <p>
@@ -45,53 +36,21 @@ const DETAILS = (
   </details>
 );
 
-const initialHistory = []; // prevent infinite loop
 const MMSPage = () => {
-  const [historyData, setHistoryData] = useLocalStorage<MMSResult[]>(
-    "mmsHistory",
-    initialHistory
-  );
-  const [mmsParams, setMMSParams] = useMMSParams();
-
-  async function mmsConsumer(params: MMSParams) {
-    const data = await generateWithMMS(params);
-    if (params.use_random_seed)
-      setMMSParams((x) => ({ ...x, seed: params.seed }));
-    setHistoryData((x) => [data, ...x]);
-    return data;
-  }
-
-  const handleChange = parseFormChange(setMMSParams);
-
-  //   const useSeed = (_url: string, data?: MMSResult) => {
-  //     const seed = data?.metadata?.seed;
-  //     if (!seed) return;
-  //     setMMSParams({
-  //       ...mmsParams,
-  //       //   seed: Number(seed),
-  //     });
-  //   };
-
-  const useParameters = (_url: string, data?: MMSResult) => {
-    const params = data?.metadata;
-    if (!params) return;
-    setMMSParams({
-      ...mmsParams,
-      ...params,
-      //   seed: Number(params.seed),
-    });
-  };
-
-  const funcs = {
-    // favorite: barkFavorite,
-    // useSeed,
-    useParameters,
-  };
+  const {
+    historyData,
+    setHistoryData,
+    mmsParams,
+    setMMSParams,
+    consumer: mmsConsumer,
+    handleChange,
+    funcs,
+  } = useMMSPage();
 
   return (
     <Template title="MMS">
       <div className="gap-y-4 p-4 flex w-full flex-col">
-        {DETAILS}
+        <MMSDescription />
         <MMSInputs
           mmsParams={mmsParams}
           handleChange={handleChange}

@@ -11,12 +11,12 @@ import { parseFormChange } from "../data/parseFormChange";
 import { useSeedHelper } from "../functions/results/useSeedHelper";
 import { favorite } from "../functions/favorite";
 
-export const musicgenId = "musicgenParams.v2";
+export const musicgenId = "musicgenParams.v3";
 
 export type MusicgenParams = Seeded & {
   text: string;
   melody?: string;
-  model: string;
+  model_name: string;
   duration: number;
   topk: number;
   topp: number;
@@ -31,7 +31,7 @@ export const initialMusicgenParams: MusicgenParams = {
 
   text: "lofi hip hop beats to relax/study to",
   melody: undefined,
-  model: "facebook/musicgen-small",
+  model_name: "facebook/musicgen-small",
   duration: 1,
   topk: 250,
   topp: 0,
@@ -42,7 +42,7 @@ export const initialMusicgenParams: MusicgenParams = {
 
 export type MusicgenResult = {
   audio: GradioFile;
-  history_bundle_name_data: string;
+  folder_root: string;
   metadata: {
     _version: string;
     _hash_version: string;
@@ -91,8 +91,7 @@ export const useMusicgenPage = () => {
 
   const consumer = async (params: MusicgenParams) => {
     const data = await generateWithMusicgen(params);
-    if (params.use_random_seed)
-      setMusicgenParams((x) => ({ ...x, seed: params.seed }));
+    setMusicgenParams((x) => ({ ...x, seed: params.seed }));
     setHistoryData((x) => [data, ...x]);
     return data;
   };
@@ -114,7 +113,7 @@ export const useMusicgenPage = () => {
         ...musicgenParams,
         ...params,
         seed: Number(params.seed),
-        model: params.model || "facebook/musicgen-small",
+        model_name: params.model || "facebook/musicgen-small",
       });
     },
   };

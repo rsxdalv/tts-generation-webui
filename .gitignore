@@ -31,6 +31,7 @@ config.json
 /data/models/hubert_base.pt
 /data/models/rmvpe.pt
 /data/models/audiocraft_plus/
+/data/models/parler_tts/
 
 # Ignore temporary files
 temp/

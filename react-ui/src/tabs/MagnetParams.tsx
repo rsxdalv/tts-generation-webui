@@ -11,10 +11,10 @@ import { favorite } from "../functions/favorite";
 import { Seeded } from "../types/Seeded";
 import { useSeedHelper } from "../functions/results/useSeedHelper";
 
-export const magnetId = "magnetParams";
+export const magnetId = "magnetParams.v4";
 
 export type MagnetParams = Seeded & {
-  model: string;
+  model_name: string;
   text: string;
   use_sampling: boolean;
   top_k: number;
@@ -30,7 +30,7 @@ export type MagnetParams = Seeded & {
 };
 
 export const initialMagnetParams: MagnetParams = {
-  model: "facebook/magnet-small-10secs",
+  model_name: "facebook/magnet-small-10secs",
   text: "",
   seed: 0,
   use_sampling: true,
@@ -49,7 +49,7 @@ export const initialMagnetParams: MagnetParams = {
 
 export type MagnetResult = {
   audio: GradioFile;
-  history_bundle_name_data: string;
+  folder_root: string;
   metadata: {
     _version: string;
     _hash_version: string;
@@ -95,12 +95,11 @@ export const getMagnetParams = (): MagnetParams =>
 export const useMagnetPage = () => {
   const [magnetParams, setMagnetParams] = useMagnetParams();
 
-  const [historyData, setHistoryData] = useHistory<MagnetResult>("magnet");
+  const [historyData, setHistoryData] = useHistory<MagnetResult>("magnet.v2");
 
   const consumer = async (params: MagnetParams) => {
     const data = await generateWithMagnet(params);
-    if (params.use_random_seed)
-      setMagnetParams((x) => ({ ...x, seed: params.seed }));
+    setMagnetParams((x) => ({ ...x, seed: params.seed }));
     setHistoryData((x) => [data, ...x]);
     return data;
   };
@@ -115,7 +114,7 @@ export const useMagnetPage = () => {
         ...magnetParams,
         ...params,
         seed: Number(params.seed),
-        model: params.model || initialMagnetParams.model,
+        model_name: params.model || initialMagnetParams.model_name,
         decoding_steps_1: params.decoding_steps[0],
         decoding_steps_2: params.decoding_steps[1],
         decoding_steps_3: params.decoding_steps[2],

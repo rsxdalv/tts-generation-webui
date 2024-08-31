@@ -48,6 +48,8 @@ type GradioChoices = {
 };
 
 const extractChoices = ({ choices }: GradioChoices) => choices.map((x) => x[0]);
+const extractChoicesTuple = ({ choices }: GradioChoices) =>
+  choices.map((x) => x[1]);
 
 const gradioPredict = <T extends any[]>(...args: Parameters<PredictFunction>) =>
   getClient().then((app) => app.predict(...args)) as Promise<{ data: T }>;
@@ -98,58 +100,34 @@ async function encodec_decode({ npz_file }) {
   return result?.data[0];
 }
 
-async function musicgen({ melody, ...params }) {
+async function musicgen({ melody, model, ...params }) {
   const melodyBlob = await getFile(melody);
 
-  const result = await gradioPredict<
-    [
-      GradioFile, // output
-      string, // history_bundle_name_data
-      string, // image
-      null, // seed_cache
-      Object // result_json
-    ]
-  >("/musicgen", [
-    params.text,
-    melodyBlob, // blob in 'Melody (optional)' Audio component
-    params.model, // string (Option from: ['facebook/musicgen-small', 'facebook/musicgen-medium', 'facebook/musicgen-large', 'facebook/musicgen-large-v2', 'facebook/musicgen-large-v2-melody']) in 'Model'
-    params.duration, // number in 'Duration' Slider component
-    params.topk, // number in 'Top K' Slider component
-    params.topp, // number in 'Top P' Slider component
-    params.temperature, // number in 'Temperature' Slider component
-    params.cfg_coef, // number in 'CFG Coefficient' Slider component
-    params.seed, // number in 'Seed' Slider component
-    params.use_multi_band_diffusion, // boolean  in 'Use Multi-Band Diffusion' Checkbox component
-  ]);
-  const [audio, history_bundle_name_data, , , metadata] = result?.data;
-  return {
-    audio,
-    history_bundle_name_data,
-    metadata,
-  };
+  const result = await gradioPredict<[GradioFile, Object, string]>(
+    "/musicgen",
+    {
+      melody: melodyBlob,
+      model_name: model,
+      ...params,
+    }
+  );
+  const [audio, metadata, folder_root] = result?.data;
+  return { audio, metadata, folder_root };
 }
 
-async function bark_voice_tokenizer_load({ tokenizer, use_gpu }) {
-  const result = await gradioPredict<[string]>("/bark_voice_tokenizer_load", [
-    tokenizer, // string (Option from: ['quantifier_hubert_base_ls960.pth @ GitMylo/bark-voice-cloning', 'quantifier_hubert_base_ls960_14.pth @ GitMylo/bark-voice-cloning', 'quantifier_V1_hubert_base_ls960_23.pth @ GitMylo/bark-voice-cloning', 'polish-HuBERT-quantizer_8_epoch.pth @ Hobis/bark-voice-cloning-polish-HuBERT-quantizer', 'german-HuBERT-quantizer_14_epoch.pth @ CountFloyd/bark-voice-cloning-german-HuBERT-quantizer', 'es_tokenizer.pth @ Lancer1408/bark-es-tokenizer', 'portuguese-HuBERT-quantizer_24_epoch.pth @ MadVoyager/bark-voice-cloning-portuguese-HuBERT-quantizer']) in 'Tokenizer' Dropdown component
-    use_gpu, // boolean  in 'Use GPU' Checkbox component
-  ]);
-
-  return result?.data[0];
-}
+const bark_voice_tokenizer_load = ({ tokenizer, use_gpu }) =>
+  gradioPredict<[string]>("/bark_voice_tokenizer_load", [
+    tokenizer,
+    use_gpu,
+  ]).then((result) => result?.data);
 
 async function bark_voice_generate({ audio, use_gpu }) {
   const audioBlob = await getFile(audio);
 
-  const result = await gradioPredict<
-    [
-      string, // string representing output in 'Voice file name' Textbox component
-      GradioFile // { name: string; data: string; size?: number; is_file?: boolean; orig_name?: string} representing output in 'Encodec audio preview' Audio component
-    ]
-  >("/bark_voice_generate", [
-    audioBlob, // blob in 'Input Audio' Audio component
-    use_gpu, // boolean  in 'Use GPU' Checkbox component
-  ]);
+  const result = await gradioPredict<[string, GradioFile]>(
+    "/bark_voice_generate",
+    [audioBlob, use_gpu]
+  );
 
   const [filename, preview] = result?.data;
   return { filename, preview };
@@ -158,62 +136,37 @@ async function bark_voice_generate({ audio, use_gpu }) {
 async function bark({
   burn_in_prompt,
   text,
-  history_setting,
-  languageRadio,
-  speakerIdRadio,
-  useV2,
   text_temp,
   waveform_temp,
   long_prompt_radio,
   long_prompt_history_radio,
-  old_generation_dropdown,
-  seed: seed_input,
-  history_prompt_semantic_dropdown,
-  max_gen_duration_s,
+  seed,
+  max_length,
+
+  history_prompt,
+  history_prompt_semantic,
 }) {
-  const result = await gradioPredict<
-    [
-      // GradioFile, // audio
-      { value: GradioFile; label: string }, // npz
-      string, // image
-      Object, // save_button
-      Object, // continue_button
-      Object, // buttons_row
-      null, // npz
-      null, // seed
-      null, // json_text -> metadata
-      null // history_bundle_name_data
-      // note - ignore other 8 rows of data
-    ]
-  >("/bark", [
-    burn_in_prompt,
-    text,
-    history_setting,
-    languageRadio,
-    speakerIdRadio,
-    useV2,
-    text_temp,
-    waveform_temp,
-    long_prompt_radio,
-    long_prompt_history_radio,
-    old_generation_dropdown,
-    seed_input,
-    history_prompt_semantic_dropdown,
-    max_gen_duration_s,
-  ]);
-
-  const [audio_update, npz, metadata, history_bundle_name_data] = result?.data;
-
-  const audio = audio_update.value;
-  const fixedAudio = {
-    ...audio,
-    data: `http://127.0.0.1:7770/file=${audio.name}`,
-  };
+  const result = await gradioPredict<[GradioFile, string, Object, string]>(
+    "/bark",
+    {
+      seed,
+      text,
+      burn_in_prompt,
+      text_temp,
+      waveform_temp,
+      max_length,
+      history_prompt,
+      history_prompt_semantic,
+      long_prompt_radio,
+      long_prompt_history_radio,
+    }
+  );
+  const [audio, npz, metadata, folder_root] = result?.data;
   return {
-    audio: fixedAudio,
+    audio: { ...audio, data: audio.url },
     npz,
     metadata,
-    history_bundle_name_data,
+    folder_root,
   };
 }
 
@@ -222,8 +175,8 @@ const reload_old_generation_dropdown = () =>
     (result) => extractChoices(result?.data[0])
   );
 
-const bark_favorite = async ({ history_bundle_name_data }) =>
-  gradioPredict<[Object]>("/bark_favorite", [history_bundle_name_data]).then(
+const bark_favorite = async ({ folder_root }) =>
+  gradioPredict<[Object]>("/bark_favorite", [folder_root]).then(
     (result) => result?.data
   );
 
@@ -259,32 +212,29 @@ async function tortoise({
   // use_random_seed,
   candidates,
 }) {
-  const job = await gradioSubmit<
+  const job = await gradioSubmit<[GradioFile, string, Object]>(
+    "/generate_tortoise_" + candidates,
     [
-      GradioFile, // audio
-      string, // bundle_name
-      Object // metadata
+      text, // string  in 'Prompt' Textbox component
+      speaker, // string (Option from: ['random', 'angie', 'applejack', 'cond_latent_example', 'daniel', 'deniro', 'emma', 'freeman', 'geralt', 'halle', 'jlaw', 'lj', 'mol', 'myself', 'pat', 'pat2', 'rainbow', 'snakes', 'tim_reynolds', 'tom', 'train_atkins', 'train_daws', 'train_dotrice', 'train_dreams', 'train_empire', 'train_grace', 'train_kennard', 'train_lescault', 'train_mouse', 'weaver', 'william', 'freeman_2a', 'freeman_3', 'pat4']) in 'parameter_2502' Dropdown component
+      preset, // string (Option from: ['ultra_fast', 'fast', 'standard', 'high_quality']) in 'parameter_2507' Dropdown component
+      seed, // number  in 'parameter_2521' Number component
+      cvvp_amount, // number (numeric value between 0.0 and 1.0) in 'CVVP Amount' Slider component
+      split_prompt, // boolean  in 'Split prompt by lines' Checkbox component
+      samples, // number (numeric value between 4 and 256) in 'Samples' Slider component
+      diffusion_iterations, // number (numeric value between 4 and 400) in 'Diffusion Iterations' Slider component
+      temperature, // number (numeric value between 0.0 and 1.0) in 'Temperature' Slider component
+      length_penalty, // number (numeric value between 0.0 and 10.0) in 'Length Penalty' Slider component
+      repetition_penalty, // number (numeric value between 0.0 and 10.0) in 'Repetition Penalty' Slider component
+      top_p, // number (numeric value between 0.0 and 1.0) in 'Top P' Slider component
+      max_mel_tokens, // number (numeric value between 10 and 600) in 'Max Mel Tokens' Slider component
+      cond_free, // boolean  in 'Cond Free' Checkbox component
+      cond_free_k, // number (numeric value between 0 and 10) in 'Cond Free K' Slider component
+      diffusion_temperature, // number (numeric value between 0.0 and 1.0) in 'Temperature' Slider component
+      model, // string (Option from: ['Default']) in 'parameter_2488' Dropdown component
+      generation_name, // string  in 'Generation Name' Textbox component
     ]
-  >("/generate_tortoise_" + candidates, [
-    text, // string  in 'Prompt' Textbox component
-    speaker, // string (Option from: ['random', 'angie', 'applejack', 'cond_latent_example', 'daniel', 'deniro', 'emma', 'freeman', 'geralt', 'halle', 'jlaw', 'lj', 'mol', 'myself', 'pat', 'pat2', 'rainbow', 'snakes', 'tim_reynolds', 'tom', 'train_atkins', 'train_daws', 'train_dotrice', 'train_dreams', 'train_empire', 'train_grace', 'train_kennard', 'train_lescault', 'train_mouse', 'weaver', 'william', 'freeman_2a', 'freeman_3', 'pat4']) in 'parameter_2502' Dropdown component
-    preset, // string (Option from: ['ultra_fast', 'fast', 'standard', 'high_quality']) in 'parameter_2507' Dropdown component
-    seed, // number  in 'parameter_2521' Number component
-    cvvp_amount, // number (numeric value between 0.0 and 1.0) in 'CVVP Amount' Slider component
-    split_prompt, // boolean  in 'Split prompt by lines' Checkbox component
-    samples, // number (numeric value between 4 and 256) in 'Samples' Slider component
-    diffusion_iterations, // number (numeric value between 4 and 400) in 'Diffusion Iterations' Slider component
-    temperature, // number (numeric value between 0.0 and 1.0) in 'Temperature' Slider component
-    length_penalty, // number (numeric value between 0.0 and 10.0) in 'Length Penalty' Slider component
-    repetition_penalty, // number (numeric value between 0.0 and 10.0) in 'Repetition Penalty' Slider component
-    top_p, // number (numeric value between 0.0 and 1.0) in 'Top P' Slider component
-    max_mel_tokens, // number (numeric value between 10 and 600) in 'Max Mel Tokens' Slider component
-    cond_free, // boolean  in 'Cond Free' Checkbox component
-    cond_free_k, // number (numeric value between 0 and 10) in 'Cond Free K' Slider component
-    diffusion_temperature, // number (numeric value between 0.0 and 1.0) in 'Temperature' Slider component
-    model, // string (Option from: ['Default']) in 'parameter_2488' Dropdown component
-    generation_name, // string  in 'Generation Name' Textbox component
-  ]);
+  );
 
   const events = await Array__fromAsync(job);
   const results = events
@@ -296,31 +246,6 @@ async function tortoise({
         seed,
         bundle_name,
         metadata,
-        // metadata: {
-        //   _version: "",
-        //   _hash_version: "",
-        //   _type: "",
-        //   text,
-        //   speaker,
-        //   preset,
-        //   seed,
-        //   cvvp_amount,
-        //   split_prompt,
-        //   samples,
-        //   diffusion_iterations,
-        //   temperature,
-        //   length_penalty,
-        //   repetition_penalty,
-        //   top_p,
-        //   max_mel_tokens,
-        //   cond_free,
-        //   cond_free_k,
-        //   diffusion_temperature,
-        //   model,
-        //   generation_name,
-        //   // use_random_seed,
-        //   candidates,
-        // },
       };
     });
   // remove last element due to return {} in generate_tortoise_long
@@ -382,20 +307,18 @@ async function rvc({
 }) {
   const original_audioBlob = await getFile(original_audio);
 
-  const result = await gradioPredict<[GradioFile, Object]>("/rvc", [
+  const result = await gradioPredict<any>("/rvc", {
     pitch_up_key, // string  in 'Pitch Up key' Textbox component
-    original_audioBlob, // blob in 'Original Audio' Audio component
-    index, // string in 'Index' Dropdown component
+    original_audio_path: original_audioBlob, // blob in 'Original Audio' Audio component
+    index_path: index, // string in 'Index' Dropdown component
     pitch_collection_method, // string (Option from: ['harvest', 'reaper', 'melodia']) in 'Pitch Collection Method' Radio component
-    model, // string in 'Model' Dropdown component
-    search_feature_ratio, // number (numeric value between 0.0 and 1.0) in 'Search Feature Ratio' Slider component
-    // device, // string (Option from: ['cuda:0', 'cpu', 'mps']) in 'Device' Dropdown component
-    // use_half_precision_model, // boolean  in 'Use half precision model (Depends on GPU support)' Checkbox component
-    filter_radius_pitch, // number (numeric value between 0 and 10) in 'Filter Radius (Pitch)' Slider component
-    resample_sample_rate, // number (numeric value between 0 and 48000) in 'Resample Sample-rate (Bug)' Slider component
-    voice_envelope_normalizaiton, // number (numeric value between 0.0 and 1.0) in 'Voice Envelope Normalizaiton' Slider component
-    protect_breath_sounds, // number (numeric value between 0.0 and 0.5) in 'Protect Breath Sounds' Slider component
-  ]);
+    model_path: model, // string in 'Model' Dropdown component
+    index_rate: search_feature_ratio, // number (numeric value between 0.0 and 1.0) in 'Search Feature Ratio' Slider component
+    filter_radius: filter_radius_pitch, // number (numeric value between 0 and 10) in 'Filter Radius (Pitch)' Slider component
+    resample_sr: resample_sample_rate, // number (numeric value between 0 and 48000) in 'Resample Sample-rate (Bug)' Slider component
+    rms_mix_rate: voice_envelope_normalizaiton, // number (numeric value between 0.0 and 1.0) in 'Voice Envelope Normalizaiton' Slider component
+    protect: protect_breath_sounds, // number (numeric value between 0.0 and 0.5) in 'Protect Breath Sounds' Slider component
+  });
 
   const [audio, metadata] = result?.data;
   return { audio, metadata };
@@ -415,8 +338,8 @@ const rvc_model_open = () => gradioPredict<[]>("/rvc_model_open");
 
 const rvc_index_open = () => gradioPredict<[]>("/rvc_index_open");
 
-const delete_generation = ({ history_bundle_name_data }) =>
-  gradioPredict<[]>("/delete_generation", [history_bundle_name_data]);
+const delete_generation = ({ folder_root }) =>
+  gradioPredict<[]>("/delete_generation", [folder_root]);
 
 const save_to_voices = ({ history_npz }) =>
   gradioPredict<[Object]>("/save_to_voices", [history_npz]);
@@ -444,11 +367,7 @@ const save_config_bark = ({
   use_gpu_codec,
   load_models_on_startup,
 }) =>
-  gradioPredict<
-    [
-      string // string representing output in 'value_1541' Markdown component
-    ]
-  >("/save_config_bark", [
+  gradioPredict<[string]>("/save_config_bark", [
     text_generation_use_gpu, // boolean  in 'Use GPU' Checkbox component
     text_generation_use_small_model, // boolean  in 'Use small model' Checkbox component
     coarse_to_fine_inference_use_gpu, // boolean  in 'Use GPU' Checkbox component
@@ -498,86 +417,28 @@ async function get_config_bark() {
   };
 }
 
-async function magnet({
-  model,
-  text,
-  seed,
-  use_sampling,
-  top_k,
-  top_p,
-  temperature,
-  max_cfg_coef,
-  min_cfg_coef,
-  decoding_steps_1,
-  decoding_steps_2,
-  decoding_steps_3,
-  decoding_steps_4,
-  span_arrangement,
-}) {
-  const result = await gradioPredict<
-    [
-      GradioFile, // output
-      string, // history_bundle_name_data
-      string, // image
-      null, // seed_cache
-      Object // result_json
-    ]
-  >("/magnet", [
-    model,
-    text,
-    seed,
-    use_sampling,
-    top_k,
-    top_p,
-    temperature,
-    max_cfg_coef,
-    min_cfg_coef,
-    decoding_steps_1,
-    decoding_steps_2,
-    decoding_steps_3,
-    decoding_steps_4,
-    span_arrangement,
-  ]);
-
-  const [audio, history_bundle_name_data, , , metadata] = result?.data;
-  return {
-    audio,
-    history_bundle_name_data,
-    metadata,
-  };
-}
+const magnet = (params) =>
+  gradioPredict<[GradioFile, Object, string]>("/magnet", params).then(
+    (result) => {
+      const [audio, metadata, folder_root] = result?.data;
+      return { audio, metadata, folder_root };
+    }
+  );
 
 const magnet_get_models = () =>
   gradioPredict<[GradioChoices]>("/magnet_get_models").then((result) =>
-    extractChoices(result?.data[0])
+    extractChoicesTuple(result?.data[0])
   );
 
 const magnet_open_model_dir = () => gradioPredict<[]>("/magnet_open_model_dir");
 
-const maha = ({
-  text,
-  model_language,
-  maha_tts_language,
-  speaker_name,
-  seed,
-  device,
-}) =>
-  gradioPredict<[GradioFile, Object]>("/maha_tts", [
-    text, // string  in 'Input' Textbox component
-    model_language, // string (Option from: ['en', 'de', 'es', 'fr', 'it', 'nl', 'pl', 'pt', 'ru', 'tr', 'zh']) in 'Model language' Dropdown component
-    maha_tts_language, // string (Option from: ['en', 'de', 'es', 'fr', 'it', 'nl', 'pl', 'pt', 'ru', 'tr', 'zh']) in 'TTS language' Dropdown component
-    speaker_name, // string  in 'Speaker name' Textbox component
-    seed, // number  in 'Seed' Number component
-    device, // string (Option from: ['cpu', 'cuda']) in 'Device' Dropdown component
-  ]).then((result) => {
-    const [audio, metadata] = result?.data;
-    return {
-      audio,
-      metadata,
-    };
-  });
-
-// maha_tts_refresh_voices
+const maha = (params) =>
+  gradioPredict<[GradioFile, Object, string]>("/maha_tts", params).then(
+    (result) => {
+      const [audio, metadata, folder_root] = result?.data;
+      return { audio, folder_root, metadata };
+    }
+  );
 
 const maha_tts_refresh_voices = () =>
   gradioPredict<[GradioChoices]>("/maha_tts_refresh_voices").then((result) =>
@@ -587,79 +448,30 @@ const maha_tts_refresh_voices = () =>
 const get_gpu_info = () =>
   gradioPredict<[Object]>("/get_gpu_info").then((result) => result?.data[0]);
 
-const mms = ({
-  text,
-  language,
-  speaking_rate,
-  noise_scale,
-  noise_scale_duration,
-}: {
-  text: string;
-  language: string;
-  speaking_rate: number;
-  noise_scale: number;
-  noise_scale_duration: number;
-}) =>
-  gradioPredict<[GradioFile]>("/mms", [
-    text, // string  in 'Input Text' Textbox component
-    language, // string (Option from: ['eng', 'deu', 'fra', 'ita', 'por', 'spa', 'zho']) in 'Language' Dropdown component
-    speaking_rate, // number  in 'Speaking Rate' Number component
-    noise_scale, // number  in 'Noise Scale' Number component
-    noise_scale_duration, // number  in 'Noise Scale Duration' Number component
-  ]).then((result) => {
-    const [audio] = result?.data;
-    return {
-      audio,
-      metadata: {
-        _version: "",
-        _hash_version: "",
-        _type: "",
-        text,
-        language,
-        speaking_rate,
-        noise_scale,
-        noise_scale_duration,
-      },
-    };
+const mms = (params) =>
+  gradioPredict<[GradioFile, Object, string]>("/mms", params).then((result) => {
+    const [audio, metadata, folder_root] = result?.data;
+    return { audio, metadata, folder_root };
   });
 
-const vall_e_x_generate = ({ text, prompt, language, accent, mode }) =>
-  gradioPredict<[GradioFile]>(
-    mode === "short" ? "/vall_e_x_generate" : "/vall_e_x_generate_long_text",
-    [
-      text, // string  in 'Input Text' Textbox component
-      prompt, // string  in 'Prompt' Textbox component
-      language, // string (Option from: ["English", "中文", "日本語", "Mix"]) in 'Language' Dropdown component
-      accent, // string (Option from: ['English', '中文', '日本語', 'no-accent']) in in 'Accent' Dropdown component
-      mode === "short" ? undefined : mode, // string (Option from: ['fixed-prompt', 'sliding-window']) in 'Mode' Dropdown component
-    ]
+const vall_e_x_generate = (params) =>
+  gradioPredict<[GradioFile, Object, string]>(
+    "/vall_e_x_generate",
+    params
   ).then((result) => {
-    const [audio] = result?.data;
-    return {
-      audio,
-      metadata: {
-        _version: "",
-        _hash_version: "",
-        _type: "",
-        text,
-        prompt,
-        language,
-        accent,
-        mode,
-      },
-    };
+    const [audio, metadata, folder_root] = result?.data;
+    return { audio, metadata, folder_root };
   });
 
 const vall_e_x_split_text_into_sentences = ({ text }) =>
-  gradioPredict<string[]>("/vall_e_x_split_text_into_sentences", [
-    text, // string  in 'Input Text' Textbox component
-  ]).then((result) => ({ split_text: result?.data?.[0] }));
+  gradioPredict<string[]>("/vall_e_x_split_text_into_sentences", [text]).then(
+    (result) => ({ split_text: result?.data?.[0] })
+  );
 
 const vall_e_x_tokenize = ({ text, language }) =>
-  gradioPredict<string[]>("/vall_e_x_tokenize", [
-    text, // string  in 'Input Text' Textbox component
-    language, // string (Option from: ['eng', 'deu', 'fra', 'ita', 'por', 'spa', 'zho']) in 'Language' Dropdown component
-  ]).then((result) => ({ tokens: result?.data?.[0] }));
+  gradioPredict<string[]>("/vall_e_x_tokenize", [text, language]).then(
+    (result) => ({ tokens: result?.data?.[0] })
+  );
 
 const scan_huggingface_cache_api = () =>
   gradioPredict<any[]>("/scan_huggingface_cache_api").then(

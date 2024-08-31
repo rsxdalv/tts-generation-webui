@@ -72,7 +72,8 @@ export const Metadata = ({
           </>
         }
       />
-      <Row label="History Prompt" value={history_prompt} />
+      {/* <Row label="History Prompt" value={history_prompt} /> */}
+      <Row label="History Prompt" value={JSON.stringify(history_prompt)} />
       <Row label="Language" value={language} />
       <Row label="Seed" value={seed} />
       <Row label="Text Temperature" value={text_temp} />

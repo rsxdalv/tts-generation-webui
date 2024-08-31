@@ -24,5 +24,5 @@ export type BarkResult = {
     semantic_prompt: string;
     coarse_prompt: string;
   };
-  history_bundle_name_data: string;
+  folder_root: string;
 };

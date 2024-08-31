@@ -101,20 +101,20 @@ export const MahaInputs = ({
           {[
             ["English", "Smolie-en"],
             ["Indian", "Smolie-in"],
-          ].map(([visual_model_language, model_language]) => (
-            <div key={visual_model_language} className="flex items-center">
+          ].map(([text, model_name]) => (
+            <div key={text} className="flex items-center">
               <input
                 type="radio"
-                name="model_language"
-                id={visual_model_language}
-                value={model_language}
-                checked={mahaParams.model_language === model_language}
+                name="model_name"
+                id={text}
+                value={model_name}
+                checked={mahaParams.model_name === model_name}
                 onChange={(event) => {
                   console.log(event.target.value);
                   if (event.target.value === "Smolie-en") {
                     handleChange({
                       target: {
-                        name: "maha_tts_language",
+                        name: "text_language",
                         value: "english",
                       },
                     });
@@ -123,11 +123,8 @@ export const MahaInputs = ({
                 }}
                 className={commonBorder}
               />
-              <label
-                className="ml-1 select-none"
-                htmlFor={visual_model_language}
-              >
-                {visual_model_language}
+              <label className="ml-1 select-none" htmlFor={text}>
+                {text}
               </label>
             </div>
           ))}
@@ -147,21 +144,21 @@ export const MahaInputs = ({
             "gujarati",
             "bengali",
             "assamese",
-          ].map((maha_tts_language) => (
-            <div key={maha_tts_language} className="flex items-center">
+          ].map((text_language) => (
+            <div key={text_language} className="flex items-center">
               <input
                 type="radio"
-                name="maha_tts_language"
-                id={maha_tts_language}
-                value={maha_tts_language}
-                checked={mahaParams.maha_tts_language === maha_tts_language}
+                name="text_language"
+                id={text_language}
+                value={text_language}
+                checked={mahaParams.text_language === text_language}
                 onChange={handleChange}
-                disabled={mahaParams.model_language !== "Smolie-in"}
+                disabled={mahaParams.model_name !== "Smolie-in"}
                 className={commonBorder}
               />
-              <label className="ml-1 select-none" htmlFor={maha_tts_language}>
-                {maha_tts_language.charAt(0).toUpperCase() +
-                  maha_tts_language.slice(1)}
+              <label className="ml-1 select-none" htmlFor={text_language}>
+                {text_language.charAt(0).toUpperCase() +
+                  text_language.slice(1)}
               </label>
             </div>
           ))}

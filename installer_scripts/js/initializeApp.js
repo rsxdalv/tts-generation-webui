@@ -91,7 +91,7 @@ const askForGPUChoice = () =>
       "Integrated GPU (unsupported)",
     ],
     `
-These are automatically supported yet: AMD GPU, Intel GPU, Integrated GPU. Select CPU mode.
+These are not yet automatically supported: AMD GPU, Intel GPU, Integrated GPU.
 Select the device (GPU/CPU) you are using to run the application:
 (use arrow keys to move, enter to select)
   `

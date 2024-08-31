@@ -9,7 +9,7 @@ import { useHistory } from "../hooks/useHistory";
 import { generateWithVallex } from "../functions/generateWithVallex";
 import { parseFormChange } from "../data/parseFormChange";
 
-const vallex_ID = "vallexParams";
+const vallex_ID = "vallexParams.v2";
 
 export type VallexParams = Seeded & {
   text: string;
@@ -70,8 +70,7 @@ export const useVallexPage = () => {
 
   const consumer = async (params: VallexParams) => {
     const data = await generateWithVallex(params);
-    if (params.use_random_seed)
-      setVallexParams((x) => ({ ...x, seed: params.seed }));
+    setVallexParams((x) => ({ ...x, seed: params.seed }));
     setHistoryData((x) => [data, ...x]);
     return data;
   };

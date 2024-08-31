@@ -87,12 +87,7 @@ def transcribe_ui():
 
     with gr.Row():
         with gr.Column():
-            audio = gr.Audio(
-                label="Audio",
-                type="filepath",
-                sources="upload",
-                elem_classes="tts-audio",
-            )
+            audio = gr.Audio(label="Audio", type="filepath", sources="upload")
             model_dropdown = gr.Dropdown(
                 choices=[
                     "openai/whisper-tiny.en",

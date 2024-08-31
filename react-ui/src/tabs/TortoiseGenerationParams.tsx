@@ -115,8 +115,8 @@ export const useTortoisePage = () => {
 
   const funcs = {
     favorite: async (_url: string, data?: TortoiseResult) => {
-      const history_bundle_name_data = data?.bundle_name;
-      favorite("", { history_bundle_name_data });
+      const folder_root = data?.bundle_name;
+      favorite("", { folder_root });
     },
     useSeed: useSeedHelper(setTortoiseGenerationParams),
     // useParameters: (_url: string, data?: TortoiseResult) => {
