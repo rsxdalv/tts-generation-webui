@@ -19,6 +19,7 @@ from tts_webui.decorators.decorator_add_base_filename import decorator_add_base_
 from tts_webui.decorators.decorator_add_date import decorator_add_date
 from tts_webui.decorators.decorator_add_model_type import decorator_add_model_type
 from tts_webui.decorators.log_function_time import log_function_time
+from tts_webui.decorators.decorator_save_musicgen_npz import decorator_save_musicgen_npz
 from tts_webui.extensions_loader.decorator_extensions import (
     decorator_extension_outer,
     decorator_extension_inner,
@@ -44,29 +45,6 @@ def get_model(model):
     return MAGNeT.get_pretrained(model)
 
 
-def unload_model_magnet():
-    unload_model("magnet")
-
-
-def decorator_save_musicgen_npz(fn):
-    def wrapper(*args, **kwargs):
-        result_dict = fn(*args, **kwargs)
-        tokens = result_dict["tokens"]
-
-        if tokens is not None:
-            from tts_webui.utils.outputs.path import get_relative_output_path_ext
-
-            path = get_relative_output_path_ext(result_dict, ".npz")
-            from tts_webui.bark.npz_tools import save_npz_musicgen
-
-            save_npz_musicgen(path, tokens, result_dict["metadata"])
-
-        return result_dict
-
-    return wrapper
-
-
-# How to deal with yield in function? I can write yield/non yield functions, but how to combine them in one
 @decorator_extension_outer
 @decorator_apply_torch_seed
 @decorator_save_musicgen_npz
@@ -191,12 +169,7 @@ def magnet_ui():
             seed, randomize_seed_callback = randomize_seed_ui()
 
     with gr.Column():
-        audio_out = gr.Audio(
-            label="Generated Music",
-            type="numpy",
-            interactive=False,
-            elem_classes="tts-audio",
-        )
+        audio_out = gr.Audio(label="Generated Music", type="numpy")
         with gr.Row():
             folder_root = gr.Textbox(visible=False)
             save_button = gr.Button("Save to favorites", visible=True)

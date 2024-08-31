@@ -40,7 +40,6 @@ def preload_models_if_needed(model_name, device):
     return load_models(name=model_name, device=device)
 
 
-# How to deal with yield in function? I can write yield/non yield functions, but how to combine them in one
 @decorator_extension_outer
 @decorator_apply_torch_seed
 @decorator_save_metadata

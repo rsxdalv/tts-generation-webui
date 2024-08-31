@@ -3,7 +3,6 @@ export interface VoteCount {
 }
 
 // const BASE_URL = "http://localhost:3001";
-const BASE_URL = "https://riga.us.to:3002";
 
 const callAPI = async (
   url: string,
@@ -36,24 +35,25 @@ export const submitVote = async (
   option: string,
   value: number
 ): Promise<void> => {
-  const url = `${BASE_URL}/vote/${encodeURIComponent(option)}/${value}`;
-  try {
-    await callAPI(url, "POST");
-    console.log("Vote counted successfully.");
-  } catch (error) {
-    console.error("Failed to submit vote:", error);
-  }
+  // const url = `${BASE_URL}/vote/${encodeURIComponent(option)}/${value}`;
+  // try {
+  //   await callAPI(url, "POST");
+  //   console.log("Vote counted successfully.");
+  // } catch (error) {
+  //   console.error("Failed to submit vote:", error);
+  // }
 };
 
 export const getResults = async () => {
-  const url = `${BASE_URL}/results`;
-  try {
-    const results: VoteCount = await callAPI(url);
-    return results;
-  } catch (error) {
-    console.error("Failed to get vote results:", error);
-    throw error;
-  }
+  // const url = `${BASE_URL}/results`;
+  // try {
+  //   const results: VoteCount = await callAPI(url);
+  //   return results;
+  // } catch (error) {
+  //   console.error("Failed to get vote results:", error);
+  //   throw error;
+  // }
+  return {};
 };
 
 // Usage example

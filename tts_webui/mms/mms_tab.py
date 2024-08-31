@@ -31,7 +31,6 @@ def preload_models_if_needed(language="eng") -> tuple[VitsModel, VitsTokenizer]:
     )  # type: ignore
 
 
-# How to deal with yield in function? I can write yield/non yield functions, but how to combine them in one
 @decorator_extension_outer
 @decorator_apply_torch_seed
 @decorator_save_metadata
@@ -136,6 +135,8 @@ def mms_ui():
 
     output_dict = {
         "audio_out": audio_out,
+        "metadata": gr.JSON(visible=False),
+        "folder_root": gr.Textbox(visible=False),
     }
 
     mms_generate_button.click(

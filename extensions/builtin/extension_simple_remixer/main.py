@@ -36,10 +36,8 @@ def simple_remixer_ui():
     input_audio = gr.Audio(label="Input Audio")
 
     def create_slot(id=0):
-        with gr.Group(
-            elem_classes="tts-slot",
-        ):
-            audio = gr.Audio(label=f"Slot {str(id)}", elem_classes="tts-audio")
+        with gr.Group():
+            audio = gr.Audio(label=f"Slot {str(id)}")
 
             with gr.Row():
                 clear = gr_mini_button("delete").click(
@@ -60,7 +58,7 @@ def simple_remixer_ui():
             c = create_slot(i)
         return a, b, c
 
-    with gr.Row(elem_classes="studio-slots-row"):
+    with gr.Row():
         slots = [slot_stack(i) for i in range(3)]
         slots = [x for y in slots for x in y]
 

@@ -18,8 +18,9 @@ export const NPZVoiceDropdown = ({
   const [options, setOptions] = React.useState<string[]>([]);
 
   const refreshOptions = async () => {
-    const result = await reloadOldGenerationDropdown();
-    setOptions(result);
+    const options = await reloadOldGenerationDropdown();
+    console.log(options);
+    setOptions(options);
   };
 
   React.useEffect(() => void refreshOptions(), []);
@@ -36,6 +37,7 @@ export const NPZVoiceDropdown = ({
         value={selected}
         onChange={handleChange}
       >
+        <option value="">No prompt</option>
         {selected && <option value={selected}>{selected}</option>}
         {options
           .filter((option) => option !== selected)
@@ -54,7 +56,7 @@ export const NPZVoiceDropdown = ({
         </button>
         <button
           className="border border-gray-300 p-2 rounded"
-          onClick={() => handleChange({ target: { name, value: "" } } as any)}
+          onClick={() => handleChange({ target: { name, value: null } } as any)}
         >
           Clear
         </button>

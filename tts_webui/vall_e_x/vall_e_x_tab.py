@@ -127,7 +127,7 @@ def valle_x_ui_generation():
     seed, randomize_seed_callback = randomize_seed_ui()
     unload_model_button("valle_x")
 
-    audio_out = gr.Audio(label="Generated audio", elem_classes="tts-audio")
+    audio_out = gr.Audio(label="Generated audio")
     generate_button = gr.Button("Generate")
 
     split_text_into_tokens_button.click(
@@ -173,7 +173,7 @@ from valle_x.utils.prompt_making import transcribe_one, make_prompt, make_transc
 
 def valle_x_ui_prompt_making():
     with gr.Column():
-        audio = gr.Audio(label="Audio", elem_classes="tts-audio")
+        audio = gr.Audio(label="Audio")
 
 
 def valle_x_tab():

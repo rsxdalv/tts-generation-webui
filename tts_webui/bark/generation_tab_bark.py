@@ -21,6 +21,7 @@ from tts_webui.bark.generation_settings import (
     LongPromptHistorySettings,
 )
 from tts_webui.decorators.gradio_dict_decorator import dictionarize
+from tts_webui.utils.save_json_result import save_json_result
 from tts_webui.utils.get_dict_props import get_dict_props
 from tts_webui.utils.randomize_seed import randomize_seed_ui
 from tts_webui.decorators.decorator_apply_torch_seed import (
@@ -50,11 +51,6 @@ from tts_webui.extensions_loader.decorator_extensions import (
 from tts_webui.utils.outputs.path import get_relative_output_path_ext
 
 
-def _save_json(result_dict, metadata):
-    with open(get_relative_output_path_ext(result_dict, ".json"), "w") as outfile:
-        json.dump(metadata, outfile, indent=2)
-
-
 def _decorator_bark_save_metadata_generator(fn):
     def _save_metadata_and_npz(kwargs, result_dict):
         metadata = generate_bark_metadata(
@@ -63,7 +59,7 @@ def _decorator_bark_save_metadata_generator(fn):
             params=kwargs,
         )
 
-        _save_json(result_dict, metadata)
+        save_json_result(result_dict, metadata)
 
         npz_path = get_relative_output_path_ext(result_dict, ".npz")
         save_npz(
@@ -190,7 +186,7 @@ def generation_tab_bark():
 def _npz_dropdown_ui(label):
     npz_dropdown = gr.Dropdown(
         label=label,
-        choices=get_npz_files(),  # type: ignore
+        choices=get_npz_files() + [""],  # type: ignore
         type="value",
         value=None,
         allow_custom_value=True,
@@ -207,7 +203,7 @@ def _npz_dropdown_ui(label):
         inputs=[npz_dropdown],
     )
     gr.Button("refresh", **btn_style).click(  # type: ignore
-        fn=lambda: gr.Dropdown(choices=get_npz_files()),  # type: ignore
+        fn=lambda: gr.Dropdown(choices=get_npz_files() + [""]),  # type: ignore
         outputs=npz_dropdown,
         api_name=f"reload_old_generation_dropdown{ '' if label == 'Audio Voice' else '_semantic'}",
     )
@@ -317,9 +313,7 @@ def bark_ui():
     text = gr.Textbox(label="Prompt", lines=3, placeholder="Enter text here...")
 
     with gr.Column():
-        audio = gr.Audio(
-            type="filepath", label="Generated audio", elem_classes="tts-audio"
-        )
+        audio = gr.Audio(type="filepath", label="Generated audio")
         with gr.Row():
             save_button = gr.Button("Save", size="sm")
             continue_button = gr.Button("Use as history", size="sm")

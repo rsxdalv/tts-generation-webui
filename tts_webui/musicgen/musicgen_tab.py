@@ -4,196 +4,118 @@ from audiocraft.models.musicgen import MusicGen
 from audiocraft.models.audiogen import AudioGen
 from audiocraft.models.encodec import InterleaveStereoCompressionModel
 from einops import rearrange
-from typing import Optional, Tuple, TypedDict
+from typing import Optional, Tuple
 import numpy as np
-import os
-from tts_webui.bark.npz_tools import save_npz_musicgen
-from tts_webui.musicgen.setup_seed_ui_musicgen import setup_seed_ui_musicgen
-from tts_webui.bark.parse_or_set_seed import parse_or_set_seed
+from tts_webui.decorators.gradio_dict_decorator import dictionarize
 from tts_webui.musicgen.audio_array_to_sha256 import audio_array_to_sha256
-from tts_webui.utils.set_seed import set_seed
+from tts_webui.utils.randomize_seed import randomize_seed_ui
 
-from tts_webui.extensions_loader.ext_callback_save_generation import (
-    ext_callback_save_generation_musicgen,
-)
-from tts_webui.utils.create_base_filename import create_base_filename
 from tts_webui.history_tab.save_to_favorites import save_to_favorites
-from tts_webui.utils.date import get_date_string
-from scipy.io.wavfile import write as write_wav
-from tts_webui.utils.save_waveform_plot import middleware_save_waveform_plot
 
-import json
 from typing import Optional
 from importlib.metadata import version
+from tts_webui.history_tab.save_to_favorites import save_to_favorites
+from tts_webui.utils.list_dir_models import unload_model_button
+from tts_webui.utils.randomize_seed import randomize_seed_ui
+from tts_webui.utils.manage_model_state import manage_model_state
+from tts_webui.decorators.gradio_dict_decorator import dictionarize
+from tts_webui.decorators.decorator_apply_torch_seed import decorator_apply_torch_seed
+from tts_webui.decorators.decorator_log_generation import decorator_log_generation
+from tts_webui.decorators.decorator_save_wav import decorator_save_wav
+from tts_webui.decorators.decorator_add_base_filename import (
+    decorator_add_base_filename,
+)
+from tts_webui.decorators.decorator_add_date import decorator_add_date
+from tts_webui.decorators.decorator_add_model_type import decorator_add_model_type
+from tts_webui.decorators.log_function_time import log_function_time
+from tts_webui.decorators.decorator_save_musicgen_npz import decorator_save_musicgen_npz
+from tts_webui.extensions_loader.decorator_extensions import (
+    decorator_extension_outer,
+    decorator_extension_inner,
+)
+from tts_webui.utils.save_json_result import save_json_result
 
 AUDIOCRAFT_VERSION = version("audiocraft")
-
-
-class MusicGenGeneration(TypedDict):
-    model: str
-    text: str
-    melody: Optional[Tuple[int, np.ndarray]]
-    duration: float
-    topk: int
-    topp: float
-    temperature: float
-    cfg_coef: float
-    seed: int
-    use_multi_band_diffusion: bool
 
 
 def melody_to_sha256(melody: Optional[Tuple[int, np.ndarray]]) -> Optional[str]:
     if melody is None:
         return None
-    sr, audio_array = melody
+    _, audio_array = melody
     return audio_array_to_sha256(audio_array)
 
 
-def generate_and_save_metadata(
-    prompt: str,
-    date: str,
-    filename_json: str,
-    params: MusicGenGeneration,
-    audio_array: np.ndarray,
-):
-    metadata = {
-        "_version": "0.0.1",
-        "_hash_version": "0.0.3",
-        "_type": "musicgen",
-        "_audiocraft_version": AUDIOCRAFT_VERSION,
-        "models": {},
-        "text": prompt,
-        "hash": audio_array_to_sha256(audio_array),
-        "date": date,
-        **params,
-        "seed": str(params["seed"]),
-        "melody": melody_to_sha256(params.get("melody", None)),
-    }
-    with open(filename_json, "w") as outfile:
-        json.dump(metadata, outfile, indent=2)
+def _decorator_musicgen_save_metadata(fn):
+    def wrapper(*args, **kwargs):
+        result_dict = fn(*args, **kwargs)
+        audio_array = result_dict["audio_out"][1]
+        result_dict["metadata"] = {
+            "_version": "0.0.1",
+            "_hash_version": "0.0.3",
+            "_audiocraft_version": AUDIOCRAFT_VERSION,
+            **kwargs,
+            "outputs": None,
+            "models": {},
+            "hash": audio_array_to_sha256(audio_array),
+            "date": str(result_dict["date"]),
+            "melody": melody_to_sha256(kwargs.get("melody", None)),
+        }
+        save_json_result(result_dict, result_dict["metadata"])
+        return result_dict
 
-    return metadata
+    return wrapper
 
 
-def save_generation(
-    audio_array: np.ndarray,
-    SAMPLE_RATE: int,
-    params: MusicGenGeneration,
-    tokens: Optional[torch.Tensor] = None,
-):
-    prompt = params["text"]
-    date = get_date_string()
-    title = prompt[:20].replace(" ", "_")
-    base_filename = create_base_filename(title, "outputs", model="musicgen", date=date)
-
-    def get_filenames(base_filename: str):
-        filename = f"{base_filename}.wav"
-        filename_png = f"{base_filename}.png"
-        filename_json = f"{base_filename}.json"
-        filename_npz = f"{base_filename}.npz"
-        return filename, filename_png, filename_json, filename_npz
-
-    filename, filename_png, filename_json, filename_npz = get_filenames(base_filename)
-    stereo = audio_array.shape[0] == 2
-    if stereo:
-        audio_array = np.transpose(audio_array)
-    write_wav(filename, SAMPLE_RATE, audio_array)
-    plot = middleware_save_waveform_plot(audio_array, filename_png)
-
-    metadata = generate_and_save_metadata(
-        prompt=prompt,
-        date=date,
-        filename_json=filename_json,
-        params=params,
-        audio_array=audio_array,
-    )
-    if tokens is not None:
-        save_npz_musicgen(filename_npz, tokens, metadata)
-
-    filename_ogg = filename.replace(".wav", ".ogg")
-    ext_callback_save_generation_musicgen(
-        audio_array=audio_array,
-        files={
-            "wav": filename,
-            "png": filename_png,
-            "ogg": filename_ogg,
-        },
-        metadata=metadata,
-        SAMPLE_RATE=SAMPLE_RATE,
-    )
-
-    return filename, plot, metadata
-
-
-MODEL = None
-
-
+@manage_model_state("musicgen_audiogen")
 def load_model(version):
     if version == "facebook/audiogen-medium":
         return AudioGen.get_pretrained(version)
-    print("Loading model", version)
     return MusicGen.get_pretrained(version)
 
 
-def log_generation_musicgen(
-    params: MusicGenGeneration,
+@decorator_extension_outer
+@decorator_apply_torch_seed
+@decorator_save_musicgen_npz
+@_decorator_musicgen_save_metadata
+@decorator_save_wav
+@decorator_add_model_type("musicgen")
+@decorator_add_base_filename
+@decorator_add_date
+@decorator_log_generation
+@decorator_extension_inner
+@log_function_time
+def generate(
+    text,
+    melody,
+    model_name,
+    duration,
+    topk,
+    topp,
+    temperature,
+    cfg_coef,
+    use_multi_band_diffusion,
+    **kwargs,
 ):
-    print("Generating: '''", params["text"], "'''")
-    print("Parameters:")
-    for key, value in params.items():
-        print(key, ":", value)
+    model_inst = load_model(model_name)
 
-
-def unload_models():
-    global MODEL
-    MODEL = None
-    import gc
-
-    gc.collect()
-    if torch.cuda.is_available():
-        torch.cuda.empty_cache()
-    return "Unloaded"
-
-
-def generate(params: MusicGenGeneration, melody_in: Optional[Tuple[int, np.ndarray]]):
-    model = params["model"]
-    text = params["text"]
-    # due to JSON serialization limitations
-    params["melody"] = None if "melody" not in model else melody_in
-    melody = params["melody"]
-
-    global MODEL
-    if MODEL is None or MODEL.name != model:
-        unload_models()
-        MODEL = load_model(model)
-
-    MODEL.set_generation_params(
+    model_inst.set_generation_params(
         use_sampling=True,
-        top_k=params["topk"],
-        top_p=params["topp"],
-        temperature=params["temperature"],
-        cfg_coef=params["cfg_coef"],
-        duration=params["duration"],
+        top_k=topk,
+        top_p=topp,
+        temperature=temperature,
+        cfg_coef=cfg_coef,
+        duration=duration,
     )
 
-    tokens = None
-
-    import time
-
-    start = time.time()
-
-    params["seed"] = parse_or_set_seed(params["seed"], 0)
-    # generator = torch.Generator(device=MODEL.device).manual_seed(params["seed"])
-    log_generation_musicgen(params)
-    if "melody" in model and melody is not None:
+    if "melody" in model_name and melody is not None:
         sr, melody = melody[0], torch.from_numpy(melody[1]).to(
-            MODEL.device
+            model_inst.device
         ).float().t().unsqueeze(0)
         print(melody.shape)
         if melody.dim() == 2:
             melody = melody[None]
-        melody = melody[..., : int(sr * MODEL.lm.cfg.dataset.segment_duration)]  # type: ignore
-        output, tokens = MODEL.generate_with_chroma(
+        melody = melody[..., : int(sr * model_inst.lm.cfg.dataset.segment_duration)]  # type: ignore
+        output, tokens = model_inst.generate_with_chroma(
             descriptions=[text],
             melody_wavs=melody,
             melody_sample_rate=sr,
@@ -201,35 +123,35 @@ def generate(params: MusicGenGeneration, melody_in: Optional[Tuple[int, np.ndarr
             return_tokens=True,
             # generator=generator,
         )
-    elif model == "facebook/audiogen-medium":
-        output = MODEL.generate(
+    elif model_name == "facebook/audiogen-medium":
+        output = model_inst.generate(
             descriptions=[text],
             progress=True,
             # generator=generator,
         )
+        tokens = None
     else:
-        output, tokens = MODEL.generate(
+        output, tokens = model_inst.generate(
             descriptions=[text],
             progress=True,
             return_tokens=True,
             # generator=generator,
         )
-    set_seed(-1)
 
-    elapsed = time.time() - start
-    # print time taken
-    print("Generated in", "{:.3f}".format(elapsed), "seconds")
-
-    if params["use_multi_band_diffusion"]:
-        if model != "facebook/audiogen-medium":
+    if use_multi_band_diffusion:
+        if model_name != "facebook/audiogen-medium":
             from audiocraft.models.multibanddiffusion import MultiBandDiffusion
 
             mbd = MultiBandDiffusion.get_mbd_musicgen()
-            if isinstance(MODEL.compression_model, InterleaveStereoCompressionModel):
-                left, right = MODEL.compression_model.get_left_right_codes(tokens)
+            if isinstance(
+                model_inst.compression_model, InterleaveStereoCompressionModel
+            ):
+                left, right = model_inst.compression_model.get_left_right_codes(tokens)
                 tokens = torch.cat([left, right])
             outputs_diffusion = mbd.tokens_to_wav(tokens)
-            if isinstance(MODEL.compression_model, InterleaveStereoCompressionModel):
+            if isinstance(
+                model_inst.compression_model, InterleaveStereoCompressionModel
+            ):
                 assert outputs_diffusion.shape[1] == 1  # output is mono
                 outputs_diffusion = rearrange(
                     outputs_diffusion, "(s b) c t -> b (s c) t", s=2
@@ -237,217 +159,129 @@ def generate(params: MusicGenGeneration, melody_in: Optional[Tuple[int, np.ndarr
             output = outputs_diffusion.detach().cpu().numpy().squeeze()
         else:
             print("NOTICE: Multi-band diffusion is not supported for AudioGen")
-            params["use_multi_band_diffusion"] = False
             output = output.detach().cpu().numpy().squeeze()
     else:
         output = output.detach().cpu().numpy().squeeze()
 
-    filename, plot, _metadata = save_generation(
-        audio_array=output,
-        SAMPLE_RATE=MODEL.sample_rate,
-        params=params,
-        tokens=tokens,
-    )
+    audio_array = output
+    if audio_array.shape[0] == 2:
+        audio_array = np.transpose(audio_array)
 
-    return [
-        (MODEL.sample_rate, output.transpose()),
-        os.path.dirname(filename),
-        plot,
-        params["seed"],
-        _metadata,
-    ]
+    return {"audio_out": (model_inst.sample_rate, audio_array), "tokens": tokens}
+
+
+MUSICGEN_OFFICIAL_REPOS = [
+    ("Melody", "facebook/musicgen-melody"),
+    ("Medium", "facebook/musicgen-medium"),
+    ("Small", "facebook/musicgen-small"),
+    ("Large", "facebook/musicgen-large"),
+    ("Audiogen", "facebook/audiogen-medium"),
+    ("Melody Large", "facebook/musicgen-melody-large"),
+    ("Stereo Small", "facebook/musicgen-stereo-small"),
+    ("Stereo Medium", "facebook/musicgen-stereo-medium"),
+    ("Stereo Melody", "facebook/musicgen-stereo-melody"),
+    ("Stereo Large", "facebook/musicgen-stereo-large"),
+    ("Stereo Melody Large", "facebook/musicgen-stereo-melody-large"),
+]
 
 
 def generation_tab_musicgen():
     with gr.Tab("MusicGen + AudioGen"):
-        gr.Markdown(f"""Audiocraft version: {AUDIOCRAFT_VERSION}""")
-        with gr.Row(equal_height=False):
-            with gr.Column():
-                text = gr.Textbox(
-                    label="Prompt", lines=3, placeholder="Enter text here..."
-                )
-                model = gr.Radio(
-                    [
-                        "facebook/musicgen-melody",
-                        "facebook/musicgen-medium",
-                        "facebook/musicgen-small",
-                        "facebook/musicgen-large",
-                        "facebook/audiogen-medium",
-                        "facebook/musicgen-melody-large",
-                        "facebook/musicgen-stereo-small",
-                        "facebook/musicgen-stereo-medium",
-                        "facebook/musicgen-stereo-melody",
-                        "facebook/musicgen-stereo-large",
-                        "facebook/musicgen-stereo-melody-large",
-                    ],
-                    label="Model",
-                    value="facebook/musicgen-small",
-                )
-                melody = gr.Audio(
-                    sources="upload",
-                    type="numpy",
-                    label="Melody (optional)",
-                    elem_classes="tts-audio",
-                )
-                submit = gr.Button("Generate", variant="primary")
-            with gr.Column():
-                duration = gr.Slider(
-                    minimum=1,
-                    maximum=360,
-                    value=10,
-                    label="Duration",
-                )
-                with gr.Row():
-                    topk = gr.Number(label="Top-k", value=250, interactive=True)
-                    topp = gr.Slider(
-                        minimum=0.0,
-                        maximum=1.5,
-                        value=0.0,
-                        label="Top-p",
-                        step=0.05,
-                    )
-                    temperature = gr.Slider(
-                        minimum=0.0,
-                        maximum=1.5,
-                        value=1.0,
-                        label="Temperature",
-                        step=0.05,
-                    )
-                    cfg_coef = gr.Slider(
-                        minimum=0.0,
-                        maximum=10.0,
-                        value=3.0,
-                        label="Classifier Free Guidance",
-                        step=0.1,
-                    )
-                use_multi_band_diffusion = gr.Checkbox(
-                    label="Use Multi-Band Diffusion (High VRAM Usage)",
-                    value=False,
-                )
-                seed, set_old_seed_button, _ = setup_seed_ui_musicgen()
+        musicgen_ui()
 
-                unload_models_button = gr.Button("Unload models")
-                unload_models_button.click(
-                    fn=unload_models,
-                    outputs=[unload_models_button],
-                    api_name="musicgen_audiogen_unload_models",
-                )
 
+def musicgen_ui():
+    gr.Markdown(f"""Audiocraft version: {AUDIOCRAFT_VERSION}""")
+    with gr.Row(equal_height=False):
         with gr.Column():
-            output = gr.Audio(
-                label="Generated Music",
-                type="numpy",
-                interactive=False,
-                elem_classes="tts-audio",
+            text = gr.Textbox(label="Prompt", lines=3, placeholder="Enter text here...")
+            model_name = gr.Radio(
+                choices=MUSICGEN_OFFICIAL_REPOS,
+                label="Model",
+                value="facebook/musicgen-small",
             )
-            image = gr.Image(label="Waveform", elem_classes="tts-image", visible=False)  # type: ignore
+            melody = gr.Audio(sources="upload", type="numpy", label="Melody (optional)")
+            submit = gr.Button("Generate", variant="primary")
+        with gr.Column():
+            duration = gr.Slider(minimum=1, maximum=360, value=10, label="Duration")
             with gr.Row():
-                folder_root = gr.Textbox(visible=False)
-                save_button = gr.Button("Save to favorites", visible=True)
-                melody_button = gr.Button("Use as melody", visible=True)
-            save_button.click(
-                fn=save_to_favorites,
-                inputs=[folder_root],
-                outputs=[save_button],
+                topk = gr.Number(label="Top-k", value=250, interactive=True)
+                topp = gr.Slider(
+                    minimum=0.0, maximum=1.5, value=0.0, label="Top-p", step=0.05
+                )
+                temperature = gr.Slider(
+                    minimum=0.0, maximum=1.5, value=1.0, label="Temperature", step=0.05
+                )
+                cfg_coef = gr.Slider(
+                    minimum=0.0,
+                    maximum=10.0,
+                    value=3.0,
+                    label="Classifier Free Guidance",
+                    step=0.1,
+                )
+            use_multi_band_diffusion = gr.Checkbox(
+                label="Use Multi-Band Diffusion (High VRAM Usage)",
+                value=False,
             )
+            seed, randomize_seed_callback = randomize_seed_ui()
 
-            melody_button.click(
-                fn=lambda melody_in: melody_in,
-                inputs=[output],
-                outputs=[melody],
-            )
+            unload_model_button("musicgen_audiogen")
 
-    inputs = [
-        text,
-        melody,
-        model,
-        duration,
-        topk,
-        topp,
-        temperature,
-        cfg_coef,
-        seed,
-        use_multi_band_diffusion,
-    ]
+    with gr.Column():
+        audio_out = gr.Audio(label="Generated Music", type="numpy")
+        with gr.Row():
+            folder_root = gr.Textbox(visible=False)
+            save_button = gr.Button("Save to favorites", visible=True)
+            melody_button = gr.Button("Use as melody", visible=True)
+        save_button.click(
+            fn=save_to_favorites,
+            inputs=[folder_root],
+            outputs=[save_button],
+        )
 
-    def update_json(
-        text,
-        _melody,
-        model,
-        duration,
-        topk,
-        topp,
-        temperature,
-        cfg_coef,
-        seed,
-        use_multi_band_diffusion,
-    ):
-        return {
-            "text": text,
-            "melody": "exists" if _melody else "None",  # due to JSON limits
-            "model": model,
-            "duration": float(duration),
-            "topk": int(topk),
-            "topp": float(topp),
-            "temperature": float(temperature),
-            "cfg_coef": float(cfg_coef),
-            "seed": int(seed),
-            "use_multi_band_diffusion": bool(use_multi_band_diffusion),
-        }
+        melody_button.click(
+            fn=lambda melody_in: melody_in,
+            inputs=[audio_out],
+            outputs=[melody],
+        )
 
-    seed_cache = gr.State()  # type: ignore
-    result_json = gr.JSON(
-        visible=False,
-    )
+    input_dict = {
+        text: "text",
+        melody: "melody",
+        model_name: "model_name",
+        duration: "duration",
+        topk: "topk",
+        topp: "topp",
+        temperature: "temperature",
+        cfg_coef: "cfg_coef",
+        seed: "seed",
+        use_multi_band_diffusion: "use_multi_band_diffusion",
+    }
 
-    set_old_seed_button.click(
-        fn=lambda x: gr.Number(value=x),
-        inputs=seed_cache,
-        outputs=seed,
-    )
+    output_dict = {
+        "audio_out": audio_out,
+        "metadata": gr.JSON(visible=False),
+        "folder_root": folder_root,
+    }
 
     submit.click(
-        inputs=inputs,
-        fn=lambda text, melody, model, duration, topk, topp, temperature, cfg_coef, seed, use_multi_band_diffusion: generate(
-            params=update_json(
-                text,
-                melody,
-                model,
-                duration,
-                topk,
-                topp,
-                temperature,
-                cfg_coef,
-                seed,
-                use_multi_band_diffusion,
-            ),  # type: ignore
-            melody_in=melody,
+        **randomize_seed_callback,
+    ).then(
+        **dictionarize(
+            fn=generate,
+            inputs=input_dict,
+            outputs=output_dict,
         ),
-        outputs=[output, folder_root, image, seed_cache, result_json],
         api_name="musicgen",
     )
 
 
 if __name__ == "__main__":
+    if "demo" in locals():
+        demo.close()  # type: ignore
     with gr.Blocks() as demo:
         generation_tab_musicgen()
 
-    demo.launch()
-
-# from tts_webui.musicgen.musicgen_tab import generate, MusicGenGeneration
-
-# generate(
-#     params=MusicGenGeneration(
-#         model="facebook/musicgen-small",
-#         text="I am a robot",
-#         cfg_coef=3.0,
-#         duration=10,
-#         melody=None,
-#         seed=0,
-#         temperature=1.0,
-#         topk=250,
-#         topp=0.0,
-#         use_multi_band_diffusion=False,
-#     ),
-#     melody_in=None,
-# )
+    demo.launch(
+        server_port=7770,
+    )

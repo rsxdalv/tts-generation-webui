@@ -40,7 +40,6 @@ def preview_phonemization(text):
     return phoneme_string
 
 
-# How to deal with yield in function? I can write yield/non yield functions, but how to combine them in one
 @decorator_extension_outer
 @decorator_apply_torch_seed
 @decorator_save_metadata
@@ -133,7 +132,7 @@ def style_tts2_ui():
         )
         generate_button = gr.Button("Generate", variant="primary")
 
-    audio_out = gr.Audio(label="Generated audio", elem_classes="tts-audio")
+    audio_out = gr.Audio(label="Generated audio")
 
     seed, randomize_seed_callback = randomize_seed_ui()
 

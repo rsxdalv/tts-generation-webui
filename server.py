@@ -30,12 +30,6 @@ from tts_webui.extensions_loader.interface_extensions import (
 from tts_webui.extensions_loader.decorator_extensions import (
     extension_decorator_list_tab,
 )
-from tts_webui.extensions_loader.ext_callback_save_generation import (
-    load_ext_callback_save_generation,
-)
-
-load_ext_callback_save_generation()
-
 
 def reload_config_and_restart_ui():
     os._exit(0)

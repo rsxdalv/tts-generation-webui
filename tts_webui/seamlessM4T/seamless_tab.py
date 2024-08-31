@@ -117,7 +117,6 @@ def seamless_ui():
                     sources="upload",
                     type="numpy",
                     label="Input Audio",
-                    elem_classes="tts-audio",
                 )
                 target_language_audio = gr.Dropdown(
                     choices=speech_target_languages,  # type: ignore

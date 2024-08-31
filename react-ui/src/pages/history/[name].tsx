@@ -16,12 +16,7 @@ interface Props {
 
 export default function Home({ outputs, isFavorites = false }: Props) {
   return (
-    <Template>
-      <Head>
-        <title>
-          {`${isFavorites ? "Favorites" : "History"} - TTS Generation Webui`}
-        </title>
-      </Head>
+    <Template title={isFavorites ? "Favorites" : "History"}>
       <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
         {outputs.map((generation) => (
           <HistoryCard

@@ -14,7 +14,7 @@ from tts_webui.tortoise.diffusion_params import diffusion_params
 from tts_webui.tortoise.presets import presets
 from tts_webui.tortoise.gr_reload_button import gr_open_button_simple, gr_reload_button
 from tts_webui.tortoise.tortoise_model_settings_ui import tortoise_model_settings_ui
-from tts_webui.utils.randomize_seed import randomize_seed
+from tts_webui.utils.randomize_seed import randomize_seed, randomize_seed_ui
 
 MAX_OUTPUTS = 9
 
@@ -77,11 +77,7 @@ def tortoise_core_ui():
                 step=0.1,
                 interactive=False,
             )
-            with gr.Row():
-                seed = gr.Textbox(label="Seed", value="-1")
-                CUSTOM_randomize_seed_checkbox = gr.Checkbox(
-                    label="Randomize seed", value=True
-                )
+            seed, randomize_seed_callback = randomize_seed_ui()
 
             split_prompt = gr.Checkbox(label="Split prompt by lines", value=False)
 
@@ -132,21 +128,15 @@ def tortoise_core_ui():
     )
 
     with gr.Column():
-        audio = gr.Audio(
-            type="filepath", label="Generated audio", elem_classes="tts-audio"
-        )
-        bundle_name = gr.Textbox(
-            visible=False,
-        )
-        params = gr.JSON(
-            visible=False,
-        )
+        audio = gr.Audio(type="filepath", label="Generated audio")
+        folder_root = gr.Textbox(visible=False)
+        metadata = gr.JSON(visible=False)
         with gr.Row():
             from tts_webui.history_tab.save_to_favorites import save_to_favorites
 
             gr.Button("Save to favorites").click(
                 fn=save_to_favorites,
-                inputs=[bundle_name],
+                inputs=[folder_root],
             )
 
     def generate_button(count):
@@ -162,15 +152,11 @@ def tortoise_core_ui():
                 value=f"Generate {count if count > 1 else ''}",
                 variant="primary" if count == 1 else "secondary",
             )
-            .click(
-                fn=randomize_seed,
-                inputs=[seed, CUSTOM_randomize_seed_checkbox],
-                outputs=[seed],
-            )
+            .click(**randomize_seed_callback)
             .then(
                 fn=gen,
                 inputs=inputs,
-                outputs=[audio, bundle_name, params],
+                outputs=[audio, folder_root, metadata],
                 api_name=f"generate_tortoise_{count}",
             )
         )
