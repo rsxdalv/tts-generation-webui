@@ -6,7 +6,7 @@ services:
     ports:
       - "7860:7770"
       # include React UI
-      - "3003:3000"
+      - "3000:3000"
     container_name: tts-generation-webui
     deploy:
         resources:
