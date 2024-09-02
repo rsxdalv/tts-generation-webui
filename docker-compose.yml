@@ -1,4 +1,3 @@
-version: '3'
 services:
   tts-generation-webui:
     image: "ghcr.io/rsxdalv/tts-generation-webui:main"
