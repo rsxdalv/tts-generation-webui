@@ -10,7 +10,10 @@ from tts_webui.history_tab.collections_directories_atom import (
 )
 from tts_webui.history_tab.get_wav_files import get_wav_files
 from tts_webui.history_tab.delete_generation_cb import delete_generation_cb
-from tts_webui.history_tab.save_to_favorites import save_to_collection, save_to_favorites
+from tts_webui.history_tab.save_to_favorites import (
+    save_to_collection,
+    save_to_favorites,
+)
 from tts_webui.history_tab.open_folder import open_folder
 
 
@@ -23,12 +26,18 @@ def _get_filename(table, index):
     return table["data"][index][-1]
 
 
+def get_json_text(filename):
+    try:
+        with open(filename) as f:
+            return json.load(f)
+    except:
+        return None
+
+
 def _select_audio(table, evt: gr.SelectData):
     index = _get_row_index(evt)
     filename = _get_filename(table, index)
-    with open(filename.replace(".wav", ".json")) as f:
-        json_text = json.load(f)
-    return filename, json_text
+    return filename, get_json_text(filename.replace(".wav", ".json"))
 
 
 def clear_audio():

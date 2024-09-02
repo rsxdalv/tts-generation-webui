@@ -47,6 +47,8 @@ def save_npz_musicgen(filename: str, tokens: torch.Tensor, metadata: dict[str, A
 def load_npz(filename):
     def unpack_metadata(metadata: np.ndarray):
         def join_list(x: list | np.ndarray):
+            if isinstance(x, np.ndarray):
+                x = x.tolist()
             return "".join(x)
 
         return json.loads(join_list(metadata))
