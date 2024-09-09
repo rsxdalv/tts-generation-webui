@@ -7,7 +7,7 @@ import { NPZVoiceDropdown } from "./BarkOldGeneration";
 import { PromptType, ForEachSubsequentGeneration } from "./BarkRadios";
 import { SeedInput } from "./SeedInput";
 import { HandleChange } from "../types/HandleChange";
-import { GenericSlider } from "./GenericSlider";
+import { ParameterSlider } from "./GenericSlider";
 
 export const BarkInputs = ({
   barkGenerationParams,
@@ -54,14 +54,14 @@ export const BarkInputs = ({
             barkGenerationParams={barkGenerationParams}
             handleChange={handleChange}
           />
-          <GenericSlider
+          <ParameterSlider
             label="Max generation duration (s)"
             name="max_length"
             min="0.1"
             max="18"
             step="0.1"
             params={barkGenerationParams}
-            handleChange={handleChange}
+            onChange={handleChange}
           />
         </div>
         <SeedInput params={barkGenerationParams} handleChange={handleChange} />

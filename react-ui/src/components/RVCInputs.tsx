@@ -1,7 +1,8 @@
 import React from "react";
 import { AudioInput } from "./AudioComponents";
 import { RVCParams } from "../tabs/RVCParams";
-import { GenericSlider } from "./GenericSlider";
+import { ParameterSlider } from "./GenericSlider";
+import { HandleChange } from "../types/HandleChange";
 
 const Model = ({
   rvcParams: rvcGenerationParams,
@@ -232,12 +233,7 @@ export const RVCInputs = ({
   hideAudioInput,
 }: {
   rvcParams: RVCParams;
-  handleChange: (
-    event:
-      | React.ChangeEvent<HTMLInputElement>
-      | React.ChangeEvent<HTMLTextAreaElement>
-      | React.ChangeEvent<HTMLSelectElement>
-  ) => void;
+  handleChange: HandleChange;
   hideAudioInput?: boolean;
 }) => (
   <div className="flex flex-col gap-y-2 border border-gray-300 p-2 rounded">
@@ -277,29 +273,19 @@ export const RVCInputs = ({
       <div className="flex flex-col gap-y-2">
         <div className="flex gap-2">
           <div className="flex flex-col gap-2">
-            <div className="flex flex-row gap-x-2">
-              <GenericSlider
-                params={rvcParams}
-                handleChange={handleChange}
-                label="Semitone shift"
-                name="pitch_up_key"
-                min="-24"
-                max="24"
-                step="1"
-                className="w-full"
-              />
-              <input
-                type="number"
-                name="pitch_up_key"
-                value={rvcParams.pitch_up_key}
-                onChange={handleChange}
-                className="border border-gray-300 p-2 rounded w-1/4"
-              />
-            </div>
-            {/* search feature ratio */}
-            <GenericSlider
+            <ParameterSlider
               params={rvcParams}
-              handleChange={handleChange}
+              onChange={handleChange}
+              label="Semitone shift"
+              name="pitch_up_key"
+              min="-24"
+              max="24"
+              step="1"
+              className="w-full"
+            />
+            <ParameterSlider
+              params={rvcParams}
+              onChange={handleChange}
               label="Search Feature Ratio (accent strength)"
               name="search_feature_ratio"
               min="0.0"
@@ -313,9 +299,9 @@ export const RVCInputs = ({
           />
         </div>
         <div className="flex flex-col gap-y-2">
-          <GenericSlider
+          <ParameterSlider
             params={rvcParams}
-            handleChange={handleChange}
+            onChange={handleChange}
             label="Filter Radius (Pitch median filtering)"
             name="filter_radius_pitch"
             min="0"
@@ -326,9 +312,9 @@ export const RVCInputs = ({
       </div>
       <div className="flex flex-col gap-y-2">
         <div className="flex flex-col gap-y-2">
-          <GenericSlider
+          <ParameterSlider
             params={rvcParams}
-            handleChange={handleChange}
+            onChange={handleChange}
             label="Resample to"
             name="resample_sample_rate"
             min="0"
@@ -337,9 +323,9 @@ export const RVCInputs = ({
           />
         </div>
         <div className="flex flex-col gap-y-2">
-          <GenericSlider
+          <ParameterSlider
             params={rvcParams}
-            handleChange={handleChange}
+            onChange={handleChange}
             label="Voice Envelope Normalizaiton (Volume scaling)"
             name="voice_envelope_normalizaiton"
             min="0.0"
@@ -348,9 +334,9 @@ export const RVCInputs = ({
           />
         </div>
         <div className="flex flex-col gap-y-2">
-          <GenericSlider
+          <ParameterSlider
             params={rvcParams}
-            handleChange={handleChange}
+            onChange={handleChange}
             label="Protect Breath Sounds"
             name="protect_breath_sounds"
             min="0.0"

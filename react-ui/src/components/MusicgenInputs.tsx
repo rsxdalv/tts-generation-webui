@@ -6,7 +6,7 @@ import {
   initialMusicgenParams,
 } from "../tabs/MusicgenParams";
 import { MusicgenModelSelector } from "./MusicgenModelSelector";
-import { GenericSlider } from "./GenericSlider";
+import { ParameterSlider } from "./GenericSlider";
 import { PromptTextArea } from "./PromptTextArea";
 import { HandleChange } from "../types/HandleChange";
 import { SeedInput } from "./SeedInput";
@@ -49,15 +49,16 @@ export const MusicgenInputs = ({
     </div>
 
     <div className="flex flex-col gap-y-2">
-      <GenericSlider
+      <ParameterSlider
         label="Duration"
-        format={(x) => `${x.toFixed(1)}s ${x > 30 ? "(spliced)" : ""}`}
+        // format={(x) => `${x.toFixed(1)}s ${x > 30 ? "(spliced)" : ""}`}
+        decimals={1}
         name="duration"
         min="0.5"
         max="360"
         step="0.5"
         params={musicgenParams}
-        handleChange={handleChange}
+        onChange={handleChange}
       />
 
       <label className="text-sm">Top-K:</label>
@@ -72,37 +73,37 @@ export const MusicgenInputs = ({
         step="1"
       />
 
-      <GenericSlider
+      <ParameterSlider
         label="Top-P"
-        format={(x) => x.toFixed(2)}
+        decimals={2}
         name="topp"
         min="0"
         max="1.5"
         step="0.01"
         params={musicgenParams}
-        handleChange={handleChange}
+        onChange={handleChange}
       />
 
-      <GenericSlider
+      <ParameterSlider
         label="Temperature"
-        format={(x) => x.toFixed(2)}
+        decimals={2}
         name="temperature"
         min="0"
         max="1.5"
         step="0.01"
         params={musicgenParams}
-        handleChange={handleChange}
+        onChange={handleChange}
       />
 
-      <GenericSlider
+      <ParameterSlider
         label="Classifier Free Guidance Coefficient"
-        format={(x) => x.toFixed(1)}
+        decimals={1}
         name="cfg_coef"
         min="0"
         max="10"
         step="0.1"
         params={musicgenParams}
-        handleChange={handleChange}
+        onChange={handleChange}
       />
 
       <SeedInput

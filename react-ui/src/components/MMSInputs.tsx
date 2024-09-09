@@ -2,9 +2,11 @@ import React from "react";
 import { MMSParams, MMSResult, initialMMSParams } from "../tabs/MMSParams";
 import { HandleChange } from "../types/HandleChange";
 import { PromptTextArea } from "./PromptTextArea";
-import { GenericSlider } from "./GenericSlider";
+import { ParameterSlider } from "./GenericSlider";
 import { MMS_LANGUAGE_DATA } from "./MMS_LANGUAGE_DATA";
 import { SeedInput } from "./SeedInput";
+import { SampleSliders } from "./component/sample-sliders";
+import { SampleSliders2 } from "./component/sample-sliders2";
 
 const commonBorder = "border border-gray-300 p-2 rounded";
 
@@ -67,33 +69,33 @@ export const MMSInputs = ({
       </div>
 
       <div className="flex flex-row gap-2">
-        <GenericSlider
+        <ParameterSlider
           params={params}
-          handleChange={handleChange}
+          onChange={handleChange}
           label="Speaking Rate"
-          format={(x) => x.toFixed(1)}
+          decimals={1}
           name="speaking_rate"
           min="0.1"
           max="10.0"
           step="0.1"
         />
 
-        <GenericSlider
+        <ParameterSlider
           params={params}
-          handleChange={handleChange}
+          onChange={handleChange}
           label="Noise Scale"
-          format={(x) => x.toFixed(2)}
+          decimals={2}
           name="noise_scale"
           min="-2.5"
           max="2.5"
           step="0.05"
         />
 
-        <GenericSlider
+        <ParameterSlider
           params={params}
-          handleChange={handleChange}
+          onChange={handleChange}
           label="Noise Scale Duration"
-          format={(x) => x.toFixed(2)}
+          decimals={2}
           name="noise_scale_duration"
           min="-1.0"
           max="2"

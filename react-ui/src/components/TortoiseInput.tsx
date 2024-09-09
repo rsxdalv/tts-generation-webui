@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { TortoiseGenerationParams } from "../tabs/TortoiseGenerationParams";
 import FileInput from "./FileInput";
 import { TortoiseResult } from "../tabs/TortoiseResult";
-import { GenericSlider } from "./GenericSlider";
+import { ParameterSlider } from "./GenericSlider";
 import { HandleChange } from "../types/HandleChange";
 import { PromptTextArea } from "./PromptTextArea";
 import { SeedInput } from "./SeedInput";
@@ -275,9 +275,9 @@ const CVVPAmount = ({
   tortoiseGenerationParams: TortoiseGenerationParams;
   handleChange: HandleChange;
 }) => (
-  <GenericSlider
+  <ParameterSlider
     params={tortoiseGenerationParams}
-    handleChange={handleChange}
+    onChange={handleChange}
     label="CVVP Amount (Deprecated, always 0)"
     name="cvvp_amount"
     min="0.0"
@@ -514,9 +514,9 @@ const AutoRegressiveParameters = ({
 }) => (
   <SimpleGroup>
     <h2 className="text-md">Autoregressive Parameters</h2>
-    <GenericSlider
+    <ParameterSlider
       params={tortoiseGenerationParams}
-      handleChange={handleChange}
+      onChange={handleChange}
       label="Samples"
       name="samples"
       // min="1" - needs to be at least GPU batch sized
@@ -524,49 +524,49 @@ const AutoRegressiveParameters = ({
       max="256"
       step="1"
     />
-    <GenericSlider
+    <ParameterSlider
       params={tortoiseGenerationParams}
-      handleChange={handleChange}
+      onChange={handleChange}
       label="Temperature"
-      format={(x) => x.toFixed(2)}
+      decimals={2}
       name="temperature"
       min="0.0"
       max="1.0"
       step="0.01"
     />
-    <GenericSlider
+    <ParameterSlider
       params={tortoiseGenerationParams}
-      handleChange={handleChange}
+      onChange={handleChange}
       label="Length Penalty"
       name="length_penalty"
       min="0.0"
       max="10.0"
       step="0.01"
-      format={(x) => x.toFixed(2)}
+      decimals={2}
     />
-    <GenericSlider
+    <ParameterSlider
       params={tortoiseGenerationParams}
-      handleChange={handleChange}
+      onChange={handleChange}
       label="Repetition Penalty"
       name="repetition_penalty"
       min="0.0"
       max="10.0"
       step="0.01"
-      format={(x) => x.toFixed(2)}
+      decimals={2}
     />
-    <GenericSlider
+    <ParameterSlider
       params={tortoiseGenerationParams}
-      handleChange={handleChange}
+      onChange={handleChange}
       label="Top P"
       name="top_p"
       min="0.0"
       max="1.0"
       step="0.01"
-      format={(x) => x.toFixed(2)}
+      decimals={2}
     />
-    <GenericSlider
+    <ParameterSlider
       params={tortoiseGenerationParams}
-      handleChange={handleChange}
+      onChange={handleChange}
       label="Max Mel Tokens"
       name="max_mel_tokens"
       min="0"
@@ -604,9 +604,9 @@ const DiffusionParameters = ({
 }) => (
   <SimpleGroup>
     <h2 className="text-md">Diffusion Parameters</h2>
-    <GenericSlider
+    <ParameterSlider
       params={tortoiseGenerationParams}
-      handleChange={handleChange}
+      onChange={handleChange}
       label="Diffusion Iterations"
       name="diffusion_iterations"
       min="0"
@@ -617,20 +617,20 @@ const DiffusionParameters = ({
       tortoiseGenerationParams={tortoiseGenerationParams}
       handleChange={handleChange}
     />
-    <GenericSlider
+    <ParameterSlider
       params={tortoiseGenerationParams}
-      handleChange={handleChange}
+      onChange={handleChange}
       label="Cond Free K"
       name="cond_free_k"
       min="0"
       max="10"
       step="1"
     />
-    <GenericSlider
+    <ParameterSlider
       params={tortoiseGenerationParams}
-      handleChange={handleChange}
+      onChange={handleChange}
       label="Diffusion Temperature"
-      format={(x) => x.toFixed(2)}
+      decimals={2}
       name="diffusion_temperature"
       min="0.0"
       max="1.0"

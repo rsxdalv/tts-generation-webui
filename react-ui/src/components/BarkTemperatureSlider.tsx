@@ -1,6 +1,6 @@
 import React from "react";
 import { BarkGenerationParams } from "../tabs/BarkGenerationParams";
-import { GenericSlider } from "./GenericSlider";
+import { ParameterSlider } from "./GenericSlider";
 
 const TemperatureSlider = <
   T extends {
@@ -17,9 +17,9 @@ const TemperatureSlider = <
   label: string;
   name: keyof T;
 }) => (
-  <GenericSlider
+  <ParameterSlider
     params={params}
-    handleChange={handleChange}
+    onChange={handleChange}
     label={label}
     name={name}
     min="0.0"
