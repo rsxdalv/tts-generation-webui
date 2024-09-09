@@ -1,9 +1,9 @@
 import React from "react";
-import { Progress } from "./Progress";
 import useLocalStorage from "../hooks/useLocalStorage";
 import { extractTexts, initialHyperParams } from "../data/hyperParamsUtils";
 import { applySeed } from "../data/applySeed";
 import { useInterrupt } from "../hooks/useInterrupt";
+import { Progress } from "./ui/progress";
 
 const getParams = <T extends { seed: number }>(
   texts: string[],
@@ -142,7 +142,7 @@ export const HyperParameters = ({
           className="border border-gray-300 p-2 rounded"
         />
       </div>
-      <Progress progress={progress.current} progressMax={progress.max} />
+      <ProgressStatus value={progress.current} max={progress.max} />
       <button
         className="border border-gray-300 p-2 rounded"
         onClick={interrupt}
@@ -155,3 +155,11 @@ export const HyperParameters = ({
     </div>
   );
 };
+
+const ProgressStatus = ({ value, max }: { value: number; max: number }) => (
+  <div className="flex gap-x-2 items-center">
+    <label className="text-sm">Progress:</label>
+    <Progress value={value} max={max} className="h-4 w-2/3" />
+    {value}/{max}
+  </div>
+);
