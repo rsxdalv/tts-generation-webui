@@ -191,7 +191,7 @@ const Model = ({
 
   const selected = params?.model_name;
   return (
-    <div className="flex flex-col space-y-2">
+    <div className="flex flex-col gap-y-2">
       <div className="flex gap-2">
         <select
           name="model_name"

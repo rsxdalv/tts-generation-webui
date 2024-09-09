@@ -22,7 +22,7 @@ const RvcGenerationPage = () => {
           rvcParams={rvcGenerationParams}
           handleChange={handleChange}
         />
-        <div className="flex flex-col space-y-4">
+        <div className="flex flex-col gap-y-4">
           <button
             className="border border-gray-300 p-2 rounded hover:bg-gray-100"
             onClick={() => consumer(rvcGenerationParams)}

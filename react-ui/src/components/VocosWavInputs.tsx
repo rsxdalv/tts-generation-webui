@@ -11,9 +11,9 @@ export const VocosWavInputs = ({
       React.ChangeEvent<HTMLSelectElement>
   ) => void;
 }) => (
-  <div className="space-y-2">
+  <div className="gap-y-2">
     <label className="text-sm">Bandwidth in kbps:</label>
-    <div className="flex flex-row space-x-2">
+    <div className="flex flex-row gap-x-2">
       {["1.5", "3.0", "6.0", "12.0"].map((bandwidth) => (
         <div key={bandwidth} className="flex items-center">
           <input

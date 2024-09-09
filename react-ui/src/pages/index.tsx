@@ -54,7 +54,7 @@ export default function Home() {
       <Head>
         <title>TTS Generation Webui</title>
       </Head>
-      <div className="text-center space-y-4 max-w-2xl mx-auto mb-auto">
+      <div className="text-center gap-y-4 max-w-2xl mx-auto mb-auto">
         <h2 className="text-2xl font-bold">Welcome to the TTS Webui!</h2>
         <p className="text-lg">
           This is a web interface for the TTS project. It allows you to generate

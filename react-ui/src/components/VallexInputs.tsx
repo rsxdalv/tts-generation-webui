@@ -43,7 +43,7 @@ const VallexRadio = ({
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   label: string;
 }) => (
-  <div className="flex whitespace-nowrap items-center">
+  <div className="flex whitegap-nowrap items-center">
     <input
       type="radio"
       name={name}
@@ -108,11 +108,11 @@ const TokenizeButton = ({ params }: { params: VallexParams }) => {
   };
 
   return (
-    <div className="flex flex-col space-y-2">
+    <div className="flex flex-col gap-y-2">
       <button className="border border-gray-300 p-2 rounded" onClick={tokenize}>
         Preview Tokens
       </button>
-      <div className="flex flex-col space-y-2">
+      <div className="flex flex-col gap-y-2">
         {loading && <p>Loading...</p>}
         <textarea
           className="border border-gray-300 p-2 rounded"
@@ -144,14 +144,14 @@ const SplitTextIntoSentences = ({ params }: { params: VallexParams }) => {
     setLoading(false);
   };
   return (
-    <div className="flex flex-col space-y-2">
+    <div className="flex flex-col gap-y-2">
       <button
         className="border border-gray-300 p-2 rounded"
         onClick={splitText}
       >
         Preview sentences
       </button>
-      <div className="flex flex-col space-y-2">
+      <div className="flex flex-col gap-y-2">
         {loading && <p>Loading...</p>}
         <textarea
           className="border border-gray-300 p-2 rounded"

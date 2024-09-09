@@ -48,7 +48,7 @@ export const PromptType = ({
 }) => (
   <div>
     <label className="text-sm">Prompt type:</label>
-    <div className="flex flex-row space-x-2">
+    <div className="flex flex-row gap-x-2">
       {["Short prompt (<15s)", "Split prompt by lines"].map((promptType) => (
         <div key={promptType} className="flex items-center">
           <input

@@ -14,7 +14,7 @@ export const MagnetInputs = ({
   magnetParams: MagnetParams;
   handleChange: HandleChange;
 }) => (
-  <div className="flex-col w-full space-y-4">
+  <div className="flex flex-col w-full gap-y-4">
     <div className="flex gap-x-6 w-full justify-center">
       <div className="flex flex-col gap-y-2 w-1/2">
         <MagnetModelSelector

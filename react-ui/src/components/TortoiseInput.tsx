@@ -42,9 +42,9 @@ export const TortoiseInput = ({
   handleChange: HandleChange;
   data?: TortoiseResult | null;
 }) => (
-  <div className="flex flex-col w-full space-y-2">
-    <div className="flex flex-row space-x-2">
-      <div className="space-y-2 w-1/2">
+  <div className="flex flex-col w-full gap-y-2">
+    <div className="flex flex-row gap-x-2">
+      <div className="flex flex-col gap-y-2 w-1/2">
         <SimpleGroup>
           <Model
             tortoiseGenerationParams={tortoiseGenerationParams}
@@ -68,7 +68,7 @@ export const TortoiseInput = ({
           handleChange={handleChange}
         />
       </div>
-      <div className="space-y-2 w-1/2">
+      <div className="flex flex-col gap-y-2 w-1/2">
         <DiffusionParameters
           tortoiseGenerationParams={tortoiseGenerationParams}
           handleChange={handleChange}
@@ -133,13 +133,13 @@ const SplitPromptManually = ({
             "\n"
           ),
         },
-      } as React.ChangeEvent<HTMLTextAreaElement>);
+      });
       handleChange({
         target: {
           name: "split_prompt",
           value: true as any,
         },
-      } as React.ChangeEvent<HTMLInputElement>);
+      });
     }}
   >
     Split prompt into lines by length
@@ -220,51 +220,49 @@ const Preset = ({
   tortoiseGenerationParams: TortoiseGenerationParams;
   handleChange: HandleChange;
 }) => (
-  <div className="flex items-center space-x-2">
+  <div className="flex items-center gap-2">
     <label className="text-sm">Preset:</label>
-    <div className="flex flex-row space-x-2">
-      {["ultra_fast", "fast", "standard", "high_quality"].map((preset) => (
-        <div key={preset} className="flex items-center">
-          <input
-            type="radio"
-            name="preset"
-            id={preset}
-            value={preset}
-            checked={tortoiseGenerationParams.preset === preset}
-            onChange={() => {
-              handleChange({
-                target: {
-                  name: "preset",
-                  value: preset,
-                },
-              } as React.ChangeEvent<HTMLTextAreaElement>);
-              handleChange({
-                target: {
-                  name: "samples",
-                  value: presets[preset]["num_autoregressive_samples"],
-                },
-              } as React.ChangeEvent<HTMLTextAreaElement>);
-              handleChange({
-                target: {
-                  name: "diffusion_iterations",
-                  value: presets[preset]["diffusion_iterations"],
-                },
-              } as React.ChangeEvent<HTMLTextAreaElement>);
-              handleChange({
-                target: {
-                  name: "cond_free",
-                  value: presets[preset]["cond_free"] ?? true,
-                },
-              } as React.ChangeEvent<HTMLTextAreaElement>);
-            }}
-            className="border border-gray-300 p-2 rounded"
-          />
-          <label className="ml-1" htmlFor={preset}>
-            {preset}
-          </label>
-        </div>
-      ))}
-    </div>
+    {["ultra_fast", "fast", "standard", "high_quality"].map((preset) => (
+      <div key={preset} className="flex items-center">
+        <input
+          type="radio"
+          name="preset"
+          id={preset}
+          value={preset}
+          checked={tortoiseGenerationParams.preset === preset}
+          onChange={() => {
+            handleChange({
+              target: {
+                name: "preset",
+                value: preset,
+              },
+            });
+            handleChange({
+              target: {
+                name: "samples",
+                value: presets[preset]["num_autoregressive_samples"],
+              },
+            });
+            handleChange({
+              target: {
+                name: "diffusion_iterations",
+                value: presets[preset]["diffusion_iterations"],
+              },
+            });
+            handleChange({
+              target: {
+                name: "cond_free",
+                value: presets[preset]["cond_free"] ?? true,
+              },
+            });
+          }}
+          className="border border-gray-300 p-2 rounded"
+        />
+        <label className="ml-1" htmlFor={preset}>
+          {preset}
+        </label>
+      </div>
+    ))}
   </div>
 );
 
@@ -294,7 +292,7 @@ const SplitPrompt = ({
   handleChange: HandleChange;
 }) => {
   return (
-    <div className="flex items-center space-x-2">
+    <div className="flex items-center gap-x-2">
       <label className="text-sm">Generate each line separately:</label>
       <input
         type="checkbox"
@@ -363,7 +361,7 @@ const Model = ({
     label: string;
     handleChange: HandleChange;
   }) => (
-    <div className="flex items-center space-x-2">
+    <div className="flex items-center gap-x-2">
       <label className="text-sm cursor-pointer" htmlFor={name}>
         {label}:
       </label>
@@ -384,7 +382,7 @@ const Model = ({
 
   const selected = tortoiseGenerationParams?.model;
   return (
-    <div className="flex flex-col space-y-2">
+    <div className="flex flex-col gap-y-2">
       <div className="flex gap-2">
         <label className="text-sm">Model:</label>
         <select
@@ -459,29 +457,27 @@ const Model = ({
                 name: "tokenizer",
                 value: tokenizer,
               },
-            } as React.ChangeEvent<HTMLInputElement>);
+            });
           }}
           hide_text={false}
         />
       </div>
-      <div className="flex flex-col space-y-2">
-        <button
-          className="border border-gray-300 p-2 rounded"
-          onClick={applyModelSettings}
-        >
-          {applyModelSettingsLoading ? "Applying..." : "Apply Model Settings"}
-        </button>
-        <button
-          className="border border-gray-300 p-2 rounded"
-          onClick={async () => {
-            await fetch("/api/gradio/tortoise_unload_model", {
-              method: "POST",
-            });
-          }}
-        >
-          Unload Model
-        </button>
-      </div>
+      <button
+        className="border border-gray-300 p-2 rounded"
+        onClick={applyModelSettings}
+      >
+        {applyModelSettingsLoading ? "Applying..." : "Apply Model Settings"}
+      </button>
+      <button
+        className="border border-gray-300 p-2 rounded"
+        onClick={async () => {
+          await fetch("/api/gradio/tortoise_unload_model", {
+            method: "POST",
+          });
+        }}
+      >
+        Unload Model
+      </button>
     </div>
   );
 };
@@ -493,7 +489,7 @@ const GenerationName = ({
   tortoiseGenerationParams: TortoiseGenerationParams;
   handleChange: HandleChange;
 }) => (
-  <div className="flex items-center space-x-2">
+  <div className="flex items-center gap-x-2">
     <label className="text-sm">Generation Name:</label>
     <input
       type="text"
@@ -583,7 +579,7 @@ const CondFree = ({
   tortoiseGenerationParams: TortoiseGenerationParams;
   handleChange: HandleChange;
 }) => (
-  <div className="flex items-center space-x-2">
+  <div className="flex items-center gap-2">
     <label className="text-sm">Cond Free:</label>
     <input
       type="checkbox"

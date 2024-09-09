@@ -16,7 +16,7 @@ export const PromptTextArea = <
   name: keyof T;
   className?: string;
 }) => (
-  <div className={`flex flex-col space-y-2 ${className}`}>
+  <div className={`flex flex-col gap-2 ${className}`}>
     <label className="text-sm">{label}:</label>
     <textarea
       name={name as string}

@@ -16,9 +16,9 @@ const DemucsPage = () => {
 
   return (
     <Template title="Demucs">
-      <div className="flex flex-col space-y-4">
-        <div className="flex space-x-4">
-          <div className="flex flex-col space-y-2">
+      <div className="flex flex-col gap-y-4">
+        <div className="flex gap-x-4">
+          <div className="flex flex-col gap-y-2">
             <AudioInput
               url={demucsParams?.file}
               callback={(file) => {
@@ -38,7 +38,7 @@ const DemucsPage = () => {
               Split with Demucs
             </button>
           </div>
-          <div className="flex flex-col space-y-4">
+          <div className="flex flex-col gap-y-4">
             {historyData.slice(0, 4).map(({ audio, typeName }) => (
               <AudioOutput
                 key={typeName}

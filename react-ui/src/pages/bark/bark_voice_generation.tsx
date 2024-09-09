@@ -67,7 +67,7 @@ const BarkVoiceGenerationPage = () => {
 
   return (
     <Template title="Bark Voice Generation">
-      <div className="space-y-2">
+      <div className="gap-y-2">
         <label className="text-sm">Tokenizer:</label>
         <select
           name="tokenizer"
@@ -91,8 +91,8 @@ const BarkVoiceGenerationPage = () => {
           ))}
         </select>
       </div>
-      <div className="flex space-x-4">
-        <div className="flex flex-col space-y-2">
+      <div className="flex gap-x-4">
+        <div className="flex flex-col gap-y-2">
           <AudioInput
             url={barkVoiceGenerationParams?.audio}
             callback={(file) => {
@@ -105,7 +105,7 @@ const BarkVoiceGenerationPage = () => {
           />
 
           {/* use_gpu checkbox */}
-          <div className="space-y-2">
+          <div className="gap-y-2">
             <label className="text-sm">Use GPU:</label>
             <input
               type="checkbox"
@@ -128,9 +128,9 @@ const BarkVoiceGenerationPage = () => {
             Generate Bark Voice
           </button>
         </div>
-        <div className="flex flex-col space-y-4">
+        <div className="flex flex-col gap-y-4">
           {/* Print voice filename */}
-          <div className="space-y-2">
+          <div className="gap-y-2">
             <label className="text-sm">Voice file name (read only):</label>
             <input
               type="text"

@@ -68,7 +68,7 @@ export const BarkVoice = ({
         ))}
       </div>
       <label className="text-sm">Speaker ID:</label>
-      <div className="flex flex-row space-x-2">
+      <div className="flex flex-row gap-x-2">
         {SPEAKER_IDS.map((model) => (
           <div key={model} className="flex items-center">
             <input
@@ -86,7 +86,7 @@ export const BarkVoice = ({
           </div>
         ))}
       </div>
-      <div className="flex items-center space-x-2">
+      <div className="flex items-center gap-x-2">
         <label className="text-sm">Use V2:</label>
         <input
           type="checkbox"

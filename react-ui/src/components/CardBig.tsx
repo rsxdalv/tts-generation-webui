@@ -60,7 +60,7 @@ export const CardBig = ({
   };
   return (
     <div className="flex flex-col items-center justify-start w-full max-w-md py-4 px-6 bg-white rounded shadow-lg">
-      <div className="flex flex-col space-y-4 w-full h-full justify-between">
+      <div className="flex flex-col gap-y-4 w-full h-full justify-between">
         <div className="flex items-center w-full gap-x-2">
           <h1 className="text-2xl font-bold text-gray-900">{name}</h1>
           <div className="ml-auto" />
@@ -69,7 +69,7 @@ export const CardBig = ({
           <Gender gender={gender} />
           <Flag language={language} />
         </div>
-        <div className="flex w-full space-x-4">
+        <div className="flex w-full gap-x-4">
           <img
             className="w-24 h-24 rounded select-none"
             src={image}
@@ -114,7 +114,7 @@ export const CardGeneration = ({
   // const maxLength = 100000;
   return (
     <div className="flex flex-col items-center justify-start w-full max-w-md py-4 px-6 bg-white rounded shadow-lg">
-      <div className="flex flex-col space-y-4 w-full h-full justify-between">
+      <div className="flex flex-col gap-y-4 w-full h-full justify-between">
         <div className="flex w-full">
           <h1 className="text-2xl font-bold text-gray-900">
             <span
@@ -340,7 +340,7 @@ export const HistoryCard = ({
 
   return (
     <div className="flex flex-col items-center justify-start w-full max-w-md py-4 px-6 bg-white rounded shadow-lg">
-      <div className="flex flex-col space-y-4 w-full h-full">
+      <div className="flex flex-col gap-y-4 w-full h-full">
         <div className="flex w-full">
           <h1 className="text-2xl font-bold text-gray-900">
             <span
@@ -506,7 +506,7 @@ export const SectionVoice = ({
   // const maxLength = 100000;
   return (
     <div className="flex flex-col items-center justify-start w-full py-4 px-6 bg-white rounded shadow-lg">
-      <div className="flex flex-col space-y-4 w-full h-full justify-between">
+      <div className="flex flex-col gap-y-4 w-full h-full justify-between">
         <div className="flex w-full">
           <h1 className="text-2xl font-bold text-gray-900">
             <span
@@ -547,7 +547,7 @@ export const SectionVoice = ({
 export const CardEmpty = ({ title, link }: { title: string; link: string }) => {
   return (
     <div className="flex flex-col items-center justify-start w-full max-w-md py-4 px-6 bg-white rounded shadow-lg">
-      <div className="flex flex-col space-y-4 w-full h-full justify-between">
+      <div className="flex flex-col gap-y-4 w-full h-full justify-between">
         <div className="flex items-center w-full gap-x-2">
           <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
         </div>

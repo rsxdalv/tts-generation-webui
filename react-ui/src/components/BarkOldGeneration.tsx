@@ -28,7 +28,7 @@ export const NPZVoiceDropdown = ({
   const selected = barkGenerationParams?.[name];
 
   return (
-    <div className="flex flex-col space-y-2">
+    <div className="flex flex-col gap-y-2">
       <label className="text-sm">{label}:</label>
       <select
         name={name}
@@ -47,7 +47,7 @@ export const NPZVoiceDropdown = ({
             </option>
           ))}
       </select>
-      <div className="flex flex-row space-x-2">
+      <div className="flex flex-row gap-x-2">
         <button
           className="border border-gray-300 p-2 rounded"
           onClick={refreshOptions}

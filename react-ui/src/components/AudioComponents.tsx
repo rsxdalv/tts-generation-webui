@@ -23,7 +23,7 @@ export const AudioInput = ({
   filter?: string[];
   metadata?: any;
 }) => (
-  <div className="border border-gray-300 p-2 rounded flex flex-col space-y-2">
+  <div className="border border-gray-300 p-2 rounded flex flex-col gap-y-2">
     <p className="text-sm">{label || "Input file:"}</p>
     <FileInput callback={(file?: string) => callback(file)} />
     <AudioPlayerHelper

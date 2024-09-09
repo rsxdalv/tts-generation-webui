@@ -29,8 +29,8 @@ const VocosPageNPZ = () => {
       <Head>
         <title>Vocos - TTS Generation Webui</title>
       </Head>
-      <div className="flex space-x-4 p-4">
-        <div className="flex flex-col space-y-2">
+      <div className="flex gap-x-4 p-4">
+        <div className="flex flex-col gap-y-2">
           <FileInput
             accept=".npz"
             callback={(npz_file) => {
@@ -55,7 +55,7 @@ const VocosPageNPZ = () => {
             Decode with Encodec
           </button>
         </div>
-        <div className="flex flex-col space-y-4">
+        <div className="flex flex-col gap-y-4">
           {vocosResult && (
             <AudioOutput audioOutput={vocosResult} label="Vocos Output" />
           )}

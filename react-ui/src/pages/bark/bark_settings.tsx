@@ -110,7 +110,7 @@ const BarkSettingsPage = () => {
           </div>
           <div className="flex border border-gray-300 p-2 rounded gap-2">
             <label className="text-md">Text generation:</label>
-            <div className="flex space-x-2 items-center ml-auto">
+            <div className="flex gap-x-2 items-center ml-auto">
               <input
                 type="checkbox"
                 name="text_generation_use_gpu"
@@ -120,7 +120,7 @@ const BarkSettingsPage = () => {
               />
               <label className="text-sm">Use GPU</label>
             </div>
-            <div className="flex space-x-2 items-center">
+            <div className="flex gap-x-2 items-center">
               <input
                 type="checkbox"
                 name="text_generation_use_small_model"
@@ -133,7 +133,7 @@ const BarkSettingsPage = () => {
           </div>
           <div className="flex border border-gray-300 p-2 rounded gap-2">
             <label className="text-md">Coarse-to-fine inference:</label>
-            <div className="flex space-x-2 items-center ml-auto">
+            <div className="flex gap-x-2 items-center ml-auto">
               <input
                 type="checkbox"
                 name="coarse_to_fine_inference_use_gpu"
@@ -143,7 +143,7 @@ const BarkSettingsPage = () => {
               />
               <label className="text-sm">Use GPU</label>
             </div>
-            <div className="flex space-x-2 items-center">
+            <div className="flex gap-x-2 items-center">
               <input
                 type="checkbox"
                 name="coarse_to_fine_inference_use_small_model"
@@ -158,7 +158,7 @@ const BarkSettingsPage = () => {
           </div>
           <div className="flex border border-gray-300 p-2 rounded gap-2">
             <label className="text-md">Fine-tuning:</label>
-            <div className="flex space-x-2 items-center ml-auto">
+            <div className="flex gap-x-2 items-center ml-auto">
               <input
                 type="checkbox"
                 name="fine_tuning_use_gpu"
@@ -168,7 +168,7 @@ const BarkSettingsPage = () => {
               />
               <label className="text-sm">Use GPU</label>
             </div>
-            <div className="flex space-x-2 items-center">
+            <div className="flex gap-x-2 items-center">
               <input
                 type="checkbox"
                 name="fine_tuning_use_small_model"
@@ -181,7 +181,7 @@ const BarkSettingsPage = () => {
           </div>
           <div className="flex border border-gray-300 p-2 rounded gap-2">
             <label className="text-md">Codec:</label>
-            <div className="flex space-x-2 items-center ml-auto">
+            <div className="flex gap-x-2 items-center ml-auto">
               <input
                 type="checkbox"
                 name="use_gpu_codec"
@@ -198,11 +198,11 @@ const BarkSettingsPage = () => {
             {data}
           </div>
 
-          <div className="flex flex-col space-y-2 border border-gray-300 p-2 rounded">
-            <div className="flex space-x-2 items-center">
+          <div className="flex flex-col gap-y-2 border border-gray-300 p-2 rounded">
+            <div className="flex gap-x-2 items-center">
               <label className="text-md">Environment (requires restart):</label>
             </div>
-            <div className="flex space-x-2 items-center">
+            <div className="flex gap-x-2 items-center">
               <input
                 type="checkbox"
                 name="use_small_models"
@@ -212,7 +212,7 @@ const BarkSettingsPage = () => {
               />
               <label className="text-sm">Use small models</label>
             </div>
-            <div className="flex space-x-2 items-center">
+            <div className="flex gap-x-2 items-center">
               <input
                 type="checkbox"
                 name="enable_mps"
@@ -222,7 +222,7 @@ const BarkSettingsPage = () => {
               />
               <label className="text-sm">Enable MPS</label>
             </div>
-            <div className="flex space-x-2 items-center">
+            <div className="flex gap-x-2 items-center">
               <input
                 type="checkbox"
                 name="offload_gpu_models_to_cpu"
