@@ -15,6 +15,7 @@ const cudaVersion = "11.8";
 const pythonVersion = `3.10.11`;
 const pythonPackage = `python=${pythonVersion}`;
 const ffmpegPackage = `conda-forge::ffmpeg=4.4.2[build=lgpl*]`;
+const nodePackage = `node=20.17.0`;
 const cudaChannels = [
   "",
   "pytorch",
@@ -24,10 +25,10 @@ const cudaChannels = [
 const cpuChannels = ["", "pytorch"].join(" -c ");
 
 const cudaPackages = `pytorch[version=${torchVersion},build=py3.10_cuda${cudaVersion}*] torchvision torchaudio pytorch-cuda=${cudaVersion} cuda-toolkit ninja`;
-const cudaPytorchInstall$ = `conda install -y -k ${ffmpegPackage} ${cudaPackages} ${cudaChannels}`;
+const cudaPytorchInstall$ = `conda install -y -k ${nodePackage} ${ffmpegPackage} ${cudaPackages} ${cudaChannels}`;
 
 const cpuPackages = `pytorch=${torchVersion} torchvision torchaudio cpuonly`;
-const pytorchCPUInstall$ = `conda install -y -k ${ffmpegPackage} ${cpuPackages} ${cpuChannels}`;
+const pytorchCPUInstall$ = `conda install -y -k ${nodePackage} ${ffmpegPackage} ${cpuPackages} ${cpuChannels}`;
 
 // console.log(cudaPytorchInstall$);
 // console.log(pytorchCPUInstall$);
@@ -100,9 +101,11 @@ Select the device (GPU/CPU) you are using to run the application:
 const gpuFile = "./installer_scripts/.gpu";
 const majorVersionFile = "./installer_scripts/.major_version";
 const pipPackagesFile = "./installer_scripts/.pip_packages";
-const majorVersion = "2";
+const majorVersion = "2"; // to be bumped
 
-const versions = JSON.parse(fs.readFileSync("./installer_scripts/versions.json"));
+const versions = JSON.parse(
+  fs.readFileSync("./installer_scripts/versions.json")
+);
 const newPipPackagesVersion = String(versions.pip_packages);
 
 const readGeneric = (file) => {
@@ -145,7 +148,9 @@ function tryInstall(requirements, name = "") {
 
 async function updateDependencies(optional = true) {
   if (readPipPackagesVersion() === newPipPackagesVersion) {
-    displayMessage("Dependencies are already up to date, skipping pip installs...");
+    displayMessage(
+      "Dependencies are already up to date, skipping pip installs..."
+    );
     return;
   }
   if (optional) {
