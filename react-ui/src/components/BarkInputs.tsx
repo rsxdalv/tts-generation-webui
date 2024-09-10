@@ -2,7 +2,6 @@ import React from "react";
 import { BarkGenerationParams } from "../tabs/BarkGenerationParams";
 import { BarkVoice } from "./BarkVoice";
 import { BurnInPrompt, BarkPrompt } from "./BarkPrompt";
-import { TextTemperature, WaveformTemperature } from "./BarkTemperatureSlider";
 import { NPZVoiceDropdown } from "./BarkOldGeneration";
 import { PromptType, ForEachSubsequentGeneration } from "./BarkRadios";
 import { SeedInput } from "./SeedInput";
@@ -46,13 +45,23 @@ export const BarkInputs = ({
           handleChange={handleChange}
         />
         <div className="flex gap-2">
-          <TextTemperature
-            barkGenerationParams={barkGenerationParams}
-            handleChange={handleChange}
+          <ParameterSlider
+            label="Text temperature"
+            name="text_temp"
+            min="0.0"
+            max="1.2"
+            step="0.01"
+            params={barkGenerationParams}
+            onChange={handleChange}
           />
-          <WaveformTemperature
-            barkGenerationParams={barkGenerationParams}
-            handleChange={handleChange}
+          <ParameterSlider
+            label="Waveform temperature"
+            name="waveform_temp"
+            min="0.0"
+            max="1.2"
+            step="0.01"
+            params={barkGenerationParams}
+            onChange={handleChange}
           />
           <ParameterSlider
             label="Max generation duration (s)"

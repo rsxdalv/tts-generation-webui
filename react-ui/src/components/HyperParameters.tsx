@@ -4,6 +4,9 @@ import { extractTexts, initialHyperParams } from "../data/hyperParamsUtils";
 import { applySeed } from "../data/applySeed";
 import { useInterrupt } from "../hooks/useInterrupt";
 import { Progress } from "./ui/progress";
+import { ParameterSlider } from "./GenericSlider";
+import { Switch } from "./ui/switch";
+import { Label } from "./ui/label";
 
 const getParams = <T extends { seed: number }>(
   texts: string[],
@@ -109,45 +112,39 @@ export const HyperParameters = ({
   return (
     <div className="flex flex-col gap-y-2 border border-gray-300 p-2 rounded">
       <label className="text-base">Generation Controls:</label>
+      <ParameterSlider
+        params={params}
+        onChange={(event) => {
+          setParams({
+            ...params,
+            iterations: Number(event.target.value),
+          });
+        }}
+        label="Iterations"
+        name="iterations"
+        min="1"
+        max="10"
+        step="1"
+      />
       <div className="flex gap-x-2 items-center">
-        <label className="text-sm">Iterations:</label>
-        <input
-          type="number"
-          name="iterations"
-          value={params.iterations}
-          onChange={(event) => {
-            setParams({
-              ...params,
-              iterations: Number(event.target.value),
-            });
-          }}
-          className="border border-gray-300 p-2 rounded"
-          min="1"
-          max="10"
-          step="1"
-        />
-      </div>
-      <div className="flex gap-x-2 items-center">
-        <div className="text-sm">Each line as a separate prompt:</div>
-        <input
-          type="checkbox"
-          name="splitByLines"
+        <Switch
+          id="splitByLines"
           checked={params.splitByLines}
-          onChange={(event) => {
+          onCheckedChange={(value) =>
             setParams({
               ...params,
-              splitByLines: event.target.checked,
-            });
-          }}
-          className="border border-gray-300 p-2 rounded"
+              splitByLines: value,
+            })
+          }
         />
+        <Label htmlFor="splitByLines">Each line as a separate prompt</Label>
       </div>
-      <ProgressStatus value={progress.current} max={progress.max} />
+      <ProgressStatus value={progress.current} max={progress.max || 1} />
       <button
         className="border border-gray-300 p-2 rounded"
         onClick={interrupt}
       >
-        {interrupted ? "Interrupted..." : "Interrupt"}
+        {interrupted.current ? "Interrupted..." : "Interrupt"}
       </button>
       <button className="border border-gray-300 p-2 rounded" onClick={generate}>
         Generate

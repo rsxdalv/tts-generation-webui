@@ -5,8 +5,6 @@ import { PromptTextArea } from "./PromptTextArea";
 import { ParameterSlider } from "./GenericSlider";
 import { MMS_LANGUAGE_DATA } from "./MMS_LANGUAGE_DATA";
 import { SeedInput } from "./SeedInput";
-import { SampleSliders } from "./component/sample-sliders";
-import { SampleSliders2 } from "./component/sample-sliders2";
 
 const commonBorder = "border border-gray-300 p-2 rounded";
 

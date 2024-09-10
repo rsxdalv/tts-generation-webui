@@ -1,18 +1,8 @@
 import React from "react";
 import { MagnetParams } from "../tabs/MagnetParams";
 import { HandleChange } from "../types/HandleChange";
-
-const modelMap = {
-  Small: { size: "small", 10: true, 30: true },
-  Medium: { size: "medium", 10: true, 30: true },
-  Audio: { size: "audio", 10: true, 30: false },
-};
-
-const canUseDuration = (type: string, isAudio: boolean, duration: string) => {
-  const subType = isAudio ? "Audio" : type;
-  const { [duration]: canUse } = modelMap[subType];
-  return canUse;
-};
+import { RadioWithLabel } from "./component/RadioWithLabel";
+import { ModelDropdown } from "./component/ModelDropdown";
 
 const modelToType = {
   "facebook/magnet-small-10secs": "Small",
@@ -58,102 +48,56 @@ export const MagnetModelSelector = ({
     duration,
   } = decomputeModel(magnetParams.model_name);
 
-  const handleSize = (event: React.ChangeEvent<HTMLInputElement>): void =>
-    handleChange({
-      target: {
-        name: "model_name",
-        value: computeModel(event.target.value, isAudio, duration),
-      },
-    });
-
-  const handleAudio = (event: React.ChangeEvent<HTMLInputElement>): void =>
-    handleChange({
-      target: {
-        name: "model_name",
-        value: computeModel(
-          modelType,
-          event.target.value === "Audio",
-          duration
-        ),
-      },
-    });
-
-  const handleDuration = (event: React.ChangeEvent<HTMLInputElement>): void =>
-    handleChange({
-      target: {
-        name: "model_name",
-        value: computeModel(modelType, isAudio, Number(event.target.value)),
-      },
-    });
+  const toModelChange = (newModel: string) =>
+    handleChange({ target: { name: "model_name", value: newModel } });
 
   return (
     <div className="flex flex-col border border-gray-300 p-2 rounded text-md gap-2">
-      <div className="text-md">Model:</div>
       <Model params={magnetParams} handleChange={handleChange} />
-      <div className="flex gap-2">
-        <label className="text-md">Size:</label>
-        <div className="flex gap-x-2">
-          {["Small", "Medium"].map((type) => (
-            <div key={type} className="flex items-center">
-              <input
-                type="radio"
-                name="size"
-                id={type}
-                value={type}
-                checked={modelType === type}
-                onChange={handleSize}
-                className="border border-gray-300 p-2 rounded"
-              />
-              <label className="ml-1 select-none" htmlFor={type}>
-                {type}
-              </label>
-            </div>
-          ))}
-        </div>
-      </div>
-      <div className="flex gap-2">
-        <label className="text-md">Audio:</label>
-        <div className="flex gap-x-2">
-          {["Music", "Audio"].map((type) => (
-            <div key={type} className="flex items-center">
-              <input
-                type="radio"
-                name="audio"
-                id={type}
-                value={type}
-                checked={isAudio === (type === "Audio")}
-                onChange={handleAudio}
-                className="border border-gray-300 p-2 rounded"
-              />
-              <label className="ml-1 select-none" htmlFor={type}>
-                {type}
-              </label>
-            </div>
-          ))}
-        </div>
-      </div>
-      <div className="flex gap-2">
-        <label className="text-md">Duration:</label>
-        <div className="flex gap-x-2">
-          {["10", "30"].map((d) => (
-            <div key={d} className="flex items-center">
-              <input
-                type="radio"
-                name="duration"
-                id={d}
-                value={d}
-                checked={d === String(duration)}
-                onChange={handleDuration}
-                className="border border-gray-300 p-2 rounded"
-                disabled={!canUseDuration(modelType, isAudio, d)}
-              />
-              <label className="ml-1 select-none" htmlFor={d}>
-                {d}s
-              </label>
-            </div>
-          ))}
-        </div>
-      </div>
+      <RadioWithLabel
+        inline
+        label="Size"
+        name="size"
+        value={modelType}
+        onChange={(event) =>
+          toModelChange(computeModel(event.target.value, isAudio, duration))
+        }
+        options={[
+          { label: "Small", value: "Small" },
+          { label: "Medium", value: "Medium" },
+        ]}
+      />
+      <RadioWithLabel
+        inline
+        label="Audio"
+        name="audio"
+        value={isAudio ? "Audio" : "Music"}
+        onChange={(event) =>
+          toModelChange(
+            computeModel(modelType, event.target.value === "Audio", duration)
+          )
+        }
+        options={[
+          { label: "Audio", value: "Audio" },
+          { label: "Music", value: "Music" },
+        ]}
+      />
+      <RadioWithLabel
+        inline
+        label="Duration"
+        name="duration"
+        value={duration}
+        disabled={isAudio}
+        onChange={(event) =>
+          toModelChange(
+            computeModel(modelType, isAudio, Number(event.target.value))
+          )
+        }
+        options={[
+          { label: "10s", value: 10 },
+          { label: "30s", value: 30 },
+        ]}
+      />
     </div>
   );
 };
@@ -191,38 +135,15 @@ const Model = ({
 
   const selected = params?.model_name;
   return (
-    <div className="flex flex-col gap-y-2">
-      <div className="flex gap-2">
-        <select
-          name="model_name"
-          id="model_name"
-          className="border border-gray-300 p-2 rounded text-black w-full"
-          value={selected}
-          onChange={handleChange}
-        >
-          {options
-            // concat to ensure selected is at the top and present
-            .filter((option) => option !== selected)
-            .concat(selected)
-            .map((bandwidth) => (
-              <option key={bandwidth} value={bandwidth}>
-                {bandwidth}
-              </option>
-            ))}
-        </select>
-        <button
-          className="border border-gray-300 p-2 rounded"
-          onClick={openModels}
-        >
-          Open
-        </button>
-        <button
-          className="border border-gray-300 p-2 rounded"
-          onClick={fetchOptions}
-        >
-          {loading ? "Refreshing..." : "Refresh"}
-        </button>
-      </div>
-    </div>
+    <ModelDropdown
+      name="model_name"
+      label="Model"
+      options={options.filter((option) => option !== selected).concat(selected)}
+      value={selected}
+      onChange={handleChange}
+      onRefresh={fetchOptions}
+      onOpen={openModels}
+      loading={loading}
+    />
   );
 };

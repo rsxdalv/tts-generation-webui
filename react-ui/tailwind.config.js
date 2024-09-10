@@ -47,30 +47,30 @@ module.exports = {
           foreground: "hsl(var(--card-foreground))",
         },
       },
+      keyframes: {
+        "accordion-down": {
+          from: {
+            height: "0",
+          },
+          to: {
+            height: "var(--radix-accordion-content-height)",
+          },
+        },
+        "accordion-up": {
+          from: {
+            height: "var(--radix-accordion-content-height)",
+          },
+          to: {
+            height: "0",
+          },
+        },
+      },
     },
     // borderRadius: {
     //   lg: "var(--radius)",
     //   md: "calc(var(--radius) - 2px)",
     //   sm: "calc(var(--radius) - 4px)",
     // },
-    keyframes: {
-      "accordion-down": {
-        from: {
-          height: "0",
-        },
-        to: {
-          height: "var(--radix-accordion-content-height)",
-        },
-      },
-      "accordion-up": {
-        from: {
-          height: "var(--radix-accordion-content-height)",
-        },
-        to: {
-          height: "0",
-        },
-      },
-    },
   },
   plugins: [require("tailwindcss-animate")],
 };
