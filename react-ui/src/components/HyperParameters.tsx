@@ -7,6 +7,9 @@ import { Progress } from "./ui/progress";
 import { ParameterSlider } from "./GenericSlider";
 import { Switch } from "./ui/switch";
 import { Label } from "./ui/label";
+import { cn } from "../lib/utils";
+import { Button } from "./ui/button";
+import { ArrowRightIcon, BanIcon, CheckIcon, SendHorizontalIcon, XIcon } from "lucide-react";
 
 const getParams = <T extends { seed: number }>(
   texts: string[],
@@ -84,10 +87,12 @@ export const HyperParameters = ({
   consumer,
   prefix,
   genParams,
+  className,
 }: {
   genParams: { text: string; seed: number; use_random_seed?: boolean };
   consumer: (x: any) => Promise<any>;
   prefix?: string;
+  className?: string;
 }) => {
   const [params, setParams] = useLocalStorage<typeof initialHyperParams>(
     prefix + "HyperParams",
@@ -110,7 +115,12 @@ export const HyperParameters = ({
   );
 
   return (
-    <div className="flex flex-col gap-y-2 border border-gray-300 p-2 rounded">
+    <div
+      className={cn(
+        "flex flex-col gap-y-2 border border-gray-300 p-2 rounded flex-shrink-0",
+        className
+      )}
+    >
       <label className="text-base">Generation Controls:</label>
       <ParameterSlider
         params={params}
@@ -140,23 +150,28 @@ export const HyperParameters = ({
         <Label htmlFor="splitByLines">Each line as a separate prompt</Label>
       </div>
       <ProgressStatus value={progress.current} max={progress.max || 1} />
-      <button
-        className="border border-gray-300 p-2 rounded"
-        onClick={interrupt}
-      >
-        {interrupted.current ? "Interrupted..." : "Interrupt"}
-      </button>
-      <button className="border border-gray-300 p-2 rounded" onClick={generate}>
-        Generate
-      </button>
+      <div className="grid grid-cols-2 gap-2">
+        <Button variant="destructive" onClick={interrupt}>
+          {/* <XIcon className="mr-2 h-5 w-5 flex-shrink-0" /> */}
+          {interrupted.current ? "Interrupted..." : "Interrupt"}
+          <BanIcon className="ml-2 h-5 w-5 flex-shrink-0" />
+        </Button>
+        <Button variant="default" onClick={generate}>
+          {/* <ArrowRightIcon className="mr-2 h-5 w-5 flex-shrink-0" /> */}
+          {/* <SendHorizontalIcon className="mr-2 h-5 w-5 flex-shrink-0" /> */}
+          Generate
+          <SendHorizontalIcon className="ml-2 h-5 w-5 flex-shrink-0" />
+          {/* <ArrowRightIcon className="ml-2 h-5 w-5 flex-shrink-0" /> */}
+        </Button>
+      </div>
     </div>
   );
 };
 
 const ProgressStatus = ({ value, max }: { value: number; max: number }) => (
-  <div className="flex gap-x-2 items-center">
-    <label className="text-sm">Progress:</label>
+  <div className="flex gap-x-2 items-center text-sm">
+    <label>Progress:</label>
     <Progress value={value} max={max} className="h-4 w-2/3" />
-    {value}/{max}
+    <span>{value}&nbsp;of&nbsp;{max}</span>
   </div>
 );

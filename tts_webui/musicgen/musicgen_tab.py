@@ -15,7 +15,7 @@ from tts_webui.history_tab.save_to_favorites import save_to_favorites
 from typing import Optional
 from importlib.metadata import version
 from tts_webui.history_tab.save_to_favorites import save_to_favorites
-from tts_webui.utils.list_dir_models import unload_model_button
+from tts_webui.utils.list_dir_models import model_select_ui, unload_model_button
 from tts_webui.utils.randomize_seed import randomize_seed_ui
 from tts_webui.utils.manage_model_state import manage_model_state
 from tts_webui.decorators.gradio_dict_decorator import dictionarize
@@ -170,21 +170,6 @@ def generate(
     return {"audio_out": (model_inst.sample_rate, audio_array), "tokens": tokens}
 
 
-MUSICGEN_OFFICIAL_REPOS = [
-    ("Melody", "facebook/musicgen-melody"),
-    ("Medium", "facebook/musicgen-medium"),
-    ("Small", "facebook/musicgen-small"),
-    ("Large", "facebook/musicgen-large"),
-    ("Audiogen", "facebook/audiogen-medium"),
-    ("Melody Large", "facebook/musicgen-melody-large"),
-    ("Stereo Small", "facebook/musicgen-stereo-small"),
-    ("Stereo Medium", "facebook/musicgen-stereo-medium"),
-    ("Stereo Melody", "facebook/musicgen-stereo-melody"),
-    ("Stereo Large", "facebook/musicgen-stereo-large"),
-    ("Stereo Melody Large", "facebook/musicgen-stereo-melody-large"),
-]
-
-
 def generation_tab_musicgen():
     with gr.Tab("MusicGen + AudioGen"):
         musicgen_ui()
@@ -195,10 +180,21 @@ def musicgen_ui():
     with gr.Row(equal_height=False):
         with gr.Column():
             text = gr.Textbox(label="Prompt", lines=3, placeholder="Enter text here...")
-            model_name = gr.Radio(
-                choices=MUSICGEN_OFFICIAL_REPOS,
-                label="Model",
-                value="facebook/musicgen-small",
+            model_name = model_select_ui(
+                [
+                    ("Melody", "facebook/musicgen-melody"),
+                    ("Medium", "facebook/musicgen-medium"),
+                    ("Small", "facebook/musicgen-small"),
+                    ("Large", "facebook/musicgen-large"),
+                    ("Audiogen", "facebook/audiogen-medium"),
+                    ("Melody Large", "facebook/musicgen-melody-large"),
+                    ("Stereo Small", "facebook/musicgen-stereo-small"),
+                    ("Stereo Medium", "facebook/musicgen-stereo-medium"),
+                    ("Stereo Melody", "facebook/musicgen-stereo-melody"),
+                    ("Stereo Large", "facebook/musicgen-stereo-large"),
+                    ("Stereo Melody Large", "facebook/musicgen-stereo-melody-large"),
+                ],
+                "musicgen_audiogen",
             )
             melody = gr.Audio(sources="upload", type="numpy", label="Melody (optional)")
             submit = gr.Button("Generate", variant="primary")

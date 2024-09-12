@@ -2,6 +2,7 @@ import os
 import gradio as gr
 
 from tts_webui.tortoise.gr_reload_button import gr_open_button_simple, gr_reload_button
+from tts_webui.utils.get_path_from_root import get_path_from_root
 from tts_webui.utils.manage_model_state import unload_model
 
 
@@ -19,10 +20,10 @@ def get_models(repos, abs_dir):
 
 def model_select_ui(
     repos,
-    abs_dir: str,
     prefix: str,
     Component: type[gr.Radio | gr.Dropdown] = gr.Radio,
 ):
+    abs_dir = get_path_from_root("data", "models", prefix)
     models = get_models(repos, abs_dir)
     model = Component(
         choices=models,

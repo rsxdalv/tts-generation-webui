@@ -7,14 +7,16 @@ import { sendToMusicgen } from "../tabs/MusicgenParams";
 import { sendToVocos } from "../tabs/VocosParams";
 import { GradioFile } from "../types/GradioFile";
 import { sendToBarkVoiceGeneration } from "../tabs/BarkVoiceGenerationParams";
+import { cn } from "../lib/utils";
+import { Button } from "./ui/button";
+import { DownloadIcon } from "lucide-react";
+import { Label } from "./ui/label";
 
 export const AudioInput = ({
   callback,
-  funcs,
   url,
   label,
-  filter,
-  metadata,
+  className,
 }: {
   callback: (melody?: string) => void;
   funcs?: Record<string, (audio: string | undefined | any) => void>;
@@ -22,15 +24,25 @@ export const AudioInput = ({
   label?: string;
   filter?: string[];
   metadata?: any;
+  className?: string;
 }) => (
-  <div className="border border-gray-300 p-2 rounded flex flex-col gap-y-2">
-    <p className="text-sm">{label || "Input file:"}</p>
+  <div
+    className={cn(
+      "border border-gray-300 p-2 rounded flex flex-col gap-y-2",
+      className
+    )}
+  >
+    <Label>{label || "Input file:"}</Label>
     <FileInput callback={(file?: string) => callback(file)} />
-    <AudioPlayerHelper
+    <AudioPlayer
+      height={100}
+      waveColor="#ffa500"
+      progressColor="#d59520"
+      barWidth={2}
+      barGap={1}
+      barRadius={2}
+      volume={0.4}
       url={url}
-      funcs={funcs}
-      filter={filter}
-      metadata={metadata}
     />
   </div>
 );
@@ -41,22 +53,27 @@ export const AudioOutput = ({
   funcs,
   filter,
   metadata,
+  className,
+  ...props
 }: {
   audioOutput?: GradioFile;
   label: string;
   funcs?: Record<string, (audio: string | undefined | any) => void>;
   filter?: string[];
   metadata?: any;
+  className?: string;
 }) => {
   return (
-    <div className="border border-gray-300 p-2 rounded">
-      <p className="text-sm">{label}</p>
+    <div className={cn("w-full", className)} {...props}>
+      <Label>{label}</Label>
+      {!audioOutput && <div className="w-full h-1">&nbsp;</div>}
       {audioOutput && (
         <AudioPlayerHelper
           url={audioOutput.url}
           funcs={funcs}
           filter={filter}
           metadata={metadata}
+          name={label}
         />
       )}
     </div>
@@ -72,17 +89,22 @@ const sendToFuncs = {
 
 const listOfFuncs = Object.keys(sendToFuncs);
 
-const AudioPlayerHelper = (
-  props: Omit<WaveSurferOptions, "container"> & {
-    volume?: number;
-    filter?: string[];
-    // sendAudioTo?: Array<(audio: string | undefined) => void>;
-    metadata?: any;
-    // funcs?: Array<(metadata: string | any) => void>;
-    funcs?: Record<string, (audio: string | undefined | any) => void>;
-  }
-) => {
-  const { filter: outputFilters, funcs, url, volume, metadata } = props;
+const AudioPlayerHelper = ({
+  filter: outputFilters,
+  funcs,
+  url,
+  volume,
+  metadata,
+  name,
+}: Omit<WaveSurferOptions, "container"> & {
+  volume?: number;
+  filter?: string[];
+  // sendAudioTo?: Array<(audio: string | undefined) => void>;
+  metadata?: any;
+  // funcs?: Array<(metadata: string | any) => void>;
+  funcs?: Record<string, (audio: string | undefined | any) => void>;
+  name?: string;
+}) => {
   return (
     <>
       <AudioPlayer
@@ -120,13 +142,19 @@ const AudioPlayerHelper = (
               metadata={metadata}
             />
           ))}
-        <DownloadButton url={url} />
+        <DownloadButton url={url} name={name} />
       </div>
     </>
   );
 };
 
-const DownloadButton = ({ url }: { url?: string }) => {
+const DownloadButton = ({
+  url,
+  name = "audio",
+}: {
+  url?: string;
+  name?: string;
+}) => {
   const [downloadURL, setDownloadURL] = React.useState<string | undefined>(
     undefined
   );
@@ -149,13 +177,12 @@ const DownloadButton = ({ url }: { url?: string }) => {
   }, [url]);
 
   return (
-    <a
-      className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-2 rounded inline-block text-sm"
-      href={downloadURL}
-      download="audio.wav"
-    >
-      Download
-    </a>
+    <Button variant="outline" size="sm" asChild className="flex-shrink-0">
+      <a className="cursor-pointer" href={downloadURL} download={`${name}.wav`}>
+        <DownloadIcon className="mr-2 w-5 h-5" />
+        Download
+      </a>
+    </Button>
   );
 };
 
@@ -170,10 +197,13 @@ const FuncButton = ({
   url: string | undefined | any;
   metadata?: any;
 }) => (
-  <button
-    className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-2 rounded text-sm"
-    onClick={() => func(url, metadata)}
-  >
+  // <button
+  //   className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-2 rounded text-sm"
+  //   onClick={() => func(url, metadata)}
+  // >
+  //   {name.replace(/([A-Z])/g, " $1").replace(/^./, (str) => str.toUpperCase())}
+  // </button>
+  <Button variant="outline" size="sm" onClick={() => func(url, metadata)}>
     {name.replace(/([A-Z])/g, " $1").replace(/^./, (str) => str.toUpperCase())}
-  </button>
+  </Button>
 );

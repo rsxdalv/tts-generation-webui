@@ -96,18 +96,6 @@ def generate(
     return {"audio_out": (model_inst.sample_rate, audio_array), "tokens": tokens}
 
 
-MAGNET_LOCAL_MODELS_DIR = get_path_from_root("data", "models", "magnet")
-
-MAGNET_OFFICIAL_REPOS = [
-    ("Magnet, 10s, Small", "facebook/magnet-small-10secs"),
-    ("Magnet, 10s, Medium", "facebook/magnet-medium-10secs"),
-    ("Magnet, 30s, Small", "facebook/magnet-small-30secs"),
-    ("Magnet, 30s, Medium", "facebook/magnet-medium-30secs"),
-    ("Audio, Magnet, Small", "facebook/audio-magnet-small"),
-    ("Audio, Magnet, Medium", "facebook/audio-magnet-medium"),
-]
-
-
 def generation_tab_magnet():
     with gr.Tab("Magnet"):
         magnet_ui()
@@ -119,7 +107,15 @@ def magnet_ui():
         with gr.Column():
             text = gr.Textbox(label="Prompt", lines=3, placeholder="Enter text here...")
             model_name = model_select_ui(
-                MAGNET_OFFICIAL_REPOS, MAGNET_LOCAL_MODELS_DIR, "magnet"
+                [
+                    ("Magnet, 10s, Small", "facebook/magnet-small-10secs"),
+                    ("Magnet, 10s, Medium", "facebook/magnet-medium-10secs"),
+                    ("Magnet, 30s, Small", "facebook/magnet-small-30secs"),
+                    ("Magnet, 30s, Medium", "facebook/magnet-medium-30secs"),
+                    ("Audio, Magnet, Small", "facebook/audio-magnet-small"),
+                    ("Audio, Magnet, Medium", "facebook/audio-magnet-medium"),
+                ],
+                "magnet",
             )
             unload_model_button("magnet")
             submit = gr.Button("Generate", variant="primary")

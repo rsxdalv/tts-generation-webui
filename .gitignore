@@ -32,6 +32,7 @@ config.json
 /data/models/rmvpe.pt
 /data/models/audiocraft_plus/
 /data/models/parler_tts/
+/data/models/musicgen_audiogen/*/
 
 # Ignore temporary files
 temp/

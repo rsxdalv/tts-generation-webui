@@ -7,16 +7,19 @@ export const SwitchWithLabel = ({
   name,
   value,
   onChange,
+  disabled,
 }: {
-  label: string;
+  label: string | JSX.Element;
   name: string;
   value: boolean | undefined;
   onChange: HandleChange;
+  disabled?: boolean;
 }) => (
   <div className="flex gap-2 items-center">
     <Switch
       id={name}
       checked={value}
+      disabled={disabled}
       onCheckedChange={(value) =>
         onChange({
           target: {

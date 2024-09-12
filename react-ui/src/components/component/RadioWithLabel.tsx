@@ -19,28 +19,38 @@ To read more about using these font, please visit the Next.js documentation:
 **/
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { cn } from "../../lib/utils";
 
 export function RadioWithLabel({
-  label,
   options,
   name,
   onChange,
+  label = "",
   inline = false,
+  className = "",
   ...props
 }) {
   return (
     <div
-      className={
-        inline ? "flex items-center gap-4" : "grid w-full items-center gap-2"
-      }
+      className={cn(
+        "flex",
+        inline && "flex-row items-center gap-4",
+        !inline && "flex-col gap-2",
+        className
+      )}
     >
-      <Label htmlFor={name}>{label}:</Label>
+      {label && <Label htmlFor={name}>{label}:</Label>}
       <RadioGroup
         id={name}
         name={name}
         onValueChange={(value) => onChange({ target: { name, value } })}
         {...props}
-        className="flex items-center gap-4"
+        // className="flex items-center gap-4"
+        className={cn(
+          "flex",
+          inline && "flex-row items-center gap-4",
+          !inline && "flex-col"
+        )}
       >
         {options.map((option) => (
           <div className="flex items-center gap-2" key={option.value}>

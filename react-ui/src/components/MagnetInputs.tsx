@@ -9,6 +9,7 @@ import { SimpleGroup } from "./SimpleGroup";
 import { commonBorder } from "./commonBorder";
 import { RadioWithLabel } from "./component/RadioWithLabel";
 import { SwitchWithLabel } from "./SwitchWithLabel";
+import { Link2Icon, Unlink2Icon } from "lucide-react";
 
 export const MagnetInputs = ({
   magnetParams: params,
@@ -31,6 +32,8 @@ export const MagnetInputs = ({
               min="0"
               max="250"
               step="1"
+              orientation="vertical"
+              className="h-40"
             />
             <ParameterSlider
               label="Top-P"
@@ -41,6 +44,8 @@ export const MagnetInputs = ({
               min="0"
               max="1.5"
               step="0.01"
+              orientation="vertical"
+              className="h-40"
             />
             <ParameterSlider
               label="Temperature"
@@ -51,9 +56,11 @@ export const MagnetInputs = ({
               min="0"
               max="10"
               step="0.01"
+              orientation="vertical"
+              className="h-40"
             />
-          </div>
-          <div className="flex gap-2">
+          {/* </div>
+          <div className="flex gap-2"> */}
             <ParameterSlider
               label="Min Cfg Coef"
               decimals={1}
@@ -63,6 +70,8 @@ export const MagnetInputs = ({
               min="0"
               max="100"
               step="0.1"
+              orientation="vertical"
+              className="h-40"
             />
             <ParameterSlider
               label="Max Cfg Coef"
@@ -73,12 +82,14 @@ export const MagnetInputs = ({
               min="0"
               max="100"
               step="0.1"
+              orientation="vertical"
+              className="h-40"
             />
           </div>
         </SimpleGroup>
       </div>
-      <div className="flex flex-col gap-y-2 w-1/2">
-        <div className={"flex flex-col gap-y-2 " + commonBorder}>
+      <div className="flex flex-col gap-y-2">
+        <div className={"flex flex-col gap-y-2 items-center " + commonBorder}>
           <label className="text-sm">
             Decoding Steps:{" "}
             {[
@@ -86,66 +97,95 @@ export const MagnetInputs = ({
               params.decoding_steps_2,
               params.decoding_steps_3,
               params.decoding_steps_4,
-            ].join(", ")}
+            ].map((value, index) => (
+              <span key={index} className="inline-block w-6">
+                {value}
+              </span>
+            ))}
           </label>
           <div className="flex gap-2">
             <ParameterSlider
-              label="Decoding Steps (1)"
+              label=""
               name="decoding_steps_1"
               params={params}
               onChange={onChange}
               min="0"
               max="100"
               step="1"
+              orientation="vertical"
+              className="h-40"
             />
             <ParameterSlider
-              label="Decoding Steps (2)"
+              label=""
               name="decoding_steps_2"
               params={params}
               onChange={onChange}
               min="0"
               max="100"
               step="1"
+              orientation="vertical"
+              className="h-40"
             />
-          </div>
-          <div className="flex gap-2">
             <ParameterSlider
-              label="Decoding Steps (3)"
+              label=""
               name="decoding_steps_3"
               params={params}
               onChange={onChange}
               min="0"
               max="100"
               step="1"
+              orientation="vertical"
+              className="h-40"
             />
             <ParameterSlider
-              label="Decoding Steps (4)"
+              label=""
               name="decoding_steps_4"
               params={params}
               onChange={onChange}
               min="0"
               max="100"
               step="1"
+              orientation="vertical"
+              className="h-40"
             />
           </div>
-          <RadioWithLabel
-            label="Span Arrangement"
-            name="span_arrangement"
-            inline
-            value={params.span_arrangement}
-            onChange={onChange}
-            options={[
-              { label: "Non-overlap", value: "nonoverlap" },
-              { label: "Overlap", value: "overlap" },
-            ]}
-          />
-          <SwitchWithLabel
-            label="Use Sampling"
-            name="use_sampling"
-            value={params.use_sampling}
-            onChange={onChange}
-          />
         </div>
+
+        <RadioWithLabel
+          label="Span Arrangement"
+          name="span_arrangement"
+          inline
+          value={params.span_arrangement}
+          onChange={onChange}
+          options={[
+            // { label: "Non-overlap", value: "nonoverlap" },
+            {
+              label: (
+                <div className="flex items-center gap-2">
+                  <Unlink2Icon className="w-5 h-5" />
+                  <span>Non-overlap</span>
+                </div>
+              ),
+              value: "nonoverlap",
+            },
+            // { label: "Overlap", value: "overlap" },
+            {
+              label: (
+                <div className="flex items-center gap-2">
+                  <Link2Icon className="w-5 h-5" />
+                  <span>Overlap</span>
+                </div>
+              ),
+              value: "overlap",
+            },
+          ]}
+        />
+        <SwitchWithLabel
+          label="Use Sampling"
+          name="use_sampling"
+          value={params.use_sampling}
+          onChange={onChange}
+        />
         <SeedInput params={params} handleChange={onChange} />
       </div>
     </div>

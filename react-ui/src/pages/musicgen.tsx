@@ -19,14 +19,13 @@ const MusicgenPage = () => {
 
   return (
     <Template title="Musicgen">
-      <div className="p-4 flex flex-col gap-y-4">
+      <div className="p-4 grid grid-cols-1 gap-4">
         <MusicgenInputs
           musicgenParams={musicgenParams}
           handleChange={handleChange}
           setMusicgenParams={setMusicgenParams}
         />
-
-        <div className="flex flex-col gap-y-2">
+        <div className="flex gap-2 col-span-2">
           <AudioOutput
             audioOutput={historyData[0]?.audio}
             label="Musicgen Output"
