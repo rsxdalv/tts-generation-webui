@@ -99,7 +99,7 @@ export const MusicgenModelSelector = ({
   const selected = musicgenParams?.model_name;
 
   return (
-    <div className="flex flex-col gap-4 border border-gray-300 p-2 rounded text-md">
+    <div className="flex flex-col gap-4 cell text-md">
       <ModelDropdown
         name="model_name"
         label="Model"

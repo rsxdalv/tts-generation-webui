@@ -6,7 +6,7 @@ import { ParameterSlider } from "./GenericSlider";
 import { MMS_LANGUAGE_DATA } from "./MMS_LANGUAGE_DATA";
 import { SeedInput } from "./SeedInput";
 
-const commonBorder = "border border-gray-300 p-2 rounded";
+const commonBorder = "cell";
 
 const ResetButton = <T extends {}>({
   params,

@@ -46,7 +46,7 @@ export const BarkVoice = ({
   };
 
   return (
-    <div className="flex flex-col gap-2 border border-gray-300 p-2 rounded">
+    <div className="flex flex-col gap-2 cell">
       <h2 className="text-md">Voice:</h2>
       <label className="text-sm">Language:</label>
       <div className="flex flex-row gap-x-2 flex-wrap">
@@ -59,7 +59,7 @@ export const BarkVoice = ({
               value={model}
               checked={language === model}
               onChange={handleChange}
-              className="border border-gray-300 p-2 rounded"
+              className="cell"
             />
             <label className="ml-1" htmlFor={model}>
               {model}
@@ -78,7 +78,7 @@ export const BarkVoice = ({
               value={model}
               checked={speakerID === model}
               onChange={handleChange}
-              className="border border-gray-300 p-2 rounded"
+              className="cell"
             />
             <label className="ml-1" htmlFor={model}>
               {model}
@@ -94,10 +94,10 @@ export const BarkVoice = ({
           id="useV2"
           checked={useV2}
           onChange={handleChange}
-          className="border border-gray-300 p-2 rounded"
+          className="cell"
         />
       </div>
-      <div className="border border-gray-300 p-2 rounded">
+      <div className="cell">
         Chosen voice: {barkGenerationParams.history_prompt}
         &nbsp;gender: {BARK_VOICE_TO_TRAIT[barkGenerationParams.history_prompt] || "Unknown"}
       </div>

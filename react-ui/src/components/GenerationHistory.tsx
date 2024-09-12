@@ -48,7 +48,7 @@ export const GenerationHistory = ({
   nameKey?: string;
   filter?: string[];
 }) => (
-  <div className="flex flex-col gap-y-2 border border-gray-300 p-2 rounded">
+  <div className="flex flex-col gap-y-2 cell">
     <div className="flex gap-x-2">
       <label className="text-md mr-auto">History</label>
       {/* <button
@@ -66,7 +66,7 @@ export const GenerationHistory = ({
           type="number"
           value={showLast}
           onChange={(event) => setShowLast(Number(event.target.value))}
-          className="border border-gray-300 p-2 rounded"
+          className="cell"
           min="0"
           max="100"
           step="1"

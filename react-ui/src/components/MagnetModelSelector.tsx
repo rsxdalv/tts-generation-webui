@@ -55,7 +55,7 @@ export const MagnetModelSelector = ({
     handleChange({ target: { name: "model_name", value: newModel } });
 
   return (
-    <div className="flex flex-col border border-gray-300 p-2 rounded text-md gap-2">
+    <div className="flex flex-col cell text-md gap-2">
       <Model params={magnetParams} handleChange={handleChange} />
       <RadioWithLabel
         inline

@@ -103,7 +103,7 @@ const GenerateButton = ({
   onClick: () => void;
 }) => (
   <button
-    className="border border-gray-300 p-2 rounded font-medium"
+    className="cell font-medium"
     onClick={onClick}
   >
     {status === "generating" && "Generating..."}
@@ -329,7 +329,7 @@ const PipelinePage = () => {
             representation is then refined by a postprocess model to generate a
             new audio file.
           </p>
-          <div className="flex flex-row gap-x-2 border border-gray-300 p-2 rounded mb-4">
+          <div className="flex flex-row gap-x-2 cell mb-4">
             <label>Choose a generation model:</label>
             {generationModels.map((model) => (
               <div key={model} className="flex items-center gap-x-2">
@@ -346,7 +346,7 @@ const PipelinePage = () => {
             ))}
           </div>
           <GenerationInputs model={pipelineParams.generation} seed={seed} />
-          <div className="flex flex-row gap-x-2 border border-gray-300 p-2 rounded mb-4">
+          <div className="flex flex-row gap-x-2 cell mb-4">
             <label>Choose a postprocessing model:</label>
             {postProcessingModels.map((model) => (
               <div key={model} className="flex items-center gap-x-2">

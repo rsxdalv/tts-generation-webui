@@ -98,17 +98,17 @@ const BarkSettingsPage = () => {
       </Head>
       <div className="flex gap-4 mb-auto mt-3">
         <div className="p-4 w-1/2 flex flex-col gap-4">
-          <div className="flex border border-gray-300 p-2 rounded gap-2">
+          <div className="flex cell gap-2">
             <input
               type="checkbox"
               name="load_models_on_startup"
               checked={barkSettingsParams.load_models_on_startup}
               onChange={handleChange}
-              className="border border-gray-300 p-2 rounded"
+              className="cell"
             />
             <label className="text-md">Load Bark models on startup</label>
           </div>
-          <div className="flex border border-gray-300 p-2 rounded gap-2">
+          <div className="flex cell gap-2">
             <label className="text-md">Text generation:</label>
             <div className="flex gap-x-2 items-center ml-auto">
               <input
@@ -116,7 +116,7 @@ const BarkSettingsPage = () => {
                 name="text_generation_use_gpu"
                 checked={barkSettingsParams.text_generation_use_gpu}
                 onChange={handleChange}
-                className="border border-gray-300 p-2 rounded"
+                className="cell"
               />
               <label className="text-sm">Use GPU</label>
             </div>
@@ -126,12 +126,12 @@ const BarkSettingsPage = () => {
                 name="text_generation_use_small_model"
                 checked={barkSettingsParams.text_generation_use_small_model}
                 onChange={handleChange}
-                className="border border-gray-300 p-2 rounded"
+                className="cell"
               />
               <label className="text-sm">Use small model</label>
             </div>
           </div>
-          <div className="flex border border-gray-300 p-2 rounded gap-2">
+          <div className="flex cell gap-2">
             <label className="text-md">Coarse-to-fine inference:</label>
             <div className="flex gap-x-2 items-center ml-auto">
               <input
@@ -139,7 +139,7 @@ const BarkSettingsPage = () => {
                 name="coarse_to_fine_inference_use_gpu"
                 checked={barkSettingsParams.coarse_to_fine_inference_use_gpu}
                 onChange={handleChange}
-                className="border border-gray-300 p-2 rounded"
+                className="cell"
               />
               <label className="text-sm">Use GPU</label>
             </div>
@@ -151,12 +151,12 @@ const BarkSettingsPage = () => {
                   barkSettingsParams.coarse_to_fine_inference_use_small_model
                 }
                 onChange={handleChange}
-                className="border border-gray-300 p-2 rounded"
+                className="cell"
               />
               <label className="text-sm">Use small model</label>
             </div>
           </div>
-          <div className="flex border border-gray-300 p-2 rounded gap-2">
+          <div className="flex cell gap-2">
             <label className="text-md">Fine-tuning:</label>
             <div className="flex gap-x-2 items-center ml-auto">
               <input
@@ -164,7 +164,7 @@ const BarkSettingsPage = () => {
                 name="fine_tuning_use_gpu"
                 checked={barkSettingsParams.fine_tuning_use_gpu}
                 onChange={handleChange}
-                className="border border-gray-300 p-2 rounded"
+                className="cell"
               />
               <label className="text-sm">Use GPU</label>
             </div>
@@ -174,12 +174,12 @@ const BarkSettingsPage = () => {
                 name="fine_tuning_use_small_model"
                 checked={barkSettingsParams.fine_tuning_use_small_model}
                 onChange={handleChange}
-                className="border border-gray-300 p-2 rounded"
+                className="cell"
               />
               <label className="text-sm">Use small model</label>
             </div>
           </div>
-          <div className="flex border border-gray-300 p-2 rounded gap-2">
+          <div className="flex cell gap-2">
             <label className="text-md">Codec:</label>
             <div className="flex gap-x-2 items-center ml-auto">
               <input
@@ -187,18 +187,18 @@ const BarkSettingsPage = () => {
                 name="use_gpu_codec"
                 checked={barkSettingsParams.use_gpu_codec}
                 onChange={handleChange}
-                className="border border-gray-300 p-2 rounded"
+                className="cell"
               />
               <label className="text-sm">Use GPU</label>
             </div>
           </div>
 
           {/* Save Beacon */}
-          <div className="flex border border-gray-300 p-2 rounded gap-2">
+          <div className="flex cell gap-2">
             {data}
           </div>
 
-          <div className="flex flex-col gap-y-2 border border-gray-300 p-2 rounded">
+          <div className="flex flex-col gap-y-2 cell">
             <div className="flex gap-x-2 items-center">
               <label className="text-md">Environment (requires restart):</label>
             </div>
@@ -208,7 +208,7 @@ const BarkSettingsPage = () => {
                 name="use_small_models"
                 checked={barkSettingsParams.use_small_models}
                 onChange={handleChange}
-                className="border border-gray-300 p-2 rounded"
+                className="cell"
               />
               <label className="text-sm">Use small models</label>
             </div>
@@ -218,7 +218,7 @@ const BarkSettingsPage = () => {
                 name="enable_mps"
                 checked={barkSettingsParams.enable_mps}
                 onChange={handleChange}
-                className="border border-gray-300 p-2 rounded"
+                className="cell"
               />
               <label className="text-sm">Enable MPS</label>
             </div>
@@ -228,7 +228,7 @@ const BarkSettingsPage = () => {
                 name="offload_gpu_models_to_cpu"
                 checked={barkSettingsParams.offload_gpu_models_to_cpu}
                 onChange={handleChange}
-                className="border border-gray-300 p-2 rounded"
+                className="cell"
               />
               <label className="text-sm">Offload GPU models to CPU</label>
             </div>
@@ -257,7 +257,7 @@ const BarkSettingsPage = () => {
             </li>
           </ul>
           <button
-            className="border border-gray-300 p-2 rounded"
+            className="cell"
             onClick={() => {
               setBarkSettingsParams({
                 ...barkSettingsParams,

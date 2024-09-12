@@ -92,7 +92,7 @@ export const TortoiseInput = ({
             name="candidates"
             value={tortoiseGenerationParams.candidates}
             onChange={handleChange}
-            className="border border-gray-300 p-2 rounded"
+            className="cell"
           />
           <SeedInput
             params={tortoiseGenerationParams}
@@ -124,7 +124,7 @@ const SplitPromptManually = ({
   handleChange: HandleChange;
 }) => (
   <button
-    className="border border-gray-300 p-2 rounded"
+    className="cell"
     onClick={() => {
       handleChange({
         target: {
@@ -184,7 +184,7 @@ const Speaker = ({
       <select
         name="speaker"
         id="speaker"
-        className="border border-gray-300 p-2 rounded text-black w-full"
+        className="cell text-black w-full"
         value={selected}
         onChange={handleChange}
       >
@@ -199,13 +199,13 @@ const Speaker = ({
           ))}
       </select>
       <button
-        className="border border-gray-300 p-2 rounded"
+        className="cell"
         onClick={openVoices}
       >
         Open
       </button>
       <button
-        className="border border-gray-300 p-2 rounded"
+        className="cell"
         onClick={fetchOptions}
       >
         {loading ? "Refreshing..." : "Refresh"}
@@ -256,7 +256,7 @@ const Preset = ({
               },
             });
           }}
-          className="border border-gray-300 p-2 rounded"
+          className="cell"
         />
         <label className="ml-1" htmlFor={preset}>
           {preset}
@@ -299,7 +299,7 @@ const SplitPrompt = ({
         name="split_prompt"
         checked={tortoiseGenerationParams.split_prompt}
         onChange={handleChange}
-        className="border border-gray-300 p-2 rounded"
+        className="cell"
       />
     </div>
   );
@@ -371,7 +371,7 @@ const Model = ({
         id={name}
         checked={tortoiseGenerationParams[name]}
         onChange={handleChange}
-        className="border border-gray-300 p-2 rounded cursor-pointer"
+        className="cell cursor-pointer"
       />
     </div>
   );
@@ -388,7 +388,7 @@ const Model = ({
         <select
           name="model"
           id="model"
-          className="border border-gray-300 p-2 rounded text-black w-full"
+          className="cell text-black w-full"
           value={selected}
           onChange={handleChange}
         >
@@ -403,13 +403,13 @@ const Model = ({
             ))}
         </select>
         <button
-          className="border border-gray-300 p-2 rounded"
+          className="cell"
           onClick={openModels}
         >
           Open
         </button>
         <button
-          className="border border-gray-300 p-2 rounded"
+          className="cell"
           onClick={fetchOptions}
         >
           {loading ? "Refreshing..." : "Refresh"}
@@ -447,7 +447,7 @@ const Model = ({
               name="tokenizer"
               value={tortoiseGenerationParams.tokenizer}
               onChange={handleChange}
-              className="border border-gray-300 p-2 rounded"
+              className="cell"
             /> */}
         <FileInput
           accept=".json"
@@ -463,13 +463,13 @@ const Model = ({
         />
       </div>
       <button
-        className="border border-gray-300 p-2 rounded"
+        className="cell"
         onClick={applyModelSettings}
       >
         {applyModelSettingsLoading ? "Applying..." : "Apply Model Settings"}
       </button>
       <button
-        className="border border-gray-300 p-2 rounded"
+        className="cell"
         onClick={async () => {
           await fetch("/api/gradio/tortoise_unload_model", {
             method: "POST",
@@ -496,7 +496,7 @@ const GenerationName = ({
       name="generation_name"
       value={tortoiseGenerationParams.generation_name}
       onChange={handleChange}
-      className="border border-gray-300 p-2 rounded"
+      className="cell"
     />
   </div>
 );
@@ -586,7 +586,7 @@ const CondFree = ({
       name="cond_free"
       checked={tortoiseGenerationParams.cond_free}
       onChange={handleChange}
-      className="border border-gray-300 p-2 rounded"
+      className="cell"
     />
   </div>
 );

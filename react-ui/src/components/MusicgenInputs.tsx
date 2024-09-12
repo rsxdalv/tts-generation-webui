@@ -139,7 +139,7 @@ export const MusicgenInputs = ({
       <SeedInput params={musicgenParams} handleChange={handleChange} />
 
       <button
-        className="border border-gray-300 p-2 rounded"
+        className="cell"
         onClick={() => setMusicgenParams(initialMusicgenParams)}
       >
         Reset Parameters

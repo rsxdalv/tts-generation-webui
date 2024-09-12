@@ -18,7 +18,7 @@ const LinkButton = ({
 }) => (
   <Link
     href={href}
-    className="border border-gray-300 p-2 rounded hover:bg-gray-200"
+    className="cell hover:bg-gray-200"
     target={target}
   >
     {children}
@@ -36,7 +36,7 @@ const Card = ({
   href: string;
   projectLink?: string;
 }) => (
-  <div className="flex flex-row justify-between gap-x-2 items-start border border-gray-300 p-2 rounded">
+  <div className="flex flex-row justify-between gap-x-2 items-start cell">
     <h3 className="text-lg font-medium">{title}</h3>
     <p className="text-base">{description}</p>
     <LinkButton href={href}>Run</LinkButton>

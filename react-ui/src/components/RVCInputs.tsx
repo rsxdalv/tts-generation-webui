@@ -127,7 +127,7 @@ const Device = ({
             value={device}
             checked={rvcParams.device === device}
             onChange={handleChange}
-            className="border border-gray-300 p-2 rounded"
+            className="cell"
           />
           <label className="ml-1 select-none" htmlFor={device}>
             {device}
@@ -148,7 +148,7 @@ export const RVCInputs = ({
   hideAudioInput?: boolean;
 }) => (
   <div className="flex flex-col gap-y-2 p-2">
-    <div className=" flex flex-col gap-y-2 cell">
+    <div className=" flex flex-col gap-y-2 ">
       <Model rvcParams={rvcParams} handleChange={handleChange} />
       <Index rvcParams={rvcParams} handleChange={handleChange} />
     </div>
@@ -161,7 +161,7 @@ export const RVCInputs = ({
         name="use_half_precision_model"
         checked={rvcParams?.use_half_precision_model}
         onChange={handleChange}
-        className="border border-gray-300 p-2 rounded"
+        className="cell"
       />
     </div> */}
     <div className="grid grid-cols-12 gap-2 items-end cell">

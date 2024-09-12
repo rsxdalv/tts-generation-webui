@@ -117,7 +117,7 @@ export const HyperParameters = ({
   return (
     <div
       className={cn(
-        "flex flex-col gap-y-2 border border-gray-300 p-2 rounded flex-shrink-0",
+        "flex flex-col gap-y-2 cell flex-shrink-0",
         className
       )}
     >

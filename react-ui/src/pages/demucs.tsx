@@ -32,7 +32,7 @@ const DemucsPage = () => {
             />
 
             <button
-              className="border border-gray-300 p-2 rounded"
+              className="cell"
               onClick={() => demucs(demucsParams)}
             >
               Split with Demucs

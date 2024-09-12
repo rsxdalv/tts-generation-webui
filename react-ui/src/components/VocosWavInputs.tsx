@@ -23,7 +23,7 @@ export const VocosWavInputs = ({
             value={bandwidth}
             checked={vocosParams.bandwidth === bandwidth}
             onChange={handleChange}
-            className="border border-gray-300 p-2 rounded" />
+            className="cell" />
           <label className="ml-1" htmlFor={bandwidth}>
             {bandwidth}
           </label>

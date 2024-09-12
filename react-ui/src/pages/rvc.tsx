@@ -25,7 +25,7 @@ const RvcGenerationPage = () => {
         />
         <div className="flex flex-col gap-y-4">
           {/* <button
-            className="border border-gray-300 p-2 rounded hover:bg-gray-100"
+            className="cell hover:bg-gray-100"
             onClick={() => consumer(rvcGenerationParams)}
           >
             Convert

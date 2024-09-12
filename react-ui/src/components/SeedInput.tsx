@@ -26,7 +26,7 @@ export const SeedInput = <
       value={params.seed}
       onChange={handleChange}
       maxLength={10}
-      className="border border-gray-300 p-2 rounded text-base w-36"
+      className="cell text-base w-36"
     />
 
     <Switch

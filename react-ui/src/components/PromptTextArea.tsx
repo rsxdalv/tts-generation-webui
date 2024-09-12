@@ -22,7 +22,7 @@ export const PromptTextArea = <
       name={name as string}
       value={params[name] as string}
       onChange={handleChange}
-      className="border border-gray-300 p-2 rounded resize-none"
+      className="cell resize-none"
       placeholder="Enter text here..."
       rows={3}
     />

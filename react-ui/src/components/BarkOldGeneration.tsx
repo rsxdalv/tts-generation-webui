@@ -33,7 +33,7 @@ export const NPZVoiceDropdown = ({
       <select
         name={name}
         id={name}
-        className="border border-gray-300 p-2 rounded text-black w-full"
+        className="cell text-black w-full"
         value={selected}
         onChange={handleChange}
       >
@@ -49,25 +49,25 @@ export const NPZVoiceDropdown = ({
       </select>
       <div className="flex flex-row gap-x-2">
         <button
-          className="border border-gray-300 p-2 rounded"
+          className="cell"
           onClick={refreshOptions}
         >
           Refresh
         </button>
         <button
-          className="border border-gray-300 p-2 rounded"
+          className="cell"
           onClick={() => handleChange({ target: { name, value: null } } as any)}
         >
           Clear
         </button>
         <button
-          className="border border-gray-300 p-2 rounded"
+          className="cell"
           onClick={() => window.open(getWebuiURL(selected), "_blank")}
         >
           Download
         </button>
         <button
-          className="border border-gray-300 p-2 rounded"
+          className="cell"
           onClick={async () => {
             const urlWithHost = getWebuiURLWithHost(selected);
             const x = await encodecDecode({ npz_file: urlWithHost });
@@ -78,7 +78,7 @@ export const NPZVoiceDropdown = ({
           Play as Audio
         </button>
         <button
-          className="border border-gray-300 p-2 rounded"
+          className="cell"
           onClick={() => saveToVoices(selected)}
         >
           Save to Voices

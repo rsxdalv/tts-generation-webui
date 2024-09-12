@@ -28,7 +28,7 @@ export const ForEachSubsequentGeneration = ({
               subsequentSetting
             }
             onChange={handleChange}
-            className="border border-gray-300 p-2 rounded"
+            className="cell"
           />
           <label className="ml-1" htmlFor={subsequentSetting}>
             {subsequentSetting}
@@ -58,7 +58,7 @@ export const PromptType = ({
             value={promptType}
             checked={barkGenerationParams.long_prompt_radio === promptType}
             onChange={handleChange}
-            className="border border-gray-300 p-2 rounded"
+            className="cell"
           />
           <label className="ml-1" htmlFor={promptType}>
             {promptType}

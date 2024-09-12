@@ -87,7 +87,7 @@ export const ExtensionHuggingFaceCacheManager = ({}) => {
     if (header === "delete") {
       return (
         <button
-          className="border border-gray-300 p-2 rounded"
+          className="cell"
           onClick={() => deleteRevision(row["commit_hash"])}
         >
           Delete

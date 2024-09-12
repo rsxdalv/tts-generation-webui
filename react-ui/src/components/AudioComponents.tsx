@@ -28,7 +28,7 @@ export const AudioInput = ({
 }) => (
   <div
     className={cn(
-      "border border-gray-300 p-2 rounded flex flex-col gap-y-2",
+      "cell flex flex-col gap-y-2",
       className
     )}
   >

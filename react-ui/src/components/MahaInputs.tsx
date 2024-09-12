@@ -4,7 +4,7 @@ import { HandleChange } from "../types/HandleChange";
 import { PromptTextArea } from "./PromptTextArea";
 import { SeedInput } from "./SeedInput";
 
-const commonBorder = "border border-gray-300 p-2 rounded";
+const commonBorder = "cell";
 
 const deviceList = ["auto", "cpu", "cuda"];
 
@@ -46,7 +46,7 @@ const Speaker = ({
       <select
         name="speaker_name"
         id="speaker_name"
-        className="border border-gray-300 p-2 rounded text-black w-full"
+        className="cell text-black w-full"
         value={selected}
         onChange={handleChange}
       >
@@ -61,13 +61,13 @@ const Speaker = ({
           ))}
       </select>
       <button
-        className="border border-gray-300 p-2 rounded"
+        className="cell"
         onClick={openVoices}
       >
         Open
       </button>
       <button
-        className="border border-gray-300 p-2 rounded"
+        className="cell"
         onClick={fetchOptions}
       >
         {loading ? "Refreshing..." : "Refresh"}

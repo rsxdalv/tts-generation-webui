@@ -50,7 +50,7 @@ const VocosPage = () => {
           />
 
           <button
-            className="border border-gray-300 p-2 rounded"
+            className="cell"
             onClick={vocos}
           >
             Restore with Vocos

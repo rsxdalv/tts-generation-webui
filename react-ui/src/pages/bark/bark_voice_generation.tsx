@@ -72,7 +72,7 @@ const BarkVoiceGenerationPage = () => {
         <select
           name="tokenizer"
           id="tokenizer"
-          className="border border-gray-300 p-2 rounded text-black"
+          className="cell text-black"
           value={barkVoiceGenerationParams?.tokenizer}
           onChange={handleChange}
         >
@@ -122,7 +122,7 @@ const BarkVoiceGenerationPage = () => {
           </div>
 
           <button
-            className="border border-gray-300 p-2 rounded"
+            className="cell"
             onClick={barkVoiceGeneration}
           >
             Generate Bark Voice
@@ -136,7 +136,7 @@ const BarkVoiceGenerationPage = () => {
               type="text"
               name="filename"
               id="filename"
-              className="border border-gray-300 p-2 rounded text-black w-full"
+              className="cell text-black w-full"
               value={data?.filename}
               readOnly
             />

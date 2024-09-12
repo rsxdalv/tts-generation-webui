@@ -109,13 +109,13 @@ const TokenizeButton = ({ params }: { params: VallexParams }) => {
 
   return (
     <div className="flex flex-col gap-y-2">
-      <button className="border border-gray-300 p-2 rounded" onClick={tokenize}>
+      <button className="cell" onClick={tokenize}>
         Preview Tokens
       </button>
       <div className="flex flex-col gap-y-2">
         {loading && <p>Loading...</p>}
         <textarea
-          className="border border-gray-300 p-2 rounded"
+          className="cell"
           value={result}
           readOnly
           rows={2}
@@ -146,7 +146,7 @@ const SplitTextIntoSentences = ({ params }: { params: VallexParams }) => {
   return (
     <div className="flex flex-col gap-y-2">
       <button
-        className="border border-gray-300 p-2 rounded"
+        className="cell"
         onClick={splitText}
       >
         Preview sentences
@@ -154,7 +154,7 @@ const SplitTextIntoSentences = ({ params }: { params: VallexParams }) => {
       <div className="flex flex-col gap-y-2">
         {loading && <p>Loading...</p>}
         <textarea
-          className="border border-gray-300 p-2 rounded"
+          className="cell"
           value={result}
           readOnly
           rows={2}
