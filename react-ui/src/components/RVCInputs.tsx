@@ -164,23 +164,7 @@ export const RVCInputs = ({
         className="cell"
       />
     </div> */}
-    <div className="grid grid-cols-12 gap-2 items-end cell">
-      {!hideAudioInput && (
-        <AudioInput
-          callback={(original_audio?: string) => {
-            handleChange({
-              target: {
-                name: "original_audio",
-                value: original_audio,
-              },
-            } as React.ChangeEvent<HTMLInputElement>);
-          }}
-          label="Original Audio"
-          filter={["sendToRvc"]}
-          url={rvcParams?.original_audio}
-          className="col-span-4 mb-auto"
-        />
-      )}
+    <div className="grid grid-cols-12 gap-2">
       <RadioWithLabel
         label="Pitch Collection Method"
         name="pitch_collection_method"
@@ -195,66 +179,86 @@ export const RVCInputs = ({
         ]}
         className="mb-auto"
       />
-      <ParameterSlider
-        params={rvcParams}
-        onChange={handleChange}
-        label="Semitone shift"
-        name="pitch_up_key"
-        min="-24"
-        max="24"
-        step="1"
-        // className="w-full"
-        orientation="vertical"
-        className="h-40"
-      />
-      <ParameterSlider
-        params={rvcParams}
-        onChange={handleChange}
-        // label="Search Feature Ratio (accent strength)"
-        label="Search Feature Ratio"
-        name="search_feature_ratio"
-        min="0.0"
-        max="1.0"
-        step="0.01"
-        orientation="vertical"
-        className="h-40"
-      />
-      <ParameterSlider
-        params={rvcParams}
-        onChange={handleChange}
-        // label="Filter Radius (Pitch median filtering)"
-        label="Filter Radius"
-        name="filter_radius_pitch"
-        min="0"
-        max="10"
-        step="1"
-        orientation="vertical"
-        className="h-40"
-      />
-      <ParameterSlider
-        params={rvcParams}
-        onChange={handleChange}
-        label="Protect Breath Sounds"
-        name="protect_breath_sounds"
-        min="0.0"
-        max="0.5"
-        step="0.01"
-        orientation="vertical"
-        className="h-40"
-      />
-      <ParameterSlider
-        params={rvcParams}
-        onChange={handleChange}
-        // label="Voice Envelope Normalizaiton (Volume scaling)"
-        label="Voice Envelope Normalizaiton"
-        name="voice_envelope_normalizaiton"
-        min="0.0"
-        max="1.0"
-        step="0.01"
-        orientation="vertical"
-        className="h-40"
-      />
-      <div />
+      <div className="col-span-5 grid grid-cols-5 gap-2 items-end cell">
+        <ParameterSlider
+          params={rvcParams}
+          onChange={handleChange}
+          label="Semitone shift"
+          name="pitch_up_key"
+          min="-24"
+          max="24"
+          step="1"
+          // className="w-full"
+          orientation="vertical"
+          className="h-40"
+        />
+        <ParameterSlider
+          params={rvcParams}
+          onChange={handleChange}
+          // label="Search Feature Ratio (accent strength)"
+          label="Search Feature Ratio"
+          name="search_feature_ratio"
+          min="0.0"
+          max="1.0"
+          step="0.01"
+          decimals={2}
+          orientation="vertical"
+          className="h-40"
+        />
+        <ParameterSlider
+          params={rvcParams}
+          onChange={handleChange}
+          // label="Filter Radius (Pitch median filtering)"
+          label="Filter Radius"
+          name="filter_radius_pitch"
+          min="0"
+          max="10"
+          step="1"
+          orientation="vertical"
+          className="h-40"
+        />
+        <ParameterSlider
+          params={rvcParams}
+          onChange={handleChange}
+          label="Protect Breath Sounds"
+          name="protect_breath_sounds"
+          min="0.0"
+          max="0.5"
+          step="0.01"
+          decimals={2}
+          orientation="vertical"
+          className="h-40"
+        />
+        <ParameterSlider
+          params={rvcParams}
+          onChange={handleChange}
+          // label="Voice Envelope Normalizaiton (Volume scaling)"
+          label="Voice Envelope Normalizaiton"
+          name="voice_envelope_normalizaiton"
+          min="0.0"
+          max="1.0"
+          step="0.01"
+          decimals={2}
+          orientation="vertical"
+          className="h-40"
+        />
+      </div>
+      {!hideAudioInput && (
+        <AudioInput
+          callback={(original_audio?: string) => {
+            handleChange({
+              target: {
+                name: "original_audio",
+                value: original_audio,
+              },
+            } as React.ChangeEvent<HTMLInputElement>);
+          }}
+          label="Original Audio"
+          filter={["sendToRvc"]}
+          url={rvcParams?.original_audio}
+          className="col-span-5 mb-auto"
+        />
+      )}
       <ParameterSlider
         params={rvcParams}
         onChange={handleChange}

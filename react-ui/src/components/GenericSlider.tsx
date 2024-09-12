@@ -41,7 +41,13 @@ const LabelledSlider = ({
         : "grid gap-2 grid-cols-2 items-center w-full"
     }
   >
-    <Label htmlFor={name} className="justify-self-start order-first">
+    <Label
+      htmlFor={name}
+      className={cn(
+        "justify-self-start order-first",
+        orientation === "vertical" && "text-center"
+      )}
+    >
       {label}
     </Label>
 
