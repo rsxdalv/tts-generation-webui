@@ -3,6 +3,7 @@ import { HandleChange } from "../types/HandleChange";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { cn } from "../lib/utils";
+import { Input } from "./ui/input";
 
 export const SeedInput = <
   T extends {
@@ -19,14 +20,17 @@ export const SeedInput = <
   className?: string;
 }) => (
   <div className={cn("flex gap-2 items-center w-full", className)}>
-    <label className="text-base">Seed:</label>
-    <input
+    <Label htmlFor="seed">Seed:</Label>
+    <Input
       type="number"
       name="seed"
+      min={0}
+      // max={2 ** 32 - 1}
+      disabled={params.use_random_seed}
       value={params.seed}
       onChange={handleChange}
       maxLength={10}
-      className="cell text-base w-36"
+      className="text-right w-36"
     />
 
     <Switch

@@ -48,7 +48,7 @@ export function RadioWithLabel({
         // className="flex items-center gap-4"
         className={cn(
           "flex",
-          inline && "flex-row items-center gap-4",
+          inline && "flex-row items-center gap-4 w-full flex-wrap",
           !inline && "flex-col"
         )}
       >

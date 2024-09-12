@@ -150,18 +150,14 @@ export const HyperParameters = ({
         <Label htmlFor="splitByLines">Each line as a separate prompt</Label>
       </div>
       <ProgressStatus value={progress.current} max={progress.max || 1} />
-      <div className="grid grid-cols-2 gap-2">
-        <Button variant="destructive" onClick={interrupt}>
-          {/* <XIcon className="mr-2 h-5 w-5 flex-shrink-0" /> */}
+      <div className="flex gap-2">
+        <Button className="p-2" variant="destructive" onClick={interrupt}>
           {interrupted.current ? "Interrupted..." : "Interrupt"}
           <BanIcon className="ml-2 h-5 w-5 flex-shrink-0" />
         </Button>
-        <Button variant="default" onClick={generate}>
-          {/* <ArrowRightIcon className="mr-2 h-5 w-5 flex-shrink-0" /> */}
-          {/* <SendHorizontalIcon className="mr-2 h-5 w-5 flex-shrink-0" /> */}
+        <Button className="p-2" variant="default" onClick={generate}>
           Generate
           <SendHorizontalIcon className="ml-2 h-5 w-5 flex-shrink-0" />
-          {/* <ArrowRightIcon className="ml-2 h-5 w-5 flex-shrink-0" /> */}
         </Button>
       </div>
     </div>
