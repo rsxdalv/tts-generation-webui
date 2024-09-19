@@ -28,7 +28,7 @@ export function RadioWithLabel({
         {
           inline: "flex-row items-center gap-4",
           vertical: "flex-col gap-2",
-          horizontal: "flex-row items-center gap-4",
+          horizontal: "flex-col gap-2",
         }[variantWithInline],
         className
       )}
