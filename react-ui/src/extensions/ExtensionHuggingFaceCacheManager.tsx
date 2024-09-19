@@ -1,4 +1,6 @@
 import React from "react";
+import { Button } from "../components/ui/button";
+import { DeleteIcon, TrashIcon } from "lucide-react";
 
 type HuggingFaceCache = {
   headers: string[];
@@ -86,12 +88,10 @@ export const ExtensionHuggingFaceCacheManager = ({}) => {
     }
     if (header === "delete") {
       return (
-        <button
-          className="border border-gray-300 p-2 rounded"
-          onClick={() => deleteRevision(row["commit_hash"])}
-        >
+        <Button variant="destructive" onClick={() => deleteRevision(row["commit_hash"])}>
           Delete
-        </button>
+          <TrashIcon className="ml-2 h-5 w-5 flex-shrink-0" />
+        </Button>
       );
     }
     return cell;

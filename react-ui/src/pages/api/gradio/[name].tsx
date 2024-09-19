@@ -390,7 +390,7 @@ async function get_config_bark() {
       { value: boolean }, // boolean representing output in 'Use GPU' Checkbox component
       { value: boolean }, // boolean representing output in 'Use small model' Checkbox component
       { value: boolean }, // boolean representing output in 'Use GPU for codec' Checkbox component
-      { value: boolean } // boolean representing output in 'Load Bark models on startup' Checkbox component
+      { value: boolean }, // boolean representing output in 'Load Bark models on startup' Checkbox component
     ]
   >("/get_config_bark", []);
 
@@ -481,7 +481,8 @@ const scan_huggingface_cache_api = () =>
 const delete_huggingface_cache_revisions = ({ commit_hash }) =>
   gradioPredict<[]>("/delete_huggingface_cache_revisions", [commit_hash]);
 
-const tortoise_unload_model = () => gradioPredict<[]>("/tortoise_unload_model");
+const passThrough = (endpoint) => (params) =>
+  gradioPredict<any>(endpoint, params);
 
 const endpoints = {
   maha,
@@ -491,6 +492,7 @@ const endpoints = {
   magnet,
   magnet_get_models,
   magnet_open_model_dir,
+  magnet_unload_model: passThrough("/magnet_unload_model"),
 
   vocos_wav,
   vocos_npz,
@@ -532,5 +534,17 @@ const endpoints = {
   scan_huggingface_cache_api,
   delete_huggingface_cache_revisions,
 
-  tortoise_unload_model,
+  // tortoise_unload_model,
+  tortoise_unload_model: passThrough("/tortoise_unload_model"),
+
+  musicgen_audiogen_get_models: () =>
+    gradioPredict<[GradioChoices]>("/musicgen_audiogen_get_models").then(
+      (result) => extractChoicesTuple(result?.data[0])
+    ),
+  musicgen_audiogen_open_model_dir: passThrough(
+    "/musicgen_audiogen_open_model_dir"
+  ),
+  musicgen_audiogen_unload_model: passThrough(
+    "/musicgen_audiogen_unload_model"
+  ),
 };

@@ -1,6 +1,8 @@
 import React from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { ExternalLinkIcon } from "lucide-react";
+import { RouteCommands } from "./RouteCommands";
 
 type Route = {
   href: string;
@@ -9,7 +11,7 @@ type Route = {
   subroutes?: Route[];
 };
 
-const routes: Route[] = [
+export const routes: Route[] = [
   {
     href: "/",
     text: "Home",
@@ -48,7 +50,12 @@ const routes: Route[] = [
       },
       {
         href: "https://promptecho.com/?utm_source=react_ui",
-        text: <span>More Voices&nbsp;↗</span>,
+        text: (
+          <span className="inline-flex items-center">
+            More Voices&nbsp;
+            <ExternalLinkIcon className="inline-block w-4 h-4" />
+          </span>
+        ),
         target: "_blank",
       },
     ],
@@ -138,10 +145,7 @@ export const Header = ({}) => {
     <React.Fragment key={href}>
       <Link
         href={href}
-        className={
-          highlightOnRoute(route, href.slice(1)) +
-          " whitespace-pre"
-        }
+        className={highlightOnRoute(route, href.slice(1)) + " whitespace-pre"}
         target={target}
       >
         {text}
@@ -162,6 +166,11 @@ export const Header = ({}) => {
         <h1 className="text-3xl font-bold text-start w-full text-gray-900">
           TTS Generation Webui
         </h1>
+        <div className="mr-2 relative w-96 flex-shrink-0 h-12 z-10">
+          <div className="w-full">
+            <RouteCommands />
+          </div>
+        </div>
         <a
           href="https://github.com/rsxdalv/tts-generation-webui"
           target="_blank"
@@ -169,13 +178,14 @@ export const Header = ({}) => {
         >
           GitHub
         </a>
-        &nbsp;
-        &nbsp;
+        &nbsp; &nbsp;
         <a
           href="https://forms.gle/2L62owhBsGFzdFBC8"
           target="_blank"
           className="text-gray-500 hover:underline whitespace-pre"
-        >Feedback / Bug reports</a>
+        >
+          Feedback / Bug reports
+        </a>
       </div>
       <RouteList>{routes.map(renderLink)}</RouteList>
       {subroutes && (

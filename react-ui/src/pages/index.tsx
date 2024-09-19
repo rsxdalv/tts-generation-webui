@@ -18,7 +18,7 @@ const LinkButton = ({
 }) => (
   <Link
     href={href}
-    className="border border-gray-300 p-2 rounded hover:bg-gray-200"
+    className="cell hover:bg-gray-200"
     target={target}
   >
     {children}
@@ -36,9 +36,9 @@ const Card = ({
   href: string;
   projectLink?: string;
 }) => (
-  <div className="flex flex-row justify-between gap-x-2 items-start border border-gray-300 p-2 rounded">
-    <h3 className="text-lg font-medium">{title}</h3>
-    <p className="text-base">{description}</p>
+  <div className="flex flex-row justify-between gap-x-2 items-start cell">
+    <h3 className="text-lg font-medium w-24 block flex-shrink-0 text-left">{title}</h3>
+    <p className="text-base text-left">{description}</p>
     <LinkButton href={href}>Run</LinkButton>
     {projectLink && (
       <LinkButton href={projectLink} target="_blank">
@@ -54,7 +54,7 @@ export default function Home() {
       <Head>
         <title>TTS Generation Webui</title>
       </Head>
-      <div className="text-center space-y-4 max-w-2xl mx-auto mb-auto">
+      <div className="text-center gap-y-4 max-w-2xl mx-auto mb-auto">
         <h2 className="text-2xl font-bold">Welcome to the TTS Webui!</h2>
         <p className="text-lg">
           This is a web interface for the TTS project. It allows you to generate
@@ -103,13 +103,13 @@ export default function Home() {
             />
             <Card
               title="MMS"
-              description="Scaling Speech Technology to 1000+ languages"
+              description="Fairseq based text-to-speech model that supports 1000+ languages"
               href="/mms"
               projectLink="https://github.com/facebookresearch/fairseq/blob/main/examples/mms/README.md"
             />
             <Card
               title="VALL-E X"
-              description="Multilingual Text-to-Speech Synthesis"
+              description="Multilingual TTS: Speak in three languages - English, Chinese, and Japanese - with natural and expressive speech synthesis."
               href="/vallex"
               projectLink="https://github.com/Plachtaa/VALL-E-X"
             />

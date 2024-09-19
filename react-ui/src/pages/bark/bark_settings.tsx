@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Template } from "../../components/Template";
-import Head from "next/head";
 import useLocalStorage from "../../hooks/useLocalStorage";
 import {
   BarkSettingsParams,
@@ -8,6 +7,18 @@ import {
   barkSettingsId,
 } from "../../tabs/BarkSettingsParams";
 import { GPUInfoWidget } from "../../components/GPUInfoWidget";
+import { Button } from "../../components/ui/button";
+import { SwitchWithLabel } from "../../components/SwitchWithLabel";
+import { HandleChangeEvent } from "../../types/HandleChange";
+import { Label } from "../../components/ui/label";
+import {
+  Table,
+  TableHeader,
+  TableRow,
+  TableHead,
+  TableBody,
+  TableCell,
+} from "@/components/ui/table";
 
 const BarkSettingsPage = () => {
   const [data, setData] = useState<string>(
@@ -24,7 +35,7 @@ const BarkSettingsPage = () => {
       try {
         const response = await fetch("/api/gradio/get_config_bark");
         const data = await response.json();
-        setBarkSettingsParams((x) => ({ ...x, ...data } as BarkSettingsParams));
+        setBarkSettingsParams((x) => ({ ...x, ...data }) as BarkSettingsParams);
       } catch (error) {
         console.error("Error:", error);
       }
@@ -32,12 +43,7 @@ const BarkSettingsPage = () => {
     fetchData();
   }, [setBarkSettingsParams]);
 
-  const handleChange = async (
-    event:
-      | React.ChangeEvent<HTMLInputElement>
-      | React.ChangeEvent<HTMLTextAreaElement>
-      | React.ChangeEvent<HTMLSelectElement>
-  ) => {
+  const handleChange = async (event: HandleChangeEvent) => {
     const { name, value, type } = event.target;
 
     const newBarkSettingsParams = {
@@ -46,8 +52,8 @@ const BarkSettingsPage = () => {
         type === "number" || type === "range"
           ? Number(value)
           : type === "checkbox"
-          ? (event.target as HTMLInputElement).checked // type assertion
-          : value,
+            ? (event.target as HTMLInputElement).checked // type assertion
+            : value,
     };
 
     const isConfig =
@@ -85,6 +91,7 @@ const BarkSettingsPage = () => {
           method: "POST",
           body: JSON.stringify(newBarkSettingsParams),
         });
+        setBarkSettingsParams(newBarkSettingsParams);
       } catch (error) {
         console.error("Error:", error);
       }
@@ -92,172 +99,102 @@ const BarkSettingsPage = () => {
   };
 
   return (
-    <Template>
-      <Head>
-        <title>Bark Settings - TTS Generation Webui</title>
-      </Head>
-      <div className="flex gap-4 mb-auto mt-3">
-        <div className="p-4 w-1/2 flex flex-col gap-4">
-          <div className="flex border border-gray-300 p-2 rounded gap-2">
+    <Template title="Bark Settings">
+      <div className="flex gap-4 mt-3">
+        <div className="p-4 flex flex-col gap-4 w-3/4">
+          {/* <div className="flex cell gap-2">
             <input
               type="checkbox"
               name="load_models_on_startup"
               checked={barkSettingsParams.load_models_on_startup}
               onChange={handleChange}
-              className="border border-gray-300 p-2 rounded"
+              className="cell"
             />
             <label className="text-md">Load Bark models on startup</label>
+          </div> */}
+          <div className="flex cell gap-2">
+            <Label className="text-md mr-auto">Text generation:</Label>
+            <SwitchWithLabel
+              label="Use GPU"
+              name="text_generation_use_gpu"
+              value={barkSettingsParams.text_generation_use_gpu}
+              onChange={handleChange}
+            />
+            <SwitchWithLabel
+              label="Use small model"
+              name="text_generation_use_small_model"
+              value={barkSettingsParams.text_generation_use_small_model}
+              onChange={handleChange}
+            />
           </div>
-          <div className="flex border border-gray-300 p-2 rounded gap-2">
-            <label className="text-md">Text generation:</label>
-            <div className="flex space-x-2 items-center ml-auto">
-              <input
-                type="checkbox"
-                name="text_generation_use_gpu"
-                checked={barkSettingsParams.text_generation_use_gpu}
-                onChange={handleChange}
-                className="border border-gray-300 p-2 rounded"
-              />
-              <label className="text-sm">Use GPU</label>
-            </div>
-            <div className="flex space-x-2 items-center">
-              <input
-                type="checkbox"
-                name="text_generation_use_small_model"
-                checked={barkSettingsParams.text_generation_use_small_model}
-                onChange={handleChange}
-                className="border border-gray-300 p-2 rounded"
-              />
-              <label className="text-sm">Use small model</label>
-            </div>
+          <div className="flex cell gap-2">
+            <Label className="text-md mr-auto">Coarse-to-fine inference:</Label>
+            <SwitchWithLabel
+              label="Use GPU"
+              name="coarse_to_fine_inference_use_gpu"
+              value={barkSettingsParams.coarse_to_fine_inference_use_gpu}
+              onChange={handleChange}
+            />
+            <SwitchWithLabel
+              label="Use small model"
+              name="coarse_to_fine_inference_use_small_model"
+              value={
+                barkSettingsParams.coarse_to_fine_inference_use_small_model
+              }
+              onChange={handleChange}
+            />
           </div>
-          <div className="flex border border-gray-300 p-2 rounded gap-2">
-            <label className="text-md">Coarse-to-fine inference:</label>
-            <div className="flex space-x-2 items-center ml-auto">
-              <input
-                type="checkbox"
-                name="coarse_to_fine_inference_use_gpu"
-                checked={barkSettingsParams.coarse_to_fine_inference_use_gpu}
-                onChange={handleChange}
-                className="border border-gray-300 p-2 rounded"
-              />
-              <label className="text-sm">Use GPU</label>
-            </div>
-            <div className="flex space-x-2 items-center">
-              <input
-                type="checkbox"
-                name="coarse_to_fine_inference_use_small_model"
-                checked={
-                  barkSettingsParams.coarse_to_fine_inference_use_small_model
-                }
-                onChange={handleChange}
-                className="border border-gray-300 p-2 rounded"
-              />
-              <label className="text-sm">Use small model</label>
-            </div>
+          <div className="flex cell gap-2">
+            <Label className="text-md mr-auto">Fine-tuning:</Label>
+            <SwitchWithLabel
+              label="Use GPU"
+              name="fine_tuning_use_gpu"
+              value={barkSettingsParams.fine_tuning_use_gpu}
+              onChange={handleChange}
+            />
+            <SwitchWithLabel
+              label="Use small model"
+              name="fine_tuning_use_small_model"
+              value={barkSettingsParams.fine_tuning_use_small_model}
+              onChange={handleChange}
+            />
           </div>
-          <div className="flex border border-gray-300 p-2 rounded gap-2">
-            <label className="text-md">Fine-tuning:</label>
-            <div className="flex space-x-2 items-center ml-auto">
-              <input
-                type="checkbox"
-                name="fine_tuning_use_gpu"
-                checked={barkSettingsParams.fine_tuning_use_gpu}
-                onChange={handleChange}
-                className="border border-gray-300 p-2 rounded"
-              />
-              <label className="text-sm">Use GPU</label>
-            </div>
-            <div className="flex space-x-2 items-center">
-              <input
-                type="checkbox"
-                name="fine_tuning_use_small_model"
-                checked={barkSettingsParams.fine_tuning_use_small_model}
-                onChange={handleChange}
-                className="border border-gray-300 p-2 rounded"
-              />
-              <label className="text-sm">Use small model</label>
-            </div>
-          </div>
-          <div className="flex border border-gray-300 p-2 rounded gap-2">
-            <label className="text-md">Codec:</label>
-            <div className="flex space-x-2 items-center ml-auto">
-              <input
-                type="checkbox"
-                name="use_gpu_codec"
-                checked={barkSettingsParams.use_gpu_codec}
-                onChange={handleChange}
-                className="border border-gray-300 p-2 rounded"
-              />
-              <label className="text-sm">Use GPU</label>
-            </div>
+          <div className="flex cell gap-2">
+            <Label className="text-md mr-auto">Codec:</Label>
+            <SwitchWithLabel
+              label="Use GPU"
+              name="use_gpu_codec"
+              value={barkSettingsParams.use_gpu_codec}
+              onChange={handleChange}
+            />
           </div>
 
-          {/* Save Beacon */}
-          <div className="flex border border-gray-300 p-2 rounded gap-2">
-            {data}
-          </div>
-
-          <div className="flex flex-col space-y-2 border border-gray-300 p-2 rounded">
-            <div className="flex space-x-2 items-center">
+          <div className="flex flex-col gap-y-2 cell">
+            <div className="flex gap-x-2 items-center">
               <label className="text-md">Environment (requires restart):</label>
             </div>
-            <div className="flex space-x-2 items-center">
-              <input
-                type="checkbox"
-                name="use_small_models"
-                checked={barkSettingsParams.use_small_models}
-                onChange={handleChange}
-                className="border border-gray-300 p-2 rounded"
-              />
-              <label className="text-sm">Use small models</label>
-            </div>
-            <div className="flex space-x-2 items-center">
-              <input
-                type="checkbox"
-                name="enable_mps"
-                checked={barkSettingsParams.enable_mps}
-                onChange={handleChange}
-                className="border border-gray-300 p-2 rounded"
-              />
-              <label className="text-sm">Enable MPS</label>
-            </div>
-            <div className="flex space-x-2 items-center">
-              <input
-                type="checkbox"
-                name="offload_gpu_models_to_cpu"
-                checked={barkSettingsParams.offload_gpu_models_to_cpu}
-                onChange={handleChange}
-                className="border border-gray-300 p-2 rounded"
-              />
-              <label className="text-sm">Offload GPU models to CPU</label>
-            </div>
+            <SwitchWithLabel
+              label="Use small models"
+              name="use_small_models"
+              value={barkSettingsParams.use_small_models}
+              onChange={handleChange}
+            />
+            <SwitchWithLabel
+              label="Enable MPS"
+              name="enable_mps"
+              value={barkSettingsParams.enable_mps}
+              onChange={handleChange}
+            />
+            <SwitchWithLabel
+              label="Offload GPU models to CPU"
+              name="offload_gpu_models_to_cpu"
+              value={barkSettingsParams.offload_gpu_models_to_cpu}
+              onChange={handleChange}
+            />
           </div>
-        </div>
-        <div className="flex flex-col gap-y-4 p-4">
-          Recommended settings:
-          <ul>
-            <li>For VRAM &gt;= 10GB, use large models.</li>
-            <li>For VRAM &lt; 10GB, use small models.</li>
-            <ul>
-              <li>
-                Text generation and coarse-to-fine are of similar importance.
-              </li>
-              <li>Small models might not have a perceptible difference.</li>
-            </ul>
-            <li>
-              For VRAM &lt; 4GB, use CPU offloading (requires restart).
-              <ul>
-                <li>Small models are also recommended.</li>
-              </ul>
-            </li>
-            <li>
-              For VRAM &lt; 2GB, use CPU offloading and small models (requires
-              restart).
-            </li>
-          </ul>
-          <button
-            className="border border-gray-300 p-2 rounded"
+
+          <Button
+            variant="outline"
             onClick={() => {
               setBarkSettingsParams({
                 ...barkSettingsParams,
@@ -268,15 +205,58 @@ const BarkSettingsPage = () => {
             }}
           >
             Reset to defaults
-          </button>
-          <div className="flex flex-col gap-2">
-            <h2>GPU Info</h2>
-            <GPUInfoWidget />
-          </div>
+          </Button>
+        </div>
+        <div className="flex flex-col w-1/2 gap-y-4">
+          <Guide />
+          {/* Save Beacon */}
+          <div className="cell text-xs h-20 overflow-y-scroll">{data}</div>
         </div>
       </div>
+      <GPUInfoWidget
+        className="flex-row w-full justify-center"
+        refreshInterval={30000}
+      />
     </Template>
   );
 };
 
 export default BarkSettingsPage;
+
+function Guide() {
+  return (
+    <div className="flex flex-col">
+      {/* Guide: */}
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>VRAM</TableHead>
+            <TableHead>Advice</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          <TableRow>
+            <TableCell>&ge;&nbsp;10GB</TableCell>
+            <TableCell>Use large models</TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell>&lt;&nbsp;10GB</TableCell>
+            <TableCell>Use small models</TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell>&lt;&nbsp;4GB</TableCell>
+            <TableCell>Use CPU offloading (requires restart)</TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell>&lt;&nbsp;2GB</TableCell>
+            <TableCell>Use CPU offloading and only small models</TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
+      <ul className="list-disc list-inside text-sm">
+        <li>Text generation and coarse-to-fine are of similar importance.</li>
+        <li>Small models might not have a perceptible difference.</li>
+      </ul>
+    </div>
+  );
+}

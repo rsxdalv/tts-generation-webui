@@ -4,10 +4,12 @@ import torch
 
 def gpu_info_tab():
     with gr.Tab("GPU Info"):
-        gpu_info = gr.Markdown(render_gpu_info(get_gpu_info()))
+        gpu_info = gr.Markdown("".join([render_gpu_info(x) for x in get_gpu_info()]))
 
         gr.Button("Refresh").click(
-            fn=refresh_gpu_info, outputs=gpu_info, api_name="refresh_gpu_info" #, every=1
+            fn=refresh_gpu_info,
+            outputs=gpu_info,
+            api_name="refresh_gpu_info",  # , every=1
         )
 
         gpu_info_json = gr.JSON(get_gpu_info(), visible=False)
@@ -18,36 +20,33 @@ def gpu_info_tab():
 
 
 def get_gpu_info():
-    if torch.cuda.is_available():
-        vram = torch.cuda.get_device_properties(0).total_memory / 1024**2
-        name = torch.cuda.get_device_properties(0).name
-        cuda_capabilities = torch.cuda.get_device_capability(0)
-        used_vram = torch.cuda.memory_allocated(0) / 1024**2
-        used_vram_total = (
-            torch.cuda.mem_get_info(0)[1] - torch.cuda.mem_get_info(0)[0]
-        ) / 1024**2
-        cached_vram = torch.cuda.memory_reserved(0) / 1024**2
-        torch_version = torch.__version__
-        return {
-            "vram": vram,
-            "name": name,
-            "cuda_capabilities": cuda_capabilities,
-            "used_vram": used_vram,
-            "used_vram_total": used_vram_total,
-            "cached_vram": cached_vram,
-            "torch_version": torch_version,
-        }
-    else:
-        # return "No GPU with CUDA support detected by PyTorch"
-        return {
-            "vram": 0,
-            "name": "No GPU with CUDA support detected by PyTorch",
-            "cuda_capabilities": 0,
-            "used_vram": 0,
-            "used_vram_total": 0,
-            "cached_vram": 0,
-            "torch_version": 0,
-        }
+    if not torch.cuda.is_available():
+        return []
+    device_count = torch.cuda.device_count()
+    return [get_gpu_info_idx(idx) for idx in range(device_count)]
+
+
+def get_gpu_info_idx(idx=0):
+    return {
+        "torch_version": torch.__version__,
+        "cuda_version": torch.version.cuda,
+        "vram": torch.cuda.get_device_properties(idx).total_memory / 1024**2,
+        "name": torch.cuda.get_device_properties(idx).name,
+        "cuda_capabilities": torch.cuda.get_device_capability(idx),
+        "used_vram": torch.cuda.memory_allocated(idx) / 1024**2,
+        "used_vram_total": (
+            torch.cuda.mem_get_info(idx)[1] - torch.cuda.mem_get_info(idx)[0]
+        )
+        / 1024**2,
+        "cached_vram": torch.cuda.memory_reserved(idx) / 1024**2,
+        "idx": idx,
+        "multi_processor_count": torch.cuda.get_device_properties(
+            idx
+        ).multi_processor_count,
+        "temperature": torch.cuda.temperature(idx),
+        "power_draw": torch.cuda.power_draw(idx) / 1000,
+        "utilization": torch.cuda.utilization(idx),
+    }
 
 
 def render_gpu_info(gpu_info):
@@ -79,4 +78,6 @@ if __name__ == "__main__":
     with gr.Blocks() as demo:
         gpu_info_tab()
 
-    demo.launch()
+    demo.launch(
+        server_port=7770,
+    )

@@ -3,6 +3,7 @@ import { Template } from "../components/Template";
 import { AudioInput, AudioOutput } from "../components/AudioComponents";
 import { useDemucsPage } from "../tabs/DemucsParams";
 import { GenerationHistorySimple } from "../components/GenerationHistory";
+import { Button } from "../components/ui/button";
 
 const DemucsPage = () => {
   const {
@@ -16,13 +17,12 @@ const DemucsPage = () => {
 
   return (
     <Template title="Demucs">
-      <div className="flex flex-col space-y-4">
-        <div className="flex space-x-4">
-          <div className="flex flex-col space-y-2">
+      <div className="flex flex-col gap-4">
+        <div className="flex gap-4 w-full">
+          <div className="flex flex-col gap-y-2 w-96">
             <AudioInput
               url={demucsParams?.file}
               callback={(file) => {
-                if (!file) return;
                 setDemucsParams({
                   ...demucsParams,
                   file,
@@ -31,14 +31,11 @@ const DemucsPage = () => {
               filter={["sendToDemucs"]}
             />
 
-            <button
-              className="border border-gray-300 p-2 rounded"
-              onClick={() => demucs(demucsParams)}
-            >
+            <Button onClick={() => demucs(demucsParams)}>
               Split with Demucs
-            </button>
+            </Button>
           </div>
-          <div className="flex flex-col space-y-4">
+          <div className="flex flex-col gap-y-4">
             {historyData.slice(0, 4).map(({ audio, typeName }) => (
               <AudioOutput
                 key={typeName}

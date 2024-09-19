@@ -7,8 +7,16 @@ import {
 import { HandleChange } from "../types/HandleChange";
 import { PromptTextArea } from "./PromptTextArea";
 import { ResetButton } from "./ResetButton";
-import { commonBorder } from "./commonBorder";
 import { SeedInput } from "./SeedInput";
+import { Textarea } from "./ui/textarea";
+import { RadioWithLabel } from "./component/RadioWithLabel";
+import { Button } from "./ui/button";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "./ui/collapsible";
+import { ChevronDownIcon } from "lucide-react";
 
 const VALLEX_LANGUAGE_DATA: [string, string][] = [
   ["Mix", "Mix"],
@@ -30,65 +38,6 @@ const VALLEX_MODE_DATA: [string, string][] = [
   ["Sliding Window", "sliding-window"],
 ];
 
-const VallexRadio = ({
-  name,
-  value,
-  checked,
-  onChange,
-  label,
-}: {
-  name: string;
-  value: string;
-  checked: boolean;
-  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  label: string;
-}) => (
-  <div className="flex whitespace-nowrap items-center">
-    <input
-      type="radio"
-      name={name}
-      id={label}
-      value={value}
-      checked={checked}
-      onChange={onChange}
-      className={commonBorder}
-    />
-    <label className="ml-1 select-none" htmlFor={label}>
-      {label}
-    </label>
-  </div>
-);
-
-const VallexChoices = ({
-  name,
-  choices,
-  checked,
-  onChange,
-  label,
-}: {
-  name: string;
-  choices: [string, string][];
-  checked: string;
-  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  label: string;
-}) => (
-  <div className="flex flex-col gap-2">
-    <label className="text-md">{label}:</label>
-    <div className="flex gap-x-4">
-      {choices.map(([visual_model_language, value]) => (
-        <VallexRadio
-          key={visual_model_language}
-          name={name}
-          value={value}
-          checked={checked === value}
-          onChange={onChange}
-          label={visual_model_language}
-        />
-      ))}
-    </div>
-  </div>
-);
-
 const TokenizeButton = ({ params }: { params: VallexParams }) => {
   const [result, setResult] = React.useState<string>("");
   const [loading, setLoading] = React.useState<boolean>(false);
@@ -108,18 +57,13 @@ const TokenizeButton = ({ params }: { params: VallexParams }) => {
   };
 
   return (
-    <div className="flex flex-col space-y-2">
-      <button className="border border-gray-300 p-2 rounded" onClick={tokenize}>
+    <div className="flex flex-col gap-y-2">
+      <Button variant="outline" onClick={tokenize}>
         Preview Tokens
-      </button>
-      <div className="flex flex-col space-y-2">
+      </Button>
+      <div className="flex flex-col gap-y-2">
         {loading && <p>Loading...</p>}
-        <textarea
-          className="border border-gray-300 p-2 rounded"
-          value={result}
-          readOnly
-          rows={2}
-        />
+        <Textarea value={result} readOnly rows={2} />
       </div>
     </div>
   );
@@ -144,21 +88,13 @@ const SplitTextIntoSentences = ({ params }: { params: VallexParams }) => {
     setLoading(false);
   };
   return (
-    <div className="flex flex-col space-y-2">
-      <button
-        className="border border-gray-300 p-2 rounded"
-        onClick={splitText}
-      >
+    <div className="flex flex-col gap-y-2">
+      <Button variant="outline" onClick={splitText}>
         Preview sentences
-      </button>
-      <div className="flex flex-col space-y-2">
+      </Button>
+      <div className="flex flex-col gap-y-2">
         {loading && <p>Loading...</p>}
-        <textarea
-          className="border border-gray-300 p-2 rounded"
-          value={result}
-          readOnly
-          rows={2}
-        />
+        <Textarea value={result} readOnly rows={2} />
       </div>
     </div>
   );
@@ -185,55 +121,62 @@ export const VallexInputs = ({
 
       <TokenizeButton params={params} />
       <SplitTextIntoSentences params={params} />
-
-      {/* <PromptTextArea
-        params={vallexParams}
-        handleChange={handleChange}
-        label="Prompt"
-        name="prompt"
-      /> */}
     </div>
 
     <div className="flex flex-col gap-y-2 w-1/2">
-      <VallexChoices
+      <RadioWithLabel
         label="Language"
         name="language"
-        choices={VALLEX_LANGUAGE_DATA}
-        checked={params.language}
+        variant="horizontal"
+        value={params.language}
         onChange={handleChange}
+        options={VALLEX_LANGUAGE_DATA.map(([label, value]) => ({
+          label,
+          value,
+        }))}
       />
 
-      <VallexChoices
+      <RadioWithLabel
         label="Accent"
         name="accent"
-        choices={VALLEX_ACCENT_DATA}
-        checked={params.accent}
+        variant="horizontal"
+        value={params.accent}
         onChange={handleChange}
+        options={VALLEX_ACCENT_DATA.map(([label, value]) => ({
+          label,
+          value,
+        }))}
       />
 
-      <details className="text-sm">
-        <summary>
-          For longer audio generation, two extension modes are available (click
-          to expand):
-        </summary>
-        <p>
-          <em>(Default) short:</em> This will only generate as long as the
-          model's context length.
-          <br />
-          <em>fixed-prompt:</em> This mode will keep using the same prompt the
-          user has provided, and generate audio sentence by sentence.
-          <br />
-          <em>sliding-window:</em> This mode will use the last sentence as the
-          prompt for the next sentence, but has some concern on speaker
-          maintenance.
-        </p>
-      </details>
-      <VallexChoices
+      <Collapsible className="text-sm">
+        <CollapsibleTrigger className="hover:underline flex items-center text-left">
+          For longer audio generation, two extension modes are available:
+          <ChevronDownIcon className="ml-2 h-4 w-4" />
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          <p>
+            <em>(Default) short:</em> This will only generate as long as the
+            model's context length.
+            <br />
+            <em>fixed-prompt:</em> This mode will keep using the same prompt the
+            user has provided, and generate audio sentence by sentence.
+            <br />
+            <em>sliding-window:</em> This mode will use the last sentence as the
+            prompt for the next sentence, but has some concern on speaker
+            maintenance.
+          </p>
+        </CollapsibleContent>
+      </Collapsible>
+      <RadioWithLabel
         label="Long Audio Generation Mode"
         name="mode"
-        choices={VALLEX_MODE_DATA}
-        checked={params.mode}
+        variant="horizontal"
+        value={params.mode}
         onChange={handleChange}
+        options={VALLEX_MODE_DATA.map(([label, value]) => ({
+          label,
+          value,
+        }))}
       />
 
       <SeedInput params={params} handleChange={handleChange} />

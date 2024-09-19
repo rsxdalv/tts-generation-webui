@@ -9,6 +9,10 @@ import {
   initialState,
 } from "../../tabs/BarkVoiceGenerationParams";
 import { GradioFile } from "../../types/GradioFile";
+import { SelectWithLabel } from "../../components/component/SelectWithLabel";
+import { HandleChangeEvent } from "../../types/HandleChange";
+import { SwitchWithLabel } from "../../components/SwitchWithLabel";
+import { Button } from "../../components/ui/button";
 
 type Result = {
   filename: string;
@@ -56,43 +60,76 @@ const BarkVoiceGenerationPage = () => {
     });
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newParams = {
-      ...barkVoiceGenerationParams,
-      [e.target.name]: e.target.value,
-    };
-    setBarkVoiceGenerationParams(newParams);
-    barkVoiceTokenizerLoad(newParams);
-  };
-
   return (
     <Template title="Bark Voice Generation">
-      <div className="space-y-2">
-        <label className="text-sm">Tokenizer:</label>
-        <select
-          name="tokenizer"
-          id="tokenizer"
-          className="border border-gray-300 p-2 rounded text-black"
-          value={barkVoiceGenerationParams?.tokenizer}
-          onChange={handleChange}
-        >
-          {[
-            "quantifier_hubert_base_ls960.pth @ GitMylo/bark-voice-cloning",
-            "quantifier_hubert_base_ls960_14.pth @ GitMylo/bark-voice-cloning",
-            "quantifier_V1_hubert_base_ls960_23.pth @ GitMylo/bark-voice-cloning",
-            "polish-HuBERT-quantizer_8_epoch.pth @ Hobis/bark-voice-cloning-polish-HuBERT-quantizer",
-            "german-HuBERT-quantizer_14_epoch.pth @ CountFloyd/bark-voice-cloning-german-HuBERT-quantizer",
-            "es_tokenizer.pth @ Lancer1408/bark-es-tokenizer",
-            "portuguese-HuBERT-quantizer_24_epoch.pth @ MadVoyager/bark-voice-cloning-portuguese-HuBERT-quantizer",
-          ].map((bandwidth) => (
-            <option key={bandwidth} value={bandwidth}>
-              {bandwidth}
-            </option>
-          ))}
-        </select>
-      </div>
-      <div className="flex space-x-4">
-        <div className="flex flex-col space-y-2">
+      <div className="flex gap-x-4">
+        <div className="flex flex-col gap-y-2">
+          <SelectWithLabel
+            name="tokenizer"
+            label="Tokenizer"
+            options={[
+              {
+                label:
+                  "quantifier_hubert_base_ls960.pth @ GitMylo/bark-voice-cloning",
+                value:
+                  "quantifier_hubert_base_ls960.pth @ GitMylo/bark-voice-cloning",
+              },
+              {
+                label:
+                  "quantifier_hubert_base_ls960_14.pth @ GitMylo/bark-voice-cloning",
+                value:
+                  "quantifier_hubert_base_ls960_14.pth @ GitMylo/bark-voice-cloning",
+              },
+              {
+                label:
+                  "quantifier_V1_hubert_base_ls960_23.pth @ GitMylo/bark-voice-cloning",
+                value:
+                  "quantifier_V1_hubert_base_ls960_23.pth @ GitMylo/bark-voice-cloning",
+              },
+              {
+                label:
+                  "polish-HuBERT-quantizer_8_epoch.pth @ Hobis/bark-voice-cloning-polish-HuBERT-quantizer",
+                value:
+                  "polish-HuBERT-quantizer_8_epoch.pth @ Hobis/bark-voice-cloning-polish-HuBERT-quantizer",
+              },
+              {
+                label:
+                  "german-HuBERT-quantizer_14_epoch.pth @ CountFloyd/bark-voice-cloning-german-HuBERT-quantizer",
+                value:
+                  "german-HuBERT-quantizer_14_epoch.pth @ CountFloyd/bark-voice-cloning-german-HuBERT-quantizer",
+              },
+              {
+                label: "es_tokenizer.pth @ Lancer1408/bark-es-tokenizer",
+                value: "es_tokenizer.pth @ Lancer1408/bark-es-tokenizer",
+              },
+              {
+                label:
+                  "portuguese-HuBERT-quantizer_24_epoch.pth @ MadVoyager/bark-voice-cloning-portuguese-HuBERT-quantizer",
+                value:
+                  "portuguese-HuBERT-quantizer_24_epoch.pth @ MadVoyager/bark-voice-cloning-portuguese-HuBERT-quantizer",
+              },
+            ]}
+            value={barkVoiceGenerationParams?.tokenizer}
+            onChange={(e: HandleChangeEvent) => {
+              const newParams = {
+                ...barkVoiceGenerationParams,
+                [e.target.name]: e.target.value,
+              };
+              setBarkVoiceGenerationParams(newParams);
+              barkVoiceTokenizerLoad(newParams);
+            }}
+          />
+          <SwitchWithLabel
+            label="Use GPU"
+            name="use_gpu"
+            value={barkVoiceGenerationParams.use_gpu}
+            onChange={(e: HandleChangeEvent) => {
+              setBarkVoiceGenerationParams({
+                ...barkVoiceGenerationParams,
+                [e.target.name]: e.target.value,
+              });
+            }}
+          />
           <AudioInput
             url={barkVoiceGenerationParams?.audio}
             callback={(file) => {
@@ -104,39 +141,21 @@ const BarkVoiceGenerationPage = () => {
             filter={["sendToBarkVoiceGeneration"]}
           />
 
-          {/* use_gpu checkbox */}
-          <div className="space-y-2">
-            <label className="text-sm">Use GPU:</label>
-            <input
-              type="checkbox"
-              name="use_gpu"
-              id="use_gpu"
-              checked={barkVoiceGenerationParams.use_gpu}
-              onChange={(e) =>
-                setBarkVoiceGenerationParams({
-                  ...barkVoiceGenerationParams,
-                  [e.target.name]: e.target.checked,
-                })
-              }
-            />
-          </div>
-
-          <button
-            className="border border-gray-300 p-2 rounded"
-            onClick={barkVoiceGeneration}
-          >
+          <Button variant="default" onClick={barkVoiceGeneration}>
             Generate Bark Voice
-          </button>
+          </Button>
         </div>
-        <div className="flex flex-col space-y-4">
+        <div className="flex flex-col gap-y-4">
           {/* Print voice filename */}
-          <div className="space-y-2">
-            <label className="text-sm">Voice file name (read only):</label>
+          <div className="gap-y-2">
+            <label className="text-sm">
+              Result voice file name (read only):
+            </label>
             <input
               type="text"
               name="filename"
               id="filename"
-              className="border border-gray-300 p-2 rounded text-black w-full"
+              className="cell text-black w-full"
               value={data?.filename}
               readOnly
             />

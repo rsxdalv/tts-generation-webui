@@ -1,11 +1,11 @@
 import React from "react";
 import { Template } from "../../components/Template";
 import { AudioInput, AudioOutput } from "../../components/AudioComponents";
-import Head from "next/head";
 import { useVocosResults, useVocosParams } from "../../tabs/VocosParams";
 import { parseFormChange } from "../../data/parseFormChange";
 import { applyVocosWav } from "../../functions/applyVocosWav";
 import { VocosWavInputs } from "../../components/VocosWavInputs";
+import { Button } from "../../components/ui/button";
 
 const VocosPage = () => {
   const [vocosResult, setVocosResult] = useVocosResults();
@@ -27,12 +27,9 @@ const VocosPage = () => {
   const handleChange = parseFormChange(setVocosParams);
 
   return (
-    <Template>
-      <Head>
-        <title>Vocos - TTS Generation Webui</title>
-      </Head>
-      <div className="flex space-x-4 p-4">
-        <div className="flex flex-col space-y-2">
+    <Template title="Vocos">
+      <div className="flex gap-x-4 p-4">
+        <div className="w-1/2 flex flex-col gap-y-2 flex-shrink-0">
           <AudioInput
             url={vocosParams?.audio}
             callback={(file) => {
@@ -49,14 +46,14 @@ const VocosPage = () => {
             handleChange={handleChange}
           />
 
-          <button
-            className="border border-gray-300 p-2 rounded"
+          <Button
+            variant="default"
             onClick={vocos}
           >
             Restore with Vocos
-          </button>
+          </Button>
         </div>
-        <div className="flex flex-col space-y-4">
+        <div className="w-1/2 flex flex-col gap-y-4">
           {vocosResult && (
             <AudioOutput
               audioOutput={vocosResult}

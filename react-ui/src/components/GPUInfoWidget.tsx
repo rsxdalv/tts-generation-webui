@@ -1,28 +1,11 @@
 import React from "react";
-import { ProgressBar } from "./ProgressBar";
+import { GPUMemoryUsage } from "./component/GPUMemoryUsage";
+import { GPUInfo } from "../types/GPUInfo";
+import { GPUMeta } from "./component/GPUMeta";
+import { cn } from "../lib/utils";
 
-type GPUInfo = {
-  vram: number;
-  name: string;
-  cuda_capabilities: number[];
-  used_vram: number;
-  used_vram_total: number;
-  cached_vram: number;
-  torch_version: string;
-};
-
-const REFRESH_RATE = 2000;
-
-export const GPUInfoWidget = ({}) => {
-  const [gpuData, setGPUData] = React.useState<GPUInfo>({
-    vram: 0,
-    name: "",
-    cuda_capabilities: [],
-    used_vram: 0,
-    used_vram_total: 0,
-    cached_vram: 0,
-    torch_version: "",
-  });
+export const GPUInfoWidget = ({ className = "", refreshInterval = 2000 }) => {
+  const [gpuDatas, setGPUDatas] = React.useState<GPUInfo[]>([]);
   const [loading, setLoading] = React.useState<boolean>(false);
 
   const fetchGPUData = async () => {
@@ -32,42 +15,28 @@ export const GPUInfoWidget = ({}) => {
     });
 
     const result = await response.json();
-    setGPUData(result);
+    setGPUDatas(result);
     setLoading(false);
   };
 
   React.useEffect(() => {
     fetchGPUData();
-    const interval = setInterval(fetchGPUData, REFRESH_RATE);
+    const interval = setInterval(fetchGPUData, refreshInterval);
     return () => clearInterval(interval);
-  }, []);
+  }, [refreshInterval]);
 
-  if (loading && !gpuData.name) {
+  if (loading && !gpuDatas.length) {
     return <div>Loading GPU info...</div>;
   }
 
   return (
-    <div className="flex flex-col gap-2 w-3/4">
-      <h2 className="text-lg">
-        {gpuData.name} [{Math.round(gpuData.vram / 1024)} GB]
-      </h2>
-      <h3>Compute Capability: {gpuData.cuda_capabilities.join(".")}</h3>
-      <h3>PyTorch Version: {gpuData.torch_version}</h3>
-      <ProgressBar
-        label="Used VRAM"
-        value={gpuData.used_vram}
-        total={gpuData.vram}
-      />
-      <ProgressBar
-        label="Cached VRAM"
-        value={gpuData.cached_vram}
-        total={gpuData.vram}
-      />
-      <ProgressBar
-        label="Used VRAM System"
-        value={gpuData.used_vram_total}
-        total={gpuData.vram}
-      />
+    <div className={cn("flex gap-2 w-3/4", className)}>
+      {gpuDatas.map((gpuData) => (
+        <>
+          <GPUMeta {...gpuData} />
+          <GPUMemoryUsage {...gpuData} />
+        </>
+      ))}
     </div>
   );
 };

@@ -1,5 +1,5 @@
 import React from "react";
-import { commonBorder } from "./commonBorder";
+import { Button } from "./ui/button";
 
 export const ResetButton = <T extends {}>({
   params,
@@ -10,8 +10,8 @@ export const ResetButton = <T extends {}>({
   setParams: React.Dispatch<React.SetStateAction<T>>;
   initialParams: T;
 }) => (
-  <button
-    className={commonBorder}
+  <Button
+    variant="outline"
     onClick={() =>
       setParams({
         ...params,
@@ -20,5 +20,5 @@ export const ResetButton = <T extends {}>({
     }
   >
     Reset Parameters
-  </button>
+  </Button>
 );

@@ -1,6 +1,7 @@
 import React from "react";
 import { AudioOutput } from "./AudioComponents";
 import useLocalStorage from "../hooks/useLocalStorage";
+import { Button } from "./ui/button";
 
 export const GenerationHistorySimple = ({
   setHistoryData,
@@ -22,7 +23,7 @@ export const GenerationHistorySimple = ({
 
   return (
     <GenerationHistory
-      clearHistory={() => setHistoryData(x => x.slice(0, 1))}
+      clearHistory={() => setHistoryData((x) => x.slice(0, 1))}
       showLast={showLast}
       setShowLast={setShowLast}
       {...props}
@@ -47,29 +48,32 @@ export const GenerationHistory = ({
   nameKey?: string;
   filter?: string[];
 }) => (
-  <div className="flex flex-col gap-y-2 border border-gray-300 p-2 rounded">
+  <div className="flex flex-col gap-y-2 cell">
     <div className="flex gap-x-2">
       <label className="text-md mr-auto">History</label>
-      <button
+      {/* <button
         className="border border-gray-300 py-2 px-12 rounded"
         onClick={clearHistory}
       >
         Clear History
-      </button>
+      </button> */}
+      <Button variant="outline" size="sm" onClick={clearHistory}>
+        Clear History
+      </Button>
       <div className="flex gap-x-2 items-center">
         <label className="text-sm">Show Last X entries:</label>
         <input
           type="number"
           value={showLast}
           onChange={(event) => setShowLast(Number(event.target.value))}
-          className="border border-gray-300 p-2 rounded"
+          className="cell"
           min="0"
           max="100"
           step="1"
         />
       </div>
     </div>
-    <div className="flex flex-col gap-y-2">
+    <div className="flex flex-col gap-8">
       {historyData &&
         historyData
           .slice(1, showLast + 1)
