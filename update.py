@@ -59,43 +59,44 @@ def check_if_torch_has_cuda():
 
 
 def main():
-    print("Legacy installer is almost guaranteed to break installation, including torch+cuda")
+    print("Legacy installer is guaranteed to break installation, including torch+cuda")
     print("For this reason, it is disabled")
     print("It is recommended to use the new installer in a new directory, and leave the existing installation intact")
     print("The new installer can be downloaded from https://github.com/rsxdalv/tts-generation-webui/")
-    if input("Do you still want to risk upgrading? [y/N] ").lower() != "y":
-        print("Skipping dependencies update")
-        return
+    print("If the current installation works, you can keep using it and install the new version in parallel.")
+    # if input("Do you still want to risk upgrading? [y/N] ").lower() != "y":
+    #     print("Skipping dependencies update")
+    #     return
 
-    print("Updating dependencies... (legacy installer, might break)")
-    try_install("-r requirements.txt", "Core Packages, Bark, Tortoise")
-    try_install(
-        "xformers==0.0.27 --index-url https://download.pytorch.org/whl/cu118",
-        "xformers",
-    )
-    try_install("-r requirements_bark_hubert_quantizer.txt", "Bark Voice Clone")
-    try_install("-r requirements_rvc.txt", "RVC")
-    try_install("-r requirements_audiocraft.txt", "Audiocraft")
-    try_install("-r requirements_styletts2.txt", "StyleTTS")
-    try_install("-r requirements_vall_e.txt", "Vall-E-X")
-    try_install("-r requirements_maha_tts.txt", "Maha TTS")
-    try_install("-r requirements_stable_audio.txt", "Stable Audio")
-    # reinstall hydra-core==1.3.2 because of fairseq
-    try_install("hydra-core==1.3.2", "hydra-core fix due to fairseq")
+    # print("Updating dependencies... (legacy installer, might break)")
+    # try_install("-r requirements.txt", "Core Packages, Bark, Tortoise")
+    # try_install(
+    #     "xformers==0.0.27 --index-url https://download.pytorch.org/whl/cu118",
+    #     "xformers",
+    # )
+    # try_install("-r requirements_bark_hubert_quantizer.txt", "Bark Voice Clone")
+    # try_install("-r requirements_rvc.txt", "RVC")
+    # try_install("-r requirements_audiocraft.txt", "Audiocraft")
+    # try_install("-r requirements_styletts2.txt", "StyleTTS")
+    # try_install("-r requirements_vall_e.txt", "Vall-E-X")
+    # try_install("-r requirements_maha_tts.txt", "Maha TTS")
+    # try_install("-r requirements_stable_audio.txt", "Stable Audio")
+    # # reinstall hydra-core==1.3.2 because of fairseq
+    # try_install("hydra-core==1.3.2", "hydra-core fix due to fairseq")
 
 
-    if is_node_installed():
-        setup_node_modules()
+    # if is_node_installed():
+    #     setup_node_modules()
 
-    if check_if_torch_has_cuda():
-        print("Torch has CUDA, skipping reinstall")
-    else:
-        print(
-            "Torch does not have CUDA, assuming CPU mode, installing CPU version of PyTorch"
-        )
-        do(
-            "conda install --force-reinstall -y -k pytorch torchvision torchaudio cpuonly -c pytorch"
-        )
+    # if check_if_torch_has_cuda():
+    #     print("Torch has CUDA, skipping reinstall")
+    # else:
+    #     print(
+    #         "Torch does not have CUDA, assuming CPU mode, installing CPU version of PyTorch"
+    #     )
+    #     do(
+    #         "conda install --force-reinstall -y -k pytorch torchvision torchaudio cpuonly -c pytorch"
+    #     )
 
 
 if __name__ == "__main__":

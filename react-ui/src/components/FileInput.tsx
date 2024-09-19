@@ -1,18 +1,23 @@
 import { ChangeEvent } from "react";
 
-const uploadFile = async (file?: File) => {
+export const getLocalFileURL = (file?: File) =>
+  file && "/file-input-cache/" + file.name;
+
+export const getFilenameFromLocalFileURL = (url?: string) =>
+  url?.replace("/file-input-cache/", "");
+
+export const uploadFile = async (file?: File) => {
   if (!file) return;
 
   try {
     const data = new FormData();
     data.set("file", file);
 
-    const res = await fetch("/api/upload", {
-      method: "POST",
-      body: data,
-    });
+    const res = await fetch("/api/upload", { method: "POST", body: data });
     // handle the error
     if (!res.ok) throw new Error(await res.text());
+    // return await res.json();
+    return getLocalFileURL(file);
   } catch (e: any) {
     // Handle errors here
     console.error(e);
@@ -50,6 +55,3 @@ export default function FileInput({
     </div>
   );
 }
-
-const getLocalFileURL = (file?: File) =>
-  file && "/file-input-cache/" + file.name;

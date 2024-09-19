@@ -1,6 +1,7 @@
 import React from "react";
 import { BarkGenerationParams } from "../tabs/BarkGenerationParams";
 import { HandleChange } from "../types/HandleChange";
+import { RadioWithLabel } from "./component/RadioWithLabel";
 
 export const ForEachSubsequentGeneration = ({
   barkGenerationParams,
@@ -9,34 +10,22 @@ export const ForEachSubsequentGeneration = ({
   barkGenerationParams: BarkGenerationParams;
   handleChange: HandleChange;
 }) => (
-  <div>
-    <label className="text-sm">For each subsequent generation:</label>
-    <div className="flex gap-2">
-      {[
-        "Use old generation as history",
-        "or Use history prompt setting",
-        "or Clear history",
-      ].map((subsequentSetting) => (
-        <div key={subsequentSetting} className="flex items-center">
-          <input
-            type="radio"
-            name="long_prompt_history_radio"
-            id={subsequentSetting}
-            value={subsequentSetting}
-            checked={
-              barkGenerationParams.long_prompt_history_radio ===
-              subsequentSetting
-            }
-            onChange={handleChange}
-            className="cell"
-          />
-          <label className="ml-1" htmlFor={subsequentSetting}>
-            {subsequentSetting}
-          </label>
-        </div>
-      ))}
-    </div>
-  </div>
+  <RadioWithLabel
+    label="For each subsequent generation"
+    name="long_prompt_history_radio"
+    inline
+    className="flex-col items-start"
+    value={barkGenerationParams.long_prompt_history_radio}
+    onChange={handleChange}
+    options={[
+      "Use old generation as history",
+      "or Use history prompt setting",
+      "or Clear history",
+    ].map((long_prompt_history_radio) => ({
+      label: long_prompt_history_radio,
+      value: long_prompt_history_radio,
+    }))}
+  />
 );
 
 export const PromptType = ({
@@ -46,25 +35,18 @@ export const PromptType = ({
   barkGenerationParams: BarkGenerationParams;
   handleChange: HandleChange;
 }) => (
-  <div>
-    <label className="text-sm">Prompt type:</label>
-    <div className="flex flex-row gap-x-2">
-      {["Short prompt (<15s)", "Split prompt by lines"].map((promptType) => (
-        <div key={promptType} className="flex items-center">
-          <input
-            type="radio"
-            name="long_prompt_radio"
-            id={promptType}
-            value={promptType}
-            checked={barkGenerationParams.long_prompt_radio === promptType}
-            onChange={handleChange}
-            className="cell"
-          />
-          <label className="ml-1" htmlFor={promptType}>
-            {promptType}
-          </label>
-        </div>
-      ))}
-    </div>
-  </div>
+  <RadioWithLabel
+    label="Prompt type"
+    name="long_prompt_radio"
+    inline
+    className="flex-col items-start"
+    value={barkGenerationParams.long_prompt_radio}
+    onChange={handleChange}
+    options={["Short prompt (<15s)", "Split prompt by lines"].map(
+      (long_prompt_radio) => ({
+        label: long_prompt_radio,
+        value: long_prompt_radio,
+      })
+    )}
+  />
 );

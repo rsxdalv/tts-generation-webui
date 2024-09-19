@@ -15,9 +15,9 @@ export const BarkInputs = ({
   barkGenerationParams: BarkGenerationParams;
   handleChange: HandleChange;
 }) => (
-  <div className="flex flex-col gap-y-2">
+  <div className="flex flex-col gap-y-2 p-2">
     <div className="flex flex-row gap-x-2">
-      <div className="gap-y-2 flex flex-col w-1/2">
+      <div className="gap-y-2 flex flex-col">
         <NPZVoiceDropdown
           barkGenerationParams={barkGenerationParams}
           handleChange={handleChange}
@@ -35,16 +35,18 @@ export const BarkInputs = ({
           handleChange={handleChange}
         />
       </div>
-      <div className="gap-y-2 w-1/2">
-        <PromptType
-          barkGenerationParams={barkGenerationParams}
-          handleChange={handleChange}
-        />
-        <ForEachSubsequentGeneration
-          barkGenerationParams={barkGenerationParams}
-          handleChange={handleChange}
-        />
-        <div className="flex gap-2">
+      <div className="flex flex-col gap-y-2">
+        <div className="grid grid-cols-1 gap-4">
+          <PromptType
+            barkGenerationParams={barkGenerationParams}
+            handleChange={handleChange}
+          />
+          <ForEachSubsequentGeneration
+            barkGenerationParams={barkGenerationParams}
+            handleChange={handleChange}
+          />
+        </div>
+        <div className="grid grid-cols-3 cell gap-2 items-end">
           <ParameterSlider
             label="Text temperature"
             name="text_temp"
@@ -53,6 +55,9 @@ export const BarkInputs = ({
             step="0.01"
             params={barkGenerationParams}
             onChange={handleChange}
+            decimals={2}
+            orientation="vertical"
+            className="h-40"
           />
           <ParameterSlider
             label="Waveform temperature"
@@ -62,15 +67,21 @@ export const BarkInputs = ({
             step="0.01"
             params={barkGenerationParams}
             onChange={handleChange}
+            decimals={2}
+            orientation="vertical"
+            className="h-40"
           />
           <ParameterSlider
-            label="Max generation duration (s)"
+            label="Max length (s)"
             name="max_length"
             min="0.1"
             max="18"
             step="0.1"
             params={barkGenerationParams}
             onChange={handleChange}
+            decimals={1}
+            orientation="vertical"
+            className="h-40"
           />
         </div>
         <SeedInput params={barkGenerationParams} handleChange={handleChange} />

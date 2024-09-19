@@ -9,6 +9,7 @@ export type HandleChangeEvent =
         name: string;
         value: string | number | boolean | null | undefined;
         type?: string;
+        checked?: boolean;
       };
     };
 

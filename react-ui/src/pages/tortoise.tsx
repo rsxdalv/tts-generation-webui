@@ -19,7 +19,7 @@ const TortoiseGenerationPage = () => {
 
   return (
     <Template title="Tortoise">
-      <div className="flex w-full flex-col">
+      <div className="gap-y-4 pt-4 flex w-full flex-col">
         <TortoiseInput
           tortoiseGenerationParams={tortoiseGenerationParams}
           setTortoiseGenerationParams={setTortoiseGenerationParams}

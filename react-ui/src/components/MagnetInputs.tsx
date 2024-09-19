@@ -5,8 +5,6 @@ import { ParameterSlider } from "./GenericSlider";
 import { HandleChange } from "../types/HandleChange";
 import { PromptTextArea } from "./PromptTextArea";
 import { SeedInput } from "./SeedInput";
-import { SimpleGroup } from "./SimpleGroup";
-import { commonBorder } from "./commonBorder";
 import { RadioWithLabel } from "./component/RadioWithLabel";
 import { SwitchWithLabel } from "./SwitchWithLabel";
 import { Link2Icon, Unlink2Icon } from "lucide-react";
@@ -22,74 +20,72 @@ export const MagnetInputs = ({
     <div className="flex gap-x-6 w-full justify-center">
       <div className="flex flex-col gap-y-2 w-1/2">
         <MagnetModelSelector magnetParams={params} handleChange={onChange} />
-        <SimpleGroup>
-          <div className="flex gap-2 w-full justify-between">
-            <ParameterSlider
-              label="Top-K"
-              name="top_k"
-              params={params}
-              onChange={onChange}
-              min="0"
-              max="250"
-              step="1"
-              orientation="vertical"
-              className="h-40"
-            />
-            <ParameterSlider
-              label="Top-P"
-              decimals={2}
-              name="top_p"
-              params={params}
-              onChange={onChange}
-              min="0"
-              max="1.5"
-              step="0.01"
-              orientation="vertical"
-              className="h-40"
-            />
-            <ParameterSlider
-              label="Temperature"
-              decimals={2}
-              name="temperature"
-              params={params}
-              onChange={onChange}
-              min="0"
-              max="10"
-              step="0.01"
-              orientation="vertical"
-              className="h-40"
-            />
-          {/* </div>
-          <div className="flex gap-2"> */}
-            <ParameterSlider
-              label="Min Cfg Coef"
-              decimals={1}
-              name="min_cfg_coef"
-              params={params}
-              onChange={onChange}
-              min="0"
-              max="100"
-              step="0.1"
-              orientation="vertical"
-              className="h-40"
-            />
-            <ParameterSlider
-              label="Max Cfg Coef"
-              decimals={1}
-              name="max_cfg_coef"
-              params={params}
-              onChange={onChange}
-              min="0"
-              max="100"
-              step="0.1"
-              orientation="vertical"
-              className="h-40"
-            />
-          </div>
-        </SimpleGroup>
+        <div className="flex gap-2 w-full justify-between cell">
+          <ParameterSlider
+            label="Top-K"
+            name="top_k"
+            params={params}
+            onChange={onChange}
+            min="0"
+            max="250"
+            step="1"
+            orientation="vertical"
+            className="h-40"
+          />
+          <ParameterSlider
+            label="Top-P"
+            decimals={2}
+            name="top_p"
+            params={params}
+            onChange={onChange}
+            min="0"
+            max="1.5"
+            step="0.01"
+            orientation="vertical"
+            className="h-40"
+          />
+          <ParameterSlider
+            label="Temperature"
+            decimals={2}
+            name="temperature"
+            params={params}
+            onChange={onChange}
+            min="0"
+            max="10"
+            step="0.01"
+            orientation="vertical"
+            className="h-40"
+          />
+        {/* </div>
+        <div className="flex gap-2"> */}
+          <ParameterSlider
+            label="Min Cfg Coef"
+            decimals={1}
+            name="min_cfg_coef"
+            params={params}
+            onChange={onChange}
+            min="0"
+            max="100"
+            step="0.1"
+            orientation="vertical"
+            className="h-40"
+          />
+          <ParameterSlider
+            label="Max Cfg Coef"
+            decimals={1}
+            name="max_cfg_coef"
+            params={params}
+            onChange={onChange}
+            min="0"
+            max="100"
+            step="0.1"
+            orientation="vertical"
+            className="h-40"
+          />
+        </div>
       </div>
       <div className="flex flex-col gap-y-4">
-        <div className={"flex flex-col gap-y-2 items-center " + commonBorder}>
+        <div className={"flex flex-col gap-y-2 items-center cell"}>
           <label className="text-sm">
             Decoding Steps:{" "}
             {[

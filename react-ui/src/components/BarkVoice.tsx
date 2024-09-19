@@ -2,7 +2,11 @@ import React, { useState } from "react";
 import { BarkGenerationParams } from "../tabs/BarkGenerationParams";
 import { BARK_VOICE_TO_TRAIT } from "../data/BARK_VOICE_TO_TRAIT";
 import { BARK_LANGUAGE_TO_CODE } from "../data/BARK_LANGUAGE_TO_CODE";
-import { HandleChange } from "../types/HandleChange";
+import { HandleChange, HandleChangeEvent } from "../types/HandleChange";
+import { SwitchWithLabel } from "./SwitchWithLabel";
+import { RadioWithLabel } from "./component/RadioWithLabel";
+import { Label } from "./ui/label";
+import { Separator } from "./ui/separator";
 
 export const BarkVoice = ({
   barkGenerationParams,
@@ -25,20 +29,20 @@ export const BarkVoice = ({
       },
     });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: HandleChangeEvent) => {
     switch (e.target.name) {
       case "language":
-        const newLanguage = e.target.value;
+        const newLanguage = e.target.value as string;
         setLanguage(newLanguage);
         updatePrompt(newLanguage, speakerID, useV2);
         break;
       case "speakerID":
-        const newSpeakerID = e.target.value;
+        const newSpeakerID = e.target.value as string;
         setSpeakerID(newSpeakerID);
         updatePrompt(language, newSpeakerID, useV2);
         break;
       case "useV2":
-        const newUseV2 = e.target.checked;
+        const newUseV2 = e.target.value as boolean;
         setUseV2(newUseV2);
         updatePrompt(language, speakerID, newUseV2);
         break;
@@ -46,60 +50,49 @@ export const BarkVoice = ({
   };
 
   return (
-    <div className="flex flex-col gap-2 cell">
-      <h2 className="text-md">Voice:</h2>
-      <label className="text-sm">Language:</label>
-      <div className="flex flex-row gap-x-2 flex-wrap">
-        {BARK_VOICE_LANGUAGES.map((model) => (
-          <div key={model} className="flex items-center">
-            <input
-              type="radio"
-              name="language"
-              id={model}
-              value={model}
-              checked={language === model}
-              onChange={handleChange}
-              className="cell"
-            />
-            <label className="ml-1" htmlFor={model}>
-              {model}
-            </label>
-          </div>
-        ))}
-      </div>
-      <label className="text-sm">Speaker ID:</label>
-      <div className="flex flex-row gap-x-2">
-        {SPEAKER_IDS.map((model) => (
-          <div key={model} className="flex items-center">
-            <input
-              type="radio"
-              name="speakerID"
-              id={model}
-              value={model}
-              checked={speakerID === model}
-              onChange={handleChange}
-              className="cell"
-            />
-            <label className="ml-1" htmlFor={model}>
-              {model}
-            </label>
-          </div>
-        ))}
-      </div>
-      <div className="flex items-center gap-x-2">
-        <label className="text-sm">Use V2:</label>
-        <input
-          type="checkbox"
+    <div className="flex flex-col gap-4 cell">
+      <Label>Voice:</Label>
+      <RadioWithLabel
+        label="Language"
+        name="language"
+        inline
+        value={language}
+        onChange={handleChange}
+        options={BARK_VOICE_LANGUAGES.map((language) => ({
+          label: language,
+          value: language,
+        }))}
+        className="flex-col items-start"
+      />
+      <Separator />
+      <RadioWithLabel
+        className="flex-col items-start"
+        label="Speaker ID"
+        name="speakerID"
+        inline
+        value={speakerID}
+        onChange={handleChange}
+        options={SPEAKER_IDS.map((speakerID) => ({
+          label: speakerID,
+          value: speakerID,
+        }))}
+      />
+      <Separator />
+      <div className="flex gap-2 items-center justify-between">
+        <SwitchWithLabel
+          label="Use V2"
           name="useV2"
-          id="useV2"
-          checked={useV2}
+          value={useV2}
           onChange={handleChange}
-          className="cell"
         />
-      </div>
-      <div className="cell">
-        Chosen voice: {barkGenerationParams.history_prompt}
-        &nbsp;gender: {BARK_VOICE_TO_TRAIT[barkGenerationParams.history_prompt] || "Unknown"}
+        {BARK_VOICE_TO_TRAIT[barkGenerationParams.history_prompt] && (
+          <div className="text-sm">
+            Chosen voice: {barkGenerationParams.history_prompt}{", "}
+            Gender:{" "}
+            {BARK_VOICE_TO_TRAIT[barkGenerationParams.history_prompt] ||
+              "Unknown"}
+          </div>
+        )}
       </div>
     </div>
   );

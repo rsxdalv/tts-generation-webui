@@ -2,7 +2,6 @@ import React from "react";
 import { Template } from "../components/Template";
 import useLocalStorage from "../hooks/useLocalStorage";
 import { AudioOutput } from "../components/AudioComponents";
-import Head from "next/head";
 import { GradioFile } from "../types/GradioFile";
 import { splitWithDemucs } from "../functions/splitWithDemucs";
 import { generateWithBark } from "../functions/generateWithBark";
@@ -50,6 +49,8 @@ import { getVallexParams, useVallexParams } from "../tabs/VallexParams";
 import { generateWithVallex } from "../functions/generateWithVallex";
 import { VallexInputs } from "../components/VallexInputs";
 import { applySeed } from "../data/applySeed";
+import { Button } from "../components/ui/button";
+import { RadioWithLabel } from "../components/component/RadioWithLabel";
 
 interface PipelineParams {
   generation: string;
@@ -102,14 +103,11 @@ const GenerateButton = ({
   status: string;
   onClick: () => void;
 }) => (
-  <button
-    className="cell font-medium"
-    onClick={onClick}
-  >
+  <Button className="cell font-medium" onClick={onClick}>
     {status === "generating" && "Generating..."}
     {status === "postprocessing" && "Postprocessing..."}
     {status === "idle" && "Run Pipeline"}
-  </button>
+  </Button>
 );
 
 const GenerationInputs = ({ model, seed }: { model: string; seed: number }) => {
@@ -329,7 +327,7 @@ const PipelinePage = () => {
             representation is then refined by a postprocess model to generate a
             new audio file.
           </p>
-          <div className="flex flex-row gap-x-2 cell mb-4">
+          {/* <div className="flex flex-row gap-x-2 cell mb-4">
             <label>Choose a generation model:</label>
             {generationModels.map((model) => (
               <div key={model} className="flex items-center gap-x-2">
@@ -344,30 +342,40 @@ const PipelinePage = () => {
                 <label htmlFor={model}>{model}</label>
               </div>
             ))}
-          </div>
+          </div> */}
+          <RadioWithLabel
+            label="Choose a generation model"
+            name="generation"
+            className="cell"
+            inline
+            value={pipelineParams.generation}
+            onChange={onChangeModel}
+            options={generationModels.map((model) => ({
+              label: model,
+              value: model,
+            }))}
+          />
           <GenerationInputs model={pipelineParams.generation} seed={seed} />
-          <div className="flex flex-row gap-x-2 cell mb-4">
-            <label>Choose a postprocessing model:</label>
-            {postProcessingModels.map((model) => (
-              <div key={model} className="flex items-center gap-x-2">
-                <input
-                  type="radio"
-                  name="postprocess"
-                  id={model}
-                  value={model}
-                  checked={pipelineParams.postprocess === model}
-                  onChange={() =>
-                    setPipelineParams((x) => ({ ...x, postprocess: model }))
-                  }
-                  disabled={
-                    model === "vocos npz (bark only)" &&
-                    pipelineParams.generation !== "bark"
-                  }
-                />
-                <label htmlFor={model}>{model}</label>
-              </div>
-            ))}
-          </div>
+          <RadioWithLabel
+            label="Choose a postprocessing model"
+            name="postprocess"
+            className="cell"
+            inline
+            value={pipelineParams.postprocess}
+            onChange={(event) =>
+              setPipelineParams((x) => ({
+                ...x,
+                postprocess: event.target.value,
+              }))
+            }
+            options={postProcessingModels.map((model) => ({
+              label: model,
+              value: model,
+              disabled:
+                model === "vocos npz (bark only)" &&
+                pipelineParams.generation !== "bark",
+            }))}
+          />
           <PostProcessInputs model={pipelineParams.postprocess} />
           <GenerateButton status={status} onClick={pipeline} />
         </div>

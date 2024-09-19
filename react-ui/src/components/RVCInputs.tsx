@@ -5,6 +5,7 @@ import { ParameterSlider } from "./GenericSlider";
 import { HandleChange } from "../types/HandleChange";
 import { RadioWithLabel } from "./component/RadioWithLabel";
 import { ModelDropdown } from "./component/ModelDropdown";
+import { Button } from "./ui/button";
 
 const Model = ({
   rvcParams: rvcGenerationParams,
@@ -243,33 +244,32 @@ export const RVCInputs = ({
           className="h-40"
         />
       </div>
-      {!hideAudioInput && (
-        <AudioInput
-          callback={(original_audio?: string) => {
-            handleChange({
-              target: {
-                name: "original_audio",
-                value: original_audio,
-              },
-            } as React.ChangeEvent<HTMLInputElement>);
-          }}
-          label="Original Audio"
-          filter={["sendToRvc"]}
-          url={rvcParams?.original_audio}
-          className="col-span-5 mb-auto"
+      <div className="flex flex-col col-span-6 mb-auto">
+        {!hideAudioInput && (
+          <AudioInput
+            callback={(original_audio?: string) => {
+              handleChange({
+                target: {
+                  name: "original_audio",
+                  value: original_audio,
+                },
+              } as React.ChangeEvent<HTMLInputElement>);
+            }}
+            label="Original Audio"
+            filter={["sendToRvc"]}
+            url={rvcParams?.original_audio}
+          />
+        )}
+        <ParameterSlider
+          params={rvcParams}
+          onChange={handleChange}
+          label="Resample to"
+          name="resample_sample_rate"
+          min="0"
+          max="48000"
+          step="100"
         />
-      )}
-      <ParameterSlider
-        params={rvcParams}
-        onChange={handleChange}
-        label="Resample to"
-        name="resample_sample_rate"
-        min="0"
-        max="48000"
-        step="100"
-        orientation="vertical"
-        className="h-40"
-      />
+      </div>
     </div>
   </div>
 );

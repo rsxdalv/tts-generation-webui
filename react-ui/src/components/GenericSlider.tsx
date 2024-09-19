@@ -26,7 +26,7 @@ const LabelledSlider = ({
   max: number;
   step: number;
   className?: string;
-  label: string;
+  label: string | JSX.Element;
   name: string;
   decimals?: number;
   value: number;
@@ -143,7 +143,7 @@ export const ParameterSlider = <
 }: {
   params: T;
   onChange: HandleChange;
-  label: string;
+  label: string | JSX.Element;
   name: keyof T;
   min: string | number;
   max: string | number;

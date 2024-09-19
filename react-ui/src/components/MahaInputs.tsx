@@ -98,15 +98,13 @@ export const MahaInputs = ({
   resetParams: () => void;
 }) => (
   <div className="flex gap-x-6 w-full justify-center">
-    <div className="flex flex-col gap-y-2 w-1/2">
+    <div className="flex flex-col gap-y-4 w-1/2">
       <PromptTextArea
         params={mahaParams}
         handleChange={handleChange}
         label="Text"
         name="text"
       />
-    </div>
-    <div className="flex flex-col gap-y-4 w-1/2">
       <RadioWithLabel
         label="Model"
         name="model_name"
@@ -140,10 +138,12 @@ export const MahaInputs = ({
           "bengali",
           "assamese",
         ].map((text_language) => ({
-          label: text_language,
+          label: text_language[0].toUpperCase() + text_language.slice(1),
           value: text_language,
         }))}
       />
+    </div>
+    <div className="flex flex-col gap-y-4 w-1/2">
 
       <Speaker mahaParams={mahaParams} handleChange={handleChange} />
 

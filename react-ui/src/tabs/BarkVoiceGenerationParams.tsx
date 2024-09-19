@@ -22,5 +22,5 @@ export const sendToBarkVoiceGeneration = (audio?: string) => {
     (vocosParams: BarkVoiceGenerationParams = initialState) =>
       ({ ...vocosParams, audio } as BarkVoiceGenerationParams)
   );
-  router.push("/bark_voice_generation");
+  router.push("/bark/bark_voice_generation");
 };

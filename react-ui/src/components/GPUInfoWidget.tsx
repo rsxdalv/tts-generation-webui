@@ -2,10 +2,9 @@ import React from "react";
 import { GPUMemoryUsage } from "./component/GPUMemoryUsage";
 import { GPUInfo } from "../types/GPUInfo";
 import { GPUMeta } from "./component/GPUMeta";
+import { cn } from "../lib/utils";
 
-const REFRESH_INTERVAL = 2000;
-
-export const GPUInfoWidget = ({}) => {
+export const GPUInfoWidget = ({ className = "", refreshInterval = 2000 }) => {
   const [gpuDatas, setGPUDatas] = React.useState<GPUInfo[]>([]);
   const [loading, setLoading] = React.useState<boolean>(false);
 
@@ -22,16 +21,16 @@ export const GPUInfoWidget = ({}) => {
 
   React.useEffect(() => {
     fetchGPUData();
-    const interval = setInterval(fetchGPUData, REFRESH_INTERVAL);
+    const interval = setInterval(fetchGPUData, refreshInterval);
     return () => clearInterval(interval);
-  }, []);
+  }, [refreshInterval]);
 
   if (loading && !gpuDatas.length) {
     return <div>Loading GPU info...</div>;
   }
 
   return (
-    <div className="flex gap-2 w-3/4">
+    <div className={cn("flex gap-2 w-3/4", className)}>
       {gpuDatas.map((gpuData) => (
         <>
           <GPUMeta {...gpuData} />
