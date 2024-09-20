@@ -11,7 +11,6 @@ const Slider = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <SliderPrimitive.Root
     ref={ref}
-    // eslint-disable-next-line tailwindcss/no-contradicting-classname
     className={cn(
       "relative flex touch-none select-none",
       "data-[orientation='horizontal']:h-2 data-[orientation='horizontal']:w-full data-[orientation='horizontal']:items-center",
