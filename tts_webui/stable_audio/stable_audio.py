@@ -284,7 +284,7 @@ sample_size = 1920000
 def create_sampling_ui(model_config, inpainting=False):
     with gr.Row():
         with gr.Column(scale=6):
-            prompt = gr.Textbox(show_label=False, placeholder="Prompt")
+            text = gr.Textbox(show_label=False, placeholder="Prompt")
             negative_prompt = gr.Textbox(
                 show_label=False, placeholder="Negative prompt"
             )
@@ -461,7 +461,7 @@ def create_sampling_ui(model_config, inpainting=False):
                     )  # still working on the usefulness of this
 
                     inputs = [
-                        prompt,
+                        text,
                         negative_prompt,
                         seconds_start_slider,
                         seconds_total_slider,
@@ -499,7 +499,7 @@ def create_sampling_ui(model_config, inpainting=False):
                     )
 
                     inputs = [
-                        prompt,
+                        text,
                         negative_prompt,
                         seconds_start_slider,
                         seconds_total_slider,

@@ -115,6 +115,32 @@ async function musicgen({ melody, model, ...params }) {
   return { audio, metadata, folder_root };
 }
 
+const stable_audio_generate = async ({ init_audio, text, ...params }) => {
+  const exampleAudio = await getFile(init_audio);
+  const result = await gradioPredict("/stable_audio_generate", {
+    prompt: text, // temporary fix until forking stable-audio
+    // prompt: "Hello!!",
+    // negative_prompt: "Hello!!",
+    // seconds_start: 0,
+    // seconds_total: 0,
+    // cfg_scale: 0,
+    // steps: 1,
+    // preview_every: 0,
+    // seed: "Hello!!",
+    // sampler_type: "dpmpp-2m-sde",
+    // sigma_min: 0,
+    // sigma_max: 0,
+    // cfg_rescale: 0,
+    // use_init: true,
+    init_audio: exampleAudio,
+    // init_noise_level: 0.1,
+    ...params,
+  });
+
+  const [audio, gallery] = result?.data;
+  return { audio, gallery };
+};
+
 const bark_voice_tokenizer_load = ({ tokenizer, use_gpu }) =>
   gradioPredict<[string]>("/bark_voice_tokenizer_load", [
     tokenizer,
@@ -547,4 +573,11 @@ const endpoints = {
   musicgen_audiogen_unload_model: passThrough(
     "/musicgen_audiogen_unload_model"
   ),
+  // stable_audio_generate: passThrough("/stable_audio_generate"),
+  stable_audio_generate,
+  stable_audio_inpaint: passThrough("/stable_audio_inpaint"),
+  stable_audio_get_models: () =>
+    gradioPredict<[GradioChoices]>("/stable_audio_get_models").then((result) =>
+      extractChoicesTuple(result?.data[0])
+    ),
 };
