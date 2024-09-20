@@ -73,6 +73,10 @@ export const routes: Route[] = [
     text: "MAGNeT",
   },
   {
+    href: "/stable-audio",
+    text: "Stable Audio (Demo)",
+  },
+  {
     href: "/demucs",
     text: "Demucs",
   },
