@@ -510,6 +510,34 @@ const delete_huggingface_cache_revisions = ({ commit_hash }) =>
 const passThrough = (endpoint) => (params) =>
   gradioPredict<any>(endpoint, params);
 
+type LocalCacheFile = {
+  __type: "local_cache_file";
+  path: string;
+};
+
+const isLocalCacheFile = (x: any): x is LocalCacheFile =>
+  typeof x === "object" && x.__type === "local_cache_file";
+
+const resolveParam = async (key: string, value: any) =>
+  isLocalCacheFile(value) ? await getFile(value.path) : value;
+
+const resolveFileParams = async (params: Record<string, any>) =>
+  Object.fromEntries(
+    await Promise.all(
+      Object.entries(params).map(async ([key, value]) => [
+        key,
+        await resolveParam(key, value),
+      ])
+    )
+  );
+
+const resolvedPassThrough =
+  (endpoint: string, map = (x) => x) =>
+  (params: Record<string, any>) =>
+    resolveFileParams(params)
+      .then((resolvedParams) => gradioPredict<any>(endpoint, resolvedParams))
+      .then(map);
+
 const endpoints = {
   maha,
   maha_tts_refresh_voices,
@@ -580,4 +608,8 @@ const endpoints = {
     gradioPredict<[GradioChoices]>("/stable_audio_get_models").then((result) =>
       extractChoicesTuple(result?.data[0])
     ),
+  load_ffmpeg_metadata: resolvedPassThrough(
+    "/load_ffmpeg_metadata",
+    (result) => result?.data[0]
+  ),
 };

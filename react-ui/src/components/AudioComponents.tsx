@@ -18,7 +18,7 @@ export const AudioInput = ({
   label,
   className,
 }: {
-  callback: (melody?: string) => void;
+  callback: (filename?: string) => void;
   funcs?: Record<string, (audio: string | undefined | any) => void>;
   url?: string;
   label?: string;
