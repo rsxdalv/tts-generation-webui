@@ -147,6 +147,7 @@ def maha_tts_ui():
                 outputs=[speaker_name],
                 api_name="maha_tts_refresh_voices",
             )
+        gr.Markdown("Note: The speaker audio must be mono at this time.")
 
     seed, randomize_seed_callback = randomize_seed_ui()
 
