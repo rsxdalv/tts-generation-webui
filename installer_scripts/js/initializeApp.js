@@ -15,7 +15,8 @@ const cudaVersion = "11.8";
 const pythonVersion = `3.10.11`;
 const pythonPackage = `python=${pythonVersion}`;
 const ffmpegPackage = `conda-forge::ffmpeg=4.4.2[build=lgpl*]`;
-const nodePackage = `node=20.17.0`;
+const nodePackage = ``;
+// const nodePackage = `node=20.17.0`;
 const cudaChannels = [
   "",
   "pytorch",
