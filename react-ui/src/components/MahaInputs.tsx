@@ -53,38 +53,6 @@ const Speaker = ({
       onOpen={openVoices}
       loading={loading}
     />
-    // <div className="flex gap-2">
-    //   <label className="text-sm">Speaker:</label>
-    //   <select
-    //     name="speaker_name"
-    //     id="speaker_name"
-    //     className="cell text-black w-full"
-    //     value={selected}
-    //     onChange={handleChange}
-    //   >
-    //     {options
-    //       // concat to ensure selected is at the top and present
-    //       .filter((option) => option !== selected)
-    //       .concat(selected)
-    //       .map((bandwidth) => (
-    //         <option key={bandwidth} value={bandwidth}>
-    //           {bandwidth}
-    //         </option>
-    //       ))}
-    //   </select>
-    //   <button
-    //     className="cell"
-    //     onClick={openVoices}
-    //   >
-    //     Open
-    //   </button>
-    //   <button
-    //     className="cell"
-    //     onClick={fetchOptions}
-    //   >
-    //     {loading ? "Refreshing..." : "Refresh"}
-    //   </button>
-    // </div>
   );
 };
 
@@ -146,6 +114,10 @@ export const MahaInputs = ({
     <div className="flex flex-col gap-y-4 w-1/2">
 
       <Speaker mahaParams={mahaParams} handleChange={handleChange} />
+
+      <p className="text-sm">
+        Note: The speaker audio must be mono at this time.
+      </p>
 
       <SeedInput params={mahaParams} handleChange={handleChange} />
 

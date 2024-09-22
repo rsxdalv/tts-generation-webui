@@ -31,12 +31,13 @@ def load_ffmpeg_metadata(filename: str):
     if not filename or not os.path.exists(filename):
         return None
     ffmpeg_output = ffmpeg.probe(filename)
-    if filename.endswith(".ogg"):
+    if filename.endswith(".ogg") or ffmpeg_output["format"]["format_name"] == "ogg":
         return json.loads(ffmpeg_output["streams"][0]["tags"]["comment"])
-    if filename.endswith(".flac"):
+    if filename.endswith(".flac") or ffmpeg_output["format"]["format_name"] == "flac":
         return json.loads(ffmpeg_output["format"]["tags"]["comment"])
+    print("Unknown file type:", filename)
     print(json.dumps(ffmpeg_output, indent=4, sort_keys=True))
-    return None
+    return json.loads(json.dumps(ffmpeg_output, indent=4, sort_keys=True))
 
 
 def ffmpeg_metadata_ui():
