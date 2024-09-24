@@ -5,7 +5,7 @@ FROM nvidia/cuda:11.8.0-devel-ubuntu22.04 AS env_base
 RUN apt-get update && apt-get install --no-install-recommends -y \
     git vim nano build-essential python3-dev python3-venv python3-pip gcc g++ ffmpeg
 
-ENV NODE_VERSION=20.17.0
+ENV NODE_VERSION=22.9.0
 RUN apt-get update && apt install -y curl
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
 ENV NVM_DIR=/root/.nvm

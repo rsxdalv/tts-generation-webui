@@ -15,8 +15,10 @@ const cudaVersion = "11.8";
 const pythonVersion = `3.10.11`;
 const pythonPackage = `python=${pythonVersion}`;
 const ffmpegPackage = `conda-forge::ffmpeg=4.4.2[build=lgpl*]`;
-const nodePackage = ``;
-// const nodePackage = `node=20.17.0`;
+const nodePackage = `conda-forge::nodejs=22.9.0`;
+// const anacondaPostgresqlPackage = `anaconda::postgresql=12.17`;
+const anacondaPostgresqlPackage = ``;
+
 const cudaChannels = [
   "",
   "pytorch",
@@ -25,14 +27,25 @@ const cudaChannels = [
 ].join(" -c ");
 const cpuChannels = ["", "pytorch"].join(" -c ");
 
-const cudaPackages = `pytorch[version=${torchVersion},build=py3.10_cuda${cudaVersion}*] torchvision torchaudio pytorch-cuda=${cudaVersion} cuda-toolkit ninja`;
-const cudaPytorchInstall$ = `conda install -y -k ${nodePackage} ${ffmpegPackage} ${cudaPackages} ${cudaChannels}`;
+const cudaPackages = `pytorch[version=${torchVersion},build=py3.10_cuda${cudaVersion}*] pytorch-cuda=${cudaVersion} torchvision torchaudio cuda-toolkit ninja`;
+const cudaPytorchInstall$ = [
+  "conda install -y -k",
+  anacondaPostgresqlPackage,
+  nodePackage,
+  ffmpegPackage,
+  cudaPackages,
+  cudaChannels,
+].join(" ");
 
 const cpuPackages = `pytorch=${torchVersion} torchvision torchaudio cpuonly`;
-const pytorchCPUInstall$ = `conda install -y -k ${nodePackage} ${ffmpegPackage} ${cpuPackages} ${cpuChannels}`;
-
-// console.log(cudaPytorchInstall$);
-// console.log(pytorchCPUInstall$);
+const pytorchCPUInstall$ = [
+  "conda install -y -k",
+  anacondaPostgresqlPackage,
+  nodePackage,
+  ffmpegPackage,
+  cpuPackages,
+  cpuChannels,
+].join(" ");
 
 const ensurePythonVersion = async () => {
   try {
@@ -102,7 +115,7 @@ Select the device (GPU/CPU) you are using to run the application:
 const gpuFile = "./installer_scripts/.gpu";
 const majorVersionFile = "./installer_scripts/.major_version";
 const pipPackagesFile = "./installer_scripts/.pip_packages";
-const majorVersion = "2"; // to be bumped
+const majorVersion = "3";
 
 const versions = JSON.parse(
   fs.readFileSync("./installer_scripts/versions.json")

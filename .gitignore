@@ -51,3 +51,6 @@ node_modules/
 # Temporary files used by some modules
 output.wav
 log.out
+
+# Database
+/data/postgres/
