@@ -1,9 +1,9 @@
 import React from "react";
-import { Template } from "../components/Template";
-import { AudioInput, AudioOutput } from "../components/AudioComponents";
-import { useDemucsPage } from "../tabs/DemucsParams";
-import { GenerationHistorySimple } from "../components/GenerationHistory";
-import { Button } from "../components/ui/button";
+import { Template } from "../../components/Template";
+import { AudioInput, AudioOutput } from "../../components/AudioComponents";
+import { useDemucsPage } from "../../tabs/DemucsParams";
+import { GenerationHistorySimple } from "../../components/GenerationHistory";
+import { Button } from "../../components/ui/button";
 
 const DemucsPage = () => {
   const {

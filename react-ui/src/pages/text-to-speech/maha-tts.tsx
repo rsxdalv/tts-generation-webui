@@ -1,10 +1,10 @@
 import React from "react";
-import { Template } from "../components/Template";
-import { AudioOutput } from "../components/AudioComponents";
-import { useMahaPage } from "../tabs/MahaParams";
-import { HyperParameters } from "../components/HyperParameters";
-import { MahaInputs } from "../components/MahaInputs";
-import { GenerationHistorySimple } from "../components/GenerationHistory";
+import { Template } from "../../components/Template";
+import { AudioOutput } from "../../components/AudioComponents";
+import { useMahaPage } from "../../tabs/MahaParams";
+import { HyperParameters } from "../../components/HyperParameters";
+import { MahaInputs } from "../../components/MahaInputs";
+import { GenerationHistorySimple } from "../../components/GenerationHistory";
 
 const MahaPage = () => {
   const {

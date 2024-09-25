@@ -74,7 +74,7 @@ export const StableAudioInputs: React.FC<StableAudioInputsProps> = ({
             step="1"
           />
         </div>
-        <div className="flex gap-2 cell">
+        <div className="flex gap-2 cell justify-center">
           <ParameterSlider
             params={stableAudioParams}
             onChange={handleChange}
@@ -98,6 +98,8 @@ export const StableAudioInputs: React.FC<StableAudioInputsProps> = ({
             orientation="vertical"
             className="h-40"
           />
+        </div>
+        <div className="hidden">
           <ParameterSlider
             params={stableAudioParams}
             onChange={handleChange}
@@ -108,6 +110,7 @@ export const StableAudioInputs: React.FC<StableAudioInputsProps> = ({
             step="1"
             orientation="vertical"
             className="h-40"
+            disabled
           />
         </div>
         <StableAudioModels

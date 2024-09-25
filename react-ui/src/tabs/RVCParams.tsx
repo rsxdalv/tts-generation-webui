@@ -47,7 +47,7 @@ export const sendToRVCGeneration = (audio?: string) => {
     (vocosParams: RVCParams = initialState) =>
       ({ ...vocosParams, audio } as RVCParams)
   );
-  router.push("/bark");
+  router.push("/audio-conversion/rvc");
 };
 
 export const useRVCGenerationParams = () =>

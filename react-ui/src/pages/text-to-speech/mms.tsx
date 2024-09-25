@@ -1,10 +1,10 @@
 import React from "react";
-import { Template } from "../components/Template";
-import { AudioOutput } from "../components/AudioComponents";
-import { useMMSPage } from "../tabs/MMSParams";
-import { HyperParameters } from "../components/HyperParameters";
-import { MMSInputs } from "../components/MMSInputs";
-import { GenerationHistorySimple } from "../components/GenerationHistory";
+import { Template } from "../../components/Template";
+import { AudioOutput } from "../../components/AudioComponents";
+import { useMMSPage } from "../../tabs/MMSParams";
+import { HyperParameters } from "../../components/HyperParameters";
+import { MMSInputs } from "../../components/MMSInputs";
+import { GenerationHistorySimple } from "../../components/GenerationHistory";
 
 const MMSPage = () => {
   const {

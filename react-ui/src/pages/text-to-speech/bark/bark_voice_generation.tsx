@@ -1,18 +1,18 @@
 import React from "react";
-import { Template } from "../../components/Template";
-import useLocalStorage from "../../hooks/useLocalStorage";
-import { AudioInput, AudioOutput } from "../../components/AudioComponents";
+import { Template } from "../../../components/Template";
+import useLocalStorage from "../../../hooks/useLocalStorage";
+import { AudioInput, AudioOutput } from "../../../components/AudioComponents";
 import Head from "next/head";
 import {
   BarkVoiceGenerationParams,
   barkVoiceGenerationId,
   initialState,
-} from "../../tabs/BarkVoiceGenerationParams";
-import { GradioFile } from "../../types/GradioFile";
-import { SelectWithLabel } from "../../components/component/SelectWithLabel";
-import { HandleChangeEvent } from "../../types/HandleChange";
-import { SwitchWithLabel } from "../../components/SwitchWithLabel";
-import { Button } from "../../components/ui/button";
+} from "../../../tabs/BarkVoiceGenerationParams";
+import { GradioFile } from "../../../types/GradioFile";
+import { SelectWithLabel } from "../../../components/component/SelectWithLabel";
+import { HandleChangeEvent } from "../../../types/HandleChange";
+import { SwitchWithLabel } from "../../../components/SwitchWithLabel";
+import { Button } from "../../../components/ui/button";
 
 type Result = {
   filename: string;

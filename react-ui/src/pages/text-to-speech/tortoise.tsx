@@ -1,10 +1,10 @@
 import React from "react";
-import { Template } from "../components/Template";
-import { AudioOutput } from "../components/AudioComponents";
-import { TortoiseInput } from "../components/TortoiseInput";
-import { GenerationHistorySimple } from "../components/GenerationHistory";
-import { HyperParameters } from "../components/HyperParameters";
-import { useTortoisePage } from "../tabs/TortoiseGenerationParams";
+import { Template } from "../../components/Template";
+import { AudioOutput } from "../../components/AudioComponents";
+import { TortoiseInput } from "../../components/TortoiseInput";
+import { GenerationHistorySimple } from "../../components/GenerationHistory";
+import { HyperParameters } from "../../components/HyperParameters";
+import { useTortoisePage } from "../../tabs/TortoiseGenerationParams";
 
 const TortoiseGenerationPage = () => {
   const {
