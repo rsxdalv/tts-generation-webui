@@ -6,7 +6,6 @@ const { $, $$, $sh } = require("./shell.js");
 
 const DEBUG_DRY_RUN = false;
 
-// const torchVersion = $$(`pip show torch | grep Version`);
 const torchVersion = "2.3.1";
 const cudaVersion = "11.8";
 
@@ -16,8 +15,8 @@ const pythonVersion = `3.10.11`;
 const pythonPackage = `python=${pythonVersion}`;
 const ffmpegPackage = `conda-forge::ffmpeg=4.4.2[build=lgpl*]`;
 const nodePackage = `conda-forge::nodejs=22.9.0`;
-// const anacondaPostgresqlPackage = `anaconda::postgresql=12.17`;
-const anacondaPostgresqlPackage = ``;
+const anacondaPostgresqlPackage = `anaconda::postgresql=12.17`;
+const terraformPackage = `conda-forge::terraform=1.8.2`;
 
 const cudaChannels = [
   "",
@@ -30,6 +29,7 @@ const cpuChannels = ["", "pytorch"].join(" -c ");
 const cudaPackages = `pytorch[version=${torchVersion},build=py3.10_cuda${cudaVersion}*] pytorch-cuda=${cudaVersion} torchvision torchaudio cuda-toolkit ninja`;
 const cudaPytorchInstall$ = [
   "conda install -y -k",
+  terraformPackage,
   anacondaPostgresqlPackage,
   nodePackage,
   ffmpegPackage,
@@ -40,6 +40,7 @@ const cudaPytorchInstall$ = [
 const cpuPackages = `pytorch=${torchVersion} torchvision torchaudio cpuonly`;
 const pytorchCPUInstall$ = [
   "conda install -y -k",
+  terraformPackage,
   anacondaPostgresqlPackage,
   nodePackage,
   ffmpegPackage,
@@ -290,3 +291,17 @@ function setupReactUI() {
   }
 }
 exports.setupReactUI = setupReactUI;
+
+async function setupDB() {
+  // initdb -D data/postgres -U postgres
+  // pg_ctl -D data/postgres -l data/postgres/logfile start
+  try {
+    displayMessage("Initializing database...");
+    await $sh("initdb -D data/postgres -U postgres");
+    // todo - manage DB process
+    // await $sh("pg_ctl -D data/postgres -l data/postgres/logfile start");
+    displayMessage("Successfully initialized database");
+  } catch (error) {
+    displayMessage("Failed to initialize database");
+  }
+}
