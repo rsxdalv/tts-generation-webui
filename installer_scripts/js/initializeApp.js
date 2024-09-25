@@ -16,7 +16,8 @@ const pythonPackage = `python=${pythonVersion}`;
 const ffmpegPackage = `conda-forge::ffmpeg=4.4.2[build=lgpl*]`;
 const nodePackage = `conda-forge::nodejs=22.9.0`;
 const anacondaPostgresqlPackage = `anaconda::postgresql=12.17`;
-const terraformPackage = `conda-forge::terraform=1.8.2`;
+// const terraformPackage = `conda-forge::terraform=1.8.2`;
+const terraformPackage = ``;
 
 const cudaChannels = [
   "",
