@@ -43,6 +43,7 @@
     "eslint-config-next": "13.4.1",
     "express": "^4.18.2",
     "iconv": "^3.0.1",
+    "liquibase": "^4.4.0",
     "lucide-react": "^0.438.0",
     "music-metadata": "^8.1.4",
     "next": "13.5",
