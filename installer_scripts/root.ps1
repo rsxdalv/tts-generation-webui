@@ -40,6 +40,35 @@ if ($LASTEXITCODE -ne 0) {
     exit 1
 }
 
+$env:Path += ";$PSScriptRoot\..\installer_files\env\Library\bin\"
+
+if (!(Get-Command "vswhere" -ErrorAction SilentlyContinue)) {
+    Write-Host "Critical Warning: vswhere is not installed, automatic validation of Visual Studio Build Tools installation will not work."
+    Write-Host "For more information, please visit:"
+    Write-Host "https://github.com/microsoft/vswhere"
+    Write-Host "The app will try to launch but might fail."
+} else {
+    Write-Host "vswhere is installed, checking for Visual Studio Build Tools installation..."
+    $vswhereOutput = vswhere -products * -format json | ConvertFrom-Json
+    if ($vswhereOutput.length -eq 0) {
+        Write-Host "Warning: Visual Studio compiler is not installed."
+        if (!(Get-Command "winget" -ErrorAction SilentlyContinue)) {
+            Write-Host "Warning: winget is not installed, automatic installation of Visual Studio Build Tools will not work."
+            Write-Host "Please install Visual Studio Build Tools manually and restart the installer."
+            Write-Host "(Note: The full Visual Studio is NOT required, only the Build Tools)"
+            Write-Host "For more information, please visit:"
+            Write-Host "https://learn.microsoft.com/en-us/cpp/build/vscpp-step-0-installation?view=msvc-170"
+            exit 1
+        } else {
+            Write-Host "Attempting to install Visual Studio Build Tools using winget..."
+            Write-Host "This will open a new window, please follow the instructions."
+            winget install Microsoft.VisualStudio.2022.BuildTools --accept-package-agreements --accept-source-agreements
+        }
+    } else {
+        Write-Host "Visual Studio Build Tools is installed, continuing..."
+    }
+}
+
 & "$PSScriptRoot\init_app.bat"
 if ($LASTEXITCODE -ne 0) {
     Write-Host "Failed to init the app, exiting..."
