@@ -100,6 +100,7 @@ const installDependencies = async (gpuchoice) => {
     await updateDependencies(false);
   } catch (error) {
     displayError(`Error during installation: ${error.message}`);
+    throw error;
   }
 };
 
@@ -304,6 +305,7 @@ function setupReactUI() {
     displayMessage("Successfully built react-ui");
   } catch (error) {
     displayMessage("Failed to install node_modules or build react-ui");
+    throw error;
   }
 }
 exports.setupReactUI = setupReactUI;
