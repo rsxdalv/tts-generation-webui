@@ -125,6 +125,11 @@ export const parseNpy = (arrayBufferContents: ArrayBuffer) => {
   );
   const shape = header.shape;
   const dtype = dTypeMapping[header.descr];
+  if (!dtype) {
+    console.log(header);
+    console.log(hcontents);
+    throw new Error(`Unknown dtype: ${header.descr}`);
+  }
   const nums = new dtype["arrayConstructor"](arrayBufferContents, offsetBytes);
 
   // if fortran_order:

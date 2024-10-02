@@ -63,7 +63,7 @@ export const getOggData = async (collection = "favorites") => {
   return oggDataParsed;
 };
 
-const parseToNpzData = (buf: Buffer | ArrayBuffer) => {
+const parseToNpzData = (buf: Buffer | ArrayBuffer, filename?: string) => {
   try {
     return new AdmZip.default(buf instanceof Buffer ? buf : Buffer.from(buf))
       .getEntries()
@@ -72,6 +72,7 @@ const parseToNpzData = (buf: Buffer | ArrayBuffer) => {
       .map((entry) => npyToUtf8(entry))
       .map((entry) => JSON.parse(entry))[0];
   } catch (error) {
+    console.log("Error parsing metadata for file: " + filename);
     console.error(error);
     return null;
   }
@@ -90,7 +91,7 @@ export const getNpzDataSimpleVoices = async () =>
   getNpzs(npzPathWebui)
     .filter((file) => file.endsWith(".npz"))
     .map((npz) => ({
-      ...parseToNpzData(fs.readFileSync(path.join(npzPathWebui, npz))),
+      ...parseToNpzData(fs.readFileSync(path.join(npzPathWebui, npz)), npz),
       filename: path.join(baseUrlPath, "voices", npz).split(path.sep).join("/"),
       url: getWebuiURL("voices", npz),
     }));
