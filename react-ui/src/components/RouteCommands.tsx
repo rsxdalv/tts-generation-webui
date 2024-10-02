@@ -8,7 +8,7 @@ import {
   CommandGroup,
   CommandItem,
 } from "@/components/ui/command";
-import { routes } from "./Header";
+import { Route, routes } from "./Header";
 
 function CommandShortcut() {
   return (
@@ -24,6 +24,24 @@ function CommandShortcut() {
 export function RouteCommands({}) {
   const [isFocused, setIsFocused] = useState(false);
   const router = useRouter();
+  const allRoutes: (Route & { parent?: Route })[] = routes.reduce(
+    (acc, route) => [
+      ...acc,
+      route,
+      ...(route.subroutes || []).reduce(
+        (acc, subroute) => [
+          ...acc,
+          { ...subroute, parent: route },
+          ...(subroute.subroutes || []).map((subsubroute) => ({
+            ...subsubroute,
+            parent: subroute,
+          })),
+        ],
+        [] as Route[]
+      ),
+    ],
+    [] as Route[]
+  );
 
   return (
     <Command
@@ -35,11 +53,12 @@ export function RouteCommands({}) {
       <CommandList className={isFocused ? "" : "hidden"}>
         <CommandEmpty>No results found.</CommandEmpty>
         <CommandGroup heading="Navigation">
-          {routes.map((route) => (
+          {allRoutes.map((route) => (
             <CommandItem
               key={route.href}
               onSelect={() => router.push(route.href)}
             >
+              {route.parent ? route.parent.text + " > " : ""}
               {route.text}
             </CommandItem>
           ))}

@@ -1,16 +1,16 @@
 import React, { useState } from "react";
-import { Template } from "../../components/Template";
-import useLocalStorage from "../../hooks/useLocalStorage";
+import { Template } from "../../../components/Template";
+import useLocalStorage from "../../../hooks/useLocalStorage";
 import {
   BarkSettingsParams,
   initialBarkSettingsParams,
   barkSettingsId,
-} from "../../tabs/BarkSettingsParams";
-import { GPUInfoWidget } from "../../components/GPUInfoWidget";
-import { Button } from "../../components/ui/button";
-import { SwitchWithLabel } from "../../components/SwitchWithLabel";
-import { HandleChangeEvent } from "../../types/HandleChange";
-import { Label } from "../../components/ui/label";
+} from "../../../tabs/BarkSettingsParams";
+import { GPUInfoWidget } from "../../../components/GPUInfoWidget";
+import { Button } from "../../../components/ui/button";
+import { SwitchWithLabel } from "../../../components/SwitchWithLabel";
+import { HandleChangeEvent } from "../../../types/HandleChange";
+import { Label } from "../../../components/ui/label";
 import {
   Table,
   TableHeader,

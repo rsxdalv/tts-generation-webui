@@ -1,16 +1,16 @@
 import React from "react";
-import { Template } from "../../components/Template";
-import useLocalStorage from "../../hooks/useLocalStorage";
-import { AudioOutput } from "../../components/AudioComponents";
+import { Template } from "../../../components/Template";
+import useLocalStorage from "../../../hooks/useLocalStorage";
+import { AudioOutput } from "../../../components/AudioComponents";
 import {
   useVocosParamsNPZ,
   useVocosResultsNPZ,
-} from "../../tabs/VocosParamsNPZ";
-import { GradioFile } from "../../types/GradioFile";
-import { encodecDecode } from "../../functions/encodecDecode";
-import { applyVocosNPZ } from "../../functions/applyVocosNPZ";
-import { Button } from "../../components/ui/button";
-import { SingleFileUpload } from "../../components/SingleFileUpload";
+} from "../../../tabs/VocosParamsNPZ";
+import { GradioFile } from "../../../types/GradioFile";
+import { encodecDecode } from "../../../functions/encodecDecode";
+import { applyVocosNPZ } from "../../../functions/applyVocosNPZ";
+import { Button } from "../../../components/ui/button";
+import { SingleFileUpload } from "../../../components/SingleFileUpload";
 
 const VocosPageNPZ = () => {
   const [dataEncodec, setDataEncodec] = useLocalStorage<GradioFile | null>(

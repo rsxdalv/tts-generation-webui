@@ -1,10 +1,10 @@
 import React from "react";
-import { Template } from "../components/Template";
-import { AudioOutput } from "../components/AudioComponents";
-import { BarkInputs } from "../components/BarkInputs";
-import { useBarkPage } from "../tabs/BarkGenerationParams";
-import { GenerationHistorySimple } from "../components/GenerationHistory";
-import { HyperParameters } from "../components/HyperParameters";
+import { Template } from "../../components/Template";
+import { AudioOutput } from "../../components/AudioComponents";
+import { BarkInputs } from "../../components/BarkInputs";
+import { useBarkPage } from "../../tabs/BarkGenerationParams";
+import { GenerationHistorySimple } from "../../components/GenerationHistory";
+import { HyperParameters } from "../../components/HyperParameters";
 
 const BarkGenerationPage = () => {
   const {

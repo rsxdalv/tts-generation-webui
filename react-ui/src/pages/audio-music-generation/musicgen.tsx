@@ -1,10 +1,10 @@
 import React from "react";
-import { Template } from "../components/Template";
-import { AudioOutput } from "../components/AudioComponents";
-import { useMusicgenPage } from "../tabs/MusicgenParams";
-import { HyperParameters } from "../components/HyperParameters";
-import { MusicgenInputs } from "../components/MusicgenInputs";
-import { GenerationHistorySimple } from "../components/GenerationHistory";
+import { Template } from "../../components/Template";
+import { AudioOutput } from "../../components/AudioComponents";
+import { useMusicgenPage } from "../../tabs/MusicgenParams";
+import { HyperParameters } from "../../components/HyperParameters";
+import { MusicgenInputs } from "../../components/MusicgenInputs";
+import { GenerationHistorySimple } from "../../components/GenerationHistory";
 
 const MusicgenPage = () => {
   const {

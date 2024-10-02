@@ -157,6 +157,9 @@ export const TortoiseInput = ({
           label="Prompt"
           handleChange={handleChange}
           params={tortoiseGenerationParams}
+          optimalLength={200}
+          softMaxLength={300}
+          hardMaxLength={500}
         />
       </div>
       <div className="flex flex-col gap-y-2">

@@ -1,10 +1,10 @@
 import React from "react";
-import { AudioOutput } from "../components/AudioComponents";
-import { Template } from "../components/Template";
-import { useRVCPage } from "../tabs/RVCParams";
-import { RVCInputs } from "../components/RVCInputs";
-import { GenerationHistorySimple } from "../components/GenerationHistory";
-import { Button } from "../components/ui/button";
+import { AudioOutput } from "../../components/AudioComponents";
+import { Template } from "../../components/Template";
+import { useRVCPage } from "../../tabs/RVCParams";
+import { RVCInputs } from "../../components/RVCInputs";
+import { GenerationHistorySimple } from "../../components/GenerationHistory";
+import { Button } from "../../components/ui/button";
 
 const RvcGenerationPage = () => {
   const {

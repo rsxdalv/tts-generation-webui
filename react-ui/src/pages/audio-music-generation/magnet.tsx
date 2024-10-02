@@ -1,11 +1,11 @@
 import React from "react";
-import { Template } from "../components/Template";
-import { AudioOutput } from "../components/AudioComponents";
-import { useMagnetPage } from "../tabs/MagnetParams";
-import { HyperParameters } from "../components/HyperParameters";
-import { parseFormChange } from "../data/parseFormChange";
-import { MagnetInputs } from "../components/MagnetInputs";
-import { GenerationHistorySimple } from "../components/GenerationHistory";
+import { Template } from "../../components/Template";
+import { AudioOutput } from "../../components/AudioComponents";
+import { useMagnetPage } from "../../tabs/MagnetParams";
+import { HyperParameters } from "../../components/HyperParameters";
+import { parseFormChange } from "../../data/parseFormChange";
+import { MagnetInputs } from "../../components/MagnetInputs";
+import { GenerationHistorySimple } from "../../components/GenerationHistory";
 
 const MagnetPage = () => {
   const {

@@ -1,17 +1,17 @@
 import React from "react";
-import { Template } from "../components/Template";
-import { AudioOutput } from "../components/AudioComponents";
-import { useVallexPage } from "../tabs/VallexParams";
-import { HyperParameters } from "../components/HyperParameters";
-import { VallexInputs } from "../components/VallexInputs";
-import { GenerationHistorySimple } from "../components/GenerationHistory";
+import { Template } from "../../components/Template";
+import { AudioOutput } from "../../components/AudioComponents";
+import { useVallexPage } from "../../tabs/VallexParams";
+import { HyperParameters } from "../../components/HyperParameters";
+import { VallexInputs } from "../../components/VallexInputs";
+import { GenerationHistorySimple } from "../../components/GenerationHistory";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "../components/ui/collapsible";
+} from "../../components/ui/collapsible";
 import { ChevronDownIcon } from "lucide-react";
-import { Separator } from "../components/ui/separator";
+import { Separator } from "../../components/ui/separator";
 
 const VallexPage = () => {
   const {

@@ -1,7 +1,6 @@
 import React from "react";
-import { Template } from "../components/Template";
-import Head from "next/head";
-import { GPUInfoWidget } from "../components/GPUInfoWidget";
+import { Template } from "../../components/Template";
+import { GPUInfoWidget } from "../../components/GPUInfoWidget";
 
 const GPUInfoPage = () => {
   return (

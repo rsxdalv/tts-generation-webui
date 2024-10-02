@@ -17,7 +17,9 @@ from tts_webui.config.load_config import default_config
 from tts_webui.config.config import config
 
 from tts_webui.css.css import full_css
-from tts_webui.history_tab.collections_directories_atom import collections_directories_atom
+from tts_webui.history_tab.collections_directories_atom import (
+    collections_directories_atom,
+)
 
 print("Starting server...\n")
 
@@ -30,6 +32,7 @@ from tts_webui.extensions_loader.interface_extensions import (
 from tts_webui.extensions_loader.decorator_extensions import (
     extension_decorator_list_tab,
 )
+
 
 def reload_config_and_restart_ui():
     os._exit(0)
@@ -141,7 +144,11 @@ def all_tabs():
                 "generation_tab_tortoise",
                 "Tortoise TTS",
             ),
-            ("tts_webui.seamlessM4T.seamless_tab", "seamless_tab", "SeamlessM4Tv2Model"),
+            (
+                "tts_webui.seamlessM4T.seamless_tab",
+                "seamless_tab",
+                "SeamlessM4Tv2Model",
+            ),
             (
                 "tts_webui.vall_e_x.vall_e_x_tab",
                 "valle_x_tab",
@@ -197,7 +204,12 @@ def all_tabs():
                 "RVC",
                 "-r requirements_rvc.txt",
             ),
-            ("tts_webui.rvc_tab.uvr5_tab", "uvr5_tab", "UVR5", "-r requirements_rvc.txt"),
+            (
+                "tts_webui.rvc_tab.uvr5_tab",
+                "uvr5_tab",
+                "UVR5",
+                "-r requirements_rvc.txt",
+            ),
             (
                 "tts_webui.demucs.demucs_tab",
                 "demucs_tab",
@@ -242,7 +254,11 @@ def all_tabs():
         settings_tab_gradio(reload_config_and_restart_ui, gradio_interface_options)
 
         settings_tabs = [
-            ("tts_webui.bark.settings_tab_bark", "settings_tab_bark", "Settings (Bark)"),
+            (
+                "tts_webui.bark.settings_tab_bark",
+                "settings_tab_bark",
+                "Settings (Bark)",
+            ),
             (
                 "tts_webui.utils.model_location_settings_tab",
                 "model_location_settings_tab",
@@ -301,14 +317,48 @@ def start_gradio_server():
             f"Gradio server will be available on http://localhost:{gradio_interface_options['server_port']}"
         )
 
-    demo.queue(
-        # concurrency_count=gradio_interface_options.get("concurrency_count", 5),
-    ).launch(**gradio_interface_options, allowed_paths=["."])
+    # concurrency_count=gradio_interface_options.get("concurrency_count", 5),
+    demo.queue().launch(**gradio_interface_options, allowed_paths=["."])
 
 
-if __name__ == "__main__":
+def server_hypervisor():
     import subprocess
-    import webbrowser
+    # import webbrowser
+    # import threading
+    import signal
+    import sys
+
+    # def wait_for_postgres():
+    #     import time
+
+    #     time.sleep(1)
+    #     try:
+    #         subprocess.check_call("pg_isready -U postgres", shell=True)
+    #         print("Postgres is ready")
+    #     except:
+    #         wait_for_postgres()
+
+    # def create_db():
+    #     try:
+    #         wait_for_postgres()
+    #         subprocess.Popen("createdb -U postgres webui", shell=True)
+    #         print("Successfully created database 'webui'")
+    #         # subprocess.Popen("liquibase update", shell=True)
+    #     except:
+    #         pass
+
+    def stop_postgres(postgres_process):
+        try:
+            subprocess.check_call("pg_ctl stop -D data\\postgres -m fast", shell=True)
+            print("PostgreSQL stopped gracefully.")
+        except Exception as e:
+            print(f"Error stopping PostgreSQL: {e}")
+            postgres_process.terminate()
+
+    def signal_handler(signal, frame, postgres_process):
+        print("Shutting down...")
+        stop_postgres(postgres_process)
+        sys.exit(0)
 
     print("Starting React UI...")
     subprocess.Popen(
@@ -319,6 +369,25 @@ if __name__ == "__main__":
         },
         shell=True,
     )
+    print("Starting Postgres...")
+    postgres_process = subprocess.Popen("postgres -D data\\postgres", shell=True)
+    try:
+        signal.signal(signal.SIGINT, lambda sig, frame: signal_handler(sig, frame, postgres_process))  # Ctrl+C
+        signal.signal(signal.SIGTERM, lambda sig, frame: signal_handler(sig, frame, postgres_process))  # Termination signals
+        if os.name != "nt":
+            signal.signal(signal.SIGHUP, lambda sig, frame: signal_handler(sig, frame, postgres_process))   # Terminal closure
+            signal.signal(signal.SIGQUIT, lambda sig, frame: signal_handler(sig, frame, postgres_process))  # Quit
+    except (ValueError, OSError) as e:
+        print(f"Failed to set signal handlers: {e}")
+
+    # db_thread = threading.Thread(target=create_db)
+    # db_thread.start()
+
+
+if __name__ == "__main__":
+    server_hypervisor()
+    import webbrowser
+
     if gradio_interface_options["inbrowser"]:
         webbrowser.open("http://localhost:3000")
 

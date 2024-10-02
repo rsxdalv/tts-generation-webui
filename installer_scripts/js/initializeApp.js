@@ -1,12 +1,13 @@
 const fs = require("fs");
+const { resolve } = require("path");
 const { displayError, displayMessage } = require("./displayMessage.js");
 const { processExit } = require("./processExit.js");
 const { menu } = require("./menu.js");
 const { $, $$, $sh } = require("./shell.js");
+const { applyDatabaseConfig } = require("./applyDatabaseConfig.js");
 
 const DEBUG_DRY_RUN = false;
 
-// const torchVersion = $$(`pip show torch | grep Version`);
 const torchVersion = "2.3.1";
 const cudaVersion = "11.8";
 
@@ -15,8 +16,11 @@ const cudaVersion = "11.8";
 const pythonVersion = `3.10.11`;
 const pythonPackage = `python=${pythonVersion}`;
 const ffmpegPackage = `conda-forge::ffmpeg=4.4.2[build=lgpl*]`;
-const nodePackage = ``;
-// const nodePackage = `node=20.17.0`;
+const nodePackage = `conda-forge::nodejs=22.9.0`;
+const anacondaPostgresqlPackage = `conda-forge::postgresql=16.4`;
+// const terraformPackage = `conda-forge::terraform=1.8.2`;
+const terraformPackage = ``;
+
 const cudaChannels = [
   "",
   "pytorch",
@@ -25,14 +29,32 @@ const cudaChannels = [
 ].join(" -c ");
 const cpuChannels = ["", "pytorch"].join(" -c ");
 
-const cudaPackages = `pytorch[version=${torchVersion},build=py3.10_cuda${cudaVersion}*] torchvision torchaudio pytorch-cuda=${cudaVersion} cuda-toolkit ninja`;
-const cudaPytorchInstall$ = `conda install -y -k ${nodePackage} ${ffmpegPackage} ${cudaPackages} ${cudaChannels}`;
+const windowsOnlyPackages =
+  process.platform === "win32" ? ["conda-forge::vswhere"] : [];
+
+const cudaPackages = `pytorch[version=${torchVersion},build=py3.10_cuda${cudaVersion}*] pytorch-cuda=${cudaVersion} torchvision torchaudio cuda-toolkit ninja`;
+const cudaPytorchInstall$ = [
+  "conda install -y -k",
+  ...windowsOnlyPackages,
+  terraformPackage,
+  anacondaPostgresqlPackage,
+  nodePackage,
+  ffmpegPackage,
+  cudaPackages,
+  cudaChannels,
+].join(" ");
 
 const cpuPackages = `pytorch=${torchVersion} torchvision torchaudio cpuonly`;
-const pytorchCPUInstall$ = `conda install -y -k ${nodePackage} ${ffmpegPackage} ${cpuPackages} ${cpuChannels}`;
-
-// console.log(cudaPytorchInstall$);
-// console.log(pytorchCPUInstall$);
+const pytorchCPUInstall$ = [
+  "conda install -y -k",
+  ...windowsOnlyPackages,
+  terraformPackage,
+  anacondaPostgresqlPackage,
+  nodePackage,
+  ffmpegPackage,
+  cpuPackages,
+  cpuChannels,
+].join(" ");
 
 const ensurePythonVersion = async () => {
   try {
@@ -99,13 +121,15 @@ Select the device (GPU/CPU) you are using to run the application:
   `
   );
 
-const gpuFile = "./installer_scripts/.gpu";
-const majorVersionFile = "./installer_scripts/.major_version";
-const pipPackagesFile = "./installer_scripts/.pip_packages";
-const majorVersion = "2"; // to be bumped
+const getInstallerFilesPath = (file) => resolve(__dirname, "..", file);
+
+const gpuFile = getInstallerFilesPath(".gpu");
+const majorVersionFile = getInstallerFilesPath(".major_version");
+const pipPackagesFile = getInstallerFilesPath(".pip_packages");
+const majorVersion = "3";
 
 const versions = JSON.parse(
-  fs.readFileSync("./installer_scripts/versions.json")
+  fs.readFileSync(getInstallerFilesPath("versions.json"))
 );
 const newPipPackagesVersion = String(versions.pip_packages);
 
@@ -116,9 +140,7 @@ const readGeneric = (file) => {
   return -1;
 };
 
-const saveGeneric = (file, data) => {
-  fs.writeFileSync(file, data.toString());
-};
+const saveGeneric = (file, data) => fs.writeFileSync(file, data.toString());
 
 const readMajorVersion = () => readGeneric(majorVersionFile);
 const saveMajorVersion = (data) => saveGeneric(majorVersionFile, data);
@@ -128,9 +150,7 @@ const readGPUChoice = () => readGeneric(gpuFile);
 const saveGPUChoice = (data) => saveGeneric(gpuFile, data);
 
 const removeGPUChoice = () => {
-  if (fs.existsSync(gpuFile)) {
-    fs.unlinkSync(gpuFile);
-  }
+  if (fs.existsSync(gpuFile)) fs.unlinkSync(gpuFile);
 };
 
 const dry_run_flag = DEBUG_DRY_RUN ? "--dry-run " : "";
@@ -202,6 +222,11 @@ const FORCE_REINSTALL = process.env.FORCE_REINSTALL ? true : false;
 const initializeApp = async () => {
   displayMessage("Ensuring that python has the correct version...");
   await ensurePythonVersion();
+  try {
+    await applyDatabaseConfig();
+  } catch (error) {
+    displayError("Failed to apply database config");
+  }
   displayMessage("Checking if Torch is installed...");
   if (readMajorVersion() === majorVersion && !FORCE_REINSTALL) {
     if (await checkIfTorchInstalled()) {

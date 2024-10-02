@@ -1,10 +1,10 @@
 import React from "react";
-import { Template } from "../components/Template";
-import { AudioOutput } from "../components/AudioComponents";
-import { HyperParameters } from "../components/HyperParameters";
-import { GenerationHistorySimple } from "../components/GenerationHistory";
-import { useStableAudioPage } from "../tabs/StableAudioParams";
-import { StableAudioInputs } from "../components/StableAudioInputs";
+import { Template } from "../../components/Template";
+import { AudioOutput } from "../../components/AudioComponents";
+import { HyperParameters } from "../../components/HyperParameters";
+import { GenerationHistorySimple } from "../../components/GenerationHistory";
+import { useStableAudioPage } from "../../tabs/StableAudioParams";
+import { StableAudioInputs } from "../../components/StableAudioInputs";
 
 const StableAudioPage = () => {
   const {
