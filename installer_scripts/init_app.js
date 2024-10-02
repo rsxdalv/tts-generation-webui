@@ -1,4 +1,5 @@
 const fs = require("fs");
+const { resolve } = require("path");
 const { $ } = require("./js/shell");
 const { displayError, displayMessage } = require("./js/displayMessage.js");
 const { processExit } = require("./js/processExit.js");
@@ -27,7 +28,7 @@ const getGitCommitHash = () =>
   fs.readFileSync("./.git/refs/heads/main", "utf8");
 
 const AppliedGitVersion = {
-  file: "./.git_version",
+  file: resolve(__dirname, ".git_version"),
   get: () =>
     fs.existsSync(AppliedGitVersion.file)
       ? fs.readFileSync(AppliedGitVersion.file, "utf8")
