@@ -86,9 +86,9 @@ def mms_ui():
 
     Speaking rate. Larger values give faster synthesised speech.
 
-    How random the speech prediction is. Larger values create more variation in the predicted speech.
+    Noise scale. How random the speech prediction is. Larger values create more variation in the predicted speech.
     
-    How random the duration prediction is. Larger values create more variation in the predicted durations.
+    Noise scale duration. How random the duration prediction is. Larger values create more variation in the predicted durations.
     """
     )
     mms_input = gr.Textbox(lines=2, label="Input Text")
