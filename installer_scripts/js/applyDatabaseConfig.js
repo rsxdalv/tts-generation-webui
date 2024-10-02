@@ -56,6 +56,8 @@ async function applyDatabaseConfig() {
     await awaitDatabase();
     try {
       await func();
+    } catch (error) {
+      throw error;
     } finally {
       await stopDatabase();
     }

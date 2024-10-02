@@ -219,14 +219,8 @@ const checkIfTorchInstalled = async () => {
 
 const FORCE_REINSTALL = process.env.FORCE_REINSTALL ? true : false;
 
-const initializeApp = async () => {
-  displayMessage("Ensuring that python has the correct version...");
-  await ensurePythonVersion();
-  try {
-    await applyDatabaseConfig();
-  } catch (error) {
-    displayError("Failed to apply database config");
-  }
+async function applyCondaConfig() {
+  displayMessage("Applying conda config...");
   displayMessage("Checking if Torch is installed...");
   if (readMajorVersion() === majorVersion && !FORCE_REINSTALL) {
     if (await checkIfTorchInstalled()) {
@@ -250,6 +244,17 @@ const initializeApp = async () => {
     displayMessage(`You selected: ${gpuchoice}`);
     saveGPUChoice(gpuchoice);
     await installDependencies(gpuchoice);
+  }
+}
+
+const initializeApp = async () => {
+  displayMessage("Ensuring that python has the correct version...");
+  await ensurePythonVersion();
+  await applyCondaConfig();
+  try {
+    await applyDatabaseConfig();
+  } catch (error) {
+    displayError("Failed to apply database config");
   }
 };
 exports.initializeApp = initializeApp;

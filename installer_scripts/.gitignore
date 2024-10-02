@@ -11,6 +11,7 @@ output.log
 .python_version
 .pip_packages
 .db_version
+.git_version
 
 # Diagnostic
 diagnostic.txt
