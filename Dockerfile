@@ -43,6 +43,7 @@ WORKDIR /app/tts-generation-webui
 RUN pip3 install --no-cache-dir torch==$TORCH_VERSION -r requirements.txt
 RUN pip3 install --no-cache-dir torch==$TORCH_VERSION -r requirements_bark_hubert_quantizer.txt
 RUN pip3 install --no-cache-dir torch==$TORCH_VERSION -r requirements_rvc.txt
+RUN pip3 install --no-cache-dir torch==$TORCH_VERSION -r requirements_audiocraft_0.txt
 RUN pip3 install --no-cache-dir torch==$TORCH_VERSION -r requirements_audiocraft.txt
 RUN pip3 install --no-cache-dir torch==$TORCH_VERSION -r requirements_styletts2.txt
 RUN pip3 install --no-cache-dir torch==$TORCH_VERSION -r requirements_vall_e.txt

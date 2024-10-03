@@ -195,6 +195,7 @@ async function updateDependencies(optional = true) {
   );
   tryInstall("-r requirements_bark_hubert_quantizer.txt", "Bark Voice Clone");
   tryInstall("-r requirements_rvc.txt", "RVC");
+  tryInstall("-r requirements_audiocraft_0.txt", "Audiocraft (workaround)");
   tryInstall("-r requirements_audiocraft.txt", "Audiocraft");
   tryInstall("-r requirements_styletts2.txt", "StyleTTS");
   tryInstall("-r requirements_vall_e.txt", "Vall-E-X");
