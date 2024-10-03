@@ -26,6 +26,23 @@ def get_gpu_info():
     return [get_gpu_info_idx(idx) for idx in range(device_count)]
 
 
+def get_pynvml_fields(idx=0):
+    # check if pynvml is installed
+    try:
+        # import pynvml
+        return {
+            "temperature": torch.cuda.temperature(idx),
+            "power_draw": torch.cuda.power_draw(idx) / 1000,
+            "utilization": torch.cuda.utilization(idx),
+        }
+    # except ImportError:
+    except:
+        return {
+            "temperature": 0,
+            "power_draw": 0,
+            "utilization": 0,
+        }
+
 def get_gpu_info_idx(idx=0):
     return {
         "torch_version": torch.__version__,
@@ -43,9 +60,7 @@ def get_gpu_info_idx(idx=0):
         "multi_processor_count": torch.cuda.get_device_properties(
             idx
         ).multi_processor_count,
-        "temperature": torch.cuda.temperature(idx),
-        "power_draw": torch.cuda.power_draw(idx) / 1000,
-        "utilization": torch.cuda.utilization(idx),
+        **get_pynvml_fields(idx),
     }
 
 

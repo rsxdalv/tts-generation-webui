@@ -49,6 +49,8 @@ RUN pip3 install --no-cache-dir torch==$TORCH_VERSION -r requirements_styletts2.
 RUN pip3 install --no-cache-dir torch==$TORCH_VERSION -r requirements_vall_e.txt
 RUN pip3 install --no-cache-dir torch==$TORCH_VERSION -r requirements_maha_tts.txt
 RUN pip3 install --no-cache-dir torch==$TORCH_VERSION -r requirements_stable_audio.txt
+# RUN pip3 install --no-cache-dir torch==$TORCH_VERSION hydra-core==1.3.2
+RUN pip3 install --no-cache-dir torch==$TORCH_VERSION nvidia-ml-py
 
 # Build the React UI
 RUN cd react-ui && npm install && npm run build

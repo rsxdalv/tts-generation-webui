@@ -203,6 +203,7 @@ async function updateDependencies(optional = true) {
   tryInstall("-r requirements_stable_audio.txt", "Stable Audio");
   // reinstall hydra-core==1.3.2 because of fairseq
   tryInstall("hydra-core==1.3.2", "hydra-core fix due to fairseq");
+  tryInstall("nvidia-ml-py", "nvidia-ml-py");
   savePipPackagesVersion(newPipPackagesVersion);
 }
 
