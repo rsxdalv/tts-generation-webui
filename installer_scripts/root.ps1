@@ -62,7 +62,9 @@ if (!(Get-Command "vswhere" -ErrorAction SilentlyContinue)) {
         } else {
             Write-Host "Attempting to install Visual Studio Build Tools using winget..."
             Write-Host "This will open a new window, please follow the instructions."
-            winget install Microsoft.VisualStudio.2022.BuildTools --accept-package-agreements --accept-source-agreements
+            # quiet install does not seem user friendly
+            # winget install Microsoft.VisualStudio.2022.BuildTools --silent --override "--wait --quiet --add Microsoft.VisualStudio.Workload.VCTools --includeRecommended"
+            winget install Microsoft.VisualStudio.2022.BuildTools --silent --override "--wait --add Microsoft.VisualStudio.Workload.VCTools --includeRecommended"
         }
     } else {
         Write-Host "Visual Studio Build Tools is installed, continuing..."

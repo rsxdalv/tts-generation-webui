@@ -23,7 +23,8 @@ default_config = {
         "auth_message": None,
         "prevent_thread_lock": False,
         "show_error": False,
-        "server_name": "0.0.0.0",
+        # "server_name": "0.0.0.0",
+        "server_name": "127.0.0.1",
         "server_port": 7770,
         # "show_tips": False, # DEPRECATED
         "height": 500,
