@@ -32,14 +32,19 @@ const cpuChannels = ["", "pytorch"].join(" -c ");
 const windowsOnlyPackages =
   process.platform === "win32" ? ["conda-forge::vswhere"] : [];
 
-const cudaPackages = `pytorch[version=${torchVersion},build=py3.10_cuda${cudaVersion}*] pytorch-cuda=${cudaVersion} torchvision torchaudio cuda-toolkit ninja`;
-const cudaPytorchInstall$ = [
-  "conda install -y -k",
+const commonPackages = [
+  "conda-forge::uv=0.4.17",
   ...windowsOnlyPackages,
   terraformPackage,
   anacondaPostgresqlPackage,
   nodePackage,
   ffmpegPackage,
+];
+
+const cudaPackages = `pytorch[version=${torchVersion},build=py3.10_cuda${cudaVersion}*] pytorch-cuda=${cudaVersion} torchvision torchaudio cuda-toolkit ninja`;
+const cudaPytorchInstall$ = [
+  "conda install -y -k",
+  ...commonPackages,
   cudaPackages,
   cudaChannels,
 ].join(" ");
@@ -47,11 +52,7 @@ const cudaPytorchInstall$ = [
 const cpuPackages = `pytorch=${torchVersion} torchvision torchaudio cpuonly`;
 const pytorchCPUInstall$ = [
   "conda install -y -k",
-  ...windowsOnlyPackages,
-  terraformPackage,
-  anacondaPostgresqlPackage,
-  nodePackage,
-  ffmpegPackage,
+  ...commonPackages,
   cpuPackages,
   cpuChannels,
 ].join(" ");
@@ -97,7 +98,7 @@ const installDependencies = async (gpuchoice) => {
     }
 
     saveMajorVersion(majorVersion);
-    await updateDependencies(false);
+    await updateDependencies();
   } catch (error) {
     displayError(`Error during installation: ${error.message}`);
     throw error;
@@ -156,10 +157,10 @@ const removeGPUChoice = () => {
 
 const dry_run_flag = DEBUG_DRY_RUN ? "--dry-run " : "";
 
-function tryInstall(requirements, name = "") {
+function pip_install(requirements, name = "") {
   try {
     displayMessage(`Installing ${name || requirements} dependencies...`);
-    $sh(`pip install ${dry_run_flag}${requirements} torch==${torchVersion}`);
+    $sh(`uv pip install ${dry_run_flag}${requirements} torch==${torchVersion}`);
     displayMessage(
       `Successfully installed ${name || requirements} dependencies`
     );
@@ -168,42 +169,29 @@ function tryInstall(requirements, name = "") {
   }
 }
 
-async function updateDependencies(optional = true) {
-  if (readPipPackagesVersion() === newPipPackagesVersion) {
-    displayMessage(
+async function updateDependencies() {
+  if (readPipPackagesVersion() === newPipPackagesVersion)
+    return displayMessage(
       "Dependencies are already up to date, skipping pip installs..."
     );
-    return;
-  }
-  if (optional) {
-    if (
-      (await menu(
-        ["Yes", "No"],
-        "Do you want to update dependencies?\n(not updating might break new features)"
-      )) === "No"
-    ) {
-      displayMessage("Skipping dependencies update");
-      return;
-    }
-  }
 
   displayMessage("Updating dependencies...");
-  tryInstall("-r requirements.txt", "Core Packages, Bark, Tortoise");
-  tryInstall(
+  pip_install("-r requirements.txt", "Core Packages, Bark, Tortoise");
+  pip_install(
     "xformers==0.0.27 --index-url https://download.pytorch.org/whl/cu118",
     "xformers"
   );
-  tryInstall("-r requirements_bark_hubert_quantizer.txt", "Bark Voice Clone");
-  tryInstall("-r requirements_rvc.txt", "RVC");
-  tryInstall("-r requirements_audiocraft_0.txt", "Audiocraft (workaround)");
-  tryInstall("-r requirements_audiocraft.txt", "Audiocraft");
-  tryInstall("-r requirements_styletts2.txt", "StyleTTS");
-  tryInstall("-r requirements_vall_e.txt", "Vall-E-X");
-  tryInstall("-r requirements_maha_tts.txt", "Maha TTS");
-  tryInstall("-r requirements_stable_audio.txt", "Stable Audio");
+  pip_install("-r requirements_bark_hubert_quantizer.txt", "Bark Voice Clone");
+  pip_install("-r requirements_rvc.txt", "RVC");
+  pip_install("-r requirements_audiocraft_0.txt", "Audiocraft (workaround)");
+  pip_install("-r requirements_audiocraft.txt", "Audiocraft");
+  pip_install("-r requirements_styletts2.txt", "StyleTTS");
+  pip_install("-r requirements_vall_e.txt", "Vall-E-X");
+  pip_install("-r requirements_maha_tts.txt", "Maha TTS");
+  pip_install("-r requirements_stable_audio.txt", "Stable Audio");
   // reinstall hydra-core==1.3.2 because of fairseq
-  tryInstall("hydra-core==1.3.2", "hydra-core fix due to fairseq");
-  tryInstall("nvidia-ml-py", "nvidia-ml-py");
+  pip_install("hydra-core==1.3.2", "hydra-core fix due to fairseq");
+  pip_install("nvidia-ml-py", "nvidia-ml-py");
   savePipPackagesVersion(newPipPackagesVersion);
 }
 
