@@ -89,7 +89,7 @@ const installDependencies = async (gpuchoice) => {
       );
       displayMessage("Linux only!");
       await $(
-        `pip install torch==${torchVersion} torchvision==0.18.1 torchaudio==${torchVersion} --index-url https://download.pytorch.org/whl/rocm6.0`
+        `uv pip install torch==${torchVersion} torchvision==0.18.1 torchaudio==${torchVersion} --index-url https://download.pytorch.org/whl/rocm6.0`
       );
     } else {
       displayMessage("Unsupported or cancelled. Exiting...");
