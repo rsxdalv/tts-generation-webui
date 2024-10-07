@@ -355,6 +355,9 @@ def server_hypervisor():
         },
         shell=True,
     )
+    if "--docker" in os.sys.argv:
+        print("Info: Docker mode: skipping Postgres")
+        return
     print("Starting Postgres...")
     postgres_process = subprocess.Popen(
         f"postgres -D {postgres_dir}", shell=True
