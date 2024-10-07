@@ -323,33 +323,15 @@ def start_gradio_server():
 
 def server_hypervisor():
     import subprocess
-    # import webbrowser
-    # import threading
     import signal
     import sys
 
-    # def wait_for_postgres():
-    #     import time
-
-    #     time.sleep(1)
-    #     try:
-    #         subprocess.check_call("pg_isready -U postgres", shell=True)
-    #         print("Postgres is ready")
-    #     except:
-    #         wait_for_postgres()
-
-    # def create_db():
-    #     try:
-    #         wait_for_postgres()
-    #         subprocess.Popen("createdb -U postgres webui", shell=True)
-    #         print("Successfully created database 'webui'")
-    #         # subprocess.Popen("liquibase update", shell=True)
-    #     except:
-    #         pass
-
+    postgres_dir = os.path.join("data", "postgres")
     def stop_postgres(postgres_process):
         try:
-            subprocess.check_call("pg_ctl stop -D data\\postgres -m fast", shell=True)
+            subprocess.check_call(
+                f"pg_ctl stop -D {postgres_dir} -m fast", shell=True
+            )
             print("PostgreSQL stopped gracefully.")
         except Exception as e:
             print(f"Error stopping PostgreSQL: {e}")
@@ -370,18 +352,29 @@ def server_hypervisor():
         shell=True,
     )
     print("Starting Postgres...")
-    postgres_process = subprocess.Popen("postgres -D data\\postgres", shell=True)
+    postgres_process = subprocess.Popen(
+        f"postgres -D {postgres_dir}", shell=True
+    )
     try:
-        signal.signal(signal.SIGINT, lambda sig, frame: signal_handler(sig, frame, postgres_process))  # Ctrl+C
-        signal.signal(signal.SIGTERM, lambda sig, frame: signal_handler(sig, frame, postgres_process))  # Termination signals
+        signal.signal(
+            signal.SIGINT,
+            lambda sig, frame: signal_handler(sig, frame, postgres_process),
+        )  # Ctrl+C
+        signal.signal(
+            signal.SIGTERM,
+            lambda sig, frame: signal_handler(sig, frame, postgres_process),
+        )  # Termination signals
         if os.name != "nt":
-            signal.signal(signal.SIGHUP, lambda sig, frame: signal_handler(sig, frame, postgres_process))   # Terminal closure
-            signal.signal(signal.SIGQUIT, lambda sig, frame: signal_handler(sig, frame, postgres_process))  # Quit
+            signal.signal(
+                signal.SIGHUP,
+                lambda sig, frame: signal_handler(sig, frame, postgres_process),
+            )  # Terminal closure
+            signal.signal(
+                signal.SIGQUIT,
+                lambda sig, frame: signal_handler(sig, frame, postgres_process),
+            )  # Quit
     except (ValueError, OSError) as e:
         print(f"Failed to set signal handlers: {e}")
-
-    # db_thread = threading.Thread(target=create_db)
-    # db_thread.start()
 
 
 if __name__ == "__main__":
