@@ -36,7 +36,8 @@ RUN git clone https://github.com/rsxdalv/tts-generation-webui.git
 WORKDIR /app/tts-generation-webui
 
 # Install all requirements
-RUN uv pip install --no-cache-dir --system --verbose torch==$TORCH_VERSION -r requirements.txt
+RUN pip3 install --no-cache-dir torch==$TORCH_VERSION -r requirements.txt
+# RUN uv pip install --no-cache-dir --system --verbose torch==$TORCH_VERSION -r requirements.txt
 RUN uv pip install --no-cache-dir --system --verbose torch==$TORCH_VERSION -r requirements_bark_hubert_quantizer.txt
 RUN uv pip install --no-cache-dir --system --verbose torch==$TORCH_VERSION -r requirements_rvc.txt
 RUN uv pip install --no-cache-dir --system --verbose torch==$TORCH_VERSION -r requirements_audiocraft_0.txt
