@@ -290,6 +290,10 @@ def start_gradio_server():
         print("Gradio share mode enabled")
         gradio_interface_options["share"] = True
 
+    if "--docker" in os.sys.argv:
+        gradio_interface_options["server_name"] = "0.0.0.0"
+        print("Info: Docker mode: opening gradio server on all interfaces")
+
     print("Starting Gradio server...")
     if "enable_queue" in gradio_interface_options:
         del gradio_interface_options["enable_queue"]
