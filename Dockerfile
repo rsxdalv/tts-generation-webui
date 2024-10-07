@@ -36,15 +36,15 @@ RUN git clone https://github.com/rsxdalv/tts-generation-webui.git
 WORKDIR /app/tts-generation-webui
 
 # Install all requirements
-RUN uv pip install --no-cache-dir --system torch==$TORCH_VERSION -r requirements.txt
-RUN uv pip install --no-cache-dir --system torch==$TORCH_VERSION -r requirements_bark_hubert_quantizer.txt
-RUN uv pip install --no-cache-dir --system torch==$TORCH_VERSION -r requirements_rvc.txt
-RUN uv pip install --no-cache-dir --system torch==$TORCH_VERSION -r requirements_audiocraft_0.txt
-RUN uv pip install --no-cache-dir --system torch==$TORCH_VERSION -r requirements_audiocraft.txt
-RUN uv pip install --no-cache-dir --system torch==$TORCH_VERSION -r requirements_styletts2.txt
-RUN uv pip install --no-cache-dir --system torch==$TORCH_VERSION -r requirements_vall_e.txt
-RUN uv pip install --no-cache-dir --system torch==$TORCH_VERSION -r requirements_maha_tts.txt
-RUN uv pip install --no-cache-dir --system torch==$TORCH_VERSION -r requirements_stable_audio.txt
+RUN uv pip install --no-cache-dir --system --verbose torch==$TORCH_VERSION -r requirements.txt
+RUN uv pip install --no-cache-dir --system --verbose torch==$TORCH_VERSION -r requirements_bark_hubert_quantizer.txt
+RUN uv pip install --no-cache-dir --system --verbose torch==$TORCH_VERSION -r requirements_rvc.txt
+RUN uv pip install --no-cache-dir --system --verbose torch==$TORCH_VERSION -r requirements_audiocraft_0.txt
+RUN uv pip install --no-cache-dir --system --verbose torch==$TORCH_VERSION -r requirements_audiocraft.txt
+RUN uv pip install --no-cache-dir --system --verbose torch==$TORCH_VERSION -r requirements_styletts2.txt
+RUN uv pip install --no-cache-dir --system --verbose torch==$TORCH_VERSION -r requirements_vall_e.txt
+RUN uv pip install --no-cache-dir --system --verbose torch==$TORCH_VERSION -r requirements_maha_tts.txt
+RUN uv pip install --no-cache-dir --system --verbose torch==$TORCH_VERSION -r requirements_stable_audio.txt
 # RUN uv pip install --no-cache-dir --system torch==$TORCH_VERSION hydra-core==1.3.2
 RUN uv pip install --no-cache-dir --system torch==$TORCH_VERSION nvidia-ml-py
 
