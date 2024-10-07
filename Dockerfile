@@ -16,7 +16,6 @@ ENV PATH="/root/.nvm/versions/node/v${NODE_VERSION}/bin/:${PATH}"
 RUN node --version
 RUN npm --version
 
-ENV VIRTUAL_ENV=/venv
 # Install uv
 ADD --chmod=755 https://astral.sh/uv/install.sh /install.sh
 RUN /install.sh && rm /install.sh
@@ -25,7 +24,7 @@ RUN /install.sh && rm /install.sh
 ENV TORCH_VERSION=2.3.1
 
 ENV PATH="/root/.cargo/bin:$PATH"
-RUN uv pip install --no-cache-dir setuptools torch==$TORCH_VERSION torchvision torchaudio 
+RUN uv pip install --no-cache-dir --system setuptools torch==$TORCH_VERSION torchvision torchaudio 
 
 # Set working directory
 WORKDIR /app
@@ -37,17 +36,17 @@ RUN git clone https://github.com/rsxdalv/tts-generation-webui.git
 WORKDIR /app/tts-generation-webui
 
 # Install all requirements
-RUN uv pip install --no-cache-dir torch==$TORCH_VERSION -r requirements.txt
-RUN uv pip install --no-cache-dir torch==$TORCH_VERSION -r requirements_bark_hubert_quantizer.txt
-RUN uv pip install --no-cache-dir torch==$TORCH_VERSION -r requirements_rvc.txt
-RUN uv pip install --no-cache-dir torch==$TORCH_VERSION -r requirements_audiocraft_0.txt
-RUN uv pip install --no-cache-dir torch==$TORCH_VERSION -r requirements_audiocraft.txt
-RUN uv pip install --no-cache-dir torch==$TORCH_VERSION -r requirements_styletts2.txt
-RUN uv pip install --no-cache-dir torch==$TORCH_VERSION -r requirements_vall_e.txt
-RUN uv pip install --no-cache-dir torch==$TORCH_VERSION -r requirements_maha_tts.txt
-RUN uv pip install --no-cache-dir torch==$TORCH_VERSION -r requirements_stable_audio.txt
-# RUN uv pip install --no-cache-dir torch==$TORCH_VERSION hydra-core==1.3.2
-RUN uv pip install --no-cache-dir torch==$TORCH_VERSION nvidia-ml-py
+RUN uv pip install --no-cache-dir --system torch==$TORCH_VERSION -r requirements.txt
+RUN uv pip install --no-cache-dir --system torch==$TORCH_VERSION -r requirements_bark_hubert_quantizer.txt
+RUN uv pip install --no-cache-dir --system torch==$TORCH_VERSION -r requirements_rvc.txt
+RUN uv pip install --no-cache-dir --system torch==$TORCH_VERSION -r requirements_audiocraft_0.txt
+RUN uv pip install --no-cache-dir --system torch==$TORCH_VERSION -r requirements_audiocraft.txt
+RUN uv pip install --no-cache-dir --system torch==$TORCH_VERSION -r requirements_styletts2.txt
+RUN uv pip install --no-cache-dir --system torch==$TORCH_VERSION -r requirements_vall_e.txt
+RUN uv pip install --no-cache-dir --system torch==$TORCH_VERSION -r requirements_maha_tts.txt
+RUN uv pip install --no-cache-dir --system torch==$TORCH_VERSION -r requirements_stable_audio.txt
+# RUN uv pip install --no-cache-dir --system torch==$TORCH_VERSION hydra-core==1.3.2
+RUN uv pip install --no-cache-dir --system torch==$TORCH_VERSION nvidia-ml-py
 
 
 # add postgres & run setup
