@@ -23,7 +23,7 @@ def pip_uninstall_wrapper(package_name, name):
 
 def pip_install(requirements, name):
     # process = subprocess.Popen(
-    #     f"pip install {requirements}",
+    #     f"uv pip install {requirements}",
     #     shell=True,
     #     stdout=subprocess.PIPE,
     #     stderr=subprocess.STDOUT,
@@ -48,6 +48,7 @@ def pip_install(requirements, name):
     try:
         print(f"Installing {name} dependencies...")
         yield from pip_shell(f"pip install {requirements}")
+        # yield from pip_shell(f"uv pip install {requirements}")
         print(f"Successfully installed {name} dependencies")
         yield f"Successfully installed {name} dependencies"
     except Exception:
@@ -59,6 +60,7 @@ def pip_uninstall(package_name, name):
     try:
         print(f"Uninstalling {name} ({package_name})...")
         yield from pip_shell(f"pip uninstall -y {package_name}")
+        # yield from pip_shell(f"uv pip uninstall {package_name}")
         print(f"Successfully uninstalled {name} ({package_name})")
         yield f"Successfully uninstalled {name} ({package_name})"
     except Exception:

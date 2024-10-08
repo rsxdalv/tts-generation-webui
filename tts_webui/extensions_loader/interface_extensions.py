@@ -116,7 +116,12 @@ def extension_list_tab():
                 install_button = gr.Button("Install extension")
 
                 def install_extension(package_name):
-                    yield from pip_install_wrapper(package_name, package_name)()
+                    requirements = [
+                        x["requirements"]
+                        for x in external_extension_list
+                        if x["package_name"] == package_name
+                    ][0]
+                    yield from pip_install_wrapper(requirements, package_name)()
 
                 install_button.click(
                     fn=install_extension,
