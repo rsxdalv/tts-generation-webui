@@ -47,7 +47,8 @@ def pip_install(requirements, name):
     #     yield f"Failed to install {name}"
     try:
         print(f"Installing {name} dependencies...")
-        yield from pip_shell(f"uv pip install {requirements}")
+        yield from pip_shell(f"pip install {requirements}")
+        # yield from pip_shell(f"uv pip install {requirements}")
         print(f"Successfully installed {name} dependencies")
         yield f"Successfully installed {name} dependencies"
     except Exception:
@@ -58,7 +59,8 @@ def pip_install(requirements, name):
 def pip_uninstall(package_name, name):
     try:
         print(f"Uninstalling {name} ({package_name})...")
-        yield from pip_shell(f"uv pip uninstall -y {package_name}")
+        yield from pip_shell(f"pip uninstall -y {package_name}")
+        # yield from pip_shell(f"uv pip uninstall {package_name}")
         print(f"Successfully uninstalled {name} ({package_name})")
         yield f"Successfully uninstalled {name} ({package_name})"
     except Exception:
