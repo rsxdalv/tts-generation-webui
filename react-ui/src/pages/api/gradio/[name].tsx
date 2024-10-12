@@ -443,12 +443,14 @@ async function get_config_bark() {
   };
 }
 
-const magnet = (params) =>
-  gradioPredict<[GradioFile, Object, string]>("/magnet", params).then(
-    (result) => {
-      const [audio, metadata, folder_root] = result?.data;
-      return { audio, metadata, folder_root };
-    }
+const simpleOutputMap = (result: { data: [GradioFile, Object, string] }) => {
+  const [audio, metadata, folder_root] = result?.data;
+  return { audio, metadata, folder_root };
+};
+
+const simpleEndpoint = (endpoint) => (params) =>
+  gradioPredict<[GradioFile, Object, string]>(endpoint, params).then(
+    simpleOutputMap
   );
 
 const magnet_get_models = () =>
@@ -458,14 +460,6 @@ const magnet_get_models = () =>
 
 const magnet_open_model_dir = () => gradioPredict<[]>("/magnet_open_model_dir");
 
-const maha = (params) =>
-  gradioPredict<[GradioFile, Object, string]>("/maha_tts", params).then(
-    (result) => {
-      const [audio, metadata, folder_root] = result?.data;
-      return { audio, folder_root, metadata };
-    }
-  );
-
 const maha_tts_refresh_voices = () =>
   gradioPredict<[GradioChoices]>("/maha_tts_refresh_voices").then((result) =>
     extractChoices(result?.data[0])
@@ -473,21 +467,6 @@ const maha_tts_refresh_voices = () =>
 
 const get_gpu_info = () =>
   gradioPredict<[Object]>("/get_gpu_info").then((result) => result?.data[0]);
-
-const mms = (params) =>
-  gradioPredict<[GradioFile, Object, string]>("/mms", params).then((result) => {
-    const [audio, metadata, folder_root] = result?.data;
-    return { audio, metadata, folder_root };
-  });
-
-const vall_e_x_generate = (params) =>
-  gradioPredict<[GradioFile, Object, string]>(
-    "/vall_e_x_generate",
-    params
-  ).then((result) => {
-    const [audio, metadata, folder_root] = result?.data;
-    return { audio, metadata, folder_root };
-  });
 
 const vall_e_x_split_text_into_sentences = ({ text }) =>
   gradioPredict<string[]>("/vall_e_x_split_text_into_sentences", [text]).then(
@@ -539,11 +518,11 @@ const resolvedPassThrough =
       .then(map);
 
 const endpoints = {
-  maha,
+  maha: simpleEndpoint("/maha_tts"),
   maha_tts_refresh_voices,
   demucs,
   musicgen,
-  magnet,
+  magnet: simpleEndpoint("/magnet"),
   magnet_get_models,
   magnet_open_model_dir,
   magnet_unload_model: passThrough("/magnet_unload_model"),
@@ -577,11 +556,11 @@ const endpoints = {
   save_config_bark,
   get_config_bark,
 
-  mms,
+  mms: simpleEndpoint("/mms"),
 
   get_gpu_info,
 
-  vall_e_x_generate,
+  vall_e_x_generate: simpleEndpoint("/vall_e_x_generate"),
   vall_e_x_split_text_into_sentences,
   vall_e_x_tokenize,
 

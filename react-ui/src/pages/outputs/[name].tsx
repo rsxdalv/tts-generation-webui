@@ -43,8 +43,8 @@ export const getStaticProps = async ({ params: { name } }) => {
 export const getStaticPaths = async () => {
   return {
     paths: [
-      "/history/outputs",
-      "/history/favorites",
+      "/outputs/outputs",
+      "/outputs/favorites",
       // "/history/collections",
     ],
     fallback: "blocking",

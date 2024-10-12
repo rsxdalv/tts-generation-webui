@@ -31,6 +31,7 @@ const VocosPageNPZ = () => {
           <SingleFileUpload
             label="Input NPZ"
             file={vocosParamsNPZ?.npz_file}
+            accept={{ "application/x-npz": [".npz"] }}
             callback={(npz_file) => {
               setVocosParamsNPZ({
                 ...vocosParamsNPZ,

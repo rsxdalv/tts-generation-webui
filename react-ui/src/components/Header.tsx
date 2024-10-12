@@ -46,10 +46,6 @@ export const routes: Route[] = [
             text: "Settings",
           },
           {
-            href: "/text-to-speech/bark/vocos_wav",
-            text: "Vocos Wav",
-          },
-          {
             href: "/text-to-speech/bark/vocos_npz",
             text: "Vocos NPZ",
           },
@@ -65,22 +61,6 @@ export const routes: Route[] = [
           },
         ],
       },
-      // {
-      //   href: "/tortoise",
-      //   text: "Tortoise",
-      // },
-      // {
-      //   href: "/maha-tts",
-      //   text: "Maha TTS",
-      // },
-      // {
-      //   href: "/mms",
-      //   text: "MMS",
-      // },
-      // {
-      //   href: "/vallex",
-      //   text: "Vall-E-X",
-      // },
       {
         href: "/text-to-speech/tortoise",
         text: "Tortoise",
@@ -103,18 +83,6 @@ export const routes: Route[] = [
     href: "/audio-music-generation",
     text: "Audio/Music Generation",
     subroutes: [
-      // {
-      //   href: "/musicgen",
-      //   text: "MusicGen",
-      // },
-      // {
-      //   href: "/magnet",
-      //   text: "MAGNeT",
-      // },
-      // {
-      //   href: "/stable-audio",
-      //   text: "Stable Audio (Demo)",
-      // },
       {
         href: "/audio-music-generation/musicgen",
         text: "MusicGen",
@@ -134,45 +102,46 @@ export const routes: Route[] = [
     text: "Audio Conversion",
     subroutes: [
       {
-        // href: "/rvc",
         href: "/audio-conversion/rvc",
         text: "RVC",
       },
       {
-        // href: "/demucs",
         href: "/audio-conversion/demucs",
         text: "Demucs",
       },
       {
-        href: "/text-to-speech/bark/vocos_wav",
+        href: "/audio-conversion/vocos_wav",
         text: "Vocos Wav",
       },
     ],
   },
   {
-    // href: "/outputs",
-    href: "/history",
+    href: "/outputs",
     text: "Outputs",
     subroutes: [
       {
-        href: "/history/outputs",
-        text: "History",
+        href: "/outputs/outputs",
+        text: "History (Slow!)",
       },
       {
-        href: "/history/favorites",
-        text: "Favorites",
+        href: "/outputs/favorites",
+        text: "Favorites (Slow!)",
       },
       // {
-      //   href: "/history/collections",
-      //   text: "History Collections",
-      // },
-      // {
-      //   href: "/generations",
+      //   href: "/outputs/generations",
       //   text: "Generations View (Beta)",
       // },
       // {
-      //   href: "/voice-drafts",
+      //   href: "/outputs/voice-drafts",
       //   text: "Voice Tree",
+      // },
+      {
+        href: "/outputs/ffmpeg-metadata-page",
+        text: "FFMPEG Metadata",
+      },
+      // {
+      //   href: "/outputs/collections",
+      //   text: "History Collections",
       // },
     ],
   },
@@ -180,14 +149,6 @@ export const routes: Route[] = [
     href: "/tools",
     text: "Tools",
     subroutes: [
-      // {
-      //   href: "/gpu_info",
-      //   text: "GPU Info",
-      // },
-      // {
-      //   href: "/extensions/huggingface_cache_manager",
-      //   text: "Huggingface Cache Manager",
-      // },
       {
         href: "/tools/gpu_info",
         text: "GPU Info",

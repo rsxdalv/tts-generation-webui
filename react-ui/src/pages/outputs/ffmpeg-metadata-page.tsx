@@ -1,14 +1,14 @@
 import React, { useState } from "react";
-import { Template } from "../components/Template";
-import { AudioInput } from "../components/AudioComponents";
+import { Template } from "../../components/Template";
+import { AudioInput } from "../../components/AudioComponents";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from "../components/ui/card";
-import { LocalCacheFile } from "../types/LocalCacheFile";
-import { BarkMetadataDisplay } from "../components/BarkMetadataDisplay";
+} from "../../components/ui/card";
+import { LocalCacheFile } from "../../types/LocalCacheFile";
+import { BarkMetadataDisplay } from "../../components/BarkMetadataDisplay";
 
 const FFMPEGMetadataPage = () => {
   const [audioUrl, setAudioUrl] = useState<string | undefined>();

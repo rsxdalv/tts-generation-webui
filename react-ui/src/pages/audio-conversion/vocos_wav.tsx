@@ -1,11 +1,11 @@
 import React from "react";
-import { Template } from "../../../components/Template";
-import { AudioInput, AudioOutput } from "../../../components/AudioComponents";
-import { useVocosResults, useVocosParams } from "../../../tabs/VocosParams";
-import { parseFormChange } from "../../../data/parseFormChange";
-import { applyVocosWav } from "../../../functions/applyVocosWav";
-import { VocosWavInputs } from "../../../components/VocosWavInputs";
-import { Button } from "../../../components/ui/button";
+import { Template } from "../../components/Template";
+import { AudioInput, AudioOutput } from "../../components/AudioComponents";
+import { useVocosResults, useVocosParams } from "../../tabs/VocosParams";
+import { parseFormChange } from "../../data/parseFormChange";
+import { applyVocosWav } from "../../functions/applyVocosWav";
+import { VocosWavInputs } from "../../components/VocosWavInputs";
+import { Button } from "../../components/ui/button";
 
 const VocosPage = () => {
   const [vocosResult, setVocosResult] = useVocosResults();

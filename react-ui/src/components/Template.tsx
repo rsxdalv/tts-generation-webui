@@ -3,7 +3,7 @@ import Head from "next/head";
 import { FavoritesProvider } from "./FavoritesProvider";
 import { LocalVotesProvider, VotesProvider } from "@/components/VotesProvider";
 import { Header } from "./Header";
-import { inter } from "../pages/generations";
+import { inter } from "../pages/outputs/generations";
 
 export const Template = ({
   children,
