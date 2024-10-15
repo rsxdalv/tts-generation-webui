@@ -1,14 +1,13 @@
 import os
 import numpy as np
 import gradio as gr
+from scipy.io.wavfile import write as write_wav
+
+from tts_webui.tortoise.save_json import save_json
 from tts_webui.bark.split_text_functions import split_by_lines
 from tts_webui.utils.create_base_filename import create_base_filename
 from tts_webui.utils.date import get_date_string
 from tts_webui.utils.save_waveform_plot import middleware_save_waveform_plot
-from tortoise.api import TextToSpeech, MODELS_DIR
-from tortoise.utils.audio import load_voices, get_voices
-from tts_webui.tortoise.save_json import save_json
-from scipy.io.wavfile import write as write_wav
 from tts_webui.tortoise.TortoiseParameters import TortoiseParameters
 from tts_webui.utils.get_path_from_root import get_path_from_root
 from tts_webui.utils.torch_clear_memory import torch_clear_memory
@@ -58,6 +57,8 @@ def switch_model(
     tokenizer=None,
     use_basic_cleaners=False,
 ):
+    from tortoise.api import MODELS_DIR
+
     get_tts(
         models_dir=(
             MODELS_DIR if model_dir == "Default" else get_full_model_dir(model_dir)
@@ -73,6 +74,8 @@ def switch_model(
 
 
 def get_voice_list():
+    from tortoise.utils.audio import get_voices
+
     return ["random"] + list(get_voices(extra_voice_dirs=[TORTOISE_VOICE_DIR]))
 
 
@@ -89,7 +92,7 @@ def unload_tortoise_model():
 
 
 def get_tts(
-    models_dir=MODELS_DIR,
+    models_dir=None,
     force_reload=False,
     kv_cache=False,
     use_deepspeed=False,
@@ -98,6 +101,10 @@ def get_tts(
     tokenizer_path=None,
     tokenizer_basic=False,
 ):
+    from tortoise.api import MODELS_DIR, TextToSpeech
+
+    if models_dir is None:
+        models_dir = MODELS_DIR
     global MODEL
     if MODEL is None or force_reload:
         print("Loading tortoise model: ", models_dir)
@@ -124,6 +131,8 @@ conditioning_latents = None
 
 
 def get_voices_cached(voice):
+    from tortoise.utils.audio import load_voices
+
     global last_voices, voice_samples, conditioning_latents
 
     if voice == last_voices:
