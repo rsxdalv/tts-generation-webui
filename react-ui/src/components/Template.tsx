@@ -1,9 +1,10 @@
+import { Inter } from "next/font/google";
 import React from "react";
 import Head from "next/head";
 import { FavoritesProvider } from "./FavoritesProvider";
 import { LocalVotesProvider, VotesProvider } from "@/components/VotesProvider";
 import { Header } from "./Header";
-import { inter } from "../pages/outputs/generations";
+export const inter = Inter({ subsets: ["latin"] });
 
 export const Template = ({
   children,
