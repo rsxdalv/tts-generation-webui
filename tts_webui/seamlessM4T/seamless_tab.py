@@ -1,7 +1,6 @@
 import gradio as gr
 import torch
 import torchaudio
-from transformers import AutoProcessor, SeamlessM4Tv2Model
 
 from tts_webui.seamlessM4T.language_code_to_name import (
     text_source_languages,
@@ -30,6 +29,8 @@ from tts_webui.extensions_loader.decorator_extensions import (
 
 @manage_model_state("seamless")
 def get_model(model_name=""):
+    from transformers import AutoProcessor, SeamlessM4Tv2Model
+
     # todo - add device setting
     return SeamlessM4Tv2Model.from_pretrained(
         model_name

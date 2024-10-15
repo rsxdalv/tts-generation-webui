@@ -1,9 +1,9 @@
 from huggingface_hub import hf_hub_download
-from fairseq import checkpoint_utils
 import os
 
 
 def load_hubert_new(config, path="assets/hubert/hubert_base.pt"):
+    from fairseq import checkpoint_utils
     models, _, _ = checkpoint_utils.load_model_ensemble_and_task(
         [path],
         suffix="",

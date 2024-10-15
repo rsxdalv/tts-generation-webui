@@ -331,11 +331,10 @@ def server_hypervisor():
     import sys
 
     postgres_dir = os.path.join("data", "postgres")
+
     def stop_postgres(postgres_process):
         try:
-            subprocess.check_call(
-                f"pg_ctl stop -D {postgres_dir} -m fast", shell=True
-            )
+            subprocess.check_call(f"pg_ctl stop -D {postgres_dir} -m fast", shell=True)
             print("PostgreSQL stopped gracefully.")
         except Exception as e:
             print(f"Error stopping PostgreSQL: {e}")
@@ -359,9 +358,7 @@ def server_hypervisor():
         print("Info: Docker mode: skipping Postgres")
         return
     print("Starting Postgres...")
-    postgres_process = subprocess.Popen(
-        f"postgres -D {postgres_dir}", shell=True
-    )
+    postgres_process = subprocess.Popen(f"postgres -D {postgres_dir}", shell=True)
     try:
         signal.signal(
             signal.SIGINT,

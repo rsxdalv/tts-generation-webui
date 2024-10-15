@@ -1,25 +1,32 @@
+import torchaudio
+import torch
+import gradio as gr
+import numpy as np
+
+from encodec.utils import convert_audio
+from bark.generation import load_codec_model
+from encodec.model import EncodecModel
+
 from tts_webui.bark.history_to_hash import history_to_hash
 from tts_webui.bark.npz_tools import save_npz
 from tts_webui.bark.FullGeneration import FullGeneration
 from tts_webui.utils.date import get_date_string
 from tts_webui.bark.get_audio_from_npz import get_audio_from_full_generation
-from bark_hubert_quantizer.hubert_manager import HuBERTManager
-from bark_hubert_quantizer.pre_kmeans_hubert import CustomHubert
-from bark_hubert_quantizer.customtokenizer import CustomTokenizer
-import torchaudio
-import torch
-from encodec.utils import convert_audio
-from bark.generation import load_codec_model
-from encodec.model import EncodecModel
 
-import gradio as gr
-import numpy as np
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from bark_hubert_quantizer.pre_kmeans_hubert import CustomHubert
+    from bark_hubert_quantizer.customtokenizer import CustomTokenizer
 
 
 hubert_model = None
 
 
 def _load_hubert_model(device):
+    from bark_hubert_quantizer.hubert_manager import HuBERTManager
+    from bark_hubert_quantizer.pre_kmeans_hubert import CustomHubert
+
     hubert_path = HuBERTManager.make_sure_hubert_installed()
     global hubert_model
     if hubert_model is None:
@@ -30,7 +37,7 @@ def _load_hubert_model(device):
     return hubert_model
 
 
-def _get_semantic_vectors(hubert_model: CustomHubert, path_to_wav: str, device):
+def _get_semantic_vectors(hubert_model: "CustomHubert", path_to_wav: str, device):
     # This is where you load your wav, with soundfile or torchaudio for example
     wav, sr = torchaudio.load(path_to_wav)
 
@@ -55,7 +62,10 @@ def _load_tokenizer(
     repo: str = "GitMylo/bark-voice-cloning",
     force_reload: bool = False,
     device="cpu",
-) -> CustomTokenizer:
+) -> "CustomTokenizer":
+    from bark_hubert_quantizer.customtokenizer import CustomTokenizer
+    from bark_hubert_quantizer.hubert_manager import HuBERTManager
+
     tokenizer_path = HuBERTManager.make_sure_tokenizer_installed(
         model=model,
         repo=repo,
@@ -114,6 +124,7 @@ def get_encodec_prompts(path_to_wav: str, use_gpu=True):
     coarse_prompt = fine_prompt[:2, :]
     return fine_prompt, coarse_prompt
 
+
 def save_cloned_voice(full_generation: FullGeneration):
     voice_name = f"voice_from_audio_{history_to_hash(full_generation)}"
     filename = f"voices/{voice_name}.npz"
@@ -160,7 +171,6 @@ def tab_voice_clone():
 
             """
             )
-
 
         with gr.Column():
             tokenizer_dropdown = gr.Dropdown(
@@ -227,7 +237,7 @@ def tab_voice_clone():
                 outputs=[tokenizer_dropdown],
                 api_name="bark_voice_tokenizer_load",
             )
-            
+
             gr.Markdown("Generated voice:")
             voice_file_name = gr.Textbox(
                 label="Voice file name", value="", interactive=False

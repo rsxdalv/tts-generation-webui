@@ -2,7 +2,6 @@ import gradio as gr
 from typing import List, TypedDict, Literal
 import numpy as np
 from importlib.metadata import version
-from audiocraft.models.magnet import MAGNeT
 
 from tts_webui.utils.only_overlap import only_overlap
 from tts_webui.history_tab.save_to_favorites import save_to_favorites
@@ -42,6 +41,8 @@ class MagnetGenerationParams(TypedDict):
 
 @manage_model_state("magnet")
 def get_model(model):
+    from audiocraft.models.magnet import MAGNeT
+
     return MAGNeT.get_pretrained(model)
 
 
