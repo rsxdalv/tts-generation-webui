@@ -236,7 +236,7 @@ def all_tabs():
 
         outputs_tabs = [
             # voices
-            ("tts_webui.history_tab.voices_tab", "voices_tab", "Voices"),
+            # ("tts_webui.history_tab.voices_tab", "voices_tab", "Voices"),
         ]
         load_tabs(outputs_tabs)
 
@@ -253,11 +253,11 @@ def all_tabs():
         settings_tab_gradio(reload_config_and_restart_ui, gradio_interface_options)
 
         settings_tabs = [
-            (
-                "tts_webui.bark.settings_tab_bark",
-                "settings_tab_bark",
-                "Settings (Bark)",
-            ),
+            # (
+            #     "tts_webui.bark.settings_tab_bark",
+            #     "settings_tab_bark",
+            #     "Settings (Bark)",
+            # ),
             (
                 "tts_webui.utils.model_location_settings_tab",
                 "model_location_settings_tab",
