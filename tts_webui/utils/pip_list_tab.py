@@ -8,7 +8,7 @@ def pip_list_tab():
 
         gr.Button("Refresh").click(fn=refresh_pip_list, outputs=pip_list)
 
-        pip_list_json = gr.JSON(get_pip_list(), visible=False)
+        pip_list_json = gr.JSON(None, visible=False)
 
         gr.Button("API_GET_PIP_LIST", visible=False).click(
             fn=get_pip_list, outputs=[pip_list_json], api_name="get_pip_list"
