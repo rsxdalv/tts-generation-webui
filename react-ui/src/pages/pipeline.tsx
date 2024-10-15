@@ -204,7 +204,7 @@ async function postProcessAudio(
 ): Promise<GradioFile[]> {
   switch (model) {
     case "demucs":
-      return splitWithDemucs({ file: url });
+      return splitWithDemucs({ audio: toLocalCacheFile(url) });
     case "rvc":
       return [
         (

@@ -2,7 +2,6 @@ import React from "react";
 import { Template } from "../../../components/Template";
 import useLocalStorage from "../../../hooks/useLocalStorage";
 import { AudioInput, AudioOutput } from "../../../components/AudioComponents";
-import Head from "next/head";
 import {
   BarkVoiceGenerationParams,
   barkVoiceGenerationId,
@@ -13,6 +12,7 @@ import { SelectWithLabel } from "../../../components/component/SelectWithLabel";
 import { HandleChangeEvent } from "../../../types/HandleChange";
 import { SwitchWithLabel } from "../../../components/SwitchWithLabel";
 import { Button } from "../../../components/ui/button";
+import { sendToBarkAsVoice } from "../../../tabs/BarkGenerationParams";
 
 type Result = {
   filename: string;
@@ -48,16 +48,13 @@ const BarkVoiceGenerationPage = () => {
       body: JSON.stringify(barkVoiceGenerationParams),
     });
 
-    const result = await response.json();
-    // setData(result);
+    await response.json();
   }
 
-  const useAsInput = (audio?: string) => {
-    if (!audio) return;
-    setBarkVoiceGenerationParams({
-      ...barkVoiceGenerationParams,
-      audio,
-    });
+  const useAsVoice = (_audio?: string, metadata?: Result) => {
+    const voice = metadata?.filename;
+    if (!voice) return;
+    sendToBarkAsVoice(voice);
   };
 
   return (
@@ -164,8 +161,9 @@ const BarkVoiceGenerationPage = () => {
           <AudioOutput
             audioOutput={data?.preview}
             label="Encodec audio preview"
-            funcs={{ useAsInput }}
+            funcs={{ useAsVoice }}
             filter={["sendToBarkVoiceGeneration"]}
+            metadata={data}
           />
         </div>
       </div>
