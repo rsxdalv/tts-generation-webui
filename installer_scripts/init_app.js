@@ -8,6 +8,7 @@ const checkConda = async () => {
   try {
     displayMessage("Checking conda installation...");
     await $("conda --version");
+    displayMessage("");
   } catch (error) {
     displayError(
       "Please install conda from https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html"
@@ -92,8 +93,8 @@ async function main() {
 
     const {
       initializeApp,
-      repairTorch,
       setupReactUI,
+      repairTorch,
     } = require("./js/initializeApp.js");
     await initializeApp();
     await setupReactUI();

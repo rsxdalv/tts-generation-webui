@@ -98,7 +98,8 @@ const installDependencies = async (gpuchoice) => {
     }
 
     saveMajorVersion(majorVersion);
-    await updateDependencies();
+    displayMessage("  Successfully installed torch");
+    await pip_install_all();
   } catch (error) {
     displayError(`Error during installation: ${error.message}`);
     throw error;
@@ -123,7 +124,7 @@ Select the device (GPU/CPU) you are using to run the application:
   `
   );
 
-const getInstallerFilesPath = (file) => resolve(__dirname, "..", file);
+const getInstallerFilesPath = (...files) => resolve(__dirname, "..", ...files);
 
 const gpuFile = getInstallerFilesPath(".gpu");
 const majorVersionFile = getInstallerFilesPath(".major_version");
@@ -169,7 +170,7 @@ function pip_install(requirements, name = "") {
   }
 }
 
-async function updateDependencies() {
+async function pip_install_all() {
   if (readPipPackagesVersion() === newPipPackagesVersion)
     return displayMessage(
       "Dependencies are already up to date, skipping pip installs..."
@@ -193,6 +194,7 @@ async function updateDependencies() {
   pip_install("hydra-core==1.3.2", "hydra-core fix due to fairseq");
   pip_install("nvidia-ml-py", "nvidia-ml-py");
   savePipPackagesVersion(newPipPackagesVersion);
+  displayMessage("");
 }
 
 const checkIfTorchInstalled = async () => {
@@ -212,43 +214,45 @@ const FORCE_REINSTALL = process.env.FORCE_REINSTALL ? true : false;
 
 async function applyCondaConfig() {
   displayMessage("Applying conda config...");
-  displayMessage("Checking if Torch is installed...");
+  displayMessage("  Checking if Torch is installed...");
   if (readMajorVersion() === majorVersion && !FORCE_REINSTALL) {
     if (await checkIfTorchInstalled()) {
-      displayMessage("Torch is already installed. Skipping installation...");
-      await updateDependencies();
+      displayMessage("  Torch is already installed. Skipping installation...");
+      await pip_install_all();
       return;
     } else {
-      displayMessage("Torch is not installed. Starting installation...\n");
+      displayMessage("  Torch is not installed. Starting installation...\n");
     }
   } else {
-    displayMessage("Major version update detected. Upgrading base environment");
+    displayMessage("  Major version update detected. Upgrading base environment");
   }
 
   if (fs.existsSync(gpuFile)) {
     const gpuchoice = readGPUChoice();
-    displayMessage(`Using saved GPU choice: ${gpuchoice}`);
+    displayMessage(`  Using saved GPU choice: ${gpuchoice}`);
     await installDependencies(gpuchoice);
     return;
   } else {
     const gpuchoice = await askForGPUChoice();
-    displayMessage(`You selected: ${gpuchoice}`);
+    displayMessage(`  You selected: ${gpuchoice}`);
     saveGPUChoice(gpuchoice);
     await installDependencies(gpuchoice);
   }
 }
 
-const initializeApp = async () => {
+exports.initializeApp = async () => {
   displayMessage("Ensuring that python has the correct version...");
   await ensurePythonVersion();
+  displayMessage("");
   await applyCondaConfig();
+  displayMessage("");
   try {
     await applyDatabaseConfig();
+    displayMessage("");
   } catch (error) {
     displayError("Failed to apply database config");
   }
 };
-exports.initializeApp = initializeApp;
 
 const checkIfTorchHasCuda = async () => {
   try {
@@ -264,7 +268,7 @@ const checkIfTorchHasCuda = async () => {
   }
 };
 
-async function repairTorch() {
+exports.repairTorch = async () => {
   const gpuChoice = readGPUChoice();
   if (!checkIfTorchHasCuda() && gpuChoice === "NVIDIA GPU") {
     displayMessage("Backend is NVIDIA GPU, fixing PyTorch");
@@ -282,11 +286,33 @@ async function repairTorch() {
     }
     displayMessage("Torch has CUDA, skipping reinstall");
   }
-}
-exports.repairTorch = repairTorch;
+};
 
-function setupReactUI() {
+function setupReactUIExtensions() {
   try {
+    displayMessage("Initializing extensions...");
+    const packageJSONpath = getInstallerFilesPath(
+      "..",
+      "react-ui",
+      "src",
+      "extensions",
+      "package.json"
+    );
+
+    if (!fs.existsSync(packageJSONpath)) {
+      fs.writeFileSync(packageJSONpath, "{}");
+    }
+    // $sh("cd react-ui/src/extensions && npm install");
+    // displayMessage("Successfully installed extensions");
+  } catch (error) {
+    displayMessage("Failed to install extensions");
+    throw error;
+  }
+}
+
+exports.setupReactUI = () => {
+  try {
+    setupReactUIExtensions();
     displayMessage("Installing node_modules...");
     $sh("cd react-ui && npm install");
     displayMessage("Successfully installed node_modules");
@@ -297,5 +323,4 @@ function setupReactUI() {
     displayMessage("Failed to install node_modules or build react-ui");
     throw error;
   }
-}
-exports.setupReactUI = setupReactUI;
+};

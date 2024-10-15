@@ -71,7 +71,7 @@ async function applyDatabaseConfig() {
       const version = fs.readFileSync(db_version_file, "utf8");
       if (version === db_version) {
         displayMessage(
-          `Database is already up to date version=${version}, skipping...`
+          `Database is already up to date with version=${version}, skipping...`
         );
         return;
       } else {
