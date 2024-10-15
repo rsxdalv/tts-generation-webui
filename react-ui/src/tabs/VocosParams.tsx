@@ -4,14 +4,17 @@ import useLocalStorage, {
 } from "../hooks/useLocalStorage";
 import router from "next/router";
 import { GradioFile } from "../types/GradioFile";
+import { LocalCacheFile, toLocalCacheFile } from "../types/LocalCacheFile";
 
 export type VocosParams = {
-  audio?: string;
+  audio?: LocalCacheFile;
   bandwidth?: string;
 };
 
 export const initialState: VocosParams = {
-  audio: "https://www.mfiles.co.uk/mp3-downloads/gs-cd-track2.mp3",
+  audio: toLocalCacheFile(
+    "https://www.mfiles.co.uk/mp3-downloads/gs-cd-track2.mp3"
+  ),
   bandwidth: "1.5",
 };
 
@@ -23,8 +26,10 @@ export const sendToVocos = (audio?: string) => {
   if (!audio) return;
   updateLocalStorageWithFunction(
     vocosId,
-    (vocosParams: VocosParams = initialState) =>
-      ({ ...vocosParams, audio } as VocosParams)
+    (vocosParams: VocosParams = initialState) => ({
+      ...vocosParams,
+      audio: toLocalCacheFile(audio),
+    })
   );
   router.push("/vocos_wav");
 };

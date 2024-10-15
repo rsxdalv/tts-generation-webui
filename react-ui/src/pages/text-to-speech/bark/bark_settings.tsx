@@ -56,40 +56,50 @@ const BarkSettingsPage = () => {
             : value,
     };
 
-    const isConfig =
-      name === "text_generation_use_gpu" ||
-      name === "text_generation_use_small_model" ||
-      name === "coarse_to_fine_inference_use_gpu" ||
-      name === "coarse_to_fine_inference_use_small_model" ||
-      name === "fine_tuning_use_gpu" ||
-      name === "fine_tuning_use_small_model" ||
-      name === "use_gpu_codec" ||
-      name === "load_models_on_startup";
-
-    const isEnv =
-      name === "use_small_models" ||
-      name === "enable_mps" ||
-      name === "offload_gpu_models_to_cpu";
+    const save_config_keys = [
+      "text_use_gpu",
+      "text_use_small",
+      "coarse_use_gpu",
+      "coarse_use_small",
+      "fine_use_gpu",
+      "fine_use_small",
+      "codec_use_gpu",
+    ];
+    const isConfig = save_config_keys.includes(name);
 
     if (isConfig) {
       try {
         const response = await fetch("/api/gradio/save_config_bark", {
           method: "POST",
-          body: JSON.stringify(newBarkSettingsParams),
+          body: JSON.stringify(
+            Object.fromEntries(
+              save_config_keys.map((key) => [key, newBarkSettingsParams[key]])
+            )
+          ),
         });
-        const data = await response.json();
+        setData(await response.json());
         setBarkSettingsParams(newBarkSettingsParams);
-        setData(data);
       } catch (error) {
         console.error("Error:", error);
       }
     }
 
+    const env_keys = [
+      "env_suno_use_small_models",
+      "env_suno_enable_mps",
+      "env_suno_offload_cpu",
+    ];
+    const isEnv = env_keys.includes(name);
+
     if (isEnv) {
       try {
-        await fetch("/api/gradio/save_environment_variables_bark", {
+        await fetch("/api/gradio/save_env_variables_bark", {
           method: "POST",
-          body: JSON.stringify(newBarkSettingsParams),
+          body: JSON.stringify(
+            Object.fromEntries(
+              env_keys.map((key) => [key, newBarkSettingsParams[key]])
+            )
+          ),
         });
         setBarkSettingsParams(newBarkSettingsParams);
       } catch (error) {
@@ -116,14 +126,14 @@ const BarkSettingsPage = () => {
             <Label className="text-md mr-auto">Text generation:</Label>
             <SwitchWithLabel
               label="Use GPU"
-              name="text_generation_use_gpu"
-              value={barkSettingsParams.text_generation_use_gpu}
+              name="text_use_gpu"
+              value={barkSettingsParams.text_use_gpu}
               onChange={handleChange}
             />
             <SwitchWithLabel
               label="Use small model"
-              name="text_generation_use_small_model"
-              value={barkSettingsParams.text_generation_use_small_model}
+              name="text_use_small"
+              value={barkSettingsParams.text_use_small}
               onChange={handleChange}
             />
           </div>
@@ -131,16 +141,14 @@ const BarkSettingsPage = () => {
             <Label className="text-md mr-auto">Coarse-to-fine inference:</Label>
             <SwitchWithLabel
               label="Use GPU"
-              name="coarse_to_fine_inference_use_gpu"
-              value={barkSettingsParams.coarse_to_fine_inference_use_gpu}
+              name="coarse_use_gpu"
+              value={barkSettingsParams.coarse_use_gpu}
               onChange={handleChange}
             />
             <SwitchWithLabel
               label="Use small model"
-              name="coarse_to_fine_inference_use_small_model"
-              value={
-                barkSettingsParams.coarse_to_fine_inference_use_small_model
-              }
+              name="coarse_use_small"
+              value={barkSettingsParams.coarse_use_small}
               onChange={handleChange}
             />
           </div>
@@ -148,14 +156,14 @@ const BarkSettingsPage = () => {
             <Label className="text-md mr-auto">Fine-tuning:</Label>
             <SwitchWithLabel
               label="Use GPU"
-              name="fine_tuning_use_gpu"
-              value={barkSettingsParams.fine_tuning_use_gpu}
+              name="fine_use_gpu"
+              value={barkSettingsParams.fine_use_gpu}
               onChange={handleChange}
             />
             <SwitchWithLabel
               label="Use small model"
-              name="fine_tuning_use_small_model"
-              value={barkSettingsParams.fine_tuning_use_small_model}
+              name="fine_use_small"
+              value={barkSettingsParams.fine_use_small}
               onChange={handleChange}
             />
           </div>
@@ -163,8 +171,8 @@ const BarkSettingsPage = () => {
             <Label className="text-md mr-auto">Codec:</Label>
             <SwitchWithLabel
               label="Use GPU"
-              name="use_gpu_codec"
-              value={barkSettingsParams.use_gpu_codec}
+              name="codec_use_gpu"
+              value={barkSettingsParams.codec_use_gpu}
               onChange={handleChange}
             />
           </div>
@@ -175,20 +183,20 @@ const BarkSettingsPage = () => {
             </div>
             <SwitchWithLabel
               label="Use small models"
-              name="use_small_models"
-              value={barkSettingsParams.use_small_models}
+              name="env_suno_use_small_models"
+              value={barkSettingsParams.env_suno_use_small_models}
               onChange={handleChange}
             />
             <SwitchWithLabel
               label="Enable MPS"
-              name="enable_mps"
-              value={barkSettingsParams.enable_mps}
+              name="env_suno_enable_mps"
+              value={barkSettingsParams.env_suno_enable_mps}
               onChange={handleChange}
             />
             <SwitchWithLabel
               label="Offload GPU models to CPU"
-              name="offload_gpu_models_to_cpu"
-              value={barkSettingsParams.offload_gpu_models_to_cpu}
+              name="env_suno_offload_cpu"
+              value={barkSettingsParams.env_suno_offload_cpu}
               onChange={handleChange}
             />
           </div>
@@ -198,9 +206,9 @@ const BarkSettingsPage = () => {
             onClick={() => {
               setBarkSettingsParams({
                 ...barkSettingsParams,
-                use_small_models: false,
-                enable_mps: false,
-                offload_gpu_models_to_cpu: false,
+                env_suno_use_small_models: false,
+                env_suno_enable_mps: false,
+                env_suno_offload_cpu: false,
               });
             }}
           >

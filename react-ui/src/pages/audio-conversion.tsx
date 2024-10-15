@@ -19,7 +19,7 @@ export const AudioConversionModelList = () => (
     <ProjectCard
       title="Vocos Wav"
       description="Vocos Wav is a post-processing model that can refine the output of a text-to-speech model."
-      href="/text-to-speech/bark/vocos_wav"
+      href="/audio-conversion/vocos_wav"
       projectLink="https://github.com/gemelo-ai/vocos"
     />
     <ProjectCard

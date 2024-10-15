@@ -74,54 +74,54 @@ def bark_settings_ui(settings_tab: gr.Tab):
             "true",
             "1",
         )
-        environment_suno_use_small_models = gr.Checkbox(
+        env_suno_use_small_models = gr.Checkbox(
             label="Use small models", value=ENV_SMALL_MODELS
         )
 
-        environment_suno_enable_mps = gr.Checkbox(
+        env_suno_enable_mps = gr.Checkbox(
             label="Enable MPS", value=ENV_ENABLE_MPS
         )
 
-        environment_suno_offload_cpu = gr.Checkbox(
+        env_suno_offload_cpu = gr.Checkbox(
             label="Offload GPU models to CPU", value=ENV_OFFLOAD_CPU
         )
 
-        def save_environment_variables(
-            environment_suno_use_small_models,
-            environment_suno_enable_mps,
-            environment_suno_offload_cpu,
+        def save_env_variables(
+            env_suno_use_small_models,
+            env_suno_enable_mps,
+            env_suno_offload_cpu,
         ):
             from bark import generation
 
-            generation.USE_SMALL_MODELS = environment_suno_use_small_models
-            generation.GLOBAL_ENABLE_MPS = environment_suno_enable_mps
-            generation.OFFLOAD_CPU = environment_suno_offload_cpu
+            generation.USE_SMALL_MODELS = env_suno_use_small_models
+            generation.GLOBAL_ENABLE_MPS = env_suno_enable_mps
+            generation.OFFLOAD_CPU = env_suno_offload_cpu
 
-            os.environ["SUNO_USE_SMALL_MODELS"] = str(environment_suno_use_small_models)
-            os.environ["SUNO_ENABLE_MPS"] = str(environment_suno_enable_mps)
-            os.environ["SUNO_OFFLOAD_CPU"] = str(environment_suno_offload_cpu)
+            os.environ["SUNO_USE_SMALL_MODELS"] = str(env_suno_use_small_models)
+            os.environ["SUNO_ENABLE_MPS"] = str(env_suno_enable_mps)
+            os.environ["SUNO_OFFLOAD_CPU"] = str(env_suno_offload_cpu)
             from tts_webui.utils.setup_or_recover import write_env
 
             write_env(
                 generate_env(
-                    environment_suno_use_small_models=environment_suno_use_small_models,
-                    environment_suno_enable_mps=environment_suno_enable_mps,
-                    environment_suno_offload_cpu=environment_suno_offload_cpu,
+                    env_suno_use_small_models=env_suno_use_small_models,
+                    env_suno_enable_mps=env_suno_enable_mps,
+                    env_suno_offload_cpu=env_suno_offload_cpu,
                 )
             )
 
         env_inputs = [
-            environment_suno_use_small_models,
-            environment_suno_enable_mps,
-            environment_suno_offload_cpu,
+            env_suno_use_small_models,
+            env_suno_enable_mps,
+            env_suno_offload_cpu,
         ]
 
         for i in env_inputs:
             i.change(
-                fn=save_environment_variables,
+                fn=save_env_variables,
                 inputs=env_inputs,
                 api_name=i == env_inputs[0]
-                and "save_environment_variables_bark"
+                and "save_env_variables_bark"
                 or None,
             )
 

@@ -6,6 +6,7 @@ import { parseFormChange } from "../../data/parseFormChange";
 import { applyVocosWav } from "../../functions/applyVocosWav";
 import { VocosWavInputs } from "../../components/VocosWavInputs";
 import { Button } from "../../components/ui/button";
+import { toLocalCacheFile } from "../../types/LocalCacheFile";
 
 const VocosPage = () => {
   const [vocosResult, setVocosResult] = useVocosResults();
@@ -20,7 +21,7 @@ const VocosPage = () => {
     if (!audio) return;
     setVocosParams({
       ...vocosParams,
-      audio,
+      audio: toLocalCacheFile(audio),
     });
   };
 
@@ -31,11 +32,11 @@ const VocosPage = () => {
       <div className="flex gap-x-4 p-4">
         <div className="w-1/2 flex flex-col gap-y-2 flex-shrink-0">
           <AudioInput
-            url={vocosParams?.audio}
+            url={vocosParams?.audio?.path}
             callback={(file) => {
               setVocosParams({
                 ...vocosParams,
-                audio: file,
+                audio: toLocalCacheFile(file),
               });
             }}
             filter={["sendToVocos"]}
@@ -46,10 +47,7 @@ const VocosPage = () => {
             handleChange={handleChange}
           />
 
-          <Button
-            variant="default"
-            onClick={vocos}
-          >
+          <Button variant="default" onClick={vocos}>
             Restore with Vocos
           </Button>
         </div>

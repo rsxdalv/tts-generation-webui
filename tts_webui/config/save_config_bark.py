@@ -10,7 +10,6 @@ def save_config_bark(
     fine_use_gpu: bool,
     fine_use_small: bool,
     codec_use_gpu: bool,
-    load_models_on_startup=False,
 ):
     global config
     config["model"] = {
@@ -22,7 +21,6 @@ def save_config_bark(
         "fine_use_small": fine_use_small,
         "codec_use_gpu": codec_use_gpu,
     }
-    config["load_models_on_startup"] = load_models_on_startup
     _save_config(config)
 
-    return f"Saved: {str(config)}"
+    return f"Saved: {str(config['model'])}"

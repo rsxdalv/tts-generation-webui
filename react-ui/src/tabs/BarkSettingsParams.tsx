@@ -1,35 +1,35 @@
 import { updateLocalStorageWithFunction } from "../hooks/useLocalStorage";
 import router from "next/router";
 
-export const barkSettingsId = "barkSettingsParams";
+export const barkSettingsId = "barkSettingsParams.v4";
 
 export type BarkSettingsParams = {
-  use_small_models: boolean;
-  enable_mps: boolean;
-  offload_gpu_models_to_cpu: boolean;
+  env_suno_use_small_models: boolean;
+  env_suno_enable_mps: boolean;
+  env_suno_offload_cpu: boolean;
 
-  text_generation_use_gpu: boolean;
-  text_generation_use_small_model: boolean;
-  coarse_to_fine_inference_use_gpu: boolean;
-  coarse_to_fine_inference_use_small_model: boolean;
-  fine_tuning_use_gpu: boolean;
-  fine_tuning_use_small_model: boolean;
-  use_gpu_codec: boolean;
+  text_use_gpu: boolean;
+  text_use_small: boolean;
+  coarse_use_gpu: boolean;
+  coarse_use_small: boolean;
+  fine_use_gpu: boolean;
+  fine_use_small: boolean;
+  codec_use_gpu: boolean;
   load_models_on_startup: boolean;
 };
 
 export const initialBarkSettingsParams: BarkSettingsParams = {
-  use_small_models: false,
-  enable_mps: false,
-  offload_gpu_models_to_cpu: false,
+  env_suno_use_small_models: false,
+  env_suno_enable_mps: false,
+  env_suno_offload_cpu: false,
 
-  text_generation_use_gpu: false,
-  text_generation_use_small_model: false,
-  coarse_to_fine_inference_use_gpu: false,
-  coarse_to_fine_inference_use_small_model: false,
-  fine_tuning_use_gpu: false,
-  fine_tuning_use_small_model: false,
-  use_gpu_codec: false,
+  text_use_gpu: false,
+  text_use_small: false,
+  coarse_use_gpu: false,
+  coarse_use_small: false,
+  fine_use_gpu: false,
+  fine_use_small: false,
+  codec_use_gpu: false,
   load_models_on_startup: false,
 };
 
@@ -38,7 +38,7 @@ export const sendToBarkSettings = (melody?: string) => {
   updateLocalStorageWithFunction(
     barkSettingsId,
     (barkSettingsParams: BarkSettingsParams = initialBarkSettingsParams) =>
-      ({ ...barkSettingsParams, melody } as BarkSettingsParams)
+      ({ ...barkSettingsParams, melody }) as BarkSettingsParams
   );
   router.push("/barkSettings");
 };
