@@ -5,6 +5,9 @@ import numpy as np
 import gradio as gr
 
 from tts_webui.config.config import config
+from tts_webui.bark.clone.tab_voice_clone import tab_voice_clone
+from tts_webui.history_tab.voices_tab import voices_tab
+from tts_webui.bark.settings_tab_bark import settings_tab_bark
 
 from tts_webui.bark.get_speaker_gender import get_speaker_gender
 from tts_webui.bark.npz_tools import get_npz_files, save_npz
@@ -203,7 +206,13 @@ def unload_models():
 
 def bark_tab():
     with gr.Tab(label="Bark", id="generation_bark"):
-        bark_ui()
+        with gr.Tabs():
+            with gr.Tab("Generation"):
+                bark_ui()
+            # tab_voice_clone()
+
+            voices_tab()
+            settings_tab_bark()
 
 
 def _npz_dropdown_ui(label):
