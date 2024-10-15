@@ -65,7 +65,7 @@ def run_tab(module_name, function_name, name, requirements=None):
         generic_error_tab_advanced(e, name=name, requirements=requirements)
     finally:
         elapsed_time = time.time() - start_time
-        print(f"{name} tab loaded in {elapsed_time:.2f} seconds.")
+        print(f"  Done in {elapsed_time:.2f} seconds. ({name})\n")
 
 
 def load_tabs(list_of_tabs):

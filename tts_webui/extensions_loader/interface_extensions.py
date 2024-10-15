@@ -54,7 +54,7 @@ def _handle_package(package_name, title_name, requirements):
             )
         finally:
             elapsed_time = time.time() - start_time
-            print(f"{title_name} Extension loaded in {elapsed_time:.2f} seconds.")
+            print(f"  Done in {elapsed_time:.2f} seconds. ({title_name} Extension)\n")
     else:
         with gr.Tab(f"[Available] {title_name} Extension"):
             gr.Markdown(f"{title_name} Extension not installed")
