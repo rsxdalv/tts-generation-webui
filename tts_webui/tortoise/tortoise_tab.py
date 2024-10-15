@@ -19,12 +19,12 @@ from tts_webui.utils.randomize_seed import randomize_seed_ui
 MAX_OUTPUTS = 9
 
 
-def generation_tab_tortoise():
+def tortoise_tab():
     with gr.Tab("Tortoise TTS"):
-        tortoise_core_ui()
+        tortoise_ui()
 
 
-def tortoise_core_ui():
+def tortoise_ui():
     with gr.Row():
         with gr.Column():
             model = tortoise_model_settings_ui()
@@ -172,7 +172,7 @@ if __name__ == "__main__":
     from tts_webui.css.css import full_css
 
     with gr.Blocks(css=full_css) as demo:
-        generation_tab_tortoise()
+        tortoise_tab()
 
     demo.launch(
         server_port=7770,

@@ -4,6 +4,7 @@ from tts_webui.config.config import config
 from tts_webui.config.save_config_bark import save_config_bark
 from tts_webui.bark.BarkModelManager import bark_model_manager
 from tts_webui.utils.setup_or_recover import generate_env
+from tts_webui.utils.setup_or_recover import write_env
 
 
 def settings_tab_bark() -> None:
@@ -13,45 +14,45 @@ def settings_tab_bark() -> None:
 
 def bark_settings_ui(settings_tab: gr.Tab):
     with gr.Column():
+        model_config = config["model"]
         with gr.Row(variant="panel"):
             gr.Markdown("### Text generation:")
             text_use_gpu = gr.Checkbox(
                 label="Use GPU",
-                value=config["model"]["text_use_gpu"],
+                value=model_config["text_use_gpu"],
             )
             text_use_small = gr.Checkbox(
                 label="Use small model",
-                value=config["model"]["text_use_small"],
+                value=model_config["text_use_small"],
             )
 
         with gr.Row(variant="panel"):
             gr.Markdown("### Coarse-to-fine inference:")
             coarse_use_gpu = gr.Checkbox(
                 label="Use GPU",
-                value=config["model"]["coarse_use_gpu"],
+                value=model_config["coarse_use_gpu"],
             )
             coarse_use_small = gr.Checkbox(
                 label="Use small model",
-                value=config["model"]["coarse_use_small"],
+                value=model_config["coarse_use_small"],
             )
 
         with gr.Row(variant="panel"):
             gr.Markdown("### Fine-tuning:")
             fine_use_gpu = gr.Checkbox(
                 label="Use GPU",
-                value=config["model"]["fine_use_gpu"],
+                value=model_config["fine_use_gpu"],
             )
             fine_use_small = gr.Checkbox(
                 label="Use small model",
-                value=config["model"]["fine_use_small"],
+                value=model_config["fine_use_small"],
             )
 
         with gr.Row(variant="panel"):
             gr.Markdown("### Codec:")
             codec_use_gpu = gr.Checkbox(
                 label="Use GPU for codec",
-                value=config["model"]["codec_use_gpu"],
-                scale=2,
+                value=model_config["codec_use_gpu"],
             )
 
         save_beacon = gr.Markdown("")
@@ -62,28 +63,20 @@ def bark_settings_ui(settings_tab: gr.Tab):
             (Requires restart)
         """
         )
-        ENV_SMALL_MODELS = os.environ.get("SUNO_USE_SMALL_MODELS", "").lower() in (
-            "true",
-            "1",
-        )
-        ENV_ENABLE_MPS = os.environ.get("SUNO_ENABLE_MPS", "").lower() in (
-            "true",
-            "1",
-        )
-        ENV_OFFLOAD_CPU = os.environ.get("SUNO_OFFLOAD_CPU", "").lower() in (
-            "true",
-            "1",
-        )
+
+        def _cast_bool(x: str):
+            return x.lower() in ("true", "1")
+
         env_suno_use_small_models = gr.Checkbox(
-            label="Use small models", value=ENV_SMALL_MODELS
+            label="Use small models",
+            value=_cast_bool(os.environ.get("SUNO_USE_SMALL_MODELS", "")),
         )
-
         env_suno_enable_mps = gr.Checkbox(
-            label="Enable MPS", value=ENV_ENABLE_MPS
+            label="Enable MPS", value=_cast_bool(os.environ.get("SUNO_ENABLE_MPS", ""))
         )
-
         env_suno_offload_cpu = gr.Checkbox(
-            label="Offload GPU models to CPU", value=ENV_OFFLOAD_CPU
+            label="Offload GPU models to CPU",
+            value=_cast_bool(os.environ.get("SUNO_OFFLOAD_CPU", "")),
         )
 
         def save_env_variables(
@@ -91,17 +84,6 @@ def bark_settings_ui(settings_tab: gr.Tab):
             env_suno_enable_mps,
             env_suno_offload_cpu,
         ):
-            from bark import generation
-
-            generation.USE_SMALL_MODELS = env_suno_use_small_models
-            generation.GLOBAL_ENABLE_MPS = env_suno_enable_mps
-            generation.OFFLOAD_CPU = env_suno_offload_cpu
-
-            os.environ["SUNO_USE_SMALL_MODELS"] = str(env_suno_use_small_models)
-            os.environ["SUNO_ENABLE_MPS"] = str(env_suno_enable_mps)
-            os.environ["SUNO_OFFLOAD_CPU"] = str(env_suno_offload_cpu)
-            from tts_webui.utils.setup_or_recover import write_env
-
             write_env(
                 generate_env(
                     env_suno_use_small_models=env_suno_use_small_models,
@@ -120,9 +102,7 @@ def bark_settings_ui(settings_tab: gr.Tab):
             i.change(
                 fn=save_env_variables,
                 inputs=env_inputs,
-                api_name=i == env_inputs[0]
-                and "save_env_variables_bark"
-                or None,
+                api_name=i == env_inputs[0] and "save_env_variables_bark" or None,
             )
 
         # refresh environment variables button

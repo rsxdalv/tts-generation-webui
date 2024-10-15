@@ -201,7 +201,7 @@ def unload_models():
     return gr.Button(value="Unloaded")
 
 
-def generation_tab_bark():
+def bark_tab():
     with gr.Tab(label="Bark", id="generation_bark"):
         bark_ui()
 
@@ -405,9 +405,9 @@ def bark_ui():
 
 if __name__ == "__main__":
     if "demo" in locals():
-        demo.close()  # type: ignore
+        locals()["demo"].close()
     with gr.Blocks() as demo:
-        generation_tab_bark()
+        bark_tab()
 
     demo.launch(
         server_port=7770,

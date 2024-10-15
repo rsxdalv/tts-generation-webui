@@ -285,7 +285,7 @@ def stable_audio_ui():
             )
 
 
-def stable_audio_ui_tab():
+def stable_audio_tab():
     with gr.Tab("Stable Audio"):
         stable_audio_ui()
 

@@ -171,7 +171,7 @@ def generate(
     return {"audio_out": (model_inst.sample_rate, audio_array), "tokens": tokens}
 
 
-def generation_tab_musicgen():
+def musicgen_tab():
     with gr.Tab("MusicGen + AudioGen"):
         musicgen_ui()
 
@@ -277,7 +277,7 @@ if __name__ == "__main__":
     if "demo" in locals():
         demo.close()  # type: ignore
     with gr.Blocks() as demo:
-        generation_tab_musicgen()
+        musicgen_tab()
 
     demo.launch(
         server_port=7770,

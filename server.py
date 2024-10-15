@@ -1,4 +1,5 @@
 # %%
+print("Starting server...\n")
 import tts_webui.utils.setup_or_recover as setup_or_recover
 
 setup_or_recover.setup_or_recover()
@@ -20,8 +21,6 @@ from tts_webui.css.css import full_css
 from tts_webui.history_tab.collections_directories_atom import (
     collections_directories_atom,
 )
-
-print("Starting server...\n")
 
 
 from tts_webui.utils.generic_error_tab_advanced import generic_error_tab_advanced
@@ -132,7 +131,7 @@ def main_ui(theme_choice="Base"):
 def all_tabs():
     with gr.Tab("Text-to-Speech"), gr.Tabs():
         tts_tabs = [
-            ("tts_webui.bark.generation_tab_bark", "generation_tab_bark", "Bark TTS"),
+            ("tts_webui.bark.bark_tab", "bark_tab", "Bark TTS"),
             (
                 "tts_webui.bark.clone.tab_voice_clone",
                 "tab_voice_clone",
@@ -140,8 +139,8 @@ def all_tabs():
                 "-r requirements_bark_hubert_quantizer.txt",
             ),
             (
-                "tts_webui.tortoise.generation_tab_tortoise",
-                "generation_tab_tortoise",
+                "tts_webui.tortoise.tortoise_tab",
+                "tortoise_tab",
                 "Tortoise TTS",
             ),
             (
@@ -175,20 +174,20 @@ def all_tabs():
     with gr.Tab("Audio/Music Generation"), gr.Tabs():
         audio_music_generation_tabs = [
             (
-                "tts_webui.stable_audio.stable_audio",
-                "stable_audio_ui_tab",
+                "tts_webui.stable_audio.stable_audio_tab",
+                "stable_audio_tab",
                 "Stable Audio",
                 "-r requirements_stable_audio.txt",
             ),
             (
                 "tts_webui.magnet.magnet_tab",
-                "generation_tab_magnet",
+                "magnet_tab",
                 "MAGNeT",
                 "-r requirements_audiocraft.txt",
             ),
             (
                 "tts_webui.musicgen.musicgen_tab",
-                "generation_tab_musicgen",
+                "musicgen_tab",
                 "MusicGen",
                 "-r requirements_audiocraft.txt",
             ),

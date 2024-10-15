@@ -97,7 +97,7 @@ def generate(
     return {"audio_out": (model_inst.sample_rate, audio_array), "tokens": tokens}
 
 
-def generation_tab_magnet():
+def magnet_tab():
     with gr.Tab("Magnet"):
         magnet_ui()
 
@@ -213,7 +213,7 @@ def magnet_ui():
 
 if __name__ == "__main__":
     with gr.Blocks() as demo:
-        generation_tab_magnet()
+        magnet_tab()
 
     demo.launch(
         server_port=7770,
