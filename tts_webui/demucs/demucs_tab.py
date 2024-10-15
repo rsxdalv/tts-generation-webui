@@ -1,23 +1,23 @@
 import torchaudio
 import torch
 import gradio as gr
-from demucs import pretrained
-from demucs.apply import apply_model
-from demucs.audio import convert_audio
+
+from tts_webui.utils.manage_model_state import manage_model_state
+from tts_webui.utils.list_dir_models import unload_model_button
 
 
-_demucs_model = None
+@manage_model_state("demucs")
+def _get_demucs_model():
+    from demucs import pretrained
 
-
-def get_demucs_model():
-    global _demucs_model
-    if _demucs_model is None:
-        _demucs_model = pretrained.get_model("htdemucs")
-    return _demucs_model
+    return pretrained.get_model("htdemucs")
 
 
 def apply_demucs(wav, sr):
-    demucs_model = get_demucs_model()
+    from demucs.audio import convert_audio
+    from demucs.apply import apply_model
+
+    demucs_model = _get_demucs_model()
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     wav = convert_audio(wav, sr, demucs_model.samplerate, demucs_model.audio_channels)
@@ -28,7 +28,7 @@ COMPONENTS = ["drums", "bass", "other", "vocals"]
 
 
 def demucs_audio(audio):
-    demucs_model = get_demucs_model()
+    demucs_model = _get_demucs_model()
     wav, sr = torchaudio.load(audio)
     out = apply_demucs(wav=wav.unsqueeze(0), sr=sr)
 
@@ -60,6 +60,7 @@ def demucs_ui():
         with gr.Column():
             demucs_input = gr.Audio(label="Input", type="filepath")
             button = gr.Button("Separate")
+            unload_model_button("demucs")
         with gr.Column():
             outputs = [gr.Audio(label=label) for label in COMPONENTS]
     button.click(
@@ -76,11 +77,11 @@ def demucs_tab():
 
 
 if __name__ == "__main__":
-    if "interface" in locals():
-        interface.close()  # type: ignore
+    if "demo" in locals():
+        locals()["demo"].close()
+    with gr.Blocks() as demo:
+        demucs_tab()
 
-    with gr.Blocks() as interface:
-        with gr.Tabs():
-            demucs_tab()
-
-    interface.launch(enable_queue=True)
+    demo.launch(
+        server_port=7770,
+    )
