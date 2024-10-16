@@ -1,29 +1,29 @@
 import os
 import shutil
-import json
 
 import numpy as np
 import gradio as gr
-from bark import SAMPLE_RATE
-from bark.generation import SUPPORTED_LANGS
 
-from tts_webui.bark.create_voice_string import create_voice_string
+from tts_webui.config.config import config
+from tts_webui.bark.clone.tab_voice_clone import tab_voice_clone
+from tts_webui.history_tab.voices_tab import voices_tab
+from tts_webui.bark.settings_tab_bark import settings_tab_bark
+
 from tts_webui.bark.get_speaker_gender import get_speaker_gender
-from tts_webui.history_tab.save_to_favorites import save_to_favorites
-from tts_webui.bark.generate_and_save_metadata import generate_bark_metadata
 from tts_webui.bark.npz_tools import get_npz_files, save_npz
 from tts_webui.bark.split_text_functions import split_by_length_simple, split_by_lines
-from tts_webui.bark.extended_generate import custom_generate_audio
-from tts_webui.bark.BarkModelManager import bark_model_manager
-from tts_webui.config.config import config
 from tts_webui.bark.generation_settings import (
     PromptSplitSettings,
     LongPromptHistorySettings,
 )
-from tts_webui.decorators.gradio_dict_decorator import dictionarize
+
+from tts_webui.history_tab.save_to_favorites import save_to_favorites
+
 from tts_webui.utils.save_json_result import save_json_result
 from tts_webui.utils.get_dict_props import get_dict_props
 from tts_webui.utils.randomize_seed import randomize_seed_ui
+
+from tts_webui.decorators.gradio_dict_decorator import dictionarize
 from tts_webui.decorators.decorator_apply_torch_seed import (
     decorator_apply_torch_seed_generator,
 )
@@ -50,9 +50,30 @@ from tts_webui.extensions_loader.decorator_extensions import (
 )
 from tts_webui.utils.outputs.path import get_relative_output_path_ext
 
+# from bark import SAMPLE_RATE
+SAMPLE_RATE = 24_000
+# from bark.generation import SUPPORTED_LANGS
+SUPPORTED_LANGS = [
+    ("English", "en"),
+    ("German", "de"),
+    ("Spanish", "es"),
+    ("French", "fr"),
+    ("Hindi", "hi"),
+    ("Italian", "it"),
+    ("Japanese", "ja"),
+    ("Korean", "ko"),
+    ("Polish", "pl"),
+    ("Portuguese", "pt"),
+    ("Russian", "ru"),
+    ("Turkish", "tr"),
+    ("Chinese", "zh"),
+]
+
 
 def _decorator_bark_save_metadata_generator(fn):
     def _save_metadata_and_npz(kwargs, result_dict):
+        from tts_webui.bark.generate_and_save_metadata import generate_bark_metadata
+
         metadata = generate_bark_metadata(
             date=format_date_for_file(result_dict["date"]),
             full_generation=result_dict["full_generation"],
@@ -125,6 +146,9 @@ def bark_generate_long(
     long_prompt_history_radio,
     **kwargs,
 ):
+    from tts_webui.bark.extended_generate import custom_generate_audio
+    from tts_webui.bark.BarkModelManager import bark_model_manager
+
     pieces = []
     original_history_prompt = history_prompt
     last_generation = history_prompt
@@ -174,13 +198,21 @@ def bark_generate_long(
 
 
 def unload_models():
+    from tts_webui.bark.BarkModelManager import bark_model_manager
+
     bark_model_manager.unload_models()
     return gr.Button(value="Unloaded")
 
 
-def generation_tab_bark():
+def bark_tab():
     with gr.Tab(label="Bark", id="generation_bark"):
-        bark_ui()
+        with gr.Tabs():
+            with gr.Tab("Generation"):
+                bark_ui()
+            # tab_voice_clone()
+
+            voices_tab()
+            settings_tab_bark()
 
 
 def _npz_dropdown_ui(label):
@@ -238,9 +270,14 @@ def _voice_select_ui(history_prompt):
 
     voice_inputs = [language, speaker_id, use_v2]
 
+    def create_voice_string_lazy(language, speaker_id, use_v2):
+        from tts_webui.bark.create_voice_string import create_voice_string
+
+        return create_voice_string(language, speaker_id, use_v2)
+
     for i in voice_inputs:
         i.change(
-            fn=create_voice_string,
+            fn=create_voice_string_lazy,
             inputs=voice_inputs,
             outputs=[history_prompt],
         ).then(
@@ -377,9 +414,9 @@ def bark_ui():
 
 if __name__ == "__main__":
     if "demo" in locals():
-        demo.close()  # type: ignore
+        locals()["demo"].close()
     with gr.Blocks() as demo:
-        generation_tab_bark()
+        bark_tab()
 
     demo.launch(
         server_port=7770,

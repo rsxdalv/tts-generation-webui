@@ -1,4 +1,5 @@
 # %%
+print("Starting server...\n")
 import tts_webui.utils.setup_or_recover as setup_or_recover
 
 setup_or_recover.setup_or_recover()
@@ -20,8 +21,6 @@ from tts_webui.css.css import full_css
 from tts_webui.history_tab.collections_directories_atom import (
     collections_directories_atom,
 )
-
-print("Starting server...\n")
 
 
 from tts_webui.utils.generic_error_tab_advanced import generic_error_tab_advanced
@@ -66,7 +65,7 @@ def run_tab(module_name, function_name, name, requirements=None):
         generic_error_tab_advanced(e, name=name, requirements=requirements)
     finally:
         elapsed_time = time.time() - start_time
-        print(f"{name} tab loaded in {elapsed_time:.2f} seconds.")
+        print(f"  Done in {elapsed_time:.2f} seconds. ({name})\n")
 
 
 def load_tabs(list_of_tabs):
@@ -82,7 +81,7 @@ def main_ui(theme_choice="Base"):
         "Default": gr.themes.Default,
         "Monochrome": gr.themes.Monochrome,
     }
-    theme = themes[theme_choice](
+    theme: gr.themes.Base = themes[theme_choice](
         # primary_hue="blue",
         primary_hue="sky",
         secondary_hue="sky",
@@ -93,7 +92,8 @@ def main_ui(theme_choice="Base"):
             "system-ui",
             "sans-serif",
         ],
-    ).set(
+    )
+    theme.set(
         embed_radius="*radius_sm",
         block_label_radius="*radius_sm",
         block_label_right_radius="*radius_sm",
@@ -132,7 +132,7 @@ def main_ui(theme_choice="Base"):
 def all_tabs():
     with gr.Tab("Text-to-Speech"), gr.Tabs():
         tts_tabs = [
-            ("tts_webui.bark.generation_tab_bark", "generation_tab_bark", "Bark TTS"),
+            ("tts_webui.bark.bark_tab", "bark_tab", "Bark TTS"),
             (
                 "tts_webui.bark.clone.tab_voice_clone",
                 "tab_voice_clone",
@@ -140,8 +140,8 @@ def all_tabs():
                 "-r requirements_bark_hubert_quantizer.txt",
             ),
             (
-                "tts_webui.tortoise.generation_tab_tortoise",
-                "generation_tab_tortoise",
+                "tts_webui.tortoise.tortoise_tab",
+                "tortoise_tab",
                 "Tortoise TTS",
             ),
             (
@@ -175,20 +175,20 @@ def all_tabs():
     with gr.Tab("Audio/Music Generation"), gr.Tabs():
         audio_music_generation_tabs = [
             (
-                "tts_webui.stable_audio.stable_audio",
-                "stable_audio_ui_tab",
+                "tts_webui.stable_audio.stable_audio_tab",
+                "stable_audio_tab",
                 "Stable Audio",
                 "-r requirements_stable_audio.txt",
             ),
             (
                 "tts_webui.magnet.magnet_tab",
-                "generation_tab_magnet",
+                "magnet_tab",
                 "MAGNeT",
                 "-r requirements_audiocraft.txt",
             ),
             (
                 "tts_webui.musicgen.musicgen_tab",
-                "generation_tab_musicgen",
+                "musicgen_tab",
                 "MusicGen",
                 "-r requirements_audiocraft.txt",
             ),
@@ -237,7 +237,7 @@ def all_tabs():
 
         outputs_tabs = [
             # voices
-            ("tts_webui.history_tab.voices_tab", "voices_tab", "Voices"),
+            # ("tts_webui.history_tab.voices_tab", "voices_tab", "Voices"),
         ]
         load_tabs(outputs_tabs)
 
@@ -254,11 +254,11 @@ def all_tabs():
         settings_tab_gradio(reload_config_and_restart_ui, gradio_interface_options)
 
         settings_tabs = [
-            (
-                "tts_webui.bark.settings_tab_bark",
-                "settings_tab_bark",
-                "Settings (Bark)",
-            ),
+            # (
+            #     "tts_webui.bark.settings_tab_bark",
+            #     "settings_tab_bark",
+            #     "Settings (Bark)",
+            # ),
             (
                 "tts_webui.utils.model_location_settings_tab",
                 "model_location_settings_tab",
@@ -289,6 +289,10 @@ def start_gradio_server():
     if "--share" in os.sys.argv:
         print("Gradio share mode enabled")
         gradio_interface_options["share"] = True
+
+    if "--docker" in os.sys.argv:
+        gradio_interface_options["server_name"] = "0.0.0.0"
+        print("Info: Docker mode: opening gradio server on all interfaces")
 
     print("Starting Gradio server...")
     if "enable_queue" in gradio_interface_options:
@@ -323,33 +327,14 @@ def start_gradio_server():
 
 def server_hypervisor():
     import subprocess
-    # import webbrowser
-    # import threading
     import signal
     import sys
 
-    # def wait_for_postgres():
-    #     import time
-
-    #     time.sleep(1)
-    #     try:
-    #         subprocess.check_call("pg_isready -U postgres", shell=True)
-    #         print("Postgres is ready")
-    #     except:
-    #         wait_for_postgres()
-
-    # def create_db():
-    #     try:
-    #         wait_for_postgres()
-    #         subprocess.Popen("createdb -U postgres webui", shell=True)
-    #         print("Successfully created database 'webui'")
-    #         # subprocess.Popen("liquibase update", shell=True)
-    #     except:
-    #         pass
+    postgres_dir = os.path.join("data", "postgres")
 
     def stop_postgres(postgres_process):
         try:
-            subprocess.check_call("pg_ctl stop -D data\\postgres -m fast", shell=True)
+            subprocess.check_call(f"pg_ctl stop -D {postgres_dir} -m fast", shell=True)
             print("PostgreSQL stopped gracefully.")
         except Exception as e:
             print(f"Error stopping PostgreSQL: {e}")
@@ -369,19 +354,31 @@ def server_hypervisor():
         },
         shell=True,
     )
+    if "--docker" in os.sys.argv:
+        print("Info: Docker mode: skipping Postgres")
+        return
     print("Starting Postgres...")
-    postgres_process = subprocess.Popen("postgres -D data\\postgres", shell=True)
+    postgres_process = subprocess.Popen(f"postgres -D {postgres_dir}", shell=True)
     try:
-        signal.signal(signal.SIGINT, lambda sig, frame: signal_handler(sig, frame, postgres_process))  # Ctrl+C
-        signal.signal(signal.SIGTERM, lambda sig, frame: signal_handler(sig, frame, postgres_process))  # Termination signals
+        signal.signal(
+            signal.SIGINT,
+            lambda sig, frame: signal_handler(sig, frame, postgres_process),
+        )  # Ctrl+C
+        signal.signal(
+            signal.SIGTERM,
+            lambda sig, frame: signal_handler(sig, frame, postgres_process),
+        )  # Termination signals
         if os.name != "nt":
-            signal.signal(signal.SIGHUP, lambda sig, frame: signal_handler(sig, frame, postgres_process))   # Terminal closure
-            signal.signal(signal.SIGQUIT, lambda sig, frame: signal_handler(sig, frame, postgres_process))  # Quit
+            signal.signal(
+                signal.SIGHUP,
+                lambda sig, frame: signal_handler(sig, frame, postgres_process),
+            )  # Terminal closure
+            signal.signal(
+                signal.SIGQUIT,
+                lambda sig, frame: signal_handler(sig, frame, postgres_process),
+            )  # Quit
     except (ValueError, OSError) as e:
         print(f"Failed to set signal handlers: {e}")
-
-    # db_thread = threading.Thread(target=create_db)
-    # db_thread.start()
 
 
 if __name__ == "__main__":

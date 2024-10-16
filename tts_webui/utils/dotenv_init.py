@@ -10,4 +10,5 @@ except ImportError:
 
 
 def init():
+    load_dotenv(dotenv_path=".env.user")
     load_dotenv()

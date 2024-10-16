@@ -3,7 +3,6 @@ import os
 import torch
 import gradio as gr
 from importlib.metadata import version
-from maha_tts import load_models, infer_tts, config
 from tts_webui.tortoise.gr_reload_button import gr_open_button_simple, gr_reload_button
 from tts_webui.utils.list_dir_models import unload_model_button
 from tts_webui.utils.randomize_seed import randomize_seed_ui
@@ -37,6 +36,8 @@ def get_voice_list():
 
 @manage_model_state("maha_tts")
 def preload_models_if_needed(model_name, device):
+    from maha_tts.inference import load_models
+
     return load_models(name=model_name, device=device)
 
 
@@ -58,6 +59,8 @@ def generate_audio_maha_tts(
     device="auto",
     **kwargs,
 ):
+    from maha_tts.inference import infer_tts, config
+
     device = torch.device(
         device == "auto" and "cuda" if torch.cuda.is_available() else "cpu" or device
     )
@@ -76,6 +79,10 @@ def generate_audio_maha_tts(
 
 
 def maha_tts_ui():
+    # from maha_tts.config import config
+    class config:
+        langs = ['english','tamil', 'telugu', 'punjabi', 'marathi', 'hindi', 'gujarati', 'bengali', 'assamese']
+
     gr.Markdown(
         """
     # Maha TTS Demo
@@ -110,7 +117,7 @@ def maha_tts_ui():
             type="value",
         )
     text_language = gr.Radio(
-        choices=list(config.lang_index.keys()),
+        choices=list(config.langs),
         label="Text Language",
         value="english",
         type="value",

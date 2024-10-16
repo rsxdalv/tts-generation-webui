@@ -2,20 +2,18 @@ import os
 import gradio as gr
 import glob
 from pathlib import Path
-
 from huggingface_hub import hf_hub_download
+
 from tts_webui.history_tab.open_folder import open_folder
 from tts_webui.utils.get_path_from_root import get_path_from_root
 from tts_webui.tortoise.gr_reload_button import gr_reload_button, gr_open_button_simple
 
-# from tts_webui.rvc_tab.infer_rvc import infer_rvc as infer_rvc
 from tts_webui.rvc_tab.get_and_load_hubert import download_rmvpe
-from rvc.modules.vc.modules import VC
 
-from tts_webui.decorators.gradio_dict_decorator import dictionarize
 from tts_webui.utils.randomize_seed import randomize_seed_ui
 from tts_webui.utils.manage_model_state import manage_model_state
 from tts_webui.utils.list_dir_models import unload_model_button
+from tts_webui.decorators.gradio_dict_decorator import dictionarize
 from tts_webui.decorators.decorator_apply_torch_seed import decorator_apply_torch_seed
 from tts_webui.decorators.decorator_log_generation import decorator_log_generation
 from tts_webui.decorators.decorator_save_metadata import decorator_save_metadata
@@ -29,14 +27,26 @@ from tts_webui.extensions_loader.decorator_extensions import (
     decorator_extension_inner,
 )
 
+hubert_path = ""
 
-hubert_path = hf_hub_download(
-    repo_id="lj1995/VoiceConversionWebUI", filename="hubert_base.pt"
-)
+
+def get_hubert_path():
+    global hubert_path
+
+    if hubert_path != "":
+        return hubert_path
+
+    else:
+        hubert_path = hf_hub_download(
+            repo_id="lj1995/VoiceConversionWebUI", filename="hubert_base.pt"
+        )
+        return hubert_path
 
 
 @manage_model_state("rvc")
 def get_vc(model_path):
+    from rvc.modules.vc.modules import VC
+
     vc = VC()
     vc.get_vc(model_path)
     return vc
@@ -90,7 +100,7 @@ def run_rvc(
         resample_sr=resample_sr,
         rms_mix_rate=rms_mix_rate,
         protect=protect,
-        hubert_path=hubert_path,
+        hubert_path=get_hubert_path(),
         # hubert_path="data/models/hubert/hubert_base.pt",
     )
     return {"audio_out": (tgt_sr, audio_opt)}

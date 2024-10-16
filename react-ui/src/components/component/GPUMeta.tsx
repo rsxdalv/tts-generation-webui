@@ -8,6 +8,7 @@ import {
 import { GPUInfo } from "../../types/GPUInfo";
 
 export function GPUMeta({
+  name,
   vram,
   cuda_capabilities,
   torch_version,
@@ -25,7 +26,7 @@ export function GPUMeta({
             <CpuIcon className="w-6 h-6 text-muted-foreground" />
           </div>
           <div>
-            <CardTitle>NVIDIA GeForce RTX 3090</CardTitle>
+            <CardTitle>{name}</CardTitle>
             <CardDescription className="text-sm text-muted-foreground">
               Graphics Card
             </CardDescription>

@@ -107,7 +107,7 @@ def history_content(directory, history_tab, show_collections):
                 col_count=len(datatypes),
                 datatype=datatypes,
                 headers=headers,
-                height=800,
+                max_height=800,
             )
 
         with gr.Column():

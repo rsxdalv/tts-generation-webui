@@ -21,7 +21,7 @@ export default async function handler(
   res: NextApiResponse<Data>
 ) {
   const { name } = req.query;
-  console.log("gradio api handler", name, req.body);
+  // console.log("gradio api handler", name, req.body);
 
   if (!name || typeof name !== "string" || !endpoints[name]) {
     res.status(404).json({ data: { error: "Not found" } });
@@ -50,55 +50,14 @@ type GradioChoices = {
 const extractChoices = ({ choices }: GradioChoices) => choices.map((x) => x[0]);
 const extractChoicesTuple = ({ choices }: GradioChoices) =>
   choices.map((x) => x[1]);
+const getChoices = (result: { data: GradioChoices[] }) =>
+  extractChoices(result?.data[0]);
 
 const gradioPredict = <T extends any[]>(...args: Parameters<PredictFunction>) =>
   getClient().then((app) => app.predict(...args)) as Promise<{ data: T }>;
 
 const gradioSubmit = <T extends any[]>(...args: Parameters<PredictFunction>) =>
   getClient().then((app) => app.submit(...args));
-
-async function demucs({ file }: { file: string }) {
-  const audioBlob = await getFile(file);
-
-  const result = await gradioPredict<
-    [GradioFile, GradioFile, GradioFile, GradioFile]
-  >("/demucs", [
-    audioBlob, // blob in 'Input' Audio component
-  ]);
-
-  return result?.data;
-}
-
-async function vocos_wav({ audio, bandwidth }) {
-  const audioBlob = await getFile(audio);
-
-  const result = await gradioPredict<[GradioFile]>("/vocos_wav", [
-    audioBlob, // blob in 'Input Audio' Audio component
-    bandwidth, // string (Option from: ['1.5', '3.0', '6.0', '12.0']) in 'Bandwidth in kbps' Dropdown component
-  ]);
-
-  return result?.data[0];
-}
-
-async function vocos_npz({ npz_file }) {
-  const npzBlob = await getFile(npz_file);
-
-  const result = await gradioPredict<[GradioFile]>("/vocos_npz", [
-    npzBlob, // blob in 'Input NPZ' File component
-  ]);
-
-  return result?.data[0];
-}
-
-async function encodec_decode({ npz_file }) {
-  const npzBlob = await getFile(npz_file);
-
-  const result = await gradioPredict<[GradioFile]>("/encodec_decode", [
-    npzBlob, // blob in 'Input NPZ' File component
-  ]);
-
-  return result?.data[0];
-}
 
 async function musicgen({ melody, model, ...params }) {
   const melodyBlob = await getFile(melody);
@@ -198,7 +157,7 @@ async function bark({
 
 const reload_old_generation_dropdown = () =>
   gradioPredict<[GradioChoices]>("/reload_old_generation_dropdown").then(
-    (result) => extractChoices(result?.data[0])
+    getChoices
   );
 
 const bark_favorite = async ({ folder_root }) =>
@@ -279,14 +238,10 @@ async function tortoise({
 }
 
 const tortoise_refresh_models = () =>
-  gradioPredict<[GradioChoices]>("/tortoise_refresh_models").then((result) =>
-    extractChoices(result?.data[0])
-  );
+  gradioPredict<[GradioChoices]>("/tortoise_refresh_models").then(getChoices);
 
 const tortoise_refresh_voices = () =>
-  gradioPredict<[GradioChoices]>("/tortoise_refresh_voices").then((result) =>
-    extractChoices(result?.data[0])
-  );
+  gradioPredict<[GradioChoices]>("/tortoise_refresh_voices").then(getChoices);
 
 const tortoise_open_models = () => gradioPredict<[]>("/tortoise_open_models");
 const tortoise_open_voices = () => gradioPredict<[]>("/tortoise_open_voices");
@@ -350,57 +305,30 @@ async function rvc({
   return { audio, metadata };
 }
 
-const rvc_model_reload = () =>
-  gradioPredict<[GradioChoices]>("/rvc_model_reload").then((result) =>
-    extractChoices(result?.data[0])
-  );
-
-const rvc_index_reload = () =>
-  gradioPredict<[GradioChoices]>("/rvc_index_reload").then((result) =>
-    extractChoices(result?.data[0])
-  );
-
-const rvc_model_open = () => gradioPredict<[]>("/rvc_model_open");
-
-const rvc_index_open = () => gradioPredict<[]>("/rvc_index_open");
-
 const delete_generation = ({ folder_root }) =>
   gradioPredict<[]>("/delete_generation", [folder_root]);
 
 const save_to_voices = ({ history_npz }) =>
   gradioPredict<[Object]>("/save_to_voices", [history_npz]);
 
-const open_folder = ({ folder }) => gradioPredict<[]>("/open_folder", [folder]);
-
-const save_environment_variables_bark = ({
-  use_small_models,
-  enable_mps,
-  offload_gpu_models_to_cpu,
-}) =>
-  gradioPredict<[]>("/save_environment_variables_bark", [
-    use_small_models, // boolean  in 'Use small models' Checkbox component
-    enable_mps, // boolean  in 'Enable MPS' Checkbox component
-    offload_gpu_models_to_cpu, // boolean  in 'Offload GPU models to CPU' Checkbox component
-  ]).then((result) => result?.data);
-
 const save_config_bark = ({
-  text_generation_use_gpu,
-  text_generation_use_small_model,
-  coarse_to_fine_inference_use_gpu,
-  coarse_to_fine_inference_use_small_model,
-  fine_tuning_use_gpu,
-  fine_tuning_use_small_model,
-  use_gpu_codec,
+  text_use_gpu,
+  text_use_small,
+  coarse_use_gpu,
+  coarse_use_small,
+  fine_use_gpu,
+  fine_use_small,
+  codec_use_gpu,
   load_models_on_startup,
 }) =>
   gradioPredict<[string]>("/save_config_bark", [
-    text_generation_use_gpu, // boolean  in 'Use GPU' Checkbox component
-    text_generation_use_small_model, // boolean  in 'Use small model' Checkbox component
-    coarse_to_fine_inference_use_gpu, // boolean  in 'Use GPU' Checkbox component
-    coarse_to_fine_inference_use_small_model, // boolean  in 'Use small model' Checkbox component
-    fine_tuning_use_gpu, // boolean  in 'Use GPU' Checkbox component
-    fine_tuning_use_small_model, // boolean  in 'Use small model' Checkbox component
-    use_gpu_codec, // boolean  in 'Use GPU for codec' Checkbox component
+    text_use_gpu, // boolean  in 'Use GPU' Checkbox component
+    text_use_small, // boolean  in 'Use small model' Checkbox component
+    coarse_use_gpu, // boolean  in 'Use GPU' Checkbox component
+    coarse_use_small, // boolean  in 'Use small model' Checkbox component
+    fine_use_gpu, // boolean  in 'Use GPU' Checkbox component
+    fine_use_small, // boolean  in 'Use small model' Checkbox component
+    codec_use_gpu, // boolean  in 'Use GPU for codec' Checkbox component
     load_models_on_startup, // boolean  in 'Load Bark models on startup' Checkbox component
   ]).then((result) => result?.data[0]);
 
@@ -421,82 +349,36 @@ async function get_config_bark() {
   >("/get_config_bark", []);
 
   const [
-    text_generation_use_gpu,
-    text_generation_use_small_model,
-    coarse_to_fine_inference_use_gpu,
-    coarse_to_fine_inference_use_small_model,
-    fine_tuning_use_gpu,
-    fine_tuning_use_small_model,
-    use_gpu_codec,
+    text_use_gpu,
+    text_use_small,
+    coarse_use_gpu,
+    coarse_use_small,
+    fine_use_gpu,
+    fine_use_small,
+    codec_use_gpu,
     load_models_on_startup,
   ] = result?.data.map((x) => x.value);
 
   return {
-    text_generation_use_gpu,
-    text_generation_use_small_model,
-    coarse_to_fine_inference_use_gpu,
-    coarse_to_fine_inference_use_small_model,
-    fine_tuning_use_gpu,
-    fine_tuning_use_small_model,
-    use_gpu_codec,
+    text_use_gpu,
+    text_use_small,
+    coarse_use_gpu,
+    coarse_use_small,
+    fine_use_gpu,
+    fine_use_small,
+    codec_use_gpu,
     load_models_on_startup,
   };
 }
 
-const magnet = (params) =>
-  gradioPredict<[GradioFile, Object, string]>("/magnet", params).then(
-    (result) => {
-      const [audio, metadata, folder_root] = result?.data;
-      return { audio, metadata, folder_root };
-    }
-  );
+const simpleOutputMap = (result: { data: [GradioFile, Object, string] }) => {
+  const [audio, metadata, folder_root] = result?.data;
+  return { audio, metadata, folder_root };
+};
 
-const magnet_get_models = () =>
-  gradioPredict<[GradioChoices]>("/magnet_get_models").then((result) =>
-    extractChoicesTuple(result?.data[0])
-  );
-
-const magnet_open_model_dir = () => gradioPredict<[]>("/magnet_open_model_dir");
-
-const maha = (params) =>
-  gradioPredict<[GradioFile, Object, string]>("/maha_tts", params).then(
-    (result) => {
-      const [audio, metadata, folder_root] = result?.data;
-      return { audio, folder_root, metadata };
-    }
-  );
-
-const maha_tts_refresh_voices = () =>
-  gradioPredict<[GradioChoices]>("/maha_tts_refresh_voices").then((result) =>
-    extractChoices(result?.data[0])
-  );
-
-const get_gpu_info = () =>
-  gradioPredict<[Object]>("/get_gpu_info").then((result) => result?.data[0]);
-
-const mms = (params) =>
-  gradioPredict<[GradioFile, Object, string]>("/mms", params).then((result) => {
-    const [audio, metadata, folder_root] = result?.data;
-    return { audio, metadata, folder_root };
-  });
-
-const vall_e_x_generate = (params) =>
-  gradioPredict<[GradioFile, Object, string]>(
-    "/vall_e_x_generate",
-    params
-  ).then((result) => {
-    const [audio, metadata, folder_root] = result?.data;
-    return { audio, metadata, folder_root };
-  });
-
-const vall_e_x_split_text_into_sentences = ({ text }) =>
-  gradioPredict<string[]>("/vall_e_x_split_text_into_sentences", [text]).then(
-    (result) => ({ split_text: result?.data?.[0] })
-  );
-
-const vall_e_x_tokenize = ({ text, language }) =>
-  gradioPredict<string[]>("/vall_e_x_tokenize", [text, language]).then(
-    (result) => ({ tokens: result?.data?.[0] })
+const simpleEndpoint = (endpoint) => (params) =>
+  gradioPredict<[GradioFile, Object, string]>(endpoint, params).then(
+    simpleOutputMap
   );
 
 const scan_huggingface_cache_api = () =>
@@ -539,51 +421,85 @@ const resolvedPassThrough =
       .then(map);
 
 const endpoints = {
-  maha,
-  maha_tts_refresh_voices,
-  demucs,
+  maha: simpleEndpoint("/maha_tts"),
+  maha_tts_refresh_voices: resolvedPassThrough(
+    "/maha_tts_refresh_voices",
+    getChoices
+  ),
+  demucs: resolvedPassThrough("/demucs", (result) => result?.data),
   musicgen,
-  magnet,
-  magnet_get_models,
-  magnet_open_model_dir,
+  magnet: simpleEndpoint("/magnet"),
+  // magnet_get_models,
+  magnet_get_models: resolvedPassThrough("/magnet_get_models", (result) =>
+    extractChoicesTuple(result?.data[0])
+  ),
+  // magnet_open_model_dir,
+  magnet_open_model_dir: passThrough("/magnet_open_model_dir"),
   magnet_unload_model: passThrough("/magnet_unload_model"),
 
-  vocos_wav,
-  vocos_npz,
-  encodec_decode,
+  vocos_wav: resolvedPassThrough("/vocos_wav", (result) => result?.data[0]),
+  vocos_npz: resolvedPassThrough("/vocos_npz", (result) => result?.data[0]),
+  encodec_decode: resolvedPassThrough(
+    "/encodec_decode",
+    (result) => result?.data[0]
+  ),
   bark_voice_tokenizer_load,
   bark_voice_generate,
   bark,
-  reload_old_generation_dropdown,
+  reload_old_generation_dropdown: resolvedPassThrough(
+    "/reload_old_generation_dropdown",
+    getChoices
+  ),
   bark_favorite,
   delete_generation,
 
   tortoise,
-  tortoise_refresh_models,
-  tortoise_refresh_voices,
-  tortoise_open_models,
-  tortoise_open_voices,
+  tortoise_refresh_models: resolvedPassThrough(
+    "/tortoise_refresh_models",
+    getChoices
+  ),
+  tortoise_refresh_voices: resolvedPassThrough(
+    "/tortoise_refresh_voices",
+    getChoices
+  ),
+  tortoise_open_models: passThrough("/tortoise_open_models"),
+  tortoise_open_voices: passThrough("/tortoise_open_voices"),
   tortoise_apply_model_settings,
 
   rvc,
-  rvc_model_reload,
-  rvc_index_reload,
-  rvc_model_open,
-  rvc_index_open,
-  save_to_voices,
-  open_folder,
+  rvc_model_reload: resolvedPassThrough("/rvc_model_reload", getChoices),
+  rvc_index_reload: resolvedPassThrough("/rvc_index_reload", getChoices),
+  rvc_model_open: passThrough("/rvc_model_open"),
+  rvc_index_open: passThrough("/rvc_index_open"),
+  rvc_model_unload: passThrough("/rvc_model_unload"),
+  save_to_voices: passThrough("/save_to_voices"),
+  open_folder: passThrough("/open_folder"),
 
-  save_environment_variables_bark,
-  save_config_bark,
+  save_env_variables_bark: resolvedPassThrough(
+    "/save_env_variables_bark",
+    (result) => result?.data
+  ),
+  save_config_bark: resolvedPassThrough(
+    "/save_config_bark",
+    (result) => result?.data[0]
+  ),
   get_config_bark,
 
-  mms,
+  mms: simpleEndpoint("/mms"),
 
-  get_gpu_info,
+  get_gpu_info: resolvedPassThrough(
+    "/get_gpu_info",
+    (result) => result?.data[0]
+  ),
 
-  vall_e_x_generate,
-  vall_e_x_split_text_into_sentences,
-  vall_e_x_tokenize,
+  vall_e_x_generate: simpleEndpoint("/vall_e_x_generate"),
+  vall_e_x_split_text_into_sentences: resolvedPassThrough(
+    "/vall_e_x_split_text_into_sentences",
+    (result) => ({ split_text: result?.data?.[0] })
+  ),
+  vall_e_x_tokenize: resolvedPassThrough("/vall_e_x_tokenize", (result) => ({
+    tokens: result?.data?.[0],
+  })),
 
   scan_huggingface_cache_api,
   delete_huggingface_cache_revisions,
@@ -604,10 +520,10 @@ const endpoints = {
   // stable_audio_generate: passThrough("/stable_audio_generate"),
   stable_audio_generate,
   stable_audio_inpaint: passThrough("/stable_audio_inpaint"),
-  stable_audio_get_models: () =>
-    gradioPredict<[GradioChoices]>("/stable_audio_get_models").then((result) =>
-      extractChoicesTuple(result?.data[0])
-    ),
+  stable_audio_get_models: resolvedPassThrough(
+    "/stable_audio_get_models",
+    (result) => extractChoicesTuple(result?.data[0])
+  ),
   load_ffmpeg_metadata: resolvedPassThrough(
     "/load_ffmpeg_metadata",
     (result) => result?.data[0]

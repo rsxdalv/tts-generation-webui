@@ -4,6 +4,7 @@ import { AudioInput, AudioOutput } from "../../components/AudioComponents";
 import { useDemucsPage } from "../../tabs/DemucsParams";
 import { GenerationHistorySimple } from "../../components/GenerationHistory";
 import { Button } from "../../components/ui/button";
+import { toLocalCacheFile } from "../../types/LocalCacheFile";
 
 const DemucsPage = () => {
   const {
@@ -21,11 +22,12 @@ const DemucsPage = () => {
         <div className="flex gap-4 w-full">
           <div className="flex flex-col gap-y-2 w-96">
             <AudioInput
-              url={demucsParams?.file}
+              url={demucsParams?.audio?.path}
               callback={(file) => {
                 setDemucsParams({
                   ...demucsParams,
-                  file,
+                  // audio: file,
+                  audio: toLocalCacheFile(file),
                 });
               }}
               filter={["sendToDemucs"]}

@@ -1,23 +1,76 @@
 import os
 import json
-
+import numpy as np
 import torch
-from huggingface_hub import hf_hub_download
 import gradio as gr
 
-from stable_audio_tools.interface.gradio import load_model, generate_cond
+from huggingface_hub import hf_hub_download
 
 from tts_webui.history_tab.open_folder import open_folder
 from tts_webui.utils.get_path_from_root import get_path_from_root
-
-import numpy as np
-
 from tts_webui.utils.torch_clear_memory import torch_clear_memory
 from tts_webui.utils.prompt_to_title import prompt_to_title
+from tts_webui.tortoise.gr_reload_button import gr_open_button_simple, gr_reload_button
 
 LOCAL_DIR_BASE = os.path.join("data", "models", "stable-audio")
 LOCAL_DIR_BASE_ABSOLUTE = get_path_from_root(*LOCAL_DIR_BASE.split(os.path.sep))
 OUTPUT_DIR = os.path.join("outputs-rvc", "Stable Audio")
+
+
+def generate_cond_lazy(
+    prompt,
+    negative_prompt=None,
+    seconds_start=0,
+    seconds_total=30,
+    cfg_scale=6.0,
+    steps=250,
+    preview_every=None,
+    seed=-1,
+    sampler_type="dpmpp-3m-sde",
+    sigma_min=0.03,
+    sigma_max=1000,
+    cfg_rescale=0.0,
+    use_init=False,
+    init_audio=None,
+    init_noise_level=1.0,
+    mask_cropfrom=None,
+    mask_pastefrom=None,
+    mask_pasteto=None,
+    mask_maskstart=None,
+    mask_maskend=None,
+    mask_softnessL=None,
+    mask_softnessR=None,
+    mask_marination=None,
+    batch_size=1,
+):
+    from stable_audio_tools.interface.gradio import generate_cond
+
+    return generate_cond(
+        prompt=prompt,
+        negative_prompt=negative_prompt,
+        seconds_start=seconds_start,
+        seconds_total=seconds_total,
+        cfg_scale=cfg_scale,
+        steps=steps,
+        preview_every=preview_every,
+        seed=seed,
+        sampler_type=sampler_type,
+        sigma_min=sigma_min,
+        sigma_max=sigma_max,
+        cfg_rescale=cfg_rescale,
+        use_init=use_init,
+        init_audio=init_audio,
+        init_noise_level=init_noise_level,
+        mask_cropfrom=mask_cropfrom,
+        mask_pastefrom=mask_pastefrom,
+        mask_pasteto=mask_pasteto,
+        mask_maskstart=mask_maskstart,
+        mask_maskend=mask_maskend,
+        mask_softnessL=mask_softnessL,
+        mask_softnessR=mask_softnessR,
+        mask_marination=mask_marination,
+        batch_size=batch_size,
+    )
 
 
 def get_local_dir(name):
@@ -120,6 +173,7 @@ def stable_audio_ui():
             return model_name
 
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        from stable_audio_tools.interface.gradio import load_model
 
         _, model_config_new = load_model(
             model_config=load_model_config(model_name),
@@ -155,6 +209,13 @@ def stable_audio_ui():
                 choices=get_model_list(),  # type: ignore
                 label="Model",
                 value=pretrained_name,
+            )
+
+            gr_open_button_simple(LOCAL_DIR_BASE, api_name="stable_audio_open_models")
+            gr_reload_button().click(
+                fn=lambda: gr.Dropdown(choices=get_model_list()),
+                outputs=[model_select],
+                api_name="stable_audio_refresh_models",
             )
 
             with gr.Column():
@@ -224,7 +285,7 @@ def stable_audio_ui():
             )
 
 
-def stable_audio_ui_tab():
+def stable_audio_tab():
     with gr.Tab("Stable Audio"):
         stable_audio_ui()
 
@@ -539,7 +600,7 @@ def create_sampling_ui(model_config, inpainting=False):
         inputs=[seed_textbox, CUSTOM_randomize_seed_checkbox],
         outputs=[seed_textbox],
     ).then(
-        fn=generate_cond,
+        fn=generate_cond_lazy,
         inputs=inputs,
         outputs=[audio_output, audio_spectrogram_output],
         api_name="stable_audio_inpaint" if inpainting else "stable_audio_generate",

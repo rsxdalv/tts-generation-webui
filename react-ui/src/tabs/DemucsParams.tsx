@@ -6,13 +6,16 @@ import router from "next/router";
 import { GradioFile } from "../types/GradioFile";
 import { splitWithDemucs } from "../functions/splitWithDemucs";
 import { useHistory } from "../hooks/useHistory";
+import { LocalCacheFile, toLocalCacheFile } from "../types/LocalCacheFile";
 
 export type DemucsParams = {
-  file?: string;
+  audio?: LocalCacheFile;
 };
 
 export const initialState: DemucsParams = {
-  file: "https://www.mfiles.co.uk/mp3-downloads/gs-cd-track2.mp3",
+  audio: toLocalCacheFile(
+    "https://www.mfiles.co.uk/mp3-downloads/gs-cd-track2.mp3"
+  ),
 };
 
 export type DemucsGradioFile = GradioFile & {
@@ -35,14 +38,16 @@ const addTypeNamesToAudioOutputs = (
     type_name: typeNames[index],
   }));
 
-export const demucsId = "demucs-tab";
+const demucsId = "demucs-tab.v2";
 
 export const sendToDemucs = (file?: string) => {
   if (!file) return;
   updateLocalStorageWithFunction(
     demucsId,
-    (demucsParams: DemucsParams = initialState) =>
-      ({ ...demucsParams, file } as DemucsParams)
+    (demucsParams: DemucsParams = initialState) => ({
+      ...demucsParams,
+      audio: toLocalCacheFile(file),
+    })
   );
   router.push("/demucs");
 };
@@ -74,7 +79,7 @@ export const useDemucsPage = () => {
   const funcs = {
     useAsInput: (audio?: string) => {
       if (!audio) return;
-      setDemucsParams({ ...demucsParams, file: audio });
+      setDemucsParams({ ...demucsParams, audio: toLocalCacheFile(audio) });
     },
   };
 

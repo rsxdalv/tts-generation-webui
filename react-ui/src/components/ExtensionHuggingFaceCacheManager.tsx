@@ -1,5 +1,5 @@
 import React from "react";
-import { Button } from "../components/ui/button";
+import { Button } from "./ui/button";
 import { DeleteIcon, TrashIcon } from "lucide-react";
 
 type HuggingFaceCache = {

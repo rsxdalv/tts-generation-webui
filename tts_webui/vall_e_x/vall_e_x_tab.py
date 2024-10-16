@@ -1,18 +1,6 @@
 import gradio as gr
-from valle_x.utils.generation import (
-    SAMPLE_RATE,
-    preload_models,
-    generate_audio,
-    generate_audio_from_long_text,
-    text_tokenizer,
-    langdropdown2token,
-    token2lang,
-    lang2token,
-    langid,
-)
-from valle_x.utils.sentence_cutter import split_text_into_sentences
 
-from tts_webui.decorators.gradio_dict_decorator import dictionarize, gradio_dict_decorator
+from tts_webui.decorators.gradio_dict_decorator import dictionarize
 from tts_webui.utils.randomize_seed import randomize_seed_ui
 from tts_webui.utils.manage_model_state import manage_model_state
 from tts_webui.utils.list_dir_models import unload_model_button
@@ -31,6 +19,12 @@ from tts_webui.extensions_loader.decorator_extensions import (
 
 
 def preprocess_text(text, language="auto"):
+    from valle_x.utils.generation import (
+        text_tokenizer,
+        lang2token,
+        langid,
+    )
+
     language = get_lang(language)
     text = text.replace("\n", "").strip(" ")
     # detect language
@@ -43,11 +37,15 @@ def preprocess_text(text, language="auto"):
 
 @manage_model_state("valle_x")
 def preload_models_if_needed(checkpoints_dir):
+    from valle_x.utils.generation import preload_models
+
     preload_models(checkpoints_dir=checkpoints_dir)
-    return "Loaded" # workaround because preload_models returns None
+    return "Loaded"  # workaround because preload_models returns None
 
 
 def get_lang(language):
+    from valle_x.utils.generation import langdropdown2token, token2lang
+
     lang = token2lang[langdropdown2token[language]]
     return lang if lang != "mix" else "auto"
 
@@ -63,6 +61,12 @@ def get_lang(language):
 @decorator_extension_inner
 @log_function_time
 def generate_audio_gradio(text, prompt, language, accent, mode, **kwargs):
+    from valle_x.utils.generation import (
+        SAMPLE_RATE,
+        generate_audio,
+        generate_audio_from_long_text,
+    )
+
     preload_models_if_needed("./data/models/vall-e-x/")
     lang = get_lang(language)
 
@@ -78,6 +82,12 @@ def generate_audio_gradio(text, prompt, language, accent, mode, **kwargs):
     return {"audio_out": (SAMPLE_RATE, audio_array)}
 
 
+def split_text_into_sentences(text):
+    from valle_x.utils.sentence_cutter import split_text_into_sentences
+
+    return "###\n".join(split_text_into_sentences(text))
+
+
 def valle_x_ui_generation():
     text = gr.Textbox(label="Text", lines=3, placeholder="Enter text here...")
     prompt = gr.Textbox(label="Prompt", visible=False, value="")
@@ -87,7 +97,7 @@ def valle_x_ui_generation():
         split_text = gr.Textbox(label="Text after split")
 
         split_text_into_sentences_button.click(
-            fn=lambda x: "###\n".join(split_text_into_sentences(x)),
+            fn=split_text_into_sentences,
             inputs=[text],
             outputs=[split_text],
             api_name="vall_e_x_split_text_into_sentences",
@@ -164,16 +174,16 @@ def valle_x_ui_generation():
     )
 
 
-from valle_x.utils.prompt_making import transcribe_one, make_prompt, make_transcript
+def valle_x_ui_generation_prompt_making():
+    from valle_x.utils.prompt_making import transcribe_one, make_prompt, make_transcript
 
-# transcribe_one(model, audio_path)
-# make_prompt(name, audio_prompt_path, transcript=None)
-# make_transcript(name, wav, sr, transcript=None)
+    # transcribe_one(model, audio_path)
+    # make_prompt(name, audio_prompt_path, transcript=None)
+    # make_transcript(name, wav, sr, transcript=None)
 
-
-def valle_x_ui_prompt_making():
-    with gr.Column():
-        audio = gr.Audio(label="Audio")
+    def _valle_x_ui_prompt_making():
+        with gr.Column():
+            audio = gr.Audio(label="Audio")
 
 
 def valle_x_tab():

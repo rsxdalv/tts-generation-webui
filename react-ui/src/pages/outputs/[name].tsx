@@ -1,13 +1,9 @@
-import { Inter } from "next/font/google";
 import React from "react";
 
 import { HistoryCard } from "../../components/CardBig";
 import { getDataFromJSON } from "../../data/getVoicesData";
 import { GenerationRaw } from "../../types/Generation";
 import { Template } from "../../components/Template";
-import Head from "next/head";
-
-export const inter = Inter({ subsets: ["latin"] });
 
 interface Props {
   outputs: GenerationRaw[];
@@ -43,8 +39,8 @@ export const getStaticProps = async ({ params: { name } }) => {
 export const getStaticPaths = async () => {
   return {
     paths: [
-      "/history/outputs",
-      "/history/favorites",
+      "/outputs/outputs",
+      "/outputs/favorites",
       // "/history/collections",
     ],
     fallback: "blocking",

@@ -77,16 +77,6 @@ export const initialState: TortoiseGenerationParams = {
 
 export const tortoiseGenerationId = "tortoise_generation-tab.v2";
 
-export const sendToBarkVoiceGeneration = (audio?: string) => {
-  if (!audio) return;
-  updateLocalStorageWithFunction(
-    tortoiseGenerationId,
-    (vocosParams: TortoiseGenerationParams = initialState) =>
-      ({ ...vocosParams, audio } as TortoiseGenerationParams)
-  );
-  router.push("/bark");
-};
-
 export const useTortoiseGenerationParams = () =>
   useLocalStorage<TortoiseGenerationParams>(tortoiseGenerationId, initialState);
 

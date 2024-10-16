@@ -1,10 +1,10 @@
 import { Inter } from "next/font/google";
 import React from "react";
 
-import { CardEmpty, CardGeneration, SectionVoice } from "../components/CardBig";
-import { getNpzData, getOggData } from "../data/getVoicesData";
-import { GenerationRaw } from "../types/Generation";
-import { Template } from "../components/Template";
+import { CardEmpty, CardGeneration, SectionVoice } from "../../components/CardBig";
+import { getNpzData, getOggData } from "../../data/getVoicesData";
+import { GenerationRaw } from "../../types/Generation";
+import { Template } from "../../components/Template";
 
 export const inter = Inter({ subsets: ["latin"] });
 

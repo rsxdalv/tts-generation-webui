@@ -68,21 +68,18 @@ export function ModelDropdown({
           />
           <span className="sr-only">Refresh List</span>
         </Button>
-        {onUnload && (
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onUnload}
-            title="Unload Model"
-          >
-            <ServerOffIcon className="h-5 w-5" />
-            <span className="sr-only">Unload Model</span>
-          </Button>
-        )}
+        {onUnload && <UnloadModelButton onUnload={onUnload} />}
       </div>
     </div>
   );
 }
+
+export const UnloadModelButton = ({ onUnload }: { onUnload: () => void }) => (
+  <Button variant="ghost" size="icon" onClick={onUnload} title="Unload Model">
+    <ServerOffIcon className="h-5 w-5" />
+    <span className="sr-only">Unload Model</span>
+  </Button>
+);
 
 function TrashIcon(props) {
   return (

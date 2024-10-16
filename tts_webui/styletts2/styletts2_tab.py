@@ -1,5 +1,4 @@
 import gradio as gr
-from styletts2 import tts
 
 from tts_webui.decorators.gradio_dict_decorator import gradio_dict_decorator
 from tts_webui.utils.randomize_seed import randomize_seed_ui
@@ -23,7 +22,9 @@ SAMPLE_RATE = 24_000
 
 @manage_model_state("style_tts2")
 def get_model(model_name=""):
-    return tts.StyleTTS2(
+    from styletts2.tts import StyleTTS2
+
+    return StyleTTS2(
         model_checkpoint_path=None if model_name == "" else model_name,
         config_path=None,
     )
@@ -31,6 +32,7 @@ def get_model(model_name=""):
 
 def preview_phonemization(text):
     from nltk.tokenize import word_tokenize
+
     style_tts2_model = get_model("")
     text = text.strip()
     text = text.replace('"', "")
@@ -172,7 +174,7 @@ def style_tts2_tab():
 
 if __name__ == "__main__":
     if "demo" in locals():
-        demo.close()
+        locals()["demo"].close()
     with gr.Blocks() as demo:
         style_tts2_tab()
         demo.launch()

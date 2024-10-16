@@ -18,6 +18,7 @@ import {
   AudioWaveformIcon,
   CircleCheckBigIcon,
   MinusIcon,
+  RefreshCwIcon,
   ServerOffIcon,
   WrapTextIcon,
 } from "lucide-react";
@@ -320,7 +321,11 @@ const Model = ({
           />
           <Button onClick={applyModelSettings} variant="outline">
             {applyModelSettingsLoading ? "Applying..." : "Apply Model Settings"}
-            <CircleCheckBigIcon className="ml-2 w-5 h-5" />
+            {applyModelSettingsLoading ? (
+              <RefreshCwIcon className="ml-2 w-5 h-5 animate-spin" />
+            ) : (
+              <CircleCheckBigIcon className="ml-2 w-5 h-5" />
+            )}
           </Button>
         </div>
       </div>

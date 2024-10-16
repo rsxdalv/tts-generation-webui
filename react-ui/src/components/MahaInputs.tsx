@@ -1,11 +1,12 @@
 import React from "react";
-import { MahaParams, MahaResult, initialMahaParams } from "../tabs/MahaParams";
+import { MahaParams } from "../tabs/MahaParams";
 import { HandleChange } from "../types/HandleChange";
 import { PromptTextArea } from "./PromptTextArea";
 import { SeedInput } from "./SeedInput";
-import { ModelDropdown } from "./component/ModelDropdown";
+import { ModelDropdown, UnloadModelButton } from "./component/ModelDropdown";
 import { Button } from "./ui/button";
 import { RadioWithLabel } from "./component/RadioWithLabel";
+import { BotIcon, CpuIcon, KeyboardMusicIcon } from "lucide-react";
 
 const Speaker = ({
   mahaParams,
@@ -73,20 +74,27 @@ export const MahaInputs = ({
         label="Text"
         name="text"
       />
-      <RadioWithLabel
-        label="Model"
-        name="model_name"
-        inline
-        value={mahaParams.model_name}
-        onChange={handleChange}
-        options={[
-          ["English", "Smolie-en"],
-          ["Indian", "Smolie-in"],
-        ].map(([text, model_name]) => ({
-          label: text,
-          value: model_name,
-        }))}
-      />
+      <div className="flex items-center gap-4">
+        <RadioWithLabel
+          label="Model"
+          name="model_name"
+          inline
+          value={mahaParams.model_name}
+          onChange={handleChange}
+          options={[
+            ["English", "Smolie-en"],
+            ["Indian", "Smolie-in"],
+          ].map(([text, model_name]) => ({
+            label: text,
+            value: model_name,
+          }))}
+        />
+        <UnloadModelButton
+          onUnload={() =>
+            fetch("/api/gradio/maha_tts_unload_model", { method: "POST" })
+          }
+        />
+      </div>
 
       <RadioWithLabel
         label="Text Language"
@@ -112,7 +120,6 @@ export const MahaInputs = ({
       />
     </div>
     <div className="flex flex-col gap-y-4 w-1/2">
-
       <Speaker mahaParams={mahaParams} handleChange={handleChange} />
 
       <p className="text-sm">
@@ -127,10 +134,35 @@ export const MahaInputs = ({
         inline
         value={mahaParams.device}
         onChange={handleChange}
-        options={["auto", "cpu", "cuda"].map((device) => ({
-          label: device,
-          value: device,
-        }))}
+        options={[
+          {
+            label: (
+              <div className="flex items-center gap-2">
+                <BotIcon className="w-5 h-5" />
+                <span>auto</span>
+              </div>
+            ),
+            value: "auto",
+          },
+          {
+            label: (
+              <div className="flex items-center gap-2">
+                <CpuIcon className="w-5 h-5" />
+                <span>cpu</span>
+              </div>
+            ),
+            value: "cpu",
+          },
+          {
+            label: (
+              <div className="flex items-center gap-2">
+                <KeyboardMusicIcon className="w-5 h-5" />
+                <span>cuda</span>
+              </div>
+            ),
+            value: "cuda",
+          },
+        ]}
       />
 
       <Button variant="outline" onClick={resetParams}>

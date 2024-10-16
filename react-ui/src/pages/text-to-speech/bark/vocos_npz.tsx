@@ -11,6 +11,7 @@ import { encodecDecode } from "../../../functions/encodecDecode";
 import { applyVocosNPZ } from "../../../functions/applyVocosNPZ";
 import { Button } from "../../../components/ui/button";
 import { SingleFileUpload } from "../../../components/SingleFileUpload";
+import { toLocalCacheFile } from "../../../types/LocalCacheFile";
 
 const VocosPageNPZ = () => {
   const [dataEncodec, setDataEncodec] = useLocalStorage<GradioFile | null>(
@@ -30,11 +31,12 @@ const VocosPageNPZ = () => {
         <div className="flex flex-col gap-y-2 w-1/2">
           <SingleFileUpload
             label="Input NPZ"
-            file={vocosParamsNPZ?.npz_file}
+            file={vocosParamsNPZ?.npz_file?.path}
+            accept={{ "application/x-npz": [".npz"] }}
             callback={(npz_file) => {
               setVocosParamsNPZ({
                 ...vocosParamsNPZ,
-                npz_file,
+                npz_file: toLocalCacheFile(npz_file),
               });
             }}
           />

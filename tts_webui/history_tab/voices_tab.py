@@ -1,3 +1,9 @@
+import json
+import gradio as gr
+import os
+import shutil
+
+
 from tts_webui.bark.history_to_hash import history_to_hash
 from tts_webui.history_tab.save_photo import save_photo
 from tts_webui.history_tab.edit_metadata_ui import edit_metadata_ui
@@ -6,11 +12,6 @@ from tts_webui.bark.npz_tools import load_npz, save_npz
 from tts_webui.history_tab.get_wav_files import get_npz_files_voices
 from tts_webui.history_tab.main import _get_filename, _get_row_index
 from tts_webui.history_tab.open_folder import open_folder
-import json
-import gradio as gr
-import os
-import shutil
-from bark.generation import COARSE_RATE_HZ, SEMANTIC_RATE_HZ, N_COARSE_CODEBOOKS
 from tts_webui.tortoise.gr_reload_button import gr_reload_button
 
 
@@ -23,14 +24,20 @@ def voices_tab(directory="voices"):
         with gr.Column():
             with gr.Accordion("Gallery Selector (Click to Open)", open=False):
                 history_list_as_gallery = gr.Gallery(
-                    value=[
-                        f"voices/{x}"
-                        for x in os.listdir("voices")
-                        if x.endswith(".png")
-                    ],
+                    value=[],
                     columns=4,
                     object_fit="contain",
                     height="auto",
+                )
+                gr.Button(value="Refresh").click(
+                    fn=lambda: gr.Gallery(
+                        value=[
+                            f"voices/{x}"
+                            for x in os.listdir("voices")
+                            if x.endswith(".png")
+                        ]
+                    ),
+                    outputs=[history_list_as_gallery],
                 )
             with gr.Row():
                 button_output = gr.Button(value=f"Open {directory} folder")
@@ -53,7 +60,7 @@ def voices_tab(directory="voices"):
                 datatype=datatypes,
                 col_count=len(datatypes),
                 headers=headers,
-                height=800,
+                max_height=800,
                 #  elem_classes="file-list"
             )
         with gr.Column():
@@ -101,6 +108,8 @@ def voices_tab(directory="voices"):
         }
 
     def crop_voice(voice_file_name, audio_in):
+        from bark.generation import COARSE_RATE_HZ, SEMANTIC_RATE_HZ, N_COARSE_CODEBOOKS
+
         crop_min, crop_max = audio_in.get("crop_min", 0), audio_in.get("crop_max", 100)
 
         full_generation = load_npz(voice_file_name)

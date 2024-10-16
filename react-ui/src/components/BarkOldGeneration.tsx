@@ -4,8 +4,15 @@ import { getWebuiURL, getWebuiURLWithHost } from "../data/getWebuiURL";
 import { encodecDecode } from "../functions/encodecDecode";
 import { saveToVoices } from "../functions/saveToVoices";
 import { Button } from "./ui/button";
-import { DownloadIcon, PlayIcon, RefreshCwIcon, SaveIcon, XIcon } from "lucide-react";
+import {
+  DownloadIcon,
+  PlayIcon,
+  RefreshCwIcon,
+  SaveIcon,
+  XIcon,
+} from "lucide-react";
 import { Label } from "./ui/label";
+import { toLocalCacheFile } from "../types/LocalCacheFile";
 
 export const NPZVoiceDropdown = ({
   barkGenerationParams,
@@ -72,7 +79,9 @@ export const NPZVoiceDropdown = ({
           size="sm"
           onClick={async () => {
             const urlWithHost = getWebuiURLWithHost(selected);
-            const x = await encodecDecode({ npz_file: urlWithHost });
+            const x = await encodecDecode({
+              npz_file: toLocalCacheFile(urlWithHost),
+            });
             const audio = new Audio(x.url);
             audio.play();
           }}

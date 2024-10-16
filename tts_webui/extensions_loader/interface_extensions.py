@@ -54,7 +54,7 @@ def _handle_package(package_name, title_name, requirements):
             )
         finally:
             elapsed_time = time.time() - start_time
-            print(f"{title_name} Extension loaded in {elapsed_time:.2f} seconds.")
+            print(f"  Done in {elapsed_time:.2f} seconds. ({title_name} Extension)\n")
     else:
         with gr.Tab(f"[Available] {title_name} Extension"):
             gr.Markdown(f"{title_name} Extension not installed")
@@ -116,7 +116,12 @@ def extension_list_tab():
                 install_button = gr.Button("Install extension")
 
                 def install_extension(package_name):
-                    yield from pip_install_wrapper(package_name, package_name)()
+                    requirements = [
+                        x["requirements"]
+                        for x in external_extension_list
+                        if x["package_name"] == package_name
+                    ][0]
+                    yield from pip_install_wrapper(requirements, package_name)()
 
                 install_button.click(
                     fn=install_extension,

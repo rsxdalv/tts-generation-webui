@@ -1,5 +1,5 @@
-from tts_webui.css.css import full_css
 import gradio as gr
+
 from tts_webui.tortoise.gen_tortoise import (
     generate_tortoise_long,
     get_voice_list,
@@ -14,17 +14,17 @@ from tts_webui.tortoise.diffusion_params import diffusion_params
 from tts_webui.tortoise.presets import presets
 from tts_webui.tortoise.gr_reload_button import gr_open_button_simple, gr_reload_button
 from tts_webui.tortoise.tortoise_model_settings_ui import tortoise_model_settings_ui
-from tts_webui.utils.randomize_seed import randomize_seed, randomize_seed_ui
+from tts_webui.utils.randomize_seed import randomize_seed_ui
 
 MAX_OUTPUTS = 9
 
 
-def generation_tab_tortoise():
+def tortoise_tab():
     with gr.Tab("Tortoise TTS"):
-        tortoise_core_ui()
+        tortoise_ui()
 
 
-def tortoise_core_ui():
+def tortoise_ui():
     with gr.Row():
         with gr.Column():
             model = tortoise_model_settings_ui()
@@ -32,8 +32,8 @@ def tortoise_core_ui():
                 gr.Markdown("Voice")
                 with gr.Row():
                     voice = gr.Dropdown(
-                        choices=get_voice_list(),
-                        value="random",
+                        choices=["Press refresh to load the list"],
+                        value="Press refresh to load the list",
                         show_label=False,
                         container=False,
                     )
@@ -169,8 +169,10 @@ def tortoise_core_ui():
 if __name__ == "__main__":
     if "demo" in locals():
         demo.close()  # type: ignore
+    from tts_webui.css.css import full_css
+
     with gr.Blocks(css=full_css) as demo:
-        generation_tab_tortoise()
+        tortoise_tab()
 
     demo.launch(
         server_port=7770,

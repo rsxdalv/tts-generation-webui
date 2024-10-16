@@ -1,8 +1,12 @@
 import gradio as gr
-from transformers import Pipeline, pipeline
 import gc
 import torch
 import os
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from transformers import Pipeline
 
 
 def extension__tts_generation_webui():
@@ -41,7 +45,9 @@ def unload_models():
     return "Unloaded"
 
 
-def get_pipe(model_name, device="cuda:0") -> Pipeline:
+def get_pipe(model_name, device="cuda:0") -> "Pipeline":
+    from transformers import pipeline
+
     global pipe, last_model_name
     if pipe is not None:
         if model_name == last_model_name:

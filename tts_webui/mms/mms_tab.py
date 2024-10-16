@@ -1,7 +1,6 @@
 import os
 from iso639 import Lang
 import torch
-from transformers import VitsTokenizer, VitsModel
 import gradio as gr
 
 from tts_webui.decorators.gradio_dict_decorator import dictionarize
@@ -21,9 +20,16 @@ from tts_webui.extensions_loader.decorator_extensions import (
 )
 from tts_webui.utils.randomize_seed import randomize_seed_ui
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from transformers import VitsTokenizer, VitsModel
+
 
 @manage_model_state("mms")
-def preload_models_if_needed(language="eng") -> tuple[VitsModel, VitsTokenizer]:
+def preload_models_if_needed(language="eng") -> tuple["VitsModel", "VitsTokenizer"]:
+    from transformers import VitsTokenizer, VitsModel
+
     device = "cuda" if torch.cuda.is_available() else "cpu"
     model = VitsModel.from_pretrained(  # type: ignore
         f"facebook/mms-tts-{language}",
@@ -91,42 +97,45 @@ def mms_ui():
     Noise scale duration. How random the duration prediction is. Larger values create more variation in the predicted durations.
     """
     )
-    mms_input = gr.Textbox(lines=2, label="Input Text")
     with gr.Row():
-        mms_language = gr.Dropdown(
-            choices=list(get_mms_languages()),
-            label="Language",
-            value="eng",
-        )
-        speaking_rate = gr.Slider(
-            minimum=0.1,
-            maximum=10.0,
-            step=0.1,
-            label="Speaking Rate",
-            value=1.0,
-        )
-        noise_scale = gr.Slider(
-            minimum=-2.5,
-            maximum=2.5,
-            step=0.05,
-            label="Noise Scale",
-            value=0.667,
-        )
-        noise_scale_duration = gr.Slider(
-            minimum=-1.0,
-            maximum=2,
-            step=0.05,
-            label="Noise Scale Duration",
-            value=0.8,
-        )
+        with gr.Column():
+            mms_input = gr.Textbox(lines=2, label="Input Text")
+            mms_generate_button = gr.Button("Generate")
 
-    seed, randomize_seed_callback = randomize_seed_ui()
+        with gr.Column():
+            mms_language = gr.Dropdown(
+                choices=list(get_mms_languages()),
+                label="Language",
+                value="eng",
+            )
+            speaking_rate = gr.Slider(
+                minimum=0.1,
+                maximum=10.0,
+                step=0.1,
+                label="Speaking Rate",
+                value=1.0,
+            )
+            noise_scale = gr.Slider(
+                minimum=-2.5,
+                maximum=2.5,
+                step=0.05,
+                label="Noise Scale",
+                value=0.667,
+            )
+            noise_scale_duration = gr.Slider(
+                minimum=-1.0,
+                maximum=2,
+                step=0.05,
+                label="Noise Scale Duration",
+                value=0.8,
+            )
 
-    unload_model_button("mms")
+            with gr.Row():
+                seed, randomize_seed_callback = randomize_seed_ui()
+
+                unload_model_button("mms")
 
     audio_out = gr.Audio(label="Output Audio")
-
-    mms_generate_button = gr.Button("Generate")
 
     input_dict = {
         mms_input: "text",
@@ -162,7 +171,7 @@ def mms_tab():
 
 if __name__ == "__main__":
     if "demo" in locals():
-        demo.close()
+        locals()["demo"].close()
     with gr.Blocks() as demo:
         mms_tab()
     demo.launch(

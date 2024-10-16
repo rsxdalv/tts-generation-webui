@@ -51,6 +51,7 @@ import { VallexInputs } from "../components/VallexInputs";
 import { applySeed } from "../data/applySeed";
 import { Button } from "../components/ui/button";
 import { RadioWithLabel } from "../components/component/RadioWithLabel";
+import { toLocalCacheFile } from "../types/LocalCacheFile";
 
 interface PipelineParams {
   generation: string;
@@ -203,7 +204,7 @@ async function postProcessAudio(
 ): Promise<GradioFile[]> {
   switch (model) {
     case "demucs":
-      return splitWithDemucs({ file: url });
+      return splitWithDemucs({ audio: toLocalCacheFile(url) });
     case "rvc":
       return [
         (
@@ -214,10 +215,19 @@ async function postProcessAudio(
         ).audio,
       ];
     case "vocos wav":
-      return [await applyVocosWav({ ...getVocosParams(), audio: url })];
+      return [
+        await applyVocosWav({
+          ...getVocosParams(),
+          audio: toLocalCacheFile(url),
+        }),
+      ];
     case "vocos npz (bark only)":
       if (!npz_file) return [];
-      return [await applyVocosNPZ({ npz_file: getWebuiURLWithHost(npz_file) })];
+      return [
+        await applyVocosNPZ({
+          npz_file: toLocalCacheFile(getWebuiURLWithHost(npz_file)),
+        }),
+      ];
     case "none":
     default:
       return [];

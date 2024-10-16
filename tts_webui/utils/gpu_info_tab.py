@@ -3,19 +3,23 @@ import torch
 
 
 def gpu_info_tab():
-    with gr.Tab("GPU Info"):
-        gpu_info = gr.Markdown("".join([render_gpu_info(x) for x in get_gpu_info()]))
+    with gr.Tab("GPU Info") as gpu_info_tab:
+        gpu_info = gr.Markdown("")
 
         gr.Button("Refresh").click(
             fn=refresh_gpu_info,
             outputs=gpu_info,
             api_name="refresh_gpu_info",  # , every=1
         )
-
-        gpu_info_json = gr.JSON(get_gpu_info(), visible=False)
+        gpu_info_tab.select(
+            fn=refresh_gpu_info,
+            outputs=gpu_info,
+        )
 
         gr.Button("API_GET_GPU_INFO", visible=False).click(
-            fn=get_gpu_info, outputs=[gpu_info_json], api_name="get_gpu_info"
+            fn=get_gpu_info,
+            outputs=[gr.JSON(None, visible=False)],
+            api_name="get_gpu_info",
         )
 
 
@@ -42,6 +46,7 @@ def get_pynvml_fields(idx=0):
             "power_draw": 0,
             "utilization": 0,
         }
+
 
 def get_gpu_info_idx(idx=0):
     return {
@@ -84,7 +89,7 @@ Torch Version: {gpu_info['torch_version']}"""
 
 
 def refresh_gpu_info():
-    return render_gpu_info(get_gpu_info())
+    return "".join([render_gpu_info(x) for x in get_gpu_info()])
 
 
 if __name__ == "__main__":

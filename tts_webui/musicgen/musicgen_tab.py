@@ -1,8 +1,5 @@
 import torch
 import gradio as gr
-from audiocraft.models.musicgen import MusicGen
-from audiocraft.models.audiogen import AudioGen
-from audiocraft.models.encodec import InterleaveStereoCompressionModel
 from einops import rearrange
 from typing import Optional, Tuple
 import numpy as np
@@ -68,6 +65,9 @@ def _decorator_musicgen_save_metadata(fn):
 
 @manage_model_state("musicgen_audiogen")
 def load_model(version):
+    from audiocraft.models.musicgen import MusicGen
+    from audiocraft.models.audiogen import AudioGen
+
     if version == "facebook/audiogen-medium":
         return AudioGen.get_pretrained(version)
     return MusicGen.get_pretrained(version)
@@ -141,6 +141,7 @@ def generate(
     if use_multi_band_diffusion:
         if model_name != "facebook/audiogen-medium":
             from audiocraft.models.multibanddiffusion import MultiBandDiffusion
+            from audiocraft.models.encodec import InterleaveStereoCompressionModel
 
             mbd = MultiBandDiffusion.get_mbd_musicgen()
             if isinstance(
@@ -170,7 +171,7 @@ def generate(
     return {"audio_out": (model_inst.sample_rate, audio_array), "tokens": tokens}
 
 
-def generation_tab_musicgen():
+def musicgen_tab():
     with gr.Tab("MusicGen + AudioGen"):
         musicgen_ui()
 
@@ -276,7 +277,7 @@ if __name__ == "__main__":
     if "demo" in locals():
         demo.close()  # type: ignore
     with gr.Blocks() as demo:
-        generation_tab_musicgen()
+        musicgen_tab()
 
     demo.launch(
         server_port=7770,

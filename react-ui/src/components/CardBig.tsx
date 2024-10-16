@@ -30,6 +30,7 @@ import { PlayCircleIcon, SendHorizontalIcon, SendIcon } from "lucide-react";
 import { Button } from "./ui/button";
 import { getWebuiURL, getWebuiURLWithHost } from "../data/getWebuiURL";
 import { encodecDecode } from "../functions/encodecDecode";
+import { toLocalCacheFile } from "../types/LocalCacheFile";
 
 const ActionButton = ({
   icon,
@@ -226,25 +227,14 @@ export const HistoryCard = ({
     return await response.json();
   };
 
-  const addFavorite = () =>
-    favorite("", {
-      folder_root,
-    });
-
-  const removeFavorite = () =>
-    deleteFavorite("", {
-      folder_root,
-    });
-
+  const addFavorite = () => favorite("", { folder_root });
+  const removeFavorite = () => deleteFavorite("", { folder_root });
   const openFolder = () => {
     fetch("/api/gradio/open_folder", {
       method: "POST",
-      body: JSON.stringify({
-        folder: folder_root,
-      }),
+      body: JSON.stringify({ folder_path: folder_root }),
     });
   };
-
   const useAsVoice = () => {
     const history_npz = api_filename?.replace(".ogg", ".npz");
     sendToBarkAsVoice(history_npz);
@@ -485,7 +475,9 @@ export const CardVoiceNpz = ({ generation }: { generation: NPZ }) => {
           size="default"
           onClick={async () => {
             const urlWithHost = getWebuiURLWithHost(filename);
-            const x = await encodecDecode({ npz_file: urlWithHost });
+            const x = await encodecDecode({
+              npz_file: toLocalCacheFile(urlWithHost),
+            });
             const audio = new Audio(x.url);
             audio.play();
           }}
