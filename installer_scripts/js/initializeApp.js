@@ -174,6 +174,7 @@ function pip_install(requirements, name = "", pipFallback = false) {
   }
 }
 
+// The first install is a temporary safeguard due to mysterious issues with uv
 async function pip_install_all(first_install = false) {
   if (readPipPackagesVersion() === newPipPackagesVersion)
     return displayMessage(
@@ -181,9 +182,10 @@ async function pip_install_all(first_install = false) {
     );
 
   displayMessage("Updating dependencies...");
+  // pip_install_all(false); // potential speed optimization
   pip_install("-r requirements.txt", "Core Packages, Bark, Tortoise", first_install);
   pip_install(
-    "xformers==0.0.27 --index-url https://download.pytorch.org/whl/cu118",
+    "xformers==0.0.27+cu118 --index-url https://download.pytorch.org/whl/cu118",
     "xformers"
   );
   pip_install("-r requirements_bark_hubert_quantizer.txt", "Bark Voice Clone", first_install);
