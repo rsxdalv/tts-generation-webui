@@ -158,15 +158,19 @@ const removeGPUChoice = () => {
 
 const dry_run_flag = DEBUG_DRY_RUN ? "--dry-run " : "";
 
-function pip_install(requirements, name = "") {
+function pip_install(requirements, name = "", pipFallback = false) {
   try {
     displayMessage(`Installing ${name || requirements} dependencies...`);
-    $sh(`uv pip install ${dry_run_flag}${requirements} torch==${torchVersion}`);
+    $sh(
+      `${
+        pipFallback ? "pip" : "uv pip"
+      } install ${dry_run_flag}${requirements} torch==${torchVersion}`
+    );
     displayMessage(
-      `Successfully installed ${name || requirements} dependencies`
+      `Successfully installed ${name || requirements} dependencies\n`
     );
   } catch (error) {
-    displayMessage(`Failed to install ${name || requirements} dependencies`);
+    displayMessage(`Failed to install ${name || requirements} dependencies\n`);
   }
 }
 
@@ -189,7 +193,7 @@ async function pip_install_all() {
   pip_install("-r requirements_styletts2.txt", "StyleTTS");
   pip_install("-r requirements_vall_e.txt", "Vall-E-X");
   pip_install("-r requirements_maha_tts.txt", "Maha TTS");
-  pip_install("-r requirements_stable_audio.txt", "Stable Audio");
+  pip_install("-r requirements_stable_audio.txt", "Stable Audio", true);
   // reinstall hydra-core==1.3.2 because of fairseq
   pip_install("hydra-core==1.3.2", "hydra-core fix due to fairseq");
   pip_install("nvidia-ml-py", "nvidia-ml-py");
@@ -226,7 +230,9 @@ async function applyCondaConfig() {
       displayMessage("  Torch is not installed. Starting installation...\n");
     }
   } else {
-    displayMessage("  Major version update detected. Upgrading base environment");
+    displayMessage(
+      "  Major version update detected. Upgrading base environment"
+    );
   }
 
   if (fs.existsSync(gpuFile)) {
