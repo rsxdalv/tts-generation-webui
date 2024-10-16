@@ -7,17 +7,17 @@ from tts_webui.utils.list_dir_models import unload_model_button
 
 
 @manage_model_state("demucs")
-def _get_demucs_model():
+def _get_demucs_model(model_name="htdemucs"):
     from demucs import pretrained
 
-    return pretrained.get_model("htdemucs")
+    return pretrained.get_model(model_name)
 
 
 def apply_demucs(wav, sr):
     from demucs.audio import convert_audio
     from demucs.apply import apply_model
 
-    demucs_model = _get_demucs_model()
+    demucs_model = _get_demucs_model(model_name="htdemucs")
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     wav = convert_audio(wav, sr, demucs_model.samplerate, demucs_model.audio_channels)
@@ -28,7 +28,7 @@ COMPONENTS = ["drums", "bass", "other", "vocals"]
 
 
 def demucs_audio(audio):
-    demucs_model = _get_demucs_model()
+    demucs_model = _get_demucs_model(model_name="htdemucs")
     wav, sr = torchaudio.load(audio)
     out = apply_demucs(wav=wav.unsqueeze(0), sr=sr)
 

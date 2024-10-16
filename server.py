@@ -358,7 +358,7 @@ def server_hypervisor():
         print("Info: Docker mode: skipping Postgres")
         return
     print("Starting Postgres...")
-    postgres_process = subprocess.Popen(f"postgres -D {postgres_dir}", shell=True)
+    postgres_process = subprocess.Popen(f"postgres -D {postgres_dir} -p 7773", shell=True)
     try:
         signal.signal(
             signal.SIGINT,
