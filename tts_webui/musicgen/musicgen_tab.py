@@ -108,9 +108,10 @@ def generate(
     )
 
     if "melody" in model_name and melody is not None:
-        sr, melody = melody[0], torch.from_numpy(melody[1]).to(
-            model_inst.device
-        ).float().t().unsqueeze(0)
+        sr, melody = (
+            melody[0],
+            torch.from_numpy(melody[1]).to(model_inst.device).float().t().unsqueeze(0),
+        )
         print(melody.shape)
         if melody.dim() == 2:
             melody = melody[None]

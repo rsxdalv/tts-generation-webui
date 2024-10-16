@@ -54,7 +54,10 @@ def manage_model_state(model_namespace):
 
 
 def unload_model(model_namespace):
-    if model_namespace in model_states and model_states[model_namespace].get_model() is not None:
+    if (
+        model_namespace in model_states
+        and model_states[model_namespace].get_model() is not None
+    ):
         model_states[model_namespace].set_model(None, None)
         # del model_states[model_namespace]
         torch_clear_memory()

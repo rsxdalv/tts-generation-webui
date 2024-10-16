@@ -151,7 +151,6 @@ def extension_list_tab():
 
 if __name__ == "__main__":
     with gr.Blocks() as demo:
-
         handle_extension_class("audio-music-generation")
         handle_extension_class("audio-conversion")
         handle_extension_class("text-to-speech")

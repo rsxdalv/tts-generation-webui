@@ -81,7 +81,17 @@ def generate_audio_maha_tts(
 def maha_tts_ui():
     # from maha_tts.config import config
     class config:
-        langs = ['english','tamil', 'telugu', 'punjabi', 'marathi', 'hindi', 'gujarati', 'bengali', 'assamese']
+        langs = [
+            "english",
+            "tamil",
+            "telugu",
+            "punjabi",
+            "marathi",
+            "hindi",
+            "gujarati",
+            "bengali",
+            "assamese",
+        ]
 
     gr.Markdown(
         """

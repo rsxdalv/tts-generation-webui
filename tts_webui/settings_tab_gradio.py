@@ -120,9 +120,7 @@ def settings_tab_gradio(
             ),
             "ssl_keyfile_password": gr.Textbox(
                 label="ssl_keyfile_password: Password to use with the ssl certificate for https",
-                value=gradio_interface_options.get(
-                    "ssl_keyfile_password", None
-                ),
+                value=gradio_interface_options.get("ssl_keyfile_password", None),
             ),
             "ssl_verify": gr.Checkbox(
                 label="ssl_verify: Skip certificate validation",

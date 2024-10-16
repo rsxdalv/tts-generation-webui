@@ -140,7 +140,6 @@ def tortoise_ui():
             )
 
     def generate_button(count):
-
         def gen(*args):
             yield from generate_tortoise_long(
                 count,

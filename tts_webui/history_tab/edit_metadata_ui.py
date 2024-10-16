@@ -11,11 +11,15 @@ def edit_metadata_ui(voice_file_name, metadata_display):
         def save_metadata(metadata_input, voice_file_name):
             metadata = json.loads(metadata_input)
             full_generation = load_npz(voice_file_name)
-            save_npz(voice_file_name, {
-                "coarse_prompt": full_generation["coarse_prompt"],
-                "fine_prompt": full_generation["fine_prompt"],
-                "semantic_prompt": full_generation["semantic_prompt"],
-            }, metadata=metadata)
+            save_npz(
+                voice_file_name,
+                {
+                    "coarse_prompt": full_generation["coarse_prompt"],
+                    "fine_prompt": full_generation["fine_prompt"],
+                    "semantic_prompt": full_generation["semantic_prompt"],
+                },
+                metadata=metadata,
+            )
             return {
                 metadata_display: gr.JSON(value=metadata),
                 save_metadata_button: gr.Button(value="Saved"),
@@ -28,8 +32,7 @@ def edit_metadata_ui(voice_file_name, metadata_display):
         )
 
         metadata_input.change(
-            fn=lambda: gr.Button(value="Save Metadata"),
-            outputs=[save_metadata_button]
+            fn=lambda: gr.Button(value="Save Metadata"), outputs=[save_metadata_button]
         )
 
         return metadata_input
