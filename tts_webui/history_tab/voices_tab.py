@@ -60,7 +60,7 @@ def voices_tab(directory="voices"):
                 datatype=datatypes,
                 col_count=len(datatypes),
                 headers=headers,
-                height=800,
+                max_height=800,
                 #  elem_classes="file-list"
             )
         with gr.Column():

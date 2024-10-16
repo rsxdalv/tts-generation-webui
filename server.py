@@ -81,7 +81,7 @@ def main_ui(theme_choice="Base"):
         "Default": gr.themes.Default,
         "Monochrome": gr.themes.Monochrome,
     }
-    theme = themes[theme_choice](
+    theme: gr.themes.Base = themes[theme_choice](
         # primary_hue="blue",
         primary_hue="sky",
         secondary_hue="sky",
@@ -92,7 +92,8 @@ def main_ui(theme_choice="Base"):
             "system-ui",
             "sans-serif",
         ],
-    ).set(
+    )
+    theme.set(
         embed_radius="*radius_sm",
         block_label_radius="*radius_sm",
         block_label_right_radius="*radius_sm",

@@ -158,7 +158,7 @@ def _load_decorators(class_name: Literal["outer", "inner"]):
         finally:
             elapsed_time = time.time() - start_time
             print(
-                f"Decorator extension {x['name']} loaded in {elapsed_time:.2f} seconds."
+                f"  Done in {elapsed_time:.2f} seconds. ({x['name']})\n"
             )
 
     return wrappers, gen_wrappers
