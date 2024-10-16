@@ -193,6 +193,8 @@ async function pip_install_all() {
   // reinstall hydra-core==1.3.2 because of fairseq
   pip_install("hydra-core==1.3.2", "hydra-core fix due to fairseq");
   pip_install("nvidia-ml-py", "nvidia-ml-py");
+  // huggingface_hub==0.25.2 for gradio
+  pip_install("huggingface_hub==0.25.2", "huggingface_hub fix");
   savePipPackagesVersion(newPipPackagesVersion);
   displayMessage("");
 }
