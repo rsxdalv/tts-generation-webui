@@ -99,7 +99,7 @@ const installDependencies = async (gpuchoice) => {
 
     saveMajorVersion(majorVersion);
     displayMessage("  Successfully installed torch");
-    await pip_install_all();
+    await pip_install_all(true); // approximate first install
   } catch (error) {
     displayError(`Error during installation: ${error.message}`);
     throw error;
@@ -174,25 +174,25 @@ function pip_install(requirements, name = "", pipFallback = false) {
   }
 }
 
-async function pip_install_all() {
+async function pip_install_all(first_install = false) {
   if (readPipPackagesVersion() === newPipPackagesVersion)
     return displayMessage(
       "Dependencies are already up to date, skipping pip installs..."
     );
 
   displayMessage("Updating dependencies...");
-  pip_install("-r requirements.txt", "Core Packages, Bark, Tortoise");
+  pip_install("-r requirements.txt", "Core Packages, Bark, Tortoise", first_install);
   pip_install(
     "xformers==0.0.27 --index-url https://download.pytorch.org/whl/cu118",
     "xformers"
   );
-  pip_install("-r requirements_bark_hubert_quantizer.txt", "Bark Voice Clone");
-  pip_install("-r requirements_rvc.txt", "RVC");
-  pip_install("-r requirements_audiocraft_0.txt", "Audiocraft (workaround)");
-  pip_install("-r requirements_audiocraft.txt", "Audiocraft");
-  pip_install("-r requirements_styletts2.txt", "StyleTTS");
-  pip_install("-r requirements_vall_e.txt", "Vall-E-X");
-  pip_install("-r requirements_maha_tts.txt", "Maha TTS");
+  pip_install("-r requirements_bark_hubert_quantizer.txt", "Bark Voice Clone", first_install);
+  pip_install("-r requirements_rvc.txt", "RVC", first_install);
+  pip_install("-r requirements_audiocraft_0.txt", "Audiocraft (workaround)", first_install);
+  pip_install("-r requirements_audiocraft.txt", "Audiocraft", first_install);
+  pip_install("-r requirements_styletts2.txt", "StyleTTS", first_install);
+  pip_install("-r requirements_vall_e.txt", "Vall-E-X", first_install);
+  pip_install("-r requirements_maha_tts.txt", "Maha TTS", first_install);
   pip_install("-r requirements_stable_audio.txt", "Stable Audio", true);
   // reinstall hydra-core==1.3.2 because of fairseq
   pip_install("hydra-core==1.3.2", "hydra-core fix due to fairseq");
