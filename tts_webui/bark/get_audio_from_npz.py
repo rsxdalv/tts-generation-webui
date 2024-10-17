@@ -13,7 +13,7 @@ import numpy as np
 
 def get_audio_from_npz(file_path: str) -> Tuple[int, np.ndarray]:
     full_generation = load_npz(file_path)
-    return get_audio_from_full_generation(full_generation) # type: ignore
+    return get_audio_from_full_generation(full_generation)  # type: ignore
 
 
 def get_audio_from_full_generation(

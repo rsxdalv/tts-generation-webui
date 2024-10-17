@@ -34,7 +34,7 @@ def tortoise_model_settings_ui_inner():
             label="Tokenizer",
             file_types=[".json"],
         )
-        
+
     unload_model = gr.Button(
         "Unload model",
         variant="secondary",

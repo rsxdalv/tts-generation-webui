@@ -19,7 +19,6 @@ def decorator_save_metadata(fn):
             # **result_dict,
         }
         with open(path, "w") as outfile:
-
             json.dump(
                 metadata,
                 outfile,

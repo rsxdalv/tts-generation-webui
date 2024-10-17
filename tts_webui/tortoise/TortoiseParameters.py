@@ -2,6 +2,7 @@ import gradio as gr
 
 from typing import TypedDict, Optional
 
+
 class _TortoiseParametersTypedDict(TypedDict):
     text: str
     voice: str
@@ -21,6 +22,7 @@ class _TortoiseParametersTypedDict(TypedDict):
     diffusion_temperature: float
     model: str
     name: str
+
 
 class TortoiseParameters:
     def __init__(

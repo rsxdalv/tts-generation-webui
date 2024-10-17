@@ -1,12 +1,23 @@
+import os
 import subprocess
+
+
+def write_log(output, name, type):
+    script_dir = os.path.dirname((__file__))
+    with open(
+        os.path.join(script_dir, "..", "logs", f"{type}-{name}.log"), "w"
+    ) as outfile:
+        outfile.write("\n".join(output))
 
 
 def pip_install_wrapper(requirements, name):
     def fn():
         output = []
-        for line in pip_install(requirements, name):
+        for line in _pip_install(requirements, name):
             output.append(line)
             yield "<br />".join(output)
+
+        write_log(output, name, type="pip-install")
 
     return fn
 
@@ -14,14 +25,16 @@ def pip_install_wrapper(requirements, name):
 def pip_uninstall_wrapper(package_name, name):
     def fn():
         output = []
-        for line in pip_uninstall(package_name, name):
+        for line in _pip_uninstall(package_name, name):
             output.append(line)
             yield "<br />".join(output)
+
+        write_log(output, name, type="pip-uninstall")
 
     return fn
 
 
-def pip_install(requirements, name):
+def _pip_install(requirements, name):
     # process = subprocess.Popen(
     #     f"uv pip install {requirements}",
     #     shell=True,
@@ -56,7 +69,7 @@ def pip_install(requirements, name):
         yield f"Failed to install {name} dependencies"
 
 
-def pip_uninstall(package_name, name):
+def _pip_uninstall(package_name, name):
     try:
         print(f"Uninstalling {name} ({package_name})...")
         yield from pip_shell(f"pip uninstall -y {package_name}")

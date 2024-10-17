@@ -97,7 +97,6 @@ def get_ckpt_path(name):
 
 
 def download_pretrained_model(name: str, token: str):
-
     local_dir = get_local_dir(name)
 
     model_config_path = hf_hub_download(
@@ -295,7 +294,6 @@ from tts_webui.utils.date import get_date_string
 
 
 def save_result(audio, *generation_args):
-
     date = get_date_string()
 
     generation_args = {
@@ -401,7 +399,6 @@ def create_sampling_ui(model_config, inpainting=False):
                 )
 
             with gr.Accordion("Sampler params", open=False):
-
                 # Seed
                 seed_textbox = gr.Textbox(label="Seed", value="-1")
 

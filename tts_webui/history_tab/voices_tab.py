@@ -117,9 +117,7 @@ def voices_tab(directory="voices"):
         semantic_prompt = full_generation["semantic_prompt"]
         len_semantic_prompt = len(semantic_prompt)
         semantic_prompt = semantic_prompt[
-            len_semantic_prompt
-            * crop_min
-            // 100 : len_semantic_prompt
+            len_semantic_prompt * crop_min // 100 : len_semantic_prompt
             * crop_max
             // 100
         ]

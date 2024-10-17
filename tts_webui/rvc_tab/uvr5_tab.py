@@ -37,7 +37,8 @@ UVR5_MODEL_LIST = [
 
 uvr = None
 # fix issue with / in ENV \\ from os.path.join for VR-* models
-# os.path.join(os.getenv("weight_uvr5_root"), model_name), 
+# os.path.join(os.getenv("weight_uvr5_root"), model_name),
+
 
 def uvr_wrapper(model_name, agg, input_file):
     download_uvr5(model_name)

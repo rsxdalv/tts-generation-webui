@@ -8,7 +8,6 @@ def decorator_save_musicgen_npz(fn):
         tokens = result_dict["tokens"]
 
         if tokens is not None:
-
             path = get_relative_output_path_ext(result_dict, ".npz")
 
             save_npz_musicgen(path, tokens, result_dict["metadata"])

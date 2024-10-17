@@ -4,9 +4,8 @@ import gradio as gr
 
 from tts_webui.utils.pip_install import pip_install_wrapper
 
-def generic_error_tab_advanced(
-    e: Exception, name="", requirements=None
-):
+
+def generic_error_tab_advanced(e: Exception, name="", requirements=None):
     with gr.Tab(name + " (!)"):
         gr.Markdown(f"Failed to load {name} tab. Please check your configuration.")
         gr.Markdown(f"Error: {e}")

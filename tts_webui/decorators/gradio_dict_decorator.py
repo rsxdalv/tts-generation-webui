@@ -114,7 +114,6 @@ def dictionarize(fn, inputs: dict, outputs: dict):
         return {v: result_dict[k] for k, v in outputs.items()}
 
     def get_wrapper():
-
         if inspect.isgeneratorfunction(fn):
 
             def gen_wrapper(*list_args):
