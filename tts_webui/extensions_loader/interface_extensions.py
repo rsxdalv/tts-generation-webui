@@ -10,6 +10,10 @@ from tts_webui.utils.pip_install import pip_install_wrapper, pip_uninstall_wrapp
 from tts_webui.utils.generic_error_tab_advanced import generic_error_tab_advanced
 
 
+def uninstall_extension(package_name):
+    yield from pip_uninstall_wrapper(package_name, package_name)()
+
+
 def check_if_package_installed(package_name):
     spec = importlib.util.find_spec(package_name)
     return spec is not None
@@ -41,11 +45,7 @@ def _handle_package(package_name, title_name, requirements):
                         update_button = getattr(module, "update_button")
                         update_button()
                     else:
-                        # universal update button
-                        gr.Button("Attempt Update [May already be up to date]").click(
-                            pip_install_wrapper(requirements, title_name),
-                            outputs=[gr.HTML()],
-                        )
+                        _extension_management_ui(package_name, title_name, requirements)
                 with gr.Tabs():
                     main_tab()
         except Exception as e:
@@ -65,6 +65,53 @@ def _handle_package(package_name, title_name, requirements):
                 pip_install_wrapper(requirements, title_name),
                 outputs=[console_text],
             )
+
+
+def disable_extension(package_name):
+    def _disable_extension():
+        disabled_extensions.append(package_name)
+        print(f"Disabled extension {package_name}")
+
+    return _disable_extension
+
+
+def get_latest_version(package_name):
+    def _get_latest_version():
+        print(f"Getting latest version of {package_name}")
+        for line in pip_install_wrapper(
+            f"--dry-run --no-deps {package_name}",
+            f"{package_name} (dry run, update check)",
+        )():
+            if "Would install" in line:
+                return line.split(" ")[-1]
+
+        return "Already up to date"
+
+    return _get_latest_version
+
+
+def _extension_management_ui(package_name, title_name, requirements):
+    with gr.Accordion("Manage Extension", open=True):
+        output = gr.HTML(render=False)
+        with gr.Row():
+            gr.Button("Check for updates").click(
+                get_latest_version(package_name),
+                outputs=[output],
+            )
+            gr.Button("Attempt Update", variant="primary").click(
+                pip_install_wrapper(requirements, title_name),
+                outputs=[output],
+            )
+            gr.Button("Uninstall Extension", variant="stop").click(
+                pip_uninstall_wrapper(package_name, title_name),
+                outputs=[output],
+            )
+            gr.Button("Disable Extension", visible=False).click(
+                fn=disable_extension(package_name),
+                outputs=[output],
+            )
+        gr.Markdown("Console:")
+        output.render()
 
 
 def get_extension_list_json():
@@ -137,9 +184,6 @@ def extension_list_tab():
                     choices=[x["package_name"] for x in external_extension_list],
                 )
                 uninstall_button = gr.Button("Uninstall extension")
-
-                def uninstall_extension(package_name):
-                    yield from pip_uninstall_wrapper(package_name, package_name)()
 
                 uninstall_button.click(
                     fn=uninstall_extension,
