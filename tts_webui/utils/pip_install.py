@@ -5,7 +5,7 @@ import subprocess
 def write_log(output, name, type):
     script_dir = os.path.dirname((__file__))
     with open(
-        os.path.join(script_dir, "..", "logs", f"{type}-{name}.log"), "w"
+        os.path.join(script_dir, "..", "..", "logs", f"{type}-{name}.log"), "w"
     ) as outfile:
         outfile.write("\n".join(output))
 
