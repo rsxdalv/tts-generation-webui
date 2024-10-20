@@ -1,9 +1,11 @@
 import gradio as gr
-import gc
 import torch
 import os
 
 from typing import TYPE_CHECKING
+
+from tts_webui.utils.manage_model_state import manage_model_state
+from tts_webui.utils.list_dir_models import unload_model_button
 
 if TYPE_CHECKING:
     from transformers import Pipeline
@@ -14,7 +16,7 @@ def extension__tts_generation_webui():
     return {
         "package_name": "extension_whisper",
         "name": "Whisper",
-        "version": "0.0.1",
+        "version": "0.0.2",
         "requirements": "git+https://github.com/rsxdalv/extension_whisper@main",
         "description": "Whisper allows transcribing audio files.",
         "extension_type": "interface",
@@ -28,40 +30,59 @@ def extension__tts_generation_webui():
     }
 
 
+@manage_model_state("whisper")
+def get_model(
+    model_name="openai/whisper-large-v3",
+    torch_dtype=torch.float16,
+    device="cuda:0",
+    compile=False,
+):
+    from transformers import AutoModelForSpeechSeq2Seq
+    from transformers import AutoProcessor
+
+    model = AutoModelForSpeechSeq2Seq.from_pretrained(
+        model_name, torch_dtype=torch_dtype, low_cpu_mem_usage=True
+    ).to(device)
+    if compile:
+        model.generation_config.cache_implementation = "static"
+        model.generation_config.max_new_tokens = 256
+        model.forward = torch.compile(
+            model.forward, mode="reduce-overhead", fullgraph=True
+        )
+
+    processor = AutoProcessor.from_pretrained(model_name)
+
+    return model, processor
+
+
 local_dir = os.path.join("data", "models", "whisper")
 local_cache_dir = os.path.join(local_dir, "cache")
 
-pipe = None
-last_model_name = None
 
-
-def unload_models():
-    global pipe, last_model_name
-    pipe = None
-    last_model_name = None
-    gc.collect()
-    if torch.cuda.is_available():
-        torch.cuda.empty_cache()
-    return "Unloaded"
-
-
+@manage_model_state("whisper-pipe")
 def get_pipe(model_name, device="cuda:0") -> "Pipeline":
     from transformers import pipeline
 
-    global pipe, last_model_name
-    if pipe is not None:
-        if model_name == last_model_name:
-            return pipe
-    unload_models()
-    pipe = pipeline(
-        "automatic-speech-recognition",
+    torch_dtype = torch.float16
+
+    model, processor = get_model(
+        # model_name, torch_dtype=torch.float16, device=device, compile=False
         model_name,
+        torch_dtype=torch_dtype,
+        device=device,
+        compile=False,
+    )
+    return pipeline(
+        "automatic-speech-recognition",
+        model=model,
+        tokenizer=processor.tokenizer,
+        feature_extractor=processor.feature_extractor,
+        # chunk_length_s=30,
+        # batch_size=16,  # batch size for inference - set based on your device
         torch_dtype=torch.float16,
         model_kwargs={"cache_dir": local_cache_dir},
         device=device,
     )
-    last_model_name = model_name
-    return pipe
 
 
 def transcribe(inputs, model_name="openai/whisper-large-v3"):
@@ -72,13 +93,11 @@ def transcribe(inputs, model_name="openai/whisper-large-v3"):
 
     pipe = get_pipe(model_name)
 
-    generate_kwargs = (
-        {"task": "transcribe"} if model_name == "openai/whisper-large-v3" else {}
-    )
-
     result = pipe(
         inputs,
-        generate_kwargs=generate_kwargs,
+        generate_kwargs=(
+            {"task": "transcribe"} if model_name == "openai/whisper-large-v3" else {}
+        ),
         return_timestamps=True,
     )
     return result["text"]
@@ -108,7 +127,8 @@ def transcribe_ui():
             text = gr.Textbox(label="Transcription", interactive=False)
 
     with gr.Row():
-        unload_models_button = gr.Button("Unload models")
+        unload_model_button("whisper-pipe")
+        unload_model_button("whisper")
 
         transcribe_button = gr.Button("Transcribe", variant="primary")
 
@@ -117,21 +137,12 @@ def transcribe_ui():
         inputs=[audio, model_dropdown],
         outputs=[text],
         api_name="whisper_transcribe",
-    ).then(
-        fn=lambda: gr.Button(value="Unload models"),
-        outputs=[unload_models_button],
-    )
-
-    unload_models_button.click(
-        fn=unload_models,
-        outputs=[unload_models_button],
-        api_name="whisper_unload_models",
     )
 
 
 if __name__ == "__main__":
     if "demo" in locals():
-        demo.close()
+        locals()["demo"].close()
 
     with gr.Blocks() as demo:
         with gr.Tab("Whisper"):
