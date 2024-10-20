@@ -18,6 +18,74 @@ List of models: Bark, MusicGen + AudioGen, Tortoise, RVC, Vocos, Demucs, Seamles
 
 ## Changelog
 
+Oct 19:
+* Fixed extension logs and added new extensions.
+
+Oct 18:
+* System improvements: formatted project, fixed `xformers+cuda` install, added log system, uninstall extension button, and F5 TTS extension.
+
+Oct 16:
+* First install now uses `pip` instead of `uv`.
+* Bumped major version and fixed Google Colab.
+* Added pip fallback to stable audio.
+* Fixed Demucs, changed Postgres port.
+* Fixed `huggingface_hub` install and Bark model loader.
+* Major upgrades: switched to Gradio 5, lazy loading for tabs, Docker fixes, optimized UI speed, added .env.user feature, improved logs, and upgraded React UI extensions.
+
+Oct 3:
+* Fixed GPU info tab and added `nvidia-ml-py`.
+* Created workaround for Audiocraft install bug.
+* Fixed automatic MSVC install and set server to `127.0.0.1`.
+* Fixed `.git_version` path and removed `iconv` to eliminate `node-gyp` requirement.
+* Improved installer error handling, added upgrade hash logging.
+* Upgraded Node.js to 22.9.0, added PostgreSQL support, grouped tabs in React UI.
+
+## September 2024
+
+<details>
+<summary>Click to expand</summary>
+
+Sep 23:
+* Automatically use CUDA for MMS.
+
+Sep 22:
+* Added ffmpeg metadata extension to React UI.
+* Added mono-only notice for Maha TTS.
+* Hotfix to avoid Node 20.17.0 installation failure.
+
+Sep 21:
+* Added stable audio demo to React UI.
+* Improved UI layout.
+
+Sep 19:
+* Upgraded React UI visual look with new Sliders and better layout.
+* Optimized RVC UI, fixed Colab, and added a search command box.
+* Upgrade Node.js to 20.17.0.
+
+Sep 2:
+* Fixed Dockerfile and updated docker-compose.yml.
+* Fixed bug in npz loading.
+
+</details>
+
+
+## August 2024
+
+<details>
+<summary>Click to expand</summary>
+
+Aug 31:
+* Upgrade model inference framework to decorators.
+* Moved Python files from `src` to `tts_webui` folder.
+* Rewrote the MusicGen tab and fixed related bugs.
+
+Aug 20:
+* Upgraded to Gradio 4 and added theme.
+* Added model loading messages for Tortoise.
+* Fixed ReactUI's RVC.
+* Refactored hyperparameters.
+* Added management to extensions list, XTTS-Simple extension.
+
 Aug 5:
 * Fix Bark in React UI, add Max Generation Duration.
 * Change AudioCraft Plus extension models directory to ./data/models/audiocraft_plus/
@@ -40,6 +108,7 @@ Aug 1:
 * Synchronize Gradio Port with React UI.
 * Change default Gradio port to 7770 from 7860.
 
+</details>
 
 ## July 2024
 
