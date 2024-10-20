@@ -661,7 +661,7 @@ Not exactly, the dependencies clash, especially between conda and python (and de
 * Install react dependencies: `npm install`
 * Build react: `npm run build`
 * Run react: `npm start`
-* Also run the python server: `python server.py` or with `start_(platform)` script
+* Also run the python server: `python server.py` or with `start_tts_webui` script
 
 ### Docker Setup
 
