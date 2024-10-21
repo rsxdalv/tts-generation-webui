@@ -721,7 +721,7 @@ https://github.com/rsxdalv/tts-generation-webui/discussions/186#discussioncommen
 
 ## Examples
 
-[Sample](./samples/sample.mp4)
+[Sample](./samples/sample.webm)
 
 [audio__bark__continued_generation__2024-05-04_16-07-49_long.webm](https://user-images.githubusercontent.com/6757283/236218842-b9dc253e-05de-49e5-ada9-e714e1e2cbd4.webm)
 
