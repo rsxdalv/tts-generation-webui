@@ -66,7 +66,10 @@
 
 </div>
 
-|  ![react](./screenshots/v2/react.png)  | ![musicgen](./screenshots/v2/musicgen.png) | ![rvc](./screenshots/v2/rvc.png) |
+| ![react_1](./screenshots/react_ui%20(1).png) | ![react_2](./screenshots/react_ui%20(2).png) | ![react_3](./screenshots/react_ui%20(3).png) |
+| :-----------------------------------------: | :-----------------------------------------: | :-------------------------------: |
+
+| ![gradio_1](./screenshots/gradio%20(1).png) | ![gradio_2](./screenshots/gradio%20(2).png) | ![gradio_3](./screenshots/gradio%20(3).png) |
 | :-----------------------------------------: | :-----------------------------------------: | :-------------------------------: |
 
 ## Changelog
