@@ -1,22 +1,146 @@
-# TTS Generation WebUI
+<h1 align="center">TTS Generation WebUI</h1>
 
-[Download](https://github.com/rsxdalv/tts-generation-webui/archive/refs/heads/main.zip) ||
-[Upgrading](#upgrading) ||
-[Manual installation](#manual-installation-not-recommended) ||
-[Docker Setup](#docker-setup) || [Configuration Guide](#configuration-guide) || [Discord Server](https://discord.gg/V8BKTVRtJ9) || [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rsxdalv/tts-generation-webui/blob/main/notebooks/google_colab.ipynb) || [Feedback / Bug reports](https://forms.gle/2L62owhBsGFzdFBC8)
+<div align="center">
 
-List of models: Bark, MusicGen + AudioGen, Tortoise, RVC, Vocos, Demucs, SeamlessM4T, MAGNeT, Stable Audio, Maha TTS, MMS, and more.
+  <h3 align="center">
 
-*Note: Not all models support all platforms. For example, MusicGen and AudioGen are not supported on MacOS as of yet.*
+  [Download Installer](https://github.com/rsxdalv/tts-generation-webui/archive/refs/heads/main.zip) ||
+  [Installation](#installation) ||
+  [Docker Setup](#docker-setup) ||
+  [Feedback / Bug reports](https://forms.gle/2L62owhBsGFzdFBC8)
+  
+  </h3>
+
+  [![banner](./screenshots/banner.png)](https://github.com/rsxdalv/tts-generation-webui)
+
+  [![GitHub stars](https://img.shields.io/github/stars/rsxdalv/tts-generation-webui?style=social)](https://github.com/rsxdalv/tts-generation-webui/stargazers)
+  [![GitHub](https://img.shields.io/github/license/rsxdalv/tts-generation-webui)](https://github.com/rsxdalv/tts-generation-webui/blob/main/LICENSE)
+  [![Discord](https://img.shields.io/discord/1258772280071295018?label=discord&logo=discord&logoColor=white)](https://discord.gg/V8BKTVRtJ9)
+  [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rsxdalv/tts-generation-webui/blob/main/notebooks/google_colab.ipynb)
+  [![GitHub forks](https://img.shields.io/github/forks/rsxdalv/tts-generation-webui?style=social)](https://github.com/rsxdalv/tts-generation-webui/network/members)
+
+</div>
+
+<div align="center">
 
 ## Videos
 
-|                  **Bark TTS, Seamless Translation, RVC, Music Generation and More**                  |                  **TTS Generation WebUI - A Tool for Text to Speech and Voice Cloning**                             |                       **Text to speech and voice cloning - TTS Generation WebUI**                                |
-| :------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------: |
-| [![Watch the video](https://img.youtube.com/vi/Y8J717tr9t0/sddefault.jpg)](https://youtu.be/Y8J717tr9t0) | [![Watch the video](https://img.youtube.com/vi/ScN2ypewABc/sddefault.jpg)](https://youtu.be/ScN2ypewABc) | [![Watch the video](https://img.youtube.com/vi/JXojhFjZ39k/sddefault.jpg)](https://youtu.be/JXojhFjZ39k) |
+</div>
 
+| [![Watch the video](https://img.youtube.com/vi/Y8J717tr9t0/sddefault.jpg)](https://youtu.be/Y8J717tr9t0) | [![Watch the video](https://img.youtube.com/vi/ScN2ypewABc/sddefault.jpg)](https://youtu.be/ScN2ypewABc) | [![Watch the video](https://img.youtube.com/vi/JXojhFjZ39k/sddefault.jpg)](https://youtu.be/JXojhFjZ39k) |
+| :------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------: |
+
+<div align="center">
+
+## Models
+
+| Text-to-speech                | Audio/Music Generation       | Audio Conversion/Tools        |
+|-------------------------------|------------------------------|-------------------------------|
+| [Bark](https://github.com/suno-ai/bark) | [MusicGen](https://github.com/facebookresearch/audiocraft/blob/main/docs/MUSICGEN.md) | [RVC](https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI) |
+| [Tortoise](https://github.com/neonbjb/tortoise-tts) | [MAGNeT](https://github.com/facebookresearch/audiocraft/blob/main/docs/MAGNET.md) | [Demucs](https://github.com/facebookresearch/demucs) |
+| [Maha TTS](https://github.com/dubverse-ai/MahaTTS) | [Stable Audio](https://github.com/Stability-AI/stable-audio-tools) | [Vocos](https://github.com/gemelo-ai/vocos) |
+| [MMS](https://github.com/facebookresearch/fairseq/blob/main/examples/mms/README.md) | [(Extension) Riffusion](https://github.com/riffusion/riffusion-hobby) | [Whisper](https://github.com/openai/whisper) |
+| [Vall-E X](https://github.com/Plachtaa/VALL-E-X) | [(Extension) AudioCraft Mac](https://github.com/trizko/audiocraft) | 
+| [StyleTTS2](https://github.com/sidharthrajaram/StyleTTS2) | [(Extension) AudioCraft Plus](https://github.com/GrandaddyShmax/audiocraft_plus) | 
+| [SeamlessM4T](https://github.com/facebookresearch/seamless_communication) | | |
+| [(Extension) XTTSv2](https://github.com/coqui-ai/TTS) | | |
+| [(Extension) MARS5](https://github.com/camb-ai/mars5-tts) | | |
+| [(Extension) F5-TTS](https://github.com/SWivid/F5-TTS) | | |
+| [(Extension) Parler TTS](https://github.com/huggingface/parler-tts) | | |
+
+</div>
+
+<div align="center">
+
+## Examples
+
+</div>
+
+
+| <video src="https://github.com/user-attachments/assets/16ac948a-fe98-49ad-ad87-19c41fe7e65e" width="300"></video> | <video src="https://github.com/user-attachments/assets/55bde4f7-bbcc-4ecf-8f94-b315b9d22e74" width="300"></video> | <video src="https://github.com/user-attachments/assets/fcee8906-a101-400d-8499-4e72c7603042" width="300"></video> |
+| :-----------------------------------------: | :-----------------------------------------: | :-------------------------------: |
+
+<div align="center">
+
+## Screenshots
+
+</div>
+
+| ![react_1](./screenshots/react_ui%20(1).png) | ![react_2](./screenshots/react_ui%20(2).png) | ![react_3](./screenshots/react_ui%20(3).png) |
+| :-----------------------------------------: | :-----------------------------------------: | :-------------------------------: |
+
+| ![gradio_1](./screenshots/gradio%20(1).png) | ![gradio_2](./screenshots/gradio%20(2).png) | ![gradio_3](./screenshots/gradio%20(3).png) |
+| :-----------------------------------------: | :-----------------------------------------: | :-------------------------------: |
 
 ## Changelog
+
+Oct 19:
+* Fixed extension logs and added new extensions.
+
+Oct 18:
+* System improvements: formatted project, fixed `xformers+cuda` install, added log system, uninstall extension button, and F5 TTS extension.
+
+Oct 16:
+* First install now uses `pip` instead of `uv`.
+* Bumped major version and fixed Google Colab.
+* Added pip fallback to stable audio.
+* Fixed Demucs, changed Postgres port.
+* Fixed `huggingface_hub` install and Bark model loader.
+* Major upgrades: switched to Gradio 5, lazy loading for tabs, Docker fixes, optimized UI speed, added .env.user feature, improved logs, and upgraded React UI extensions.
+
+Oct 3:
+* Fixed GPU info tab and added `nvidia-ml-py`.
+* Created workaround for Audiocraft install bug.
+* Fixed automatic MSVC install and set server to `127.0.0.1`.
+* Fixed `.git_version` path and removed `iconv` to eliminate `node-gyp` requirement.
+* Improved installer error handling, added upgrade hash logging.
+* Upgraded Node.js to 22.9.0, added PostgreSQL support, grouped tabs in React UI.
+
+## September 2024
+
+<details>
+<summary>Click to expand</summary>
+
+Sep 23:
+* Automatically use CUDA for MMS.
+
+Sep 22:
+* Added ffmpeg metadata extension to React UI.
+* Added mono-only notice for Maha TTS.
+* Hotfix to avoid Node 20.17.0 installation failure.
+
+Sep 21:
+* Added stable audio demo to React UI.
+* Improved UI layout.
+
+Sep 19:
+* Upgraded React UI visual look with new Sliders and better layout.
+* Optimized RVC UI, fixed Colab, and added a search command box.
+* Upgrade Node.js to 20.17.0.
+
+Sep 2:
+* Fixed Dockerfile and updated docker-compose.yml.
+* Fixed bug in npz loading.
+
+</details>
+
+
+## August 2024
+
+<details>
+<summary>Click to expand</summary>
+
+Aug 31:
+* Upgrade model inference framework to decorators.
+* Moved Python files from `src` to `tts_webui` folder.
+* Rewrote the MusicGen tab and fixed related bugs.
+
+Aug 20:
+* Upgraded to Gradio 4 and added theme.
+* Added model loading messages for Tortoise.
+* Fixed ReactUI's RVC.
+* Refactored hyperparameters.
+* Added management to extensions list, XTTS-Simple extension.
 
 Aug 5:
 * Fix Bark in React UI, add Max Generation Duration.
@@ -40,6 +164,7 @@ Aug 1:
 * Synchronize Gradio Port with React UI.
 * Change default Gradio port to 7770 from 7860.
 
+</details>
 
 ## July 2024
 
@@ -492,8 +617,11 @@ Before:
 * Added support for Tortoise TTS
 </details>
 
-## Upgrading
+## Upgrading (For old installations)
 *In case of issues, feel free to contact the developers*.
+
+<details>
+<summary>Click to expand</summary>
 
 ### Upgrading from v6 to new installer
 
@@ -513,31 +641,33 @@ Before:
 
 Not exactly, the dependencies clash, especially between conda and python (and dependencies are already in a critical state, moving them to conda is ways off). Therefore, while it might be possible to just replace the old installer with the new one and running the update, the problems are unpredictable and **unfixable**. Making an update to installer requires a lot of testing so it's not done lightly.
 
-## New Installer
-* Download the repository as a zip file and extract it.
-* Run start_tts_webui.bat or start_tts_webui.sh to start the server. The server will be available at http://localhost:7860
+</details>
+
+## Installation
+* Download the [latest version](https://github.com/rsxdalv/tts-generation-webui/archive/refs/heads/main.zip) and extract it.
+* Run start_tts_webui.bat or start_tts_webui.sh to start the server. It will ask you to select the GPU/Chip you are using. Once everything has installed, it will start the Gradio server at http://localhost:7770 and the React UI at http://localhost:3000.
 * Output log will be available in the installer_scripts/output.log file.
 
-## Manual installation (not recommended)
+### Manual installation (not recommended)
 * These instructions might not reflect all of the latest fixes and adjustments, but could be useful as a reference for debugging or understanding what the installer does. Hopefully they can be a basis for supporting new platforms, such as AMD/Intel.
 
 * Install conda (https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html)
-* Set up an environment: `conda create -n venv python=3.10`
-* Install git, node.js `conda install -y -c conda-forge git nodejs conda`
+  * (Windows) Install Visual Studio compiler / Visual Studio Build Tools https://visualstudio.microsoft.com/visual-cpp-build-tools/
+* Set up an environment: `conda create -n venv`
+* Install git, node.js `conda install -y -c conda-forge git python=3.10.11 conda-forge::nodejs=22.9.0 conda pip==23.3.2 conda-forge::uv=0.4.17 conda-forge::vswhere`
 * a) Either Continue with the installer script
   * activate the environment: `conda activate venv` and
   * `(venv) node installer_scripts\init_app.js`
   * then run the server with `(venv) python server.py`
 * b) Or install the requirements manually
   * Set up pytorch with CUDA or CPU (https://pytorch.org/audio/stable/build.windows.html#install-pytorch):
-    * `(venv) conda install pytorch torchvision torchaudio cpuonly ffmpeg -c pytorch` for CPU/Mac
-    * `(venv) conda install -y -k pytorch[version=2,build=py3.10_cuda11.7*] torchvision torchaudio pytorch-cuda=11.7 cuda-toolkit ninja ffmpeg -c pytorch -c nvidia/label/cuda-11.7.0 -c nvidia` for CUDA
+    * `(venv) conda install -y -k conda-forge::uv=0.4.17 conda-forge::vswhere  conda-forge::postgresql=16.4 conda-forge::nodejs=22.9.0 conda-forge::ffmpeg=4.4.2[build=lgpl*] pytorch=2.3.1 torchvision torchaudio cpuonly  -c pytorch` for CPU/Mac
+    * `(venv) conda install -y -k conda-forge::uv=0.4.17 conda-forge::vswhere  conda-forge::postgresql=16.4 conda-forge::nodejs=22.9.0 conda-forge::ffmpeg=4.4.2[build=lgpl*] pytorch[version=2.3.1,build=py3.10_cuda11.8*] pytorch-cuda=11.8 torchvision torchaudio cuda-toolkit ninja  -c pytorch -c nvidia/label/cuda-11.8.0 -c nvidia` for CUDA
   * Clone the repo: `git clone https://github.com/rsxdalv/tts-generation-webui.git`
-  * Potentially (if errors occur in the next step) need to install build tools (without Visual Studio): https://visualstudio.microsoft.com/visual-cpp-build-tools/
   * Install the requirements:
-    * activate the environment: `conda activate venv` and
     * install all the requirements*.txt (this list might not be up to date, check https://github.com/rsxdalv/tts-generation-webui/blob/main/Dockerfile#L39-L40):
       * `(venv) pip install -r requirements.txt`
+      * `(venv) pip install -r requirements_audiocraft_0.txt`
       * `(venv) pip install -r requirements_audiocraft.txt`
       * `(venv) pip install -r requirements_bark_hubert_quantizer.txt`
       * `(venv) pip install -r requirements_rvc.txt`
@@ -547,22 +677,21 @@ Not exactly, the dependencies clash, especially between conda and python (and de
       * `(venv) pip install -r requirements_maha_tts.txt`
       * `(venv) pip install -r requirements_stable_audio.txt`
       * `(venv) pip install soundfile==0.12.1`
-    * due to pip-torch _incompatibilities_ torch will be reinstalled to 2.0.0, thus it might be necessary to reinstall it again after the requirements if you have a CPU/Mac or installed a specific torch version other than 2.0.0:
-      * `(venv) conda install pytorch torchvision torchaudio cpuonly ffmpeg -c pytorch` for CPU/Mac
-      * `(venv) conda install -y -k pytorch[version=2,build=py3.10_cuda11.7*] torchvision torchaudio pytorch-cuda=11.7 cuda-toolkit ninja ffmpeg -c pytorch -c nvidia/label/cuda-11.7.0 -c nvidia` for CUDA
+      * `(venv) pip install nvidia-ml-py`
     * build the react app: `(venv) cd react-ui && npm install && npm run build`
+  * (optional) setup the database: `(venv) node installer_scripts/js/applyDatabaseConfig.js`
   * run the server: `(venv) python server.py`
 
 
-### React UI
+#### React UI
 
 * Install nodejs (if not already installed with conda)
 * Install react dependencies: `npm install`
 * Build react: `npm run build`
 * Run react: `npm start`
-* Also run the python server: `python server.py` or with `start_(platform)` script
+* Also run the python server: `python server.py` or with `start_tts_webui` script
 
-## Docker Setup
+### Docker Setup
 
 tts-generation-webui can also be ran inside of a Docker container. To get started, pull the image from GitHub Container Registry:
 
@@ -582,7 +711,7 @@ The container will take some time to generate the first output while models are 
 docker logs tts-generation-webui
 ```
 
-### Building the image yourself
+#### Building the image yourself
 If you wish to build your own docker container, you can use the included Dockerfile:
 
 ```
@@ -592,9 +721,13 @@ Please note that the docker-compose needs to be edited to use the image you just
 
 
 ## Extra Voices for Bark, Prompt Samples
-[![PromptEcho](https://promptecho.com/echo.play.ai.jpg)](https://promptecho.com/)
+<div align="center">
 
-https://rsxdalv.github.io/bark-speaker-directory/
+[![PromptEcho](https://github.com/user-attachments/assets/d26f76e9-0edf-43b9-b958-1167a867b781)](https://promptecho.com/)
+
+[![Bark Speaker Directory](https://github.com/user-attachments/assets/775bd2fe-cf69-44f3-b77a-427338f77848)](https://rsxdalv.github.io/bark-speaker-directory/)
+
+</div>
 
 ## Bark Readme
 [README_Bark.md](./README_Bark.md)
@@ -602,19 +735,6 @@ https://rsxdalv.github.io/bark-speaker-directory/
 ## Info about managing models, caches and system space for AI projects
 https://github.com/rsxdalv/tts-generation-webui/discussions/186#discussioncomment-7291274
 
-
-## Screenshots
-
-|  ![react](./screenshots/v2/react.png)  | ![musicgen](./screenshots/v2/musicgen.png) | ![rvc](./screenshots/v2/rvc.png) |
-| :-----------------------------------------: | :-----------------------------------------: | :-------------------------------: |
-
-## Examples
-
-[audio__bark__continued_generation__2024-05-04_16-07-49_long.webm](https://user-images.githubusercontent.com/6757283/236218842-b9dc253e-05de-49e5-ada9-e714e1e2cbd4.webm)
-
-[audio__bark__continued_generation__2024-05-04_16-09-21_long.webm](https://user-images.githubusercontent.com/6757283/236219228-518d2b70-51a3-4175-af44-b24c01d14932.webm)
-
-[audio__bark__continued_generation__2024-05-04_16-10-55_long.webm](https://user-images.githubusercontent.com/6757283/236219243-dad96404-0879-4274-828e-7f3afc6bac65.webm)
 
 
 ## Open Source Libraries
@@ -704,53 +824,3 @@ These messages:
 ```
 Are completely normal. It's both a limitation of pip and because this Web UI combines a lot of different AI projects together. Since the projects are not always compatible with each other, they will complain about the other projects being installed. This is normal and expected. And in the end, despite the warnings/errors the projects will work together.
 It's not clear if this situation will ever be resolvable, but that is the hope.
-
-## Configuration Guide
-
-You can configure the interface through the "Settings" tab or, for advanced users, via the config.json file in the root directory (not recommended). Below is a detailed explanation of each setting:
-
-
-### Model Configuration
-
-| Argument                | Default Value     | Description                                                                                     |
-|-------------------------|-------------------|-------------------------------------------------------------------------------------------------|
-| `text_use_gpu`          | `true`            | Determines whether the GPU should be used for text processing.                                  |
-| `text_use_small`        | `true`            | Determines whether a "small" or reduced version of the text model should be used.               |
-| `coarse_use_gpu`        | `true`            | Determines whether the GPU should be used for "coarse" processing.                              |
-| `coarse_use_small`      | `true`            | Determines whether a "small" or reduced version of the "coarse" model should be used.           |
-| `fine_use_gpu`          | `true`            | Determines whether the GPU should be used for "fine" processing.                                |
-| `fine_use_small`        | `true`            | Determines whether a "small" or reduced version of the "fine" model should be used.             |
-| `codec_use_gpu`         | `true`            | Determines whether the GPU should be used for codec processing.                                 |
-| `load_models_on_startup`| `false`           | Determines whether the models should be loaded during application startup.                      |
-  
-  
-### Gradio Interface Options
-
-| Argument                | Default Value     | Description                                                                                     |
-|-------------------------|-------------------|-------------------------------------------------------------------------------------------------|
-| `inline`                | `false`           | Display inline in an iframe.                                                                    |
-| `inbrowser`             | `true`            | Automatically launch in a new tab.                                                              |
-| `share`                 | `false`           | Create a publicly shareable link.                                                               |
-| `debug`                 | `false`           | Block the main thread from running.                                                             |
-| `enable_queue`          | `true`            | Serve inference requests through a queue.                                                       |
-| `max_threads`           | `40`              | Maximum number of total threads.                                                                |
-| `auth`                  | `null`            | Username and password required to access interface, format: `username:password`.                |
-| `auth_message`          | `null`            | HTML message provided on login page.                                                            |
-| `prevent_thread_lock`   | `false`           | Block the main thread while the server is running.                                              |
-| `show_error`            | `false`           | Display errors in an alert modal.                                                               |
-| `server_name`           | `0.0.0.0`         | Make app accessible on local network.                                                           |
-| `server_port`           | `null`            | Start Gradio app on this port.                                                                  |
-| `show_tips`             | `false`           | Show tips about new Gradio features.                                                            |
-| `height`                | `500`             | Height in pixels of the iframe element.                                                         |
-| `width`                 | `100%`            | Width in pixels of the iframe element.                                                          |
-| `favicon_path`          | `null`            | Path to a file (.png, .gif, or .ico) to use as the favicon.                                     |
-| `ssl_keyfile`           | `null`            | Path to a file to use as the private key file for a local server running on HTTPS.              |
-| `ssl_certfile`          | `null`            | Path to a file to use as the signed certificate for HTTPS.                                      |
-| `ssl_keyfile_password`  | `null`            | Password to use with the SSL certificate for HTTPS.                                            |
-| `ssl_verify`            | `true`            | Skip certificate validation.                                                                    |
-| `quiet`                 | `true`            | Suppress most print statements.                                                                 |
-| `show_api`              | `true`            | Show the API docs in the footer of the app.                                                     |
-| `file_directories`      | `null`            | List of directories that Gradio is allowed to serve files from.                                 |
-| `_frontend`             | `true`            | Frontend.                                                                                       |
-
-
