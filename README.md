@@ -2,10 +2,14 @@
 
 <div align="center">
 
+  <h3 align="center">
+
   [Download Installer](https://github.com/rsxdalv/tts-generation-webui/archive/refs/heads/main.zip) ||
   [Installation](#installation) ||
   [Docker Setup](#docker-setup) ||
-  [Feedback / Bug reports</h3>](https://forms.gle/2L62owhBsGFzdFBC8)
+  [Feedback / Bug reports](https://forms.gle/2L62owhBsGFzdFBC8)
+  
+  </h3>
 
   [![banner](./screenshots/banner.png)](https://github.com/rsxdalv/tts-generation-webui)
 
