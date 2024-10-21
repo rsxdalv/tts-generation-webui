@@ -2,7 +2,7 @@
 
 <div align="center">
 
-  [<h3>Download Installer](https://github.com/rsxdalv/tts-generation-webui/archive/refs/heads/main.zip) ||
+  [Download Installer](https://github.com/rsxdalv/tts-generation-webui/archive/refs/heads/main.zip) ||
   [Installation](#installation) ||
   [Docker Setup](#docker-setup) ||
   [Feedback / Bug reports</h3>](https://forms.gle/2L62owhBsGFzdFBC8)
