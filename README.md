@@ -721,14 +721,9 @@ https://github.com/rsxdalv/tts-generation-webui/discussions/186#discussioncommen
 
 ## Examples
 
-[Sample](./samples/sample.webm)
 
-[audio__bark__continued_generation__2024-05-04_16-07-49_long.webm](https://user-images.githubusercontent.com/6757283/236218842-b9dc253e-05de-49e5-ada9-e714e1e2cbd4.webm)
-
-[audio__bark__continued_generation__2024-05-04_16-09-21_long.webm](https://user-images.githubusercontent.com/6757283/236219228-518d2b70-51a3-4175-af44-b24c01d14932.webm)
-
-[audio__bark__continued_generation__2024-05-04_16-10-55_long.webm](https://user-images.githubusercontent.com/6757283/236219243-dad96404-0879-4274-828e-7f3afc6bac65.webm)
-
+| <video src="https://github.com/user-attachments/assets/16ac948a-fe98-49ad-ad87-19c41fe7e65e" width="300"></video> | <video src="https://github.com/user-attachments/assets/55bde4f7-bbcc-4ecf-8f94-b315b9d22e74" width="300"></video> | <video src="https://github.com/user-attachments/assets/06df99c2-742a-4cb7-9e50-d860b31297ab" width="300"></video> |
+| :-----------------------------------------: | :-----------------------------------------: | :-------------------------------: |
 
 ## Open Source Libraries
 
