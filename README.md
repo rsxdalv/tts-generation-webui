@@ -7,6 +7,8 @@
   [Docker Setup](#docker-setup) ||
   [Feedback / Bug reports</h3>](https://forms.gle/2L62owhBsGFzdFBC8)
 
+  [![banner](./screenshots/banner.png)](https://github.com/rsxdalv/tts-generation-webui)
+
   [![GitHub stars](https://img.shields.io/github/stars/rsxdalv/tts-generation-webui?style=social)](https://github.com/rsxdalv/tts-generation-webui/stargazers)
   [![GitHub](https://img.shields.io/github/license/rsxdalv/tts-generation-webui)](https://github.com/rsxdalv/tts-generation-webui/blob/main/LICENSE)
   [![Discord](https://img.shields.io/discord/1258772280071295018?label=discord&logo=discord&logoColor=white)](https://discord.gg/V8BKTVRtJ9)
