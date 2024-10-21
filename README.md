@@ -50,6 +50,25 @@
 
 </div>
 
+<div align="center">
+
+## Examples
+
+</div>
+
+
+| <video src="https://github.com/user-attachments/assets/16ac948a-fe98-49ad-ad87-19c41fe7e65e" width="300"></video> | <video src="https://github.com/user-attachments/assets/55bde4f7-bbcc-4ecf-8f94-b315b9d22e74" width="300"></video> | <video src="https://github.com/user-attachments/assets/06df99c2-742a-4cb7-9e50-d860b31297ab" width="300"></video> |
+| :-----------------------------------------: | :-----------------------------------------: | :-------------------------------: |
+
+<div align="center">
+
+## Screenshots
+
+</div>
+
+|  ![react](./screenshots/v2/react.png)  | ![musicgen](./screenshots/v2/musicgen.png) | ![rvc](./screenshots/v2/rvc.png) |
+| :-----------------------------------------: | :-----------------------------------------: | :-------------------------------: |
+
 ## Changelog
 
 Oct 19:
@@ -714,16 +733,6 @@ Please note that the docker-compose needs to be edited to use the image you just
 https://github.com/rsxdalv/tts-generation-webui/discussions/186#discussioncomment-7291274
 
 
-## Screenshots
-
-|  ![react](./screenshots/v2/react.png)  | ![musicgen](./screenshots/v2/musicgen.png) | ![rvc](./screenshots/v2/rvc.png) |
-| :-----------------------------------------: | :-----------------------------------------: | :-------------------------------: |
-
-## Examples
-
-
-| <video src="https://github.com/user-attachments/assets/16ac948a-fe98-49ad-ad87-19c41fe7e65e" width="300"></video> | <video src="https://github.com/user-attachments/assets/55bde4f7-bbcc-4ecf-8f94-b315b9d22e74" width="300"></video> | <video src="https://github.com/user-attachments/assets/06df99c2-742a-4cb7-9e50-d860b31297ab" width="300"></video> |
-| :-----------------------------------------: | :-----------------------------------------: | :-------------------------------: |
 
 ## Open Source Libraries
 
