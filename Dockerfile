@@ -57,4 +57,4 @@ RUN uv pip install --no-cache-dir --system torch==$TORCH_VERSION nvidia-ml-py
 RUN cd react-ui && npm install && npm run build
 
 # Run the server
-CMD python server.py --docker
+CMD python3 server.py --docker
