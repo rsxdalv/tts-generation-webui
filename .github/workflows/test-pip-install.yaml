@@ -11,7 +11,7 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        platform: [ubuntu-latest, macos-12, windows-latest]
+        platform: [ubuntu-latest, macos-14, windows-latest]
         python-version: ["3.10"]
 
     runs-on: ${{ matrix.platform }}
