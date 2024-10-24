@@ -16,7 +16,6 @@ default_config = {
         "inbrowser": True,
         "share": False,
         "debug": False,
-        "enable_queue": True,
         "max_threads": 40,
         "auth": None,
         "auth_message": None,
@@ -35,7 +34,6 @@ default_config = {
         "ssl_verify": True,
         "quiet": True,
         "show_api": True,
-        "file_directories": None,
         "_frontend": True,
     },
     "extensions": {

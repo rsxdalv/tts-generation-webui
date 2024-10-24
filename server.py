@@ -1,3 +1,4 @@
+# ruff: noqa: E402
 # %%
 print("Starting server...\n")
 import tts_webui.utils.setup_or_recover as setup_or_recover

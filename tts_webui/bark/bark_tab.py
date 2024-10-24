@@ -5,7 +5,7 @@ import numpy as np
 import gradio as gr
 
 from tts_webui.config.config import config
-from tts_webui.bark.clone.tab_voice_clone import tab_voice_clone
+# from tts_webui.bark.clone.tab_voice_clone import tab_voice_clone
 from tts_webui.history_tab.voices_tab import voices_tab
 from tts_webui.bark.settings_tab_bark import settings_tab_bark
 
