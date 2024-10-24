@@ -32,7 +32,7 @@ jobs:
           python -m pip install torch==2.3.1
           python -m pip install --upgrade pip==23.3.2
           python -m pip install wheel ninja
-          python -m pip install xformers==0.0.27
+          MACOSX_DEPLOYMENT_TARGET=10.9 CC=clang CXX=clang++ python -m pip install xformers==0.0.27
           python -m pip install -r requirements.txt
           python -m pip install -r requirements_bark_hubert_quantizer.txt
           python -m pip install -r requirements_rvc.txt
