@@ -57,6 +57,11 @@ const pytorchCPUInstall$ = [
   cpuChannels,
 ].join(" ");
 
+const baseOnlyInstall$ = [
+  "conda install -y -k",
+  ...commonPackages,
+].join(" ");
+
 const ensurePythonVersion = async () => {
   try {
     displayMessage("Checking python version...");
@@ -88,9 +93,14 @@ const installDependencies = async (gpuchoice) => {
         "ROCM is experimental and not well supported yet, installing..."
       );
       displayMessage("Linux only!");
+      await $(baseOnlyInstall$);
       await $(
-        `uv pip install torch==${torchVersion} torchvision==0.18.1 torchaudio==${torchVersion} --index-url https://download.pytorch.org/whl/rocm6.0`
+        `pip install torch==${torchVersion} torchvision torchaudio --index-url https://download.pytorch.org/whl/rocm6.0`
       );
+    } else if (gpuchoice === "pip torch cpu (experimental, faster install)") {
+      await $(baseOnlyInstall$);
+      await $(`pip install torch==${torchVersion} torchvision torchaudio`);
+      // uv pip install torch==2.5.0+cu118 torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
     } else {
       displayMessage("Unsupported or cancelled. Exiting...");
       removeGPUChoice();
@@ -116,6 +126,7 @@ const askForGPUChoice = () =>
       "AMD GPU (ROCM, Linux only, potentially broken)",
       "Intel GPU (unsupported)",
       "Integrated GPU (unsupported)",
+      "pip torch cpu (experimental, faster install)",
     ],
     `
 These are not yet automatically supported: AMD GPU, Intel GPU, Integrated GPU.
