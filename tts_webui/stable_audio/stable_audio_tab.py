@@ -253,35 +253,39 @@ def stable_audio_ui():
             open_dir_btn = gr.Button("Open outputs folder")
             open_dir_btn.click(lambda: open_folder(OUTPUT_DIR))
         with gr.Tab("Model Download"):
-            gr.Markdown(
-                "Models can be found on the [HuggingFace model hub](https://huggingface.co/models?search=stable-audio-open-1.0)."
-            )
-            pretrained_name_text = gr.Textbox(
-                label="HuggingFace repo name, e.g. stabilityai/stable-audio-open-1.0",
-                value="",
-            )
-            token_text = gr.Textbox(
-                label="HuggingFace Token (Optional, but needed for some non-public models)",
-                placeholder="hf_nFjKuKLJF...",
-                value="",
-            )
-            download_btn = gr.Button("Download")
-            download_btn.click(
-                download_pretrained_model,
-                inputs=[pretrained_name_text, token_text],
-                outputs=[pretrained_name_text],
-                api_name="model_download",
-            )
+            model_download_ui()
 
-            gr.Markdown(
-                "Models can also be downloaded manually and placed within the directory in a folder, for example `data/models/stable-audio/my_model`"
-            )
 
-            open_dir_btn = gr.Button("Open local models dir")
-            open_dir_btn.click(
-                lambda: open_folder(LOCAL_DIR_BASE_ABSOLUTE),
-                api_name="model_open_dir",
-            )
+def model_download_ui():
+    gr.Markdown(
+        "Models can be found on the [HuggingFace model hub](https://huggingface.co/models?search=stable-audio-open-1.0)."
+    )
+    pretrained_name_text = gr.Textbox(
+        label="HuggingFace repo name, e.g. stabilityai/stable-audio-open-1.0",
+        value="",
+    )
+    token_text = gr.Textbox(
+        label="HuggingFace Token (Optional, but needed for some non-public models)",
+        placeholder="hf_nFjKuKLJF...",
+        value="",
+    )
+    download_btn = gr.Button("Download")
+    download_btn.click(
+        download_pretrained_model,
+        inputs=[pretrained_name_text, token_text],
+        outputs=[pretrained_name_text],
+        api_name="model_download",
+    )
+
+    gr.Markdown(
+        "Models can also be downloaded manually and placed within the directory in a folder, for example `data/models/stable-audio/my_model`"
+    )
+
+    open_dir_btn = gr.Button("Open local models dir")
+    open_dir_btn.click(
+        lambda: open_folder(LOCAL_DIR_BASE_ABSOLUTE),
+        api_name="model_open_dir",
+    )
 
 
 def stable_audio_tab():

@@ -239,6 +239,21 @@
             "website": "https://github.com/camb-ai/mars5-tts",
             "extension_website": "https://github.com/rsxdalv/extension_mars5",
             "extension_platform_version": "0.0.1"
+        },
+        {
+            "package_name": "extensions.builtin.extension_model_downloader",
+            "name": "Model Downloader",
+            "version": "0.0.1",
+            "requirements": "git+https://github.com/rsxdalv/extension_model_downloader@main",
+            "description": "Model Downloader allows downloading models from the Huggingface model hub.",
+            "extension_type": "interface",
+            "extension_class": "tools",
+            "author": "rsxdalv",
+            "extension_author": "rsxdalv",
+            "license": "MIT",
+            "website": "https://github.com/rsxdalv/extension_model_downloader",
+            "extension_website": "https://github.com/rsxdalv/extension_model_downloader",
+            "extension_platform_version": "0.0.1"
         }
     ],
     "decorators": [

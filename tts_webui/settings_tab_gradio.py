@@ -163,6 +163,4 @@ def settings_tab_gradio(
             value="Apply settings and shutdown UI (Manual Restart Required)"
         )
 
-        reload_config_and_restart_ui_button.click(
-            fn=reload_config_and_restart_ui, js="window.location.reload();"
-        )
+        reload_config_and_restart_ui_button.click(fn=reload_config_and_restart_ui)
