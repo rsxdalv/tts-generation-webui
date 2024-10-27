@@ -33,7 +33,8 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          working-directory: react-ui
+          # working-directory: react-ui
+          cache-dependency-path: "react-ui"
           node-version: "22"
           cache: ${{ steps.detect-package-manager.outputs.manager }}
       - name: Restore cache
