@@ -1,0 +1,20 @@
+name: Test main installer
+
+on:
+  # push:
+  #   branches: ["main"]
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: "22"
+      - name: Run installer
+        run: node installer_scripts/init_app.js
