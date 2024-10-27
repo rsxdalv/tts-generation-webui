@@ -1,8 +1,8 @@
 name: Test main installer
 
 on:
-  push:
-    branches: ["workflows"]
+  # push:
+  #   branches: ["main"]
 
   workflow_dispatch:
 
