@@ -27,7 +27,7 @@ def decorator_average_execution_time(fn):
         result = fn(*args, **kwargs)
         end = time.time()
         times.append(end - start)
-        print("Average execution time: ", sum(times) / len(times))
+        print(f"Average execution time: {sum(times) / len(times):.3f}")
         return result
 
     return wrapper
