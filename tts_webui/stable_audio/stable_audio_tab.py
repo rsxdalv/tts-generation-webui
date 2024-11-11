@@ -257,9 +257,15 @@ def stable_audio_ui():
 
 
 def model_download_ui():
-    gr.Markdown(
-        "Models can be found on the [HuggingFace model hub](https://huggingface.co/models?search=stable-audio-open-1.0)."
-    )
+    gr.Markdown("""
+Models can be found on the [HuggingFace model hub](https://huggingface.co/models?search=stable-audio-open-1.0).
+
+Recommended models:
+
+voices: RoyalCities/Vocal_Textures_Main
+piano: RoyalCities/RC_Infinite_Pianos
+original: stabilityai/stable-audio-open-1.0
+        """)
     pretrained_name_text = gr.Textbox(
         label="HuggingFace repo name, e.g. stabilityai/stable-audio-open-1.0",
         value="",

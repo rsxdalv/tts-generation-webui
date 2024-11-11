@@ -74,6 +74,24 @@
 
 ## Changelog
 
+Nov 11:
+* Switch to a fixed fairseq version for windows reducing installation conflicts and speeding up updates.
+
+## October 2024
+
+Oct 28:
+* Added installer tests, model downloader, and pip CPU-only option for Torch.
+
+Oct 24:
+* Downgraded Gradio to 5.1.0 due to a bug.
+* Added test workflows and fixed minor bugs.
+
+Oct 22:
+* Fixed Dockerfile issues for smoother deployment.
+
+Oct 21:
+* Redesigned README: improved Whisper extension, added changelogs for August, September, and October, updated screenshots, and reorganized content.
+
 Oct 19:
 * Fixed extension logs and added new extensions.
 
