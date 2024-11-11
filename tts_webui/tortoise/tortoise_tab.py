@@ -36,6 +36,7 @@ def tortoise_ui():
                         value="Press refresh to load the list",
                         show_label=False,
                         container=False,
+                        allow_custom_value=True,
                     )
                     gr_open_button_simple(
                         TORTOISE_VOICE_DIR_ABS, api_name="tortoise_open_voices"
