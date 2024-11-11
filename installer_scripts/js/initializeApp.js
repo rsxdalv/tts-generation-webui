@@ -8,11 +8,9 @@ const { applyDatabaseConfig } = require("./applyDatabaseConfig.js");
 
 const DEBUG_DRY_RUN = false;
 
-const torchVersion = "2.3.1";
+const torchVersion = "2.3.1"; // 2.4.1+cu118
 const cudaVersion = "11.8";
 
-// xformers==0.0.19 # For torch==2.0.0 project plane
-// xformers==xformers-0.0.22.post7 # For torch==2.1.0 project plane
 const pythonVersion = `3.10.11`;
 const pythonPackage = `python=${pythonVersion}`;
 const ffmpegPackage = `conda-forge::ffmpeg=4.4.2[build=lgpl*]`;
