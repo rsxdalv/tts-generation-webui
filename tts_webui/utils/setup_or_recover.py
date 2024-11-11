@@ -53,7 +53,7 @@ def generate_env(
 
     env = "# This file gets updated automatically from the UI\n\n"
     env += "# If you wish to manually specify any ENV variables, please do so in the .env.user file\n"
-    env += "# The variables in in .env.user will take PRIORITY!\n\n"
+    env += "# The variables in .env.user will take PRIORITY!\n\n"
 
     env += env_entry(
         "SUNO_USE_SMALL_MODELS",
