@@ -43,7 +43,11 @@ def generate_cond_lazy(
     mask_marination=None,
     batch_size=1,
 ):
-    from stable_audio_tools.interface.gradio import generate_cond
+    from stable_audio_tools.interface.gradio import generate_cond, model
+
+    if model is None:
+        gr.Error("Model not loaded")
+        raise Exception("Model not loaded")
 
     return generate_cond(
         prompt=prompt,
@@ -204,18 +208,21 @@ def stable_audio_ui():
 
     def model_select_ui():
         with gr.Row():
-            model_select = gr.Dropdown(
-                choices=get_model_list(),  # type: ignore
-                label="Model",
-                value=pretrained_name,
-            )
+            with gr.Column():
+                with gr.Row():
+                    model_select = gr.Dropdown(
+                        choices=get_model_list(),  # type: ignore
+                        label="Model",
+                        value=pretrained_name,
+                    )
 
-            gr_open_button_simple(LOCAL_DIR_BASE, api_name="stable_audio_open_models")
-            gr_reload_button().click(
-                fn=lambda: gr.Dropdown(choices=get_model_list()),
-                outputs=[model_select],
-                api_name="stable_audio_refresh_models",
-            )
+                    gr_open_button_simple(LOCAL_DIR_BASE, api_name="stable_audio_open_models")
+                    gr_reload_button().click(
+                        fn=lambda: gr.Dropdown(choices=get_model_list()),
+                        outputs=[model_select],
+                        api_name="stable_audio_refresh_models",
+                    )
+            load_model_button = gr.Button(value="Load model")
 
             with gr.Column():
                 gr.Markdown(
@@ -232,7 +239,7 @@ def stable_audio_ui():
                     value=True,
                 )
 
-            model_select.change(
+            load_model_button.click(
                 fn=load_model_helper,
                 inputs=[model_select, half_checkbox],
                 outputs=[model_select],
