@@ -222,7 +222,7 @@ def stable_audio_ui():
                         outputs=[model_select],
                         api_name="stable_audio_refresh_models",
                     )
-            load_model_button = gr.Button(value="Load model")
+                load_model_button = gr.Button(value="Load model")
 
             with gr.Column():
                 gr.Markdown(

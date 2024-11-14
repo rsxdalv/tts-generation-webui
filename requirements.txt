@@ -11,3 +11,4 @@ beartype>=0.16.1 # workaround for a bug
 # no longer required directly # transformers==4.36.1 # cross-compatibility
 iso639-lang==2.2.3
 pillow==10.3.0 # for gradio, conda fix
+deepspeed @ https://github.com/rsxdalv/DeepSpeed/releases/download/v0.15.5-test/deepspeed-0.15.5+unknown-cp310-cp310-win_amd64.whl ; sys_platform == 'win32' # Apache 2.0

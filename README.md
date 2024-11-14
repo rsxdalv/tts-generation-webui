@@ -74,6 +74,10 @@
 
 ## Changelog
 
+Nov 14:
+* Add experimental Windows deepspeed wheel.
+* Add more languages to Bark voice clone.
+
 Nov 11:
 * Switch to a fixed fairseq version for windows reducing installation conflicts and speeding up updates.
 

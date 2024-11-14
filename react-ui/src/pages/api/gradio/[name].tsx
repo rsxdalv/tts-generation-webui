@@ -2,7 +2,12 @@ import { Client } from "@gradio/client";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getFile } from "../../../backend-utils/getFile";
 import { GradioFile } from "../../../types/GradioFile";
-import { PayloadMessage, PredictFunction } from "@gradio/client/dist/types";
+import {
+  GradioEvent,
+  PayloadMessage,
+  PredictFunction,
+  SubmitIterable,
+} from "@gradio/client/dist/types";
 
 type Data = { data: any };
 
@@ -53,11 +58,40 @@ const extractChoicesTuple = ({ choices }: GradioChoices) =>
 const getChoices = (result: { data: GradioChoices[] }) =>
   extractChoices(result?.data[0]);
 
+const proxyGradioFile = (data: any) =>
+  // typeof data === "object" && data.__type__ === "file"
+  //   // ? new GradioFile(data.url, data.name)
+  //   : data;
+  data
+
+const proxyGradioFiles = (data: any[]) =>
+  Array.isArray(data)
+    ? data.map(proxyGradioFile)
+    : // : typeof data === "object"
+      //   ? Object.fromEntries(
+      //       Object.entries(data).map(([key, value]) => [
+      //         key,
+      //         proxyGradioFiles(value),
+      //       ])
+      //     )
+      data;
+
 const gradioPredict = <T extends any[]>(...args: Parameters<PredictFunction>) =>
-  getClient().then((app) => app.predict(...args)) as Promise<{ data: T }>;
+  // getClient().then((app) => app.predict(...args)) as Promise<{ data: T }>;
+  getClient()
+    .then((app) => app.predict(...args) as Promise<{ data: T }>)
+    .then((result: { data: T }) => ({
+      ...result,
+      data: proxyGradioFiles(result?.data) as T,
+    }));
 
 const gradioSubmit = <T extends any[]>(...args: Parameters<PredictFunction>) =>
-  getClient().then((app) => app.submit(...args));
+  getClient().then(
+    (app) =>
+      app.submit(...args) as SubmitIterable<
+        ({ data: T } & PayloadMessage) | GradioEvent
+      >
+  );
 
 async function musicgen({ melody, model, ...params }) {
   const melodyBlob = await getFile(melody);
@@ -155,11 +189,6 @@ async function bark({
   };
 }
 
-const reload_old_generation_dropdown = () =>
-  gradioPredict<[GradioChoices]>("/reload_old_generation_dropdown").then(
-    getChoices
-  );
-
 const bark_favorite = async ({ folder_root }) =>
   gradioPredict<[Object]>("/bark_favorite", [folder_root]).then(
     (result) => result?.data
@@ -237,15 +266,6 @@ async function tortoise({
   return results.slice(0, -1);
 }
 
-const tortoise_refresh_models = () =>
-  gradioPredict<[GradioChoices]>("/tortoise_refresh_models").then(getChoices);
-
-const tortoise_refresh_voices = () =>
-  gradioPredict<[GradioChoices]>("/tortoise_refresh_voices").then(getChoices);
-
-const tortoise_open_models = () => gradioPredict<[]>("/tortoise_open_models");
-const tortoise_open_voices = () => gradioPredict<[]>("/tortoise_open_voices");
-
 async function tortoise_apply_model_settings({
   model, // string (Option from: ['Default']) in 'parameter_2488' Dropdown component
   kv_cache, // boolean  in 'parameter_2493' Checkbox component
@@ -307,32 +327,6 @@ async function rvc({
 
 const delete_generation = ({ folder_root }) =>
   gradioPredict<[]>("/delete_generation", [folder_root]);
-
-const save_to_voices = ({ history_npz }) =>
-  gradioPredict<[Object]>("/save_to_voices", [history_npz]);
-
-const save_config_bark = ({
-  text_use_gpu,
-  text_use_small,
-  coarse_use_gpu,
-  coarse_use_small,
-  fine_use_gpu,
-  fine_use_small,
-  codec_use_gpu,
-  load_models_on_startup,
-}) =>
-  gradioPredict<[string]>("/save_config_bark", [
-    text_use_gpu, // boolean  in 'Use GPU' Checkbox component
-    text_use_small, // boolean  in 'Use small model' Checkbox component
-    coarse_use_gpu, // boolean  in 'Use GPU' Checkbox component
-    coarse_use_small, // boolean  in 'Use small model' Checkbox component
-    fine_use_gpu, // boolean  in 'Use GPU' Checkbox component
-    fine_use_small, // boolean  in 'Use small model' Checkbox component
-    codec_use_gpu, // boolean  in 'Use GPU for codec' Checkbox component
-    load_models_on_startup, // boolean  in 'Load Bark models on startup' Checkbox component
-  ]).then((result) => result?.data[0]);
-
-// get_config_bark
 
 async function get_config_bark() {
   const result = await gradioPredict<

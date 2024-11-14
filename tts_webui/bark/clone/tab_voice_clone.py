@@ -184,6 +184,8 @@ def tab_voice_clone():
                     "es_tokenizer.pth @ Lancer1408/bark-es-tokenizer",
                     "portuguese-HuBERT-quantizer_24_epoch.pth @ MadVoyager/bark-voice-cloning-portuguese-HuBERT-quantizer",
                     "turkish_model_epoch_14.pth @ egeadam/bark-voice-cloning-turkish-HuBERT-quantizer",
+                    "japanese-HuBERT-quantizer_24_epoch.pth @ junwchina/bark-voice-cloning-japanese-HuBERT-quantizer",
+                    "it_tokenizer.pth @ gpwr/bark-it-tokenizer",
                 ],
                 value="quantifier_hubert_base_ls960_14.pth @ GitMylo/bark-voice-cloning",
                 allow_custom_value=True,
