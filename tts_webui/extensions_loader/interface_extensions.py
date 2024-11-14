@@ -46,8 +46,8 @@ def _handle_package(package_name, title_name, requirements):
                         update_button()
                     else:
                         _extension_management_ui(package_name, title_name, requirements)
-                with gr.Tabs():
-                    main_tab()
+                # with gr.Tabs():
+                main_tab()
         except Exception as e:
             generic_error_tab_advanced(
                 e, name=title_name + " Extension", requirements=requirements
