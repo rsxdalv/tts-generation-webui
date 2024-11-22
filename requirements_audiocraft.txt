@@ -1,1 +1,2 @@
-audiocraft @ git+https://git@github.com/rsxdalv/audiocraft@main#egg=audiocraft # MIT License
+audiocraft @ https://github.com/rsxdalv/audiocraft/releases/download/v1.4.0a1/audiocraft-1.4.0a1-py3-none-any.whl # MIT License
+spacy==3.7.6

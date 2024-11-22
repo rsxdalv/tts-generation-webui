@@ -1,1 +1,1 @@
-maha-tts @ git+https://github.com/dubverse-ai/MahaTTS.git@9d45f75e74de8f6b5e6458be52cfc3a21cfd4435 # Apache 2.0
+maha-tts @ https://github.com/rsxdalv/MahaTTS/releases/download/v1.0.0/maha_tts-1.0.0-py3-none-any.whl # Apache 2.0

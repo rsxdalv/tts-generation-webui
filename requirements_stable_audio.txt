@@ -1,4 +1,4 @@
-stable-audio-tools @ git+https://github.com/rsxdalv/stable-audio-tools@release#egg=stable-audio-tools # MIT License
-descript-audiotools @ git+https://github.com/rsxdalv/audiotools@release#egg=descript-audiotools # MIT License
+stable-audio-tools @ https://github.com/rsxdalv/stable-audio-tools/releases/download/v0.0.17/stable_audio_tools-0.0.17-py3-none-any.whl # MIT License
+descript-audiotools @ https://github.com/rsxdalv/audiotools/releases/download/v0.7.4/descript_audiotools-0.7.4-py2.py3-none-any.whl # MIT License
 protobuf==4.25.3 # needs to be pinned on audiotools too
 setuptools<=69.5.0 # prevent a bug with 70.0.0

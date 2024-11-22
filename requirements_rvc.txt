@@ -1,1 +1,1 @@
-rvc @ git+https://github.com/rsxdalv/Retrieval-based-Voice-Conversion#egg=rvc # MIT License
+rvc @ https://github.com/rsxdalv/Retrieval-based-Voice-Conversion/releases/download/v0.3.6/rvc-0.3.6-py3-none-any.whl # MIT License

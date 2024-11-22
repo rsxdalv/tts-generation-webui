@@ -42,7 +42,6 @@ RUN pip3 install --no-cache-dir torch==$TORCH_VERSION -r requirements.txt
 # RUN uv pip install --no-cache-dir --system --verbose torch==$TORCH_VERSION -r requirements.txt
 RUN uv pip install --no-cache-dir --system torch==$TORCH_VERSION -r requirements_bark_hubert_quantizer.txt
 RUN uv pip install --no-cache-dir --system torch==$TORCH_VERSION -r requirements_rvc.txt
-RUN uv pip install --no-cache-dir --system torch==$TORCH_VERSION -r requirements_audiocraft_0.txt
 RUN uv pip install --no-cache-dir --system torch==$TORCH_VERSION -r requirements_audiocraft.txt
 RUN uv pip install --no-cache-dir --system torch==$TORCH_VERSION -r requirements_styletts2.txt
 RUN uv pip install --no-cache-dir --system torch==$TORCH_VERSION -r requirements_vall_e.txt

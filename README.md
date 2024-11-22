@@ -1,4 +1,4 @@
-<h1 align="center">TTS Generation WebUI</h1>
+<h1 align="center">TTS Generation WebUI / Harmonica</h1>
 
 <div align="center">
 
@@ -73,6 +73,11 @@
 | :-----------------------------------------: | :-----------------------------------------: | :-------------------------------: |
 
 ## Changelog
+Nov 22:
+* Switch to wheels, add one-shot install prompt.
+
+Nov 15:
+* upgrade to gradio 5.5.0, add Resemble Enhance (#420)
 
 Nov 14:
 * Add experimental Windows deepspeed wheel.
@@ -689,7 +694,6 @@ Not exactly, the dependencies clash, especially between conda and python (and de
   * Install the requirements:
     * install all the requirements*.txt (this list might not be up to date, check https://github.com/rsxdalv/tts-generation-webui/blob/main/Dockerfile#L39-L40):
       * `(venv) pip install -r requirements.txt`
-      * `(venv) pip install -r requirements_audiocraft_0.txt`
       * `(venv) pip install -r requirements_audiocraft.txt`
       * `(venv) pip install -r requirements_bark_hubert_quantizer.txt`
       * `(venv) pip install -r requirements_rvc.txt`

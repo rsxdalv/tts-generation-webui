@@ -55,10 +55,7 @@ const pytorchCPUInstall$ = [
   cpuChannels,
 ].join(" ");
 
-const baseOnlyInstall$ = [
-  "conda install -y -k",
-  ...commonPackages,
-].join(" ");
+const baseOnlyInstall$ = ["conda install -y -k", ...commonPackages].join(" ");
 
 const ensurePythonVersion = async () => {
   try {
@@ -190,26 +187,58 @@ async function pip_install_all(first_install = false) {
       "Dependencies are already up to date, skipping pip installs..."
     );
 
+  const pip_install_all_choice = await menu(
+    ["Yes", "No"],
+    `Attempt single pip install of all dependencies (potentially faster)?
+    (use arrow keys to move, enter to select)`
+  );
+
+  if (pip_install_all_choice === "Yes") {
+    try {
+      displayMessage("Attempting single pip install of all dependencies...");
+      pip_install(
+        "-r requirements.txt -r requirements_bark_hubert_quantizer.txt -r requirements_rvc.txt -r requirements_audiocraft.txt -r requirements_styletts2.txt -r requirements_vall_e.txt -r requirements_maha_tts.txt -r requirements_stable_audio.txt hydra-core==1.3.2 nvidia-ml-py",
+        "All dependencies",
+        first_install
+      );
+      savePipPackagesVersion(newPipPackagesVersion);
+      displayMessage("");
+      return;
+    } catch (error) {
+      displayMessage("Failed to install all dependencies, falling back to individual installs...");
+    }
+  }
+
+
   displayMessage("Updating dependencies...");
   // pip_install_all(false); // potential speed optimization
-  pip_install("-r requirements.txt", "Core Packages, Bark, Tortoise", first_install);
+  pip_install(
+    "-r requirements.txt",
+    "Core Packages, Bark, Tortoise",
+    first_install
+  );
   pip_install(
     "xformers==0.0.27+cu118 --index-url https://download.pytorch.org/whl/cu118",
     "xformers"
   );
-  pip_install("-r requirements_bark_hubert_quantizer.txt", "Bark Voice Clone", first_install);
+  pip_install(
+    "-r requirements_bark_hubert_quantizer.txt",
+    "Bark Voice Clone",
+    first_install
+  );
   pip_install("-r requirements_rvc.txt", "RVC", first_install);
-  pip_install("-r requirements_audiocraft_0.txt", "Audiocraft (workaround)", first_install);
   pip_install("-r requirements_audiocraft.txt", "Audiocraft", first_install);
   pip_install("-r requirements_styletts2.txt", "StyleTTS", first_install);
   pip_install("-r requirements_vall_e.txt", "Vall-E-X", first_install);
   pip_install("-r requirements_maha_tts.txt", "Maha TTS", first_install);
   pip_install("-r requirements_stable_audio.txt", "Stable Audio", true);
   // reinstall hydra-core==1.3.2 because of fairseq
-  pip_install("hydra-core==1.3.2", "hydra-core fix due to fairseq");
-  pip_install("nvidia-ml-py", "nvidia-ml-py");
-  // huggingface_hub==0.25.2 for gradio
-  pip_install("huggingface_hub==0.25.2", "huggingface_hub fix");
+  pip_install(
+    "hydra-core==1.3.2",
+    "hydra-core fix due to fairseq",
+    first_install
+  );
+  pip_install("nvidia-ml-py", "nvidia-ml-py", first_install);
   savePipPackagesVersion(newPipPackagesVersion);
   displayMessage("");
 }
