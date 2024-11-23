@@ -73,6 +73,9 @@
 | :-----------------------------------------: | :-----------------------------------------: | :-------------------------------: |
 
 ## Changelog
+Nov 23:
+* Add linux fairseq wheel for better pip compatibility.
+
 Nov 22:
 * Switch to wheels, add one-shot install prompt.
 
