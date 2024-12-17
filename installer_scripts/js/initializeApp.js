@@ -39,7 +39,7 @@ const commonPackages = [
   ffmpegPackage,
 ];
 
-const cudaPackages = `pytorch[version=${torchVersion},build=py3.10_cuda${cudaVersion}*] pytorch-cuda=${cudaVersion} torchvision torchaudio cuda-toolkit ninja`;
+const cudaPackages = `pytorch[version=${torchVersion},build=py3.10_cuda${cudaVersion}.*] pytorch-cuda=${cudaVersion} torchvision torchaudio cuda-toolkit ninja`;
 const cudaPytorchInstall$ = [
   "conda install -y -k",
   ...commonPackages,
