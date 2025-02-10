@@ -677,6 +677,7 @@ Not exactly, the dependencies clash, especially between conda and python (and de
 * Download the [latest version](https://github.com/rsxdalv/tts-generation-webui/archive/refs/heads/main.zip) and extract it.
 * Run start_tts_webui.bat or start_tts_webui.sh to start the server. It will ask you to select the GPU/Chip you are using. Once everything has installed, it will start the Gradio server at http://localhost:7770 and the React UI at http://localhost:3000.
 * Output log will be available in the installer_scripts/output.log file.
+* Note: The start script sets up a conda environment and a python virtual environment. Thus you don't need to make a venv before that, and in fact, launching from another venv might break this script.
 
 ### Manual installation (not recommended)
 * These instructions might not reflect all of the latest fixes and adjustments, but could be useful as a reference for debugging or understanding what the installer does. Hopefully they can be a basis for supporting new platforms, such as AMD/Intel.
@@ -687,29 +688,29 @@ Not exactly, the dependencies clash, especially between conda and python (and de
 * Install git, node.js `conda install -y -c conda-forge git python=3.10.11 conda-forge::nodejs=22.9.0 conda pip==23.3.2 conda-forge::uv=0.4.17 conda-forge::vswhere`
 * a) Either Continue with the installer script
   * activate the environment: `conda activate venv` and
-  * `(venv) node installer_scripts\init_app.js`
-  * then run the server with `(venv) python server.py`
+  * (venv) `node installer_scripts\init_app.js`
+  * then run the server with (venv) `python server.py`
 * b) Or install the requirements manually
   * Set up pytorch with CUDA or CPU (https://pytorch.org/audio/stable/build.windows.html#install-pytorch):
-    * `(venv) conda install -y -k conda-forge::uv=0.4.17 conda-forge::vswhere  conda-forge::postgresql=16.4 conda-forge::nodejs=22.9.0 conda-forge::ffmpeg=4.4.2[build=lgpl*] pytorch=2.3.1 torchvision torchaudio cpuonly  -c pytorch` for CPU/Mac
-    * `(venv) conda install -y -k conda-forge::uv=0.4.17 conda-forge::vswhere  conda-forge::postgresql=16.4 conda-forge::nodejs=22.9.0 conda-forge::ffmpeg=4.4.2[build=lgpl*] pytorch[version=2.3.1,build=py3.10_cuda11.8*] pytorch-cuda=11.8 torchvision torchaudio cuda-toolkit ninja  -c pytorch -c nvidia/label/cuda-11.8.0 -c nvidia` for CUDA
+    * (venv) `conda install -y -k conda-forge::uv=0.4.17 conda-forge::vswhere  conda-forge::postgresql=16.4 conda-forge::nodejs=22.9.0 conda-forge::ffmpeg=4.4.2[build=lgpl*] pytorch=2.3.1 torchvision torchaudio cpuonly  -c pytorch` for CPU/Mac
+    * (venv) `conda install -y -k conda-forge::uv=0.4.17 conda-forge::vswhere  conda-forge::postgresql=16.4 conda-forge::nodejs=22.9.0 conda-forge::ffmpeg=4.4.2[build=lgpl*] pytorch[version=2.3.1,build=py3.10_cuda11.8.*] pytorch-cuda=11.8 torchvision torchaudio cuda-toolkit ninja  -c pytorch -c nvidia/label/cuda-11.8.0 -c nvidia` for CUDA
   * Clone the repo: `git clone https://github.com/rsxdalv/tts-generation-webui.git`
   * Install the requirements:
     * install all the requirements*.txt (this list might not be up to date, check https://github.com/rsxdalv/tts-generation-webui/blob/main/Dockerfile#L39-L40):
-      * `(venv) pip install -r requirements.txt`
-      * `(venv) pip install -r requirements_audiocraft.txt`
-      * `(venv) pip install -r requirements_bark_hubert_quantizer.txt`
-      * `(venv) pip install -r requirements_rvc.txt`
-      * `(venv) pip install hydra-core==1.3.2`
-      * `(venv) pip install -r requirements_styletts2.txt`
-      * `(venv) pip install -r requirements_vall_e.txt`
-      * `(venv) pip install -r requirements_maha_tts.txt`
-      * `(venv) pip install -r requirements_stable_audio.txt`
-      * `(venv) pip install soundfile==0.12.1`
-      * `(venv) pip install nvidia-ml-py`
-    * build the react app: `(venv) cd react-ui && npm install && npm run build`
-  * (optional) setup the database: `(venv) node installer_scripts/js/applyDatabaseConfig.js`
-  * run the server: `(venv) python server.py`
+      * (venv) `pip install -r requirements.txt`
+      * (venv) `pip install -r requirements_audiocraft.txt`
+      * (venv) `pip install -r requirements_bark_hubert_quantizer.txt`
+      * (venv) `pip install -r requirements_rvc.txt`
+      * (venv) `pip install hydra-core==1.3.2`
+      * (venv) `pip install -r requirements_styletts2.txt`
+      * (venv) `pip install -r requirements_vall_e.txt`
+      * (venv) `pip install -r requirements_maha_tts.txt`
+      * (venv) `pip install -r requirements_stable_audio.txt`
+      * (venv) `pip install soundfile==0.12.1`
+      * (venv) `pip install nvidia-ml-py`
+    * build the react app: (venv) `cd react-ui && npm install && npm run build`
+  * (optional) setup the database: (venv) `node installer_scripts/js/applyDatabaseConfig.js`
+  * run the server: (venv) `python server.py`
 
 
 #### React UI
