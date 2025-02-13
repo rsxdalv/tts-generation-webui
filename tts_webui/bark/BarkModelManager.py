@@ -1,3 +1,44 @@
+def bark_load_models_direct_api(
+    text_use_gpu,
+    text_use_small,
+    coarse_use_gpu,
+    coarse_use_small,
+    fine_use_gpu,
+    fine_use_small,
+    codec_use_gpu,
+    c,
+    force_reload=False,
+):
+    from bark.generation import load_model, load_codec_model
+
+    print("Loading Bark models...")
+    load_model("text_use_gpu", c["text_use_gpu"])
+    load_model("coarse_use_gpu", c["coarse_use_gpu"])
+    load_model("fine_use_gpu", c["fine_use_gpu"])
+    load_model("codec_use_gpu", c["codec_use_gpu"])
+    print("Loaded Bark models")
+
+    _ = load_model(
+        model_type="text",
+        use_gpu=text_use_gpu,
+        use_small=text_use_small,
+        force_reload=force_reload,
+    )
+    _ = load_model(
+        model_type="coarse",
+        use_gpu=coarse_use_gpu,
+        use_small=coarse_use_small,
+        force_reload=force_reload,
+    )
+    _ = load_model(
+        model_type="fine",
+        use_gpu=fine_use_gpu,
+        use_small=fine_use_small,
+        force_reload=force_reload,
+    )
+    _ = load_codec_model(use_gpu=codec_use_gpu, force_reload=force_reload)
+
+
 class BarkModelManager:
     def __init__(self):
         self.models_loaded = False

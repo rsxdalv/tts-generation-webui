@@ -28,13 +28,12 @@ from tts_webui.extensions_loader.decorator_extensions import (
 
 
 @manage_model_state("seamless")
-def get_model(model_name=""):
+def get_model(model_name="", device=torch.device("cpu")):
     from transformers import AutoProcessor, SeamlessM4Tv2Model
 
-    # todo - add device setting
     return SeamlessM4Tv2Model.from_pretrained(
-        model_name
-    ), AutoProcessor.from_pretrained(model_name)
+        model_name,
+    ).to(device), AutoProcessor.from_pretrained(model_name)
 
 
 @decorator_extension_outer
@@ -48,10 +47,12 @@ def get_model(model_name=""):
 @decorator_extension_inner
 @log_function_time
 def seamless_translate(text, src_lang_name, tgt_lang_name, **kwargs):
-    model, processor = get_model("facebook/seamless-m4t-v2-large")
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    model, processor = get_model("facebook/seamless-m4t-v2-large", device)
     src_lang = text_source_codes[text_source_languages.index(src_lang_name)]
     tgt_lang = speech_target_codes[speech_target_languages.index(tgt_lang_name)]
-    text_inputs = processor(text=text, src_lang=src_lang, return_tensors="pt")
+    text_inputs = processor(text=text, src_lang=src_lang, return_tensors="pt").to(device)
     audio_array_from_text = (
         model.generate(**text_inputs, tgt_lang=tgt_lang)[0].cpu().squeeze()
     )
@@ -71,7 +72,9 @@ def seamless_translate(text, src_lang_name, tgt_lang_name, **kwargs):
 @decorator_extension_inner
 @log_function_time
 def seamless_translate_audio(audio, tgt_lang_name):
-    model, processor = get_model("facebook/seamless-m4t-v2-large")
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    model, processor = get_model("facebook/seamless-m4t-v2-large", device)
     # audio, orig_freq = torchaudio.load(audio)
     orig_freq, audio = audio
     sample_rate = model.config.sampling_rate
@@ -79,7 +82,7 @@ def seamless_translate_audio(audio, tgt_lang_name):
         torch.from_numpy(audio).float(), orig_freq=orig_freq, new_freq=16_000
     )  # must be a 16 kHz waveform array
     tgt_lang = speech_target_codes[speech_target_languages.index(tgt_lang_name)]
-    audio_inputs = processor(audios=audio, return_tensors="pt")
+    audio_inputs = processor(audios=audio, return_tensors="pt").to(device)
     audio_array_from_audio = (
         model.generate(**audio_inputs, tgt_lang=tgt_lang)[0].cpu().squeeze()
     )

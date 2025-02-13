@@ -196,6 +196,11 @@ async function pip_install_all(first_install = false) {
   if (pip_install_all_choice === "Yes") {
     try {
       displayMessage("Attempting single pip install of all dependencies...");
+
+      pip_install(
+        "xformers==0.0.27+cu118 --index-url https://download.pytorch.org/whl/cu118",
+        "xformers"
+      );
       pip_install(
         "-r requirements.txt -r requirements_bark_hubert_quantizer.txt -r requirements_rvc.txt -r requirements_audiocraft.txt -r requirements_styletts2.txt -r requirements_vall_e.txt -r requirements_maha_tts.txt -r requirements_stable_audio.txt hydra-core==1.3.2 nvidia-ml-py",
         "All dependencies",
@@ -205,10 +210,11 @@ async function pip_install_all(first_install = false) {
       displayMessage("");
       return;
     } catch (error) {
-      displayMessage("Failed to install all dependencies, falling back to individual installs...");
+      displayMessage(
+        "Failed to install all dependencies, falling back to individual installs..."
+      );
     }
   }
-
 
   displayMessage("Updating dependencies...");
   // pip_install_all(false); // potential speed optimization

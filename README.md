@@ -73,6 +73,24 @@
 | :-----------------------------------------: | :-----------------------------------------: | :-------------------------------: |
 
 ## Changelog
+
+Feb 13:
+* Fix Stable Audio and Seamless M4T incompatibility
+* Make Seamless M4T automatically use CUDA if available, otherwise CPU
+
+Feb 10:
+* Improve installation instructions in README
+
+## January 2025
+
+
+## December 2024
+
+Dec 17:
+* Attempt fix of #429, #428, #427
+
+## November 2024
+
 Nov 23:
 * Add linux fairseq wheel for better pip compatibility.
 
@@ -90,6 +108,9 @@ Nov 11:
 * Switch to a fixed fairseq version for windows reducing installation conflicts and speeding up updates.
 
 ## October 2024
+
+<details>
+<summary>Click to expand</summary>
 
 Oct 28:
 * Added installer tests, model downloader, and pip CPU-only option for Torch.
@@ -125,6 +146,9 @@ Oct 3:
 * Fixed `.git_version` path and removed `iconv` to eliminate `node-gyp` requirement.
 * Improved installer error handling, added upgrade hash logging.
 * Upgraded Node.js to 22.9.0, added PostgreSQL support, grouped tabs in React UI.
+
+</details>
+
 
 ## September 2024
 
