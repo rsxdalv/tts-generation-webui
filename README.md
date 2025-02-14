@@ -74,6 +74,10 @@
 
 ## Changelog
 
+Feb 14:
+* Pin accelerate>=0.33.0 project wide
+* Add basic Seamless M4T quantization code
+
 Feb 13:
 * Fix Stable Audio and Seamless M4T incompatibility
 * Make Seamless M4T automatically use CUDA if available, otherwise CPU

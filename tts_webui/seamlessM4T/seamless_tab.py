@@ -28,11 +28,17 @@ from tts_webui.extensions_loader.decorator_extensions import (
 
 
 @manage_model_state("seamless")
-def get_model(model_name="", device=torch.device("cpu")):
+def get_model(model_name="", device=torch.device("cpu"), quantize=False):
     from transformers import AutoProcessor, SeamlessM4Tv2Model
 
+    if quantize:
+        from transformers import QuantoConfig
+
+        quantization_config = QuantoConfig(weights="int8")
+    else:
+        quantization_config = None
     return SeamlessM4Tv2Model.from_pretrained(
-        model_name,
+        model_name, device_map="cuda:0", quantization_config=quantization_config
     ).to(device), AutoProcessor.from_pretrained(model_name)
 
 
@@ -52,7 +58,9 @@ def seamless_translate(text, src_lang_name, tgt_lang_name, **kwargs):
     model, processor = get_model("facebook/seamless-m4t-v2-large", device)
     src_lang = text_source_codes[text_source_languages.index(src_lang_name)]
     tgt_lang = speech_target_codes[speech_target_languages.index(tgt_lang_name)]
-    text_inputs = processor(text=text, src_lang=src_lang, return_tensors="pt").to(device)
+    text_inputs = processor(text=text, src_lang=src_lang, return_tensors="pt").to(
+        device
+    )
     audio_array_from_text = (
         model.generate(**text_inputs, tgt_lang=tgt_lang)[0].cpu().squeeze()
     )
