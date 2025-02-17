@@ -74,6 +74,9 @@
 
 ## Changelog
 
+Feb 15:
+* Fix Stable Audio to match the new version
+
 Feb 14:
 * Pin accelerate>=0.33.0 project wide
 * Add basic Seamless M4T quantization code

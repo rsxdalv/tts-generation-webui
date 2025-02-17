@@ -17,6 +17,165 @@ LOCAL_DIR_BASE_ABSOLUTE = get_path_from_root(*LOCAL_DIR_BASE.split(os.path.sep))
 OUTPUT_DIR = os.path.join("outputs-rvc", "Stable Audio")
 
 
+def generate_cond(
+    prompt,
+    negative_prompt=None,
+    seconds_start=0,
+    seconds_total=30,
+    cfg_scale=6.0,
+    steps=250,
+    preview_every=None,
+    seed=-1,
+    sampler_type="dpmpp-3m-sde",
+    sigma_min=0.03,
+    sigma_max=1000,
+    cfg_rescale=0.0,
+    use_init=False,
+    init_audio=None,
+    init_noise_level=1.0,
+    mask_cropfrom=None,
+    mask_pastefrom=None,
+    mask_pasteto=None,
+    mask_maskstart=None,
+    mask_maskend=None,
+    mask_softnessL=None,
+    mask_softnessR=None,
+    mask_marination=None,
+    batch_size=1,
+):
+    import gc
+    import torchaudio
+    from einops import rearrange
+    from torchaudio import transforms as T
+    from aeiou.viz import audio_spectrogram_image
+
+    from stable_audio_tools.interface.gradio import model
+    from stable_audio_tools.inference.generation import generate_diffusion_cond
+
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
+    gc.collect()
+
+    print(f"Prompt: {prompt}")
+
+    global preview_images
+    preview_images = []
+    if preview_every == 0:
+        preview_every = None
+
+    # Return fake stereo audio
+    conditioning = [
+        {
+            "prompt": prompt,
+            "seconds_start": seconds_start,
+            "seconds_total": seconds_total,
+        }
+    ] * batch_size
+
+    if negative_prompt:
+        negative_conditioning = [
+            {
+                "prompt": negative_prompt,
+                "seconds_start": seconds_start,
+                "seconds_total": seconds_total,
+            }
+        ] * batch_size
+    else:
+        negative_conditioning = None
+
+    # Get the device from the model
+    device = next(model.parameters()).device
+
+    seed = int(seed)
+
+    if not use_init:
+        init_audio = None
+
+    input_sample_size = sample_size
+
+    if init_audio is not None:
+        in_sr, init_audio = init_audio
+        # Turn into torch tensor, converting from int16 to float32
+        init_audio = torch.from_numpy(init_audio).float().div(32767)
+
+        if init_audio.dim() == 1:
+            init_audio = init_audio.unsqueeze(0)  # [1, n]
+        elif init_audio.dim() == 2:
+            init_audio = init_audio.transpose(0, 1)  # [n, 2] -> [2, n]
+
+        if in_sr != sample_rate:
+            resample_tf = T.Resample(in_sr, sample_rate).to(init_audio.device)
+            init_audio = resample_tf(init_audio)
+
+        audio_length = init_audio.shape[-1]
+
+        if audio_length > sample_size:
+            input_sample_size = (
+                audio_length
+                + (model.min_input_length - (audio_length % model.min_input_length)) # type: ignore
+                % model.min_input_length # type: ignore
+            )
+
+        init_audio = (sample_rate, init_audio)
+
+    def progress_callback(callback_info):
+        global preview_images
+        denoised = callback_info["denoised"]
+        current_step = callback_info["i"]
+        sigma = callback_info["sigma"]
+
+        if (current_step - 1) % preview_every == 0:
+            if model.pretransform is not None:
+                denoised = model.pretransform.decode(denoised)
+            denoised = rearrange(denoised, "b d n -> d (b n)")
+            denoised = denoised.clamp(-1, 1).mul(32767).to(torch.int16).cpu()
+            audio_spectrogram = audio_spectrogram_image(
+                denoised, sample_rate=sample_rate
+            )
+            preview_images.append(
+                (audio_spectrogram, f"Step {current_step} sigma={sigma:.3f})")
+            )
+
+    # Do the audio generation
+    audio = generate_diffusion_cond(
+        model,
+        conditioning=conditioning, # type: ignore
+        negative_conditioning=negative_conditioning, # type: ignore
+        steps=steps,
+        cfg_scale=cfg_scale,  # type: ignore
+        batch_size=batch_size,
+        sample_size=input_sample_size, # type: ignore
+        sample_rate=sample_rate,
+        seed=seed,
+        device=device, # type: ignore
+        sampler_type=sampler_type,
+        sigma_min=sigma_min,
+        sigma_max=sigma_max,
+        init_audio=init_audio,
+        init_noise_level=init_noise_level,
+        # mask_args=mask_args,
+        callback=progress_callback if preview_every is not None else None,
+        scale_phi=cfg_rescale,
+    )
+
+    # Convert to WAV file
+    audio = rearrange(audio, "b d n -> d (b n)")
+    audio = (
+        audio.to(torch.float32)
+        .div(torch.max(torch.abs(audio)))
+        .clamp(-1, 1)
+        .mul(32767)
+        .to(torch.int16)
+        .cpu()
+    )
+    torchaudio.save("output.wav", audio, sample_rate)
+
+    # Let's look at a nice spectrogram too
+    audio_spectrogram = audio_spectrogram_image(audio, sample_rate=sample_rate)
+
+    return ("output.wav", [audio_spectrogram, *preview_images])
+
+
 def generate_cond_lazy(
     prompt,
     negative_prompt=None,
@@ -43,7 +202,7 @@ def generate_cond_lazy(
     mask_marination=None,
     batch_size=1,
 ):
-    from stable_audio_tools.interface.gradio import generate_cond, model
+    from stable_audio_tools.interface.gradio import model
 
     if model is None:
         gr.Error("Model not loaded")
@@ -216,7 +375,9 @@ def stable_audio_ui():
                         value=pretrained_name,
                     )
 
-                    gr_open_button_simple(LOCAL_DIR_BASE, api_name="stable_audio_open_models")
+                    gr_open_button_simple(
+                        LOCAL_DIR_BASE, api_name="stable_audio_open_models"
+                    )
                     gr_reload_button().click(
                         fn=lambda: gr.Dropdown(choices=get_model_list()),
                         outputs=[model_select],
@@ -255,7 +416,7 @@ def stable_audio_ui():
                 lambda: open_folder(OUTPUT_DIR),
                 api_name="stable_audio_open_output_dir",
             )
-        with gr.Tab("Inpainting"):
+        with gr.Tab("Inpainting", visible=False):
             create_sampling_ui(model_config, inpainting=True)
             open_dir_btn = gr.Button("Open outputs folder")
             open_dir_btn.click(lambda: open_folder(OUTPUT_DIR))
@@ -351,6 +512,95 @@ def save_result(audio, *generation_args):
             indent=2,
             default=lambda o: "<not serializable>",
         )
+
+
+def create_uncond_sampling_ui():
+    generate_button = gr.Button("Generate", variant="primary", scale=1)
+
+    with gr.Row(equal_height=False):
+        with gr.Column():
+            with gr.Row():
+                # Steps slider
+                steps_slider = gr.Slider(
+                    minimum=1, maximum=500, step=1, value=100, label="Steps"
+                )
+
+            with gr.Accordion("Sampler params", open=False):
+                # Seed
+                seed_textbox = gr.Textbox(
+                    label="Seed (set to -1 for random seed)", value="-1"
+                )
+
+                # Sampler params
+                with gr.Row():
+                    sampler_type_dropdown = gr.Dropdown(
+                        [
+                            "dpmpp-2m-sde",
+                            "dpmpp-3m-sde",
+                            "k-heun",
+                            "k-lms",
+                            "k-dpmpp-2s-ancestral",
+                            "k-dpm-2",
+                            "k-dpm-fast",
+                        ],
+                        label="Sampler type",
+                        value="dpmpp-3m-sde",
+                    )
+                    sigma_min_slider = gr.Slider(
+                        minimum=0.0,
+                        maximum=2.0,
+                        step=0.01,
+                        value=0.03,
+                        label="Sigma min",
+                    )
+                    sigma_max_slider = gr.Slider(
+                        minimum=0.0,
+                        maximum=1000.0,
+                        step=0.1,
+                        value=500,
+                        label="Sigma max",
+                    )
+
+            with gr.Accordion("Init audio", open=False):
+                init_audio_checkbox = gr.Checkbox(label="Use init audio")
+                init_audio_input = gr.Audio(label="Init audio")
+                init_noise_level_slider = gr.Slider(
+                    minimum=0.0,
+                    maximum=100.0,
+                    step=0.01,
+                    value=0.1,
+                    label="Init noise level",
+                )
+
+        with gr.Column():
+            audio_output = gr.Audio(label="Output audio", interactive=False)
+            audio_spectrogram_output = gr.Gallery(
+                label="Output spectrogram", show_label=False
+            )
+            send_to_init_button = gr.Button("Send to init audio", scale=1)
+            send_to_init_button.click(
+                fn=lambda audio: audio,
+                inputs=[audio_output],
+                outputs=[init_audio_input],
+            )
+
+    from stable_audio_tools.interface.gradio import generate_uncond
+
+    generate_button.click(
+        fn=generate_uncond,
+        inputs=[
+            steps_slider,
+            seed_textbox,
+            sampler_type_dropdown,
+            sigma_min_slider,
+            sigma_max_slider,
+            init_audio_checkbox,
+            init_audio_input,
+            init_noise_level_slider,
+        ],
+        outputs=[audio_output, audio_spectrogram_output],
+        api_name="generate",
+    )
 
 
 sample_rate = 32000
