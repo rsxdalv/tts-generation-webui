@@ -765,13 +765,14 @@ Not exactly, the dependencies clash, especially between conda and python (and de
 
 ### Docker Setup
 
-tts-generation-webui can also be ran inside of a Docker container. To get started, pull the image from GitHub Container Registry:
+tts-generation-webui can also be ran inside of a Docker container. Using CUDA inside of docker requires (NVIDIA Container Toolkit)[https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html]. To get started, pull the image from GitHub Container Registry:
 
 ```
 docker pull ghcr.io/rsxdalv/tts-generation-webui:main
 ```
 
 Once the image has been pulled it can be started with Docker Compose:
+The ports are 7770 (env:TTS_PORT) for the Gradio backend and 3000 (env:UI_PORT) for the React front end.
 
 ```
 docker compose up -d
