@@ -66,13 +66,16 @@
 
 </div>
 
-| ![react_1](./screenshots/react_ui%20(1).png) | ![react_2](./screenshots/react_ui%20(2).png) | ![react_3](./screenshots/react_ui%20(3).png) |
+| ![react_1](./documentation/screenshots/react_ui%20(1).png) | ![react_2](./documentation/screenshots/react_ui%20(2).png) | ![react_3](./documentation/screenshots/react_ui%20(3).png) |
 | :-----------------------------------------: | :-----------------------------------------: | :-------------------------------: |
 
-| ![gradio_1](./screenshots/gradio%20(1).png) | ![gradio_2](./screenshots/gradio%20(2).png) | ![gradio_3](./screenshots/gradio%20(3).png) |
+| ![gradio_1](./documentation/screenshots/gradio%20(1).png) | ![gradio_2](./documentation/screenshots/gradio%20(2).png) | ![gradio_3](./documentation/screenshots/gradio%20(3).png) |
 | :-----------------------------------------: | :-----------------------------------------: | :-------------------------------: |
 
 ## Changelog
+
+Mar 18:
+* Remove old rvc files
 
 Mar 17:
 * Upgrade Google Colab to PyTorch 2.6.0, add Conda to downgrade Python to 3.10
@@ -799,7 +802,7 @@ Please note that the docker-compose needs to be edited to use the image you just
 </div>
 
 ## Bark Readme
-[README_Bark.md](./README_Bark.md)
+[README_Bark.md](./documentation/README_Bark.md)
 
 ## Info about managing models, caches and system space for AI projects
 https://github.com/rsxdalv/tts-generation-webui/discussions/186#discussioncomment-7291274
