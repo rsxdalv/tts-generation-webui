@@ -3,9 +3,9 @@ services:
     image: "ghcr.io/rsxdalv/tts-generation-webui:main"
     restart: unless-stopped
     ports:
-      - "7770:7770"
+      - ${TTS_PORT:-7770}:7770
       # include React UI
-      - "3000:3000"
+      - ${UI_PORT:-3000}:3000
     container_name: tts-generation-webui
     deploy:
         resources:
