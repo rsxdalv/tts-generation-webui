@@ -74,6 +74,11 @@
 
 ## Changelog
 
+Mar 17:
+* Upgrade Google Colab to PyTorch 2.6.0, add Conda to downgrade Python to 3.10
+
+## February 2025
+
 Feb 15:
 * Fix Stable Audio to match the new version
 
