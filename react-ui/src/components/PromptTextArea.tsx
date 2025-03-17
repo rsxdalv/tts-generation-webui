@@ -1,30 +1,48 @@
 import React from "react";
 import { HandleChange } from "../types/HandleChange";
+import { Label } from "./ui/label";
+import { cn } from "../lib/utils";
+import { Textarea } from "./ui/textarea";
 
 export const PromptTextArea = <
-  T extends { [key: string]: number | string | boolean }
+  T extends { [key: string]: number | string | boolean },
 >({
   params,
   handleChange,
   label,
   name,
   className,
+  optimalLength,
+  softMaxLength,
+  hardMaxLength,
 }: {
   params: T;
   handleChange: HandleChange;
   label: string;
   name: keyof T;
   className?: string;
+  optimalLength?: number;
+  softMaxLength?: number;
+  hardMaxLength?: number;
 }) => (
-  <div className={`flex flex-col space-y-2 ${className}`}>
-    <label className="text-sm">{label}:</label>
-    <textarea
+  <div className={cn("flex flex-col gap-2", className)}>
+    <Label htmlFor={name as string}>
+      {label}:{" "}
+      {optimalLength && (
+        <span className="text-xs text-slate-500">
+          (Optimal length per generation/line: {optimalLength} characters)
+        </span>
+      )}
+    </Label>
+    <Textarea
+      id={name as string}
       name={name as string}
       value={params[name] as string}
       onChange={handleChange}
-      className="border border-gray-300 p-2 rounded resize-none"
+      className="cell"
       placeholder="Enter text here..."
       rows={3}
+      // maxLength={hardMaxLength || 100000}
     />
   </div>
 );

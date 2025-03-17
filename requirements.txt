@@ -1,13 +1,19 @@
-safetensors==0.3.1 # Until they fix it
-torch==2.0.0 # BSD 3-Clause - ensures torch is not reinstalled
+safetensors
 ffmpeg-python # Apache 2.0
-gradio==3.48.0
+gradio==5.5.0 # MIT License
 python-dotenv==1.0.0
 soundfile==0.12.1; sys_platform == 'win32' # torchaudio
 # sox # torchaudio for linux
-suno-bark @ git+https://github.com/rsxdalv/bark@0d91823ead3d87c317f12d01d325fca9408c669e#egg=suno-bark # MIT License
+suno-bark @ https://github.com/rsxdalv/bark/releases/download/v0.1.0/suno_bark-0.1.0-py3-none-any.whl # MIT License
 vocos==0.1.0 # MIT License
-tortoise-tts @ git+https://github.com/rsxdalv/tortoise-tts@e4711433b12bcd1086840649e1830ad5c3fa1a76#egg=tortoise-tts # Apache 2.0
-beartype>=0.16.1
-transformers==4.36.1 
+tortoise-tts @ https://github.com/rsxdalv/tortoise-tts/releases/download/v3.0.1/tortoise_tts-3.0.1-py3-none-any.whl # Apache 2.0
+beartype>=0.16.1 # workaround for a bug
+# no longer required directly # transformers==4.36.1 # cross-compatibility
 iso639-lang==2.2.3
+pillow==10.3.0 # for gradio, conda fix
+deepspeed @ https://github.com/rsxdalv/DeepSpeed/releases/download/v0.15.5-test/deepspeed-0.15.5+unknown-cp310-cp310-win_amd64.whl ; sys_platform == 'win32' # Apache 2.0
+fairseq @ https://github.com/rsxdalv/fairseq/releases/download/v0.12.3/fairseq-0.12.13-cp310-cp310-win_amd64.whl ; sys_platform == 'win32' # MIT License
+fairseq @ https://github.com/rsxdalv/fairseq/releases/download/v0.12.3/fairseq-0.12.13-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl ; sys_platform == 'linux' # MIT License
+fairseq @ https://github.com/rsxdalv/fairseq/releases/download/v0.12.3/fairseq-0.12.13-cp310-cp310-macosx_11_0_universal2.whl ; sys_platform == 'darwin' # MIT License
+accelerate>=0.33.0
+# optimum-quanto==0.2.6

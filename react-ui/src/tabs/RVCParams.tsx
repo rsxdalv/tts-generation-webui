@@ -1,7 +1,12 @@
+import { useHistory } from "../hooks/useHistory";
 import useLocalStorage, {
+  readLocalStorage,
   updateLocalStorageWithFunction,
 } from "../hooks/useLocalStorage";
 import router from "next/router";
+import { RVCResult } from "./RVCResult";
+import { applyRVC } from "../functions/applyRVC";
+import { parseFormChange } from "../data/parseFormChange";
 
 export type RVCParams = {
   pitch_up_key: string; // string  in 'Pitch Up key' Textbox component
@@ -42,8 +47,78 @@ export const sendToRVCGeneration = (audio?: string) => {
     (vocosParams: RVCParams = initialState) =>
       ({ ...vocosParams, audio } as RVCParams)
   );
-  router.push("/bark");
+  router.push("/audio-conversion/rvc");
 };
 
 export const useRVCGenerationParams = () =>
   useLocalStorage<RVCParams>(RVCId, initialState);
+
+export const getRVCGenerationParams = (): RVCParams =>
+  readLocalStorage(RVCId) ?? initialState;
+
+export const useRVCPage = () => {
+  const [rvcGenerationParams, setRvcGenerationParams] =
+    useRVCGenerationParams();
+
+  const [historyData, setHistoryData] = useHistory<RVCResult>("rvc");
+
+  const consumer = async (params: RVCParams) => {
+    const data = await applyRVC(params);
+    setHistoryData((x) => [data, ...x]);
+    return data;
+  };
+
+  const funcs = {
+    useParameters: (_url: string, data?: RVCResult) => {
+      const {
+        f0up_key: pitch_up_key,
+        index_path: index,
+        f0method: pitch_collection_method,
+        model_path: model,
+        index_rate: search_feature_ratio,
+        device,
+        is_half: use_half_precision_model,
+        filter_radius: filter_radius_pitch,
+        resample_sr: resample_sample_rate,
+        rms_mix_rate: voice_envelope_normalizaiton,
+        protect: protect_breath_sounds,
+      } = data?.metadata ?? {};
+
+      setRvcGenerationParams({
+        ...rvcGenerationParams,
+        pitch_up_key: pitch_up_key ?? rvcGenerationParams.pitch_up_key,
+        // original_audio,
+        index: index ? index.replace(".index", "") : rvcGenerationParams.index,
+        pitch_collection_method:
+          pitch_collection_method ??
+          rvcGenerationParams.pitch_collection_method,
+        model: model ? model.replace(".pth", "") : rvcGenerationParams.model,
+        search_feature_ratio:
+          search_feature_ratio ?? rvcGenerationParams.search_feature_ratio,
+        device: device ?? rvcGenerationParams.device,
+        use_half_precision_model:
+          use_half_precision_model ??
+          rvcGenerationParams.use_half_precision_model,
+        filter_radius_pitch:
+          filter_radius_pitch ?? rvcGenerationParams.filter_radius_pitch,
+        resample_sample_rate:
+          resample_sample_rate ?? rvcGenerationParams.resample_sample_rate,
+        voice_envelope_normalizaiton:
+          voice_envelope_normalizaiton ??
+          rvcGenerationParams.voice_envelope_normalizaiton,
+        protect_breath_sounds:
+          protect_breath_sounds ?? rvcGenerationParams.protect_breath_sounds,
+      });
+    },
+  };
+
+  return {
+    rvcGenerationParams,
+    setRvcGenerationParams,
+    historyData,
+    setHistoryData,
+    consumer,
+    handleChange: parseFormChange(setRvcGenerationParams),
+    funcs,
+  };
+};

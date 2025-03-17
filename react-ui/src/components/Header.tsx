@@ -1,15 +1,18 @@
 import React from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { ExternalLinkIcon } from "lucide-react";
+import { RouteCommands } from "./RouteCommands";
+import { cn } from "../lib/utils";
 
-type Route = {
+export type Route = {
   href: string;
   text: string | React.ReactNode;
   target?: string;
   subroutes?: Route[];
 };
 
-const routes: Route[] = [
+export const routes: Route[] = [
   {
     href: "/",
     text: "Home",
@@ -19,141 +22,245 @@ const routes: Route[] = [
     text: "Pipeline",
   },
   {
-    href: "/bark",
-    text: "Bark",
+    href: "/text-to-speech",
+    text: "Text-to-Speech",
     subroutes: [
       {
-        href: "/bark",
-        text: "Generation",
+        href: "/text-to-speech/bark",
+        text: "Bark",
+        subroutes: [
+          {
+            href: "/text-to-speech/bark",
+            text: "Generation",
+          },
+          {
+            href: "/text-to-speech/bark/bark_voice_generation",
+            text: "Voice Generation",
+          },
+          {
+            href: "/text-to-speech/bark/voices",
+            text: "Voices",
+          },
+          {
+            href: "/text-to-speech/bark/bark_settings",
+            text: "Settings",
+          },
+          {
+            href: "/text-to-speech/bark/vocos_npz",
+            text: "Vocos NPZ",
+          },
+          {
+            href: "https://promptecho.com/?utm_source=react_ui",
+            text: (
+              <span className="inline-flex items-center">
+                More Voices&nbsp;
+                <ExternalLinkIcon className="inline-block w-4 h-4" />
+              </span>
+            ),
+            target: "_blank",
+          },
+        ],
       },
       {
-        href: "/bark/bark_voice_generation",
-        text: "Voice Generation",
+        href: "/text-to-speech/tortoise",
+        text: "Tortoise",
       },
       {
-        href: "/bark/voices",
-        text: "Voices",
+        href: "/text-to-speech/maha-tts",
+        text: "Maha TTS",
       },
       {
-        href: "/bark/bark_settings",
-        text: "Settings",
+        href: "/text-to-speech/mms",
+        text: "MMS",
       },
       {
-        href: "/bark/vocos_wav",
-        text: "Vocos Wav",
-      },
-      {
-        href: "/bark/vocos_npz",
-        text: "Vocos NPZ",
-      },
-      {
-        href: "https://echo.ps.ai/?utm_source=react_ui",
-        text: <span>More Voices&nbsp;↗</span>,
-        target: "_blank",
+        href: "/text-to-speech/vallex",
+        text: "Vall-E-X",
       },
     ],
   },
   {
-    href: "/tortoise",
-    text: "Tortoise",
+    href: "/audio-music-generation",
+    text: "Audio/Music Generation",
+    subroutes: [
+      {
+        href: "/audio-music-generation/musicgen",
+        text: "MusicGen",
+      },
+      {
+        href: "/audio-music-generation/magnet",
+        text: "MAGNeT",
+      },
+      {
+        href: "/audio-music-generation/stable-audio",
+        text: "Stable Audio (Demo)",
+      },
+    ],
   },
   {
-    href: "/musicgen",
-    text: "MusicGen",
+    href: "/audio-conversion",
+    text: "Audio Conversion",
+    subroutes: [
+      {
+        href: "/audio-conversion/rvc",
+        text: "RVC",
+      },
+      {
+        href: "/audio-conversion/demucs",
+        text: "Demucs",
+      },
+      {
+        href: "/audio-conversion/vocos_wav",
+        text: "Vocos Wav",
+      },
+    ],
   },
   {
-    href: "/magnet",
-    text: "MAGNeT",
+    href: "/outputs",
+    text: "Outputs",
+    subroutes: [
+      {
+        href: "/outputs/outputs",
+        text: "History (Slow!)",
+      },
+      {
+        href: "/outputs/favorites",
+        text: "Favorites (Slow!)",
+      },
+      // {
+      //   href: "/outputs/generations",
+      //   text: "Generations View (Beta)",
+      // },
+      // {
+      //   href: "/outputs/voice-drafts",
+      //   text: "Voice Tree",
+      // },
+      {
+        href: "/outputs/ffmpeg-metadata-page",
+        text: "FFMPEG Metadata",
+      },
+      // {
+      //   href: "/outputs/collections",
+      //   text: "History Collections",
+      // },
+    ],
   },
   {
-    href: "/demucs",
-    text: "Demucs",
+    href: "/tools",
+    text: "Tools",
+    subroutes: [
+      {
+        href: "/tools/gpu_info",
+        text: "GPU Info",
+      },
+      {
+        href: "/extensions/huggingface_cache_manager",
+        text: "Huggingface Cache Manager",
+      },
+    ],
   },
-  {
-    href: "/rvc",
-    text: "RVC",
-  },
-  {
-    href: "/maha-tts",
-    text: "Maha TTS",
-  },
-  {
-    href: "/mms",
-    text: "MMS",
-  },
-  {
-    href: "/gpu_info",
-    text: "GPU Info",
-  },
-  {
-    href: "/history/outputs",
-    text: "History",
-  },
-  {
-    href: "/history/favorites",
-    text: "Favorites",
-  },
-  // {
-  //   href: "/history/collections",
-  //   text: "History Collections",
-  // },
-  // {
-  //   href: "/generations",
-  //   text: "Generations View (Beta)",
-  // },
-  // {
-  //   href: "/voice-drafts",
-  //   text: "Voice Tree",
-  // },
 ];
 
-const highlightOnRoute = (route: string, match: string) =>
-  route === match ? "font-bold" : "hover:text-gray-400";
+const RouteList = ({ children }: { children: React.ReactNode }) => (
+  <div className="flex gap-4 items-center justify-center w-full p-2 bg-white rounded shadow-sm">
+    {children}
+  </div>
+);
 
-export const Header = ({}) => {
+const RouteLinks = ({ routes }: { routes: Route[] }) => {
   const router = useRouter();
   const route = router.asPath.replace("/", "");
-
-  const currentRoute =
+  const currentTopRoute =
     routes.find((r) => r.href.slice(1) === route) ||
     routes.find(
       (r) => r.href.slice(1) === route.slice(0, route.lastIndexOf("/"))
+    ) ||
+    routes.find((r) => r.href.slice(1) === route.slice(0, route.indexOf("/")));
+  const currentInnerRoute =
+    currentTopRoute?.subroutes?.find((r) => r.href.slice(1) === route) ||
+    currentTopRoute?.subroutes?.find(
+      (r) => r.href.slice(1) === route.slice(0, route.lastIndexOf("/"))
     );
 
-  const subroutes = currentRoute?.subroutes;
-
-  const renderLink = (
-    { href, text, target }: Route,
-    i: number,
-    arr: Route[]
-  ) => (
-    <React.Fragment key={href}>
-      <Link
-        href={href}
-        className={
-          highlightOnRoute(route, href.slice(1)) +
-          " whitespace-pre"
-        }
-        target={target}
-      >
-        {text}
-      </Link>
-      {i < arr.length - 1 && " | "}
-    </React.Fragment>
+  const LinkHelper = ({
+    href,
+    text,
+    target,
+    highlighted = false,
+  }: {
+    href: string;
+    text: React.ReactNode;
+    target?: string;
+    highlighted?: boolean;
+  }) => (
+    <Link
+      href={href}
+      className={cn(highlighted ? "font-bold" : "hover:text-gray-400")}
+      target={target}
+    >
+      {text}
+    </Link>
   );
 
-  const RouteList = ({ children }: { children: React.ReactNode }) => (
-    <div className="flex flex-col items-center justify-center w-full p-2 bg-white rounded-lg shadow-lg">
-      <p className="text-base text-center text-gray-700">{children}</p>
-    </div>
-  );
+  const subroutes = currentTopRoute?.subroutes;
+  const innerSubroutes = currentInnerRoute?.subroutes;
 
+  // route === href.slice(1)
+
+  return (
+    <>
+      <RouteList>
+        {routes.map(({ href, text, target }, i) => (
+          <LinkHelper
+            key={i}
+            href={href}
+            text={text}
+            target={target}
+            highlighted={currentTopRoute?.href === href}
+          />
+        ))}
+      </RouteList>
+      {subroutes && (
+        <RouteList>
+          {subroutes.map(({ href, text, target }, i) => (
+            <LinkHelper
+              key={i}
+              href={href}
+              text={text}
+              target={target}
+              highlighted={currentInnerRoute?.href === href}
+            />
+          ))}
+        </RouteList>
+      )}
+      {innerSubroutes && (
+        <RouteList>
+          {innerSubroutes.map(({ href, text }, i) => (
+            <LinkHelper
+              key={i}
+              href={href}
+              text={text}
+              highlighted={href === router.asPath}
+            />
+          ))}
+        </RouteList>
+      )}
+    </>
+  );
+};
+
+export const Header = ({}) => {
   return (
     <>
       <div className="flex items-center w-full pb-1">
         <h1 className="text-3xl font-bold text-start w-full text-gray-900">
           TTS Generation Webui
         </h1>
+        <div className="mr-2 relative w-96 flex-shrink-0 h-12 z-10">
+          <div className="w-full">
+            <RouteCommands />
+          </div>
+        </div>
         <a
           href="https://github.com/rsxdalv/tts-generation-webui"
           target="_blank"
@@ -161,14 +268,16 @@ export const Header = ({}) => {
         >
           GitHub
         </a>
+        &nbsp; &nbsp;
+        <a
+          href="https://forms.gle/2L62owhBsGFzdFBC8"
+          target="_blank"
+          className="text-gray-500 hover:underline whitespace-pre"
+        >
+          Feedback / Bug reports
+        </a>
       </div>
-      <RouteList>{routes.map(renderLink)}</RouteList>
-      {subroutes && (
-        <RouteList>
-          {currentRoute?.text} {"> "}
-          {subroutes.map(renderLink)}
-        </RouteList>
-      )}
+      <RouteLinks routes={routes} />
     </>
   );
 };

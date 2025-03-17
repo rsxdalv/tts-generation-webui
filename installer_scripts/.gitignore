@@ -1,0 +1,17 @@
+# Ignore output log
+output.log
+
+# Bat exists test
+.tmp1
+.tmp2
+
+# Ignore GPU choice
+.gpu
+.major_version
+.python_version
+.pip_packages
+.db_version
+.git_version
+
+# Diagnostic
+diagnostic.txt

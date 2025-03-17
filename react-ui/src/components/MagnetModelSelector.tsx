@@ -1,16 +1,12 @@
 import React from "react";
 import { MagnetParams } from "../tabs/MagnetParams";
+import { HandleChange } from "../types/HandleChange";
+import { RadioWithLabel } from "./component/RadioWithLabel";
+import { ModelDropdown } from "./component/ModelDropdown";
+import { modelsFnFactory } from "./modelsFnFactory";
+import { AudioLinesIcon, MusicLargeIcon, MusicMediumIcon, MusicSmallIcon } from "./icons";
+import { ClockIcon } from "lucide-react";
 
-const modelMap = {
-  Small: { size: "small", 10: true, 30: true },
-  Medium: { size: "medium", 10: true, 30: true },
-  Audio: { size: "audio", 10: true, 30: false },
-};
-const canUseDuration = (type: string, isAudio: boolean, duration: string) => {
-  const subType = isAudio ? "Audio" : type;
-  const { [duration]: canUse } = modelMap[subType];
-  return canUse;
-};
 const modelToType = {
   "facebook/magnet-small-10secs": "Small",
   "facebook/magnet-medium-10secs": "Medium",
@@ -19,6 +15,7 @@ const modelToType = {
   "facebook/audio-magnet-small": "Small",
   "facebook/audio-magnet-medium": "Medium",
 };
+
 const computeModel = (type: string, isAudio: boolean, duration: number) => {
   const lowerType = type.toLowerCase();
   const durationSuffix = duration === 30 ? "-30secs" : "-10secs";
@@ -27,202 +24,173 @@ const computeModel = (type: string, isAudio: boolean, duration: number) => {
     ? `facebook/audio-magnet-${lowerType}`
     : `facebook/magnet-${lowerType}${durationSuffix}`;
 };
+
 const getType = (model: string) => {
   return modelToType[model] || "Small";
 };
+
 const decomputeModel = (
   model: string
-): { type: string; isAudio: boolean; duration: number; } => {
+): { type: string; isAudio: boolean; duration: number } => {
   const type = getType(model);
   const duration = model.includes("-30secs") ? 30 : 10;
   const isAudio = model.includes("audio");
   return { type, isAudio, duration };
 };
+
 export const MagnetModelSelector = ({
-  magnetParams, setMagnetParams,
+  magnetParams,
+  handleChange,
 }: {
   magnetParams: MagnetParams;
-  setMagnetParams: React.Dispatch<React.SetStateAction<MagnetParams>>;
+  handleChange: HandleChange;
 }) => {
   const {
-    type: modelType, isAudio, duration,
-  } = decomputeModel(magnetParams.model);
+    type: modelType,
+    isAudio,
+    duration,
+  } = decomputeModel(magnetParams.model_name);
+
+  const toModelChange = (newModel: string) =>
+    handleChange({ target: { name: "model_name", value: newModel } });
 
   return (
-    <div className="flex flex-col border border-gray-300 p-2 rounded text-md gap-2">
-      <div className="text-md">Model:</div>
-      <Model
-        params={magnetParams}
-        handleChange={(event) => setMagnetParams({
-          ...magnetParams,
-          model: event.target.value,
-        })} />
-      <div className="flex gap-2">
-        <label className="text-md">Size:</label>
-        <div className="flex gap-x-2">
-          {["Small", "Medium"].map((type) => (
-            <div key={type} className="flex items-center">
-              <input
-                type="radio"
-                name="size"
-                id={type}
-                value={type}
-                checked={modelType === type}
-                onChange={(event) => setMagnetParams({
-                  ...magnetParams,
-                  model: computeModel(event.target.value, isAudio, duration),
-                })}
-                className="border border-gray-300 p-2 rounded" />
-              <label className="ml-1 select-none" htmlFor={type}>
-                {type}
-              </label>
-            </div>
-          ))}
-        </div>
-      </div>
-      {/* <div className="flex gap-2 items-center">
-              <label className="text-md">Audio:</label>
-              <input
-                type="checkbox"
-                name="isAudio"
-                id="isAudio"
-                checked={isAudio}
-                onChange={(event) =>
-                  setMagnetParams({
-                    ...magnetParams,
-                    model: computeModel(modelType, event.target.checked, duration),
-                  })
-                }
-                className="border border-gray-300 p-2 rounded"
-              />
-            </div> */}
-      {/* Instead of a checkbox make it a radio between Audio and Music */}
-      <div className="flex gap-2">
-        <label className="text-md">Audio:</label>
-        <div className="flex gap-x-2">
-          {["Music", "Audio"].map((type) => (
-            <div key={type} className="flex items-center">
-              <input
-                type="radio"
-                name="audio"
-                id={type}
-                value={type}
-                checked={isAudio === (type === "Audio")}
-                onChange={(event) => setMagnetParams({
-                  ...magnetParams,
-                  model: computeModel(
-                    modelType,
-                    event.target.value === "Audio",
-                    duration
-                  ),
-                })}
-                className="border border-gray-300 p-2 rounded" />
-              <label className="ml-1 select-none" htmlFor={type}>
-                {type}
-              </label>
-            </div>
-          ))}
-        </div>
-      </div>
-      <div className="flex gap-2">
-        <label className="text-md">Duration:</label>
-        <div className="flex gap-x-2">
-          {["10", "30"].map((d) => (
-            <div key={d} className="flex items-center">
-              <input
-                type="radio"
-                name="duration"
-                id={d}
-                value={d}
-                checked={d === String(duration)}
-                onChange={(event) => setMagnetParams({
-                  ...magnetParams,
-                  model: computeModel(
-                    modelType,
-                    isAudio,
-                    Number(event.target.value)
-                  ),
-                })}
-                className="border border-gray-300 p-2 rounded"
-                disabled={!canUseDuration(modelType, isAudio, d)} />
-              <label className="ml-1 select-none" htmlFor={d}>
-                {d}s
-              </label>
-            </div>
-          ))}
-        </div>
-      </div>
+    <div className="flex flex-col cell text-md gap-2">
+      <Model params={magnetParams} handleChange={handleChange} />
+      <RadioWithLabel
+        inline
+        label="Size"
+        name="size"
+        value={modelType}
+        onChange={(event) =>
+          toModelChange(computeModel(event.target.value, isAudio, duration))
+        }
+        options={[
+          // { label: "Small", value: "Small" },
+          {
+            label: (
+              <div className="flex items-center gap-2">
+                <MusicSmallIcon className="w-5 h-5" />
+                <span>Small</span>
+              </div>
+            ),
+            value: "Small",
+          },
+          // { label: "Medium", value: "Medium" },
+          {
+            label: (
+              <div className="flex items-center gap-2">
+                <MusicMediumIcon className="w-5 h-5" />
+                <span>Medium</span>
+              </div>
+            ),
+            value: "Medium",
+          },
+        ]}
+      />
+      <RadioWithLabel
+        inline
+        label="Type"
+        name="audio"
+        value={isAudio ? "Audio" : "Music"}
+        onChange={(event) =>
+          toModelChange(
+            computeModel(modelType, event.target.value === "Audio", duration)
+          )
+        }
+        options={[
+          // { label: "Audio", value: "Audio" },
+          {
+            label: (
+              <div className="flex items-center gap-2">
+                <AudioLinesIcon className="w-5 h-5" />
+                <span>Audio</span>
+              </div>
+            ),
+            value: "Audio",
+          },
+          // { label: "Music", value: "Music" },
+          {
+            label: (
+              <div className="flex items-center gap-2">
+                <MusicLargeIcon className="w-5 h-5" />
+                <span>Music</span>
+              </div>
+            ),
+            value: "Music",
+          },
+        ]}
+      />
+      <RadioWithLabel
+        inline
+        label="Duration"
+        name="duration"
+        value={duration}
+        disabled={isAudio}
+        onChange={(event) =>
+          toModelChange(
+            computeModel(modelType, isAudio, Number(event.target.value))
+          )
+        }
+        options={[
+          // { label: "10s", value: 10 },
+          {
+            label: (
+              <div className="flex items-center gap-2">
+                <ClockIcon className="w-5 h-5" />
+                <span>10s</span>
+              </div>
+            ),
+            value: 10,
+          },
+          // { label: "30s", value: 30 },
+          {
+            label: (
+              <div className="flex items-center gap-2">
+                <ClockIcon className="w-5 h-5 rotate-90" />
+                <span>30s</span>
+              </div>
+            ),
+            value: 30,
+          },
+        ]}
+      />
     </div>
   );
 };
+
 const Model = ({
-  params, handleChange,
+  params,
+  handleChange,
 }: {
   params: MagnetParams;
-  handleChange: (
-    event: React.ChangeEvent<HTMLInputElement> |
-      React.ChangeEvent<HTMLTextAreaElement> |
-      React.ChangeEvent<HTMLSelectElement>
-  ) => void;
+  handleChange: HandleChange;
 }) => {
   const [options, setOptions] = React.useState<string[]>([]);
   const [loading, setLoading] = React.useState<boolean>(false);
 
-  const fetchOptions = async () => {
-    setLoading(true);
-    const response = await fetch("/api/gradio/magnet_get_models", {
-      method: "POST",
-    });
-
-    const result = await response.json();
-    setOptions(result);
-    setLoading(false);
-  };
-
-  const openModels = async () => {
-    await fetch("/api/gradio/magnet_open_model_dir", {
-      method: "POST",
-    });
-  };
+  const { fetchOptions, openModels, unloadModel } = modelsFnFactory(
+    setLoading,
+    setOptions,
+    "magnet"
+  );
 
   React.useEffect(() => {
     fetchOptions();
   }, []);
 
-  const selected = params?.model;
+  const selected = params?.model_name;
   return (
-    <div className="flex flex-col space-y-2">
-      <div className="flex gap-2">
-        <select
-          name="model"
-          id="model"
-          className="border border-gray-300 p-2 rounded text-black w-full"
-          value={selected}
-          onChange={handleChange}
-        >
-          {options
-            // concat to ensure selected is at the top and present
-            .filter((option) => option !== selected)
-            .concat(selected)
-            .map((bandwidth) => (
-              <option key={bandwidth} value={bandwidth}>
-                {bandwidth}
-              </option>
-            ))}
-        </select>
-        <button
-          className="border border-gray-300 p-2 rounded"
-          onClick={openModels}
-        >
-          Open
-        </button>
-        <button
-          className="border border-gray-300 p-2 rounded"
-          onClick={fetchOptions}
-        >
-          {loading ? "Refreshing..." : "Refresh"}
-        </button>
-      </div>
-    </div>
+    <ModelDropdown
+      name="model_name"
+      label="Model"
+      options={options.filter((option) => option !== selected).concat(selected)}
+      value={selected}
+      onChange={handleChange}
+      onRefresh={fetchOptions}
+      onOpen={openModels}
+      onUnload={unloadModel}
+      loading={loading}
+    />
   );
 };

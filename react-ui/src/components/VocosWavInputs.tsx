@@ -1,34 +1,26 @@
 import React from "react";
 import { VocosParams } from "../tabs/VocosParams";
+import { RadioWithLabel } from "./component/RadioWithLabel";
+import { HandleChange } from "../types/HandleChange";
 
 export const VocosWavInputs = ({
-  vocosParams, handleChange,
+  vocosParams,
+  handleChange,
 }: {
   vocosParams: VocosParams;
-  handleChange: (
-    event: React.ChangeEvent<HTMLInputElement> |
-      React.ChangeEvent<HTMLTextAreaElement> |
-      React.ChangeEvent<HTMLSelectElement>
-  ) => void;
+  handleChange: HandleChange;
 }) => (
-  <div className="space-y-2">
-    <label className="text-sm">Bandwidth in kbps:</label>
-    <div className="flex flex-row space-x-2">
-      {["1.5", "3.0", "6.0", "12.0"].map((bandwidth) => (
-        <div key={bandwidth} className="flex items-center">
-          <input
-            type="radio"
-            name="bandwidth"
-            id={bandwidth}
-            value={bandwidth}
-            checked={vocosParams.bandwidth === bandwidth}
-            onChange={handleChange}
-            className="border border-gray-300 p-2 rounded" />
-          <label className="ml-1" htmlFor={bandwidth}>
-            {bandwidth}
-          </label>
-        </div>
-      ))}
-    </div>
-  </div>
+  <RadioWithLabel
+    label="Bandwith in kbps"
+    name="bandwidth"
+    inline
+    value={vocosParams.bandwidth}
+    onChange={handleChange}
+    options={[
+      { label: "1.5", value: "1.5" },
+      { label: "3.0", value: "3.0" },
+      { label: "6.0", value: "6.0" },
+      { label: "12.0", value: "12.0" },
+    ]}
+  />
 );

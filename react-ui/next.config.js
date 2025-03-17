@@ -1,5 +1,7 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
+const { PHASE_EXPORT } = require("next/constants");
+
+// /** @type {import('next').NextConfig} */
+const nextConfig = (phase, { defaultConfig }) => ({
   // webpack(config) {
   //   // Grab the existing rule that handles SVG imports
   //   const fileLoaderRule = config.module.rules.find((rule) =>
@@ -27,7 +29,8 @@ const nextConfig = {
 
   //   return config
   // },
+  output: phase === PHASE_EXPORT ? "export" : undefined,
   reactStrictMode: true,
-}
+});
 
-module.exports = nextConfig
+module.exports = nextConfig;

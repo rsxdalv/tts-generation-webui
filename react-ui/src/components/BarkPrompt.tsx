@@ -14,7 +14,7 @@ export const BarkPrompt = ({
     params={barkGenerationParams}
     handleChange={handleChange}
     label="Prompt"
-    name="prompt"
+    name="text"
   />
 );
 

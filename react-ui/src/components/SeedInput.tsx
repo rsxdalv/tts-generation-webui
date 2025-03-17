@@ -1,40 +1,50 @@
 import React from "react";
 import { HandleChange } from "../types/HandleChange";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { cn } from "../lib/utils";
+import { Input } from "./ui/input";
 
-export const SeedInput = <T extends { seed: number | string | undefined }>({
+export const SeedInput = <
+  T extends {
+    use_random_seed?: boolean;
+    seed: number | string | undefined;
+  },
+>({
   params,
   handleChange,
-  setParams,
-  seed,
   className,
 }: {
   params: T;
   handleChange: HandleChange;
-  setParams: React.Dispatch<React.SetStateAction<T>>;
-  seed: number | string | undefined;
   className?: string;
 }) => (
-  <div className={`flex gap-x-2 items-center w-full ${className}`}>
-    <label className="text-base">Seed:</label>
-    <input
+  <div className={cn("flex gap-2 items-center w-full", className)}>
+    <Label htmlFor="seed">Seed:</Label>
+    <Input
       type="number"
       name="seed"
+      min={0}
+      // max={2 ** 32 - 1}
+      disabled={params.use_random_seed}
       value={params.seed}
       onChange={handleChange}
       maxLength={10}
-      className="border border-gray-300 p-2 rounded text-base w-36"
+      className="text-right w-36"
     />
-    <button
-      className="border border-gray-300 p-2 rounded text-base"
-      onClick={() => setParams({ ...params, seed: Number(seed) || -1 })}
-    >
-      Restore&nbsp;Last
-    </button>
-    <button
-      className="border border-gray-300 p-2 rounded text-base"
-      onClick={() => setParams({ ...params, seed: -1 })}
-    >
-      Randomize
-    </button>
+
+    <Switch
+      id="randomize"
+      checked={params.use_random_seed}
+      onCheckedChange={(value) =>
+        handleChange({
+          target: {
+            name: "use_random_seed",
+            value,
+          },
+        })
+      }
+    />
+    <Label htmlFor="randomize">Randomize</Label>
   </div>
 );

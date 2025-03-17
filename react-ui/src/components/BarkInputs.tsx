@@ -1,62 +1,42 @@
 import React from "react";
 import { BarkGenerationParams } from "../tabs/BarkGenerationParams";
-import { BarkResult } from "../tabs/BarkResult";
 import { BarkVoice } from "./BarkVoice";
 import { BurnInPrompt, BarkPrompt } from "./BarkPrompt";
-import { TextTemperature, WaveformTemperature } from "./BarkTemperatureSlider";
-import { OldGeneration, HistoryPromptSemantic } from "./BarkOldGeneration";
-import {
-  HistoryPromptVoiceSetting,
-  PromptType,
-  ForEachSubsequentGeneration,
-} from "./BarkRadios";
+import { NPZVoiceDropdown } from "./BarkOldGeneration";
+import { PromptType, ForEachSubsequentGeneration } from "./BarkRadios";
 import { SeedInput } from "./SeedInput";
 import { HandleChange } from "../types/HandleChange";
+import { ParameterSlider } from "./GenericSlider";
 
 export const BarkInputs = ({
   barkGenerationParams,
-  setBarkVoiceGenerationParams,
   handleChange,
-  data,
 }: {
   barkGenerationParams: BarkGenerationParams;
-  setBarkVoiceGenerationParams: React.Dispatch<
-    React.SetStateAction<BarkGenerationParams>
-  >;
   handleChange: HandleChange;
-  data: BarkResult | null;
 }) => (
-  <div className="flex flex-col space-y-2">
-    <div className="space-y-2">
-      <HistoryPromptVoiceSetting
-        barkGenerationParams={barkGenerationParams}
-        handleChange={handleChange}
-      />
-    </div>
-    <div className="flex flex-row space-x-2">
-      <div className="space-y-2 flex flex-col w-1/2">
-        {barkGenerationParams.history_setting === "or Use a voice:" && (
-          <BarkVoice
-            barkGenerationParams={barkGenerationParams}
-            handleChange={handleChange}
-          />
-        )}
-        {barkGenerationParams.history_setting ===
-          "or Use old generation as history:" && (
-          <div className="flex flex-col border border-gray-300 p-2 rounded space-y-2">
-            <OldGeneration
-              barkGenerationParams={barkGenerationParams}
-              handleChange={handleChange}
-            />
-            <HistoryPromptSemantic
-              barkGenerationParams={barkGenerationParams}
-              handleChange={handleChange}
-            />
-          </div>
-        )}
+  <div className="flex flex-col gap-y-2 p-2">
+    <div className="flex flex-row gap-x-2">
+      <div className="gap-y-2 flex flex-col">
+        <NPZVoiceDropdown
+          barkGenerationParams={barkGenerationParams}
+          handleChange={handleChange}
+          name="history_prompt_semantic"
+          label="History Prompt Semantic"
+        />
+        <NPZVoiceDropdown
+          barkGenerationParams={barkGenerationParams}
+          handleChange={handleChange}
+          name="history_prompt"
+          label="History Prompt"
+        />
+        <BarkVoice
+          barkGenerationParams={barkGenerationParams}
+          handleChange={handleChange}
+        />
       </div>
-      <div className="space-y-2 w-1/2">
-        <div className="flex flex-col space-y-2 border border-gray-300 p-2 rounded">
+      <div className="flex flex-col gap-y-2">
+        <div className="grid grid-cols-1 gap-4">
           <PromptType
             barkGenerationParams={barkGenerationParams}
             handleChange={handleChange}
@@ -65,21 +45,46 @@ export const BarkInputs = ({
             barkGenerationParams={barkGenerationParams}
             handleChange={handleChange}
           />
-          <TextTemperature
-            barkGenerationParams={barkGenerationParams}
-            handleChange={handleChange}
+        </div>
+        <div className="grid grid-cols-3 cell gap-2 items-end">
+          <ParameterSlider
+            label="Text temperature"
+            name="text_temp"
+            min="0.0"
+            max="1.2"
+            step="0.01"
+            params={barkGenerationParams}
+            onChange={handleChange}
+            decimals={2}
+            orientation="vertical"
+            className="h-40"
           />
-          <WaveformTemperature
-            barkGenerationParams={barkGenerationParams}
-            handleChange={handleChange}
+          <ParameterSlider
+            label="Waveform temperature"
+            name="waveform_temp"
+            min="0.0"
+            max="1.2"
+            step="0.01"
+            params={barkGenerationParams}
+            onChange={handleChange}
+            decimals={2}
+            orientation="vertical"
+            className="h-40"
+          />
+          <ParameterSlider
+            label="Max length (s)"
+            name="max_length"
+            min="0.1"
+            max="18"
+            step="0.1"
+            params={barkGenerationParams}
+            onChange={handleChange}
+            decimals={1}
+            orientation="vertical"
+            className="h-40"
           />
         </div>
-        <SeedInput
-          params={barkGenerationParams}
-          handleChange={handleChange}
-          setParams={setBarkVoiceGenerationParams}
-          seed={data?.json_text?.seed}
-        />
+        <SeedInput params={barkGenerationParams} handleChange={handleChange} />
       </div>
     </div>
     <BurnInPrompt

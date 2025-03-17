@@ -1,7 +1,7 @@
 import React from "react";
 import { BarkGenerationParams } from "../tabs/BarkGenerationParams";
 import { BarkResult } from "../tabs/BarkResult";
-import { barkFavorite } from "../functions/barkFavorite";
+import { favorite } from "../functions/favorite";
 
 export function getBarkFuncs(
   setBarkVoiceGenerationParams: React.Dispatch<
@@ -14,7 +14,7 @@ export function getBarkFuncs(
     if (!npz) return;
     setBarkVoiceGenerationParams({
       ...barkGenerationParams,
-      old_generation_dropdown: npz,
+      history_prompt: npz,
     });
   };
 
@@ -23,38 +23,39 @@ export function getBarkFuncs(
     if (!npz) return;
     setBarkVoiceGenerationParams({
       ...barkGenerationParams,
-      history_prompt_semantic_dropdown: npz,
+      history_prompt_semantic: npz,
     });
   };
 
   const useSeed = (_url: string, data?: BarkResult) => {
-    const seed_input = data?.json_text?.seed;
+    const seed_input = data?.metadata?.seed;
     if (!seed_input) return;
     setBarkVoiceGenerationParams({
       ...barkGenerationParams,
-      seed: seed_input,
+      seed: Number(seed_input),
     });
   };
 
   const useParametersTest = (_url: string, data?: BarkResult) => {
     const {
-      prompt, language, speaker_id, text_temp, waveform_temp, history_prompt, history_prompt_npz, semantic_prompt, coarse_prompt,
-    } = (data?.json_text)!;
+      prompt,
+      text_temp,
+      waveform_temp,
+      history_prompt_npz,
+      semantic_prompt,
+      coarse_prompt,
+    } = data?.metadata!;
     if (!prompt) return;
     setBarkVoiceGenerationParams({
       ...barkGenerationParams,
-      prompt,
-      languageRadio: language,
-      speakerIdRadio: speaker_id,
+      text: prompt,
       text_temp,
       waveform_temp,
-      history_setting: history_prompt,
-      old_generation_dropdown: history_prompt_npz,
-      history_prompt_semantic_dropdown: semantic_prompt,
+      history_prompt: history_prompt_npz,
+      history_prompt_semantic: semantic_prompt,
       burn_in_prompt: coarse_prompt,
       long_prompt_radio: "Short prompt (<15s)",
-      seed: data?.json_text?.seed ?? "-1",
-      useV2: data?.json_text?.history_prompt?.includes("v2") ?? true,
+      seed: Number(data?.metadata?.seed ?? "-1"),
     });
   };
 
@@ -62,7 +63,7 @@ export function getBarkFuncs(
     useAsHistory,
     useAsHistoryPromptSemantic,
     useSeed,
-    favorite: barkFavorite,
+    favorite: favorite,
     useParametersTest,
   };
 }

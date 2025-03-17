@@ -24,8 +24,13 @@ import { parseMetadataDate } from "./parseMetadataDate";
 import { Metadata, Row } from "./Metadata";
 import { sendToBarkAsVoice } from "../tabs/BarkGenerationParams";
 import { NPZ, NPZOptional } from "../types/NPZ";
-import { barkFavorite } from "../functions/barkFavorite";
+import { favorite } from "../functions/favorite";
 import { saveToVoices } from "../functions/saveToVoices";
+import { PlayCircleIcon, SendHorizontalIcon, SendIcon } from "lucide-react";
+import { Button } from "./ui/button";
+import { getWebuiURL, getWebuiURLWithHost } from "../data/getWebuiURL";
+import { encodecDecode } from "../functions/encodecDecode";
+import { toLocalCacheFile } from "../types/LocalCacheFile";
 
 const ActionButton = ({
   icon,
@@ -60,7 +65,7 @@ export const CardBig = ({
   };
   return (
     <div className="flex flex-col items-center justify-start w-full max-w-md py-4 px-6 bg-white rounded shadow-lg">
-      <div className="flex flex-col space-y-4 w-full h-full justify-between">
+      <div className="flex flex-col gap-y-4 w-full h-full justify-between">
         <div className="flex items-center w-full gap-x-2">
           <h1 className="text-2xl font-bold text-gray-900">{name}</h1>
           <div className="ml-auto" />
@@ -69,7 +74,7 @@ export const CardBig = ({
           <Gender gender={gender} />
           <Flag language={language} />
         </div>
-        <div className="flex w-full space-x-4">
+        <div className="flex w-full gap-x-4">
           <img
             className="w-24 h-24 rounded select-none"
             src={image}
@@ -114,7 +119,7 @@ export const CardGeneration = ({
   // const maxLength = 100000;
   return (
     <div className="flex flex-col items-center justify-start w-full max-w-md py-4 px-6 bg-white rounded shadow-lg">
-      <div className="flex flex-col space-y-4 w-full h-full justify-between">
+      <div className="flex flex-col gap-y-4 w-full h-full justify-between">
         <div className="flex w-full">
           <h1 className="text-2xl font-bold text-gray-900">
             <span
@@ -189,7 +194,7 @@ export const HistoryCard = ({
     history_hash,
     filename,
     date,
-    history_bundle_name_data,
+    folder_root,
     api_filename,
     ...rest
   },
@@ -208,39 +213,28 @@ export const HistoryCard = ({
   const deleteFavorite = async (
     _url: string,
     data?: {
-      history_bundle_name_data?: string;
+      folder_root?: string;
     }
   ) => {
-    const history_bundle_name_data = data?.history_bundle_name_data;
-    if (!history_bundle_name_data) return;
+    const folder_root = data?.folder_root;
+    if (!folder_root) return;
     const response = await fetch("/api/gradio/delete_generation", {
       method: "POST",
       body: JSON.stringify({
-        history_bundle_name_data,
+        folder_root,
       }),
     });
     return await response.json();
   };
 
-  const addFavorite = () =>
-    barkFavorite("", {
-      history_bundle_name_data,
-    });
-
-  const removeFavorite = () =>
-    deleteFavorite("", {
-      history_bundle_name_data,
-    });
-
+  const addFavorite = () => favorite("", { folder_root });
+  const removeFavorite = () => deleteFavorite("", { folder_root });
   const openFolder = () => {
     fetch("/api/gradio/open_folder", {
       method: "POST",
-      body: JSON.stringify({
-        folder: history_bundle_name_data,
-      }),
+      body: JSON.stringify({ folder_path: folder_root }),
     });
   };
-
   const useAsVoice = () => {
     const history_npz = api_filename?.replace(".ogg", ".npz");
     sendToBarkAsVoice(history_npz);
@@ -340,7 +334,7 @@ export const HistoryCard = ({
 
   return (
     <div className="flex flex-col items-center justify-start w-full max-w-md py-4 px-6 bg-white rounded shadow-lg">
-      <div className="flex flex-col space-y-4 w-full h-full">
+      <div className="flex flex-col gap-y-4 w-full h-full">
         <div className="flex w-full">
           <h1 className="text-2xl font-bold text-gray-900">
             <span
@@ -371,7 +365,7 @@ export const HistoryCard = ({
           _type={_type}
         />
         <div className="flex flex-col text-gray-500">
-          <p className="text-gray-500 text-sm">{history_bundle_name_data}</p>
+          <p className="text-gray-500 text-sm">{folder_root}</p>
           <Row label="Model" value={_type} />
         </div>
         <MetadataBlock
@@ -425,7 +419,10 @@ export const CardVoiceNpz = ({ generation }: { generation: NPZ }) => {
         <div className="flex w-full justify-between">
           <p className="text-gray-500">{prettifyDate(date!)}</p>
         </div>
-        <Metadata {...generation} />
+        <details>
+          <summary>Metadata</summary>
+          <Metadata {...generation} />
+        </details>
       </div>
     );
   };
@@ -441,9 +438,11 @@ export const CardVoiceNpz = ({ generation }: { generation: NPZ }) => {
     .replace(".npz", "")
     .replace("voices/", "")
     // reformat date YYYY-MM-DD to YYYY/MM/DD
-    .replace(/(\d{4})-(\d{2})-(\d{2})/, "$1/$2/$3")
+    // .replace(/(\d{4})-(\d{2})-(\d{2})/, "$1/$2/$3")
+    .replace(/(\d{4})-(\d{2})-(\d{2})/, "")
     // reformat time HH-MM-SS to HH:MM:SS
-    .replace(/(\d{2})-(\d{2})-(\d{2})/, "$1:$2:$3")
+    // .replace(/(\d{2})-(\d{2})-(\d{2})/, "$1:$2:$3")
+    .replace(/(\d{2})-(\d{2})-(\d{2})/, "")
     .replaceAll("_", " ")
     .replaceAll("-", " ");
   return (
@@ -460,20 +459,37 @@ export const CardVoiceNpz = ({ generation }: { generation: NPZ }) => {
             target.onerror = null;
             target.src =
               "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=";
+            target.width = 0;
+            target.height = 0;
           }}
         />
       )}
-      <p className="text-xl font-bold text-gray-900 w-full text-center">
-        {name}
-      </p>
-      <button
-        className="w-30 h-9 text-xl text-gray-900 select-none hover:text-red-500"
-        title="Use as voice"
-        onClick={useAsVoice}
-      >
-        Use ↗
-      </button>
-      {/* <AudioPlayer audio={preview} /> */}
+      <p className=" text-lg w-full ">{name}</p>
+      <div className="flex w-full justify-between">
+        {/* <AudioPlayer audio={preview} /> */}
+        {/* <Download download={getWebuiURLWithHost(filename)} /> */}
+        {/* delete */}
+
+        <Button
+          variant="outline"
+          size="default"
+          onClick={async () => {
+            const urlWithHost = getWebuiURLWithHost(filename);
+            const x = await encodecDecode({
+              npz_file: toLocalCacheFile(urlWithHost),
+            });
+            const audio = new Audio(x.url);
+            audio.play();
+          }}
+        >
+          Listen
+          <PlayCircleIcon className="ml-2 w-5 h-5" />
+        </Button>
+        <Button variant="outline" size="default" onClick={useAsVoice}>
+          Run
+          <SendHorizontalIcon className="ml-2 w-5 h-5" />
+        </Button>
+      </div>
       <Extra />
     </div>
   );
@@ -506,7 +522,7 @@ export const SectionVoice = ({
   // const maxLength = 100000;
   return (
     <div className="flex flex-col items-center justify-start w-full py-4 px-6 bg-white rounded shadow-lg">
-      <div className="flex flex-col space-y-4 w-full h-full justify-between">
+      <div className="flex flex-col gap-y-4 w-full h-full justify-between">
         <div className="flex w-full">
           <h1 className="text-2xl font-bold text-gray-900">
             <span
@@ -547,7 +563,7 @@ export const SectionVoice = ({
 export const CardEmpty = ({ title, link }: { title: string; link: string }) => {
   return (
     <div className="flex flex-col items-center justify-start w-full max-w-md py-4 px-6 bg-white rounded shadow-lg">
-      <div className="flex flex-col space-y-4 w-full h-full justify-between">
+      <div className="flex flex-col gap-y-4 w-full h-full justify-between">
         <div className="flex items-center w-full gap-x-2">
           <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
         </div>

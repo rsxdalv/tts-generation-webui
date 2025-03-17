@@ -1,12 +1,12 @@
 import React from "react";
-import { MahaParams, MahaResult, initialMahaParams } from "../tabs/MahaParams";
+import { MahaParams } from "../tabs/MahaParams";
 import { HandleChange } from "../types/HandleChange";
 import { PromptTextArea } from "./PromptTextArea";
 import { SeedInput } from "./SeedInput";
-
-const commonBorder = "border border-gray-300 p-2 rounded";
-
-const deviceList = ["auto", "cpu", "cuda"];
+import { ModelDropdown, UnloadModelButton } from "./component/ModelDropdown";
+import { Button } from "./ui/button";
+import { RadioWithLabel } from "./component/RadioWithLabel";
+import { BotIcon, CpuIcon, KeyboardMusicIcon } from "lucide-react";
 
 const Speaker = ({
   mahaParams,
@@ -41,175 +41,133 @@ const Speaker = ({
 
   const selected = mahaParams?.speaker_name;
   return (
-    <div className="flex gap-2">
-      <label className="text-sm">Speaker:</label>
-      <select
-        name="speaker_name"
-        id="speaker_name"
-        className="border border-gray-300 p-2 rounded text-black w-full"
-        value={selected}
-        onChange={handleChange}
-      >
-        {options
-          // concat to ensure selected is at the top and present
-          .filter((option) => option !== selected)
-          .concat(selected)
-          .map((bandwidth) => (
-            <option key={bandwidth} value={bandwidth}>
-              {bandwidth}
-            </option>
-          ))}
-      </select>
-      <button
-        className="border border-gray-300 p-2 rounded"
-        onClick={openVoices}
-      >
-        Open
-      </button>
-      <button
-        className="border border-gray-300 p-2 rounded"
-        onClick={fetchOptions}
-      >
-        {loading ? "Refreshing..." : "Refresh"}
-      </button>
-    </div>
+    <ModelDropdown
+      name="speaker_name"
+      label="Speaker"
+      options={options
+        .filter((option) => option !== selected)
+        .concat(selected)
+        .filter((x) => x !== "")}
+      value={selected}
+      onChange={handleChange}
+      onRefresh={fetchOptions}
+      onOpen={openVoices}
+      loading={loading}
+    />
   );
 };
 
 export const MahaInputs = ({
   mahaParams,
   handleChange,
-  setMahaParams,
-  data,
+  resetParams,
 }: {
   mahaParams: MahaParams;
   handleChange: HandleChange;
-  setMahaParams: React.Dispatch<React.SetStateAction<MahaParams>>;
-  data: MahaResult | null;
+  resetParams: () => void;
 }) => (
   <div className="flex gap-x-6 w-full justify-center">
-    <div className="flex flex-col gap-y-2 w-1/2">
+    <div className="flex flex-col gap-y-4 w-1/2">
       <PromptTextArea
         params={mahaParams}
         handleChange={handleChange}
         label="Text"
-        name="maha_tts_input"
+        name="text"
       />
-    </div>
-    <div className="flex flex-col gap-y-2 w-1/2">
-      <div className="flex gap-2 items-center">
-        <label className="text-sm">Model Language:</label>
-        <div className="flex gap-x-4">
-          {[
+      <div className="flex items-center gap-4">
+        <RadioWithLabel
+          label="Model"
+          name="model_name"
+          inline
+          value={mahaParams.model_name}
+          onChange={handleChange}
+          options={[
             ["English", "Smolie-en"],
             ["Indian", "Smolie-in"],
-          ].map(([visual_model_language, model_language]) => (
-            <div key={visual_model_language} className="flex items-center">
-              <input
-                type="radio"
-                name="model_language"
-                id={visual_model_language}
-                value={model_language}
-                checked={mahaParams.model_language === model_language}
-                onChange={(event) => {
-                  console.log(event.target.value);
-                  if (event.target.value === "Smolie-en") {
-                    setMahaParams({
-                      ...mahaParams,
-                      maha_tts_language: "english",
-                    });
-                  }
-                  handleChange(event);
-                }}
-                className={commonBorder}
-              />
-              <label
-                className="ml-1 select-none"
-                htmlFor={visual_model_language}
-              >
-                {visual_model_language}
-              </label>
-            </div>
-          ))}
-        </div>
+          ].map(([text, model_name]) => ({
+            label: text,
+            value: model_name,
+          }))}
+        />
+        <UnloadModelButton
+          onUnload={() =>
+            fetch("/api/gradio/maha_tts_unload_model", { method: "POST" })
+          }
+        />
       </div>
 
-      <div className="flex flex-col gap-y-2">
-        <label className="text-sm">TTS Language:</label>
-        <div className="flex flex-wrap gap-x-4">
-          {[
-            "english",
-            "tamil",
-            "telugu",
-            "punjabi",
-            "marathi",
-            "hindi",
-            "gujarati",
-            "bengali",
-            "assamese",
-          ].map((maha_tts_language) => (
-            <div key={maha_tts_language} className="flex items-center">
-              <input
-                type="radio"
-                name="maha_tts_language"
-                id={maha_tts_language}
-                value={maha_tts_language}
-                checked={mahaParams.maha_tts_language === maha_tts_language}
-                onChange={handleChange}
-                disabled={mahaParams.model_language !== "Smolie-in"}
-                className={commonBorder}
-              />
-              <label className="ml-1 select-none" htmlFor={maha_tts_language}>
-                {maha_tts_language.charAt(0).toUpperCase() +
-                  maha_tts_language.slice(1)}
-              </label>
-            </div>
-          ))}
-        </div>
-      </div>
-
+      <RadioWithLabel
+        label="Text Language"
+        name="text_language"
+        inline
+        className="flex-col items-start"
+        value={mahaParams.text_language}
+        onChange={handleChange}
+        options={[
+          "english",
+          "tamil",
+          "telugu",
+          "punjabi",
+          "marathi",
+          "hindi",
+          "gujarati",
+          "bengali",
+          "assamese",
+        ].map((text_language) => ({
+          label: text_language[0].toUpperCase() + text_language.slice(1),
+          value: text_language,
+        }))}
+      />
+    </div>
+    <div className="flex flex-col gap-y-4 w-1/2">
       <Speaker mahaParams={mahaParams} handleChange={handleChange} />
 
-      <SeedInput
-        params={mahaParams}
-        handleChange={handleChange}
-        setParams={setMahaParams}
-        seed={data?.metadata?.seed}
+      <p className="text-sm">
+        Note: The speaker audio must be mono at this time.
+      </p>
+
+      <SeedInput params={mahaParams} handleChange={handleChange} />
+
+      <RadioWithLabel
+        label="Device"
+        name="device"
+        inline
+        value={mahaParams.device}
+        onChange={handleChange}
+        options={[
+          {
+            label: (
+              <div className="flex items-center gap-2">
+                <BotIcon className="w-5 h-5" />
+                <span>auto</span>
+              </div>
+            ),
+            value: "auto",
+          },
+          {
+            label: (
+              <div className="flex items-center gap-2">
+                <CpuIcon className="w-5 h-5" />
+                <span>cpu</span>
+              </div>
+            ),
+            value: "cpu",
+          },
+          {
+            label: (
+              <div className="flex items-center gap-2">
+                <KeyboardMusicIcon className="w-5 h-5" />
+                <span>cuda</span>
+              </div>
+            ),
+            value: "cuda",
+          },
+        ]}
       />
 
-      <div className="flex gap-2 items-center">
-        <label className="text-sm">Device:</label>
-        <div className="flex gap-x-4">
-          {deviceList.map((device) => (
-            <div key={device} className="flex items-center">
-              <input
-                type="radio"
-                name="device"
-                id={device}
-                value={device}
-                checked={mahaParams.device === device}
-                onChange={handleChange}
-                className={commonBorder}
-              />
-              <label className="ml-1 select-none" htmlFor={device}>
-                {device}
-              </label>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <button
-        className={commonBorder}
-        onClick={() =>
-          setMahaParams({
-            ...mahaParams,
-            ...initialMahaParams,
-          })
-        }
-      >
+      <Button variant="outline" onClick={resetParams}>
         Reset Parameters
-      </button>
+      </Button>
     </div>
   </div>
 );

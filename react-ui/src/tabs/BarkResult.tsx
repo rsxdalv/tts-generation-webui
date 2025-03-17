@@ -2,13 +2,8 @@ import { GradioFile } from "../types/GradioFile";
 
 export type BarkResult = {
   audio: GradioFile;
-  image: string;
-  save_button: Object;
-  continue_button: Object;
-  buttons_row: Object;
   npz: string;
-  seed: null;
-  json_text: {
+  metadata: {
     _version: string;
     _hash_version: string;
     _type: string;
@@ -29,5 +24,5 @@ export type BarkResult = {
     semantic_prompt: string;
     coarse_prompt: string;
   };
-  history_bundle_name_data: string;
+  folder_root: string;
 };

@@ -1,5 +1,19 @@
 import React from "react";
 import { MusicgenParams } from "../tabs/MusicgenParams";
+import { RadioWithLabel } from "./component/RadioWithLabel";
+import { SwitchWithLabel } from "./SwitchWithLabel";
+import { ModelDropdown } from "./component/ModelDropdown";
+import { HandleChangeEvent } from "../types/HandleChange";
+import { modelsFnFactory } from "./modelsFnFactory";
+import {
+  MusicSmallIcon,
+  MusicMediumIcon,
+  MusicLargeIcon,
+  AudioLinesIcon,
+  MonitorSpeakerIcon,
+  FileAudio2Icon,
+} from "./icons";
+import { Label } from "./ui/label";
 
 const modelMap = {
   Small: { size: "small", stereo: true, melody: false },
@@ -33,8 +47,8 @@ const computeModel = (type: string, stereo: boolean, melody: boolean) => {
   return type === "Audiogen"
     ? `facebook/audiogen-medium`
     : melody && type !== "Small"
-    ? `facebook/musicgen${stereoPrefix}-melody${largeSuffix}`
-    : `facebook/musicgen${stereoPrefix}-${lowerType}`;
+      ? `facebook/musicgen${stereoPrefix}-melody${largeSuffix}`
+      : `facebook/musicgen${stereoPrefix}-${lowerType}`;
 };
 
 const getType = (model: string) => {
@@ -61,69 +75,141 @@ export const MusicgenModelSelector = ({
     type: modelType,
     stereo,
     melody,
-  } = decomputeModel(musicgenParams.model);
+  } = decomputeModel(musicgenParams.model_name);
 
   const { stereo: stereoAvailable, melody: melodyAvailable } =
     modelMap[modelType];
 
+  // const options = Object.keys(modelToType);
+  const [options, setOptions] = React.useState<string[]>(
+    Object.keys(modelToType)
+  );
+  const [loading, setLoading] = React.useState<boolean>(false);
+
+  const { fetchOptions, openModels, unloadModel } = modelsFnFactory(
+    setLoading,
+    setOptions,
+    "musicgen_audiogen"
+  );
+
+  React.useEffect(() => {
+    fetchOptions();
+  }, []);
+
+  const selected = musicgenParams?.model_name;
+
   return (
-    <div className="flex flex-col border border-gray-300 p-2 rounded text-md">
-      <div className="text-md">Model:</div>
-      <div className="flex gap-2">
-        <label className="text-md">Size:</label>
-        <div className="flex gap-x-2">
-          {["Small", "Medium", "Large", "Audiogen"].map((model) => (
-            <div key={model} className="flex items-center">
-              <input
-                type="radio"
-                name="size"
-                id={model}
-                value={model}
-                checked={modelType === model}
-                onChange={(event) => {
-                  const newModel = event.target.value;
-                  setMusicgenParams({
-                    ...musicgenParams,
-                    model: computeModel(newModel, stereo, melody),
-                  });
-                }}
-                className="border border-gray-300 p-2 rounded"
-              />
-              <label className="ml-1 select-none" htmlFor={model}>
-                {model}
-              </label>
+    <div className="flex flex-col gap-4 cell text-md">
+      <ModelDropdown
+        name="model_name"
+        label="Model"
+        options={options
+          .filter((option) => option !== selected)
+          .concat(selected)}
+        value={selected}
+        onChange={(event) =>
+          setMusicgenParams({
+            ...musicgenParams,
+            model_name: event.target.value as string,
+          })
+        }
+        onRefresh={fetchOptions}
+        onOpen={openModels}
+        onUnload={unloadModel}
+        loading={loading}
+      />
+      <RadioWithLabel
+        inline
+        label="Size"
+        name="size"
+        value={modelType}
+        onChange={(event) =>
+          setMusicgenParams({
+            ...musicgenParams,
+            model_name: computeModel(event.target.value, stereo, melody),
+          })
+        }
+        options={[
+          // { label: "Small", value: "Small" },
+          {
+            label: (
+              <div className="flex items-center gap-2">
+                <MusicSmallIcon className="w-5 h-5" />
+                <span>Small</span>
+              </div>
+            ),
+            value: "Small",
+          },
+          // { label: "Medium", value: "Medium" },
+          {
+            label: (
+              <div className="flex items-center gap-2">
+                <MusicMediumIcon className="w-5 h-5" />
+                <span>Medium</span>
+              </div>
+            ),
+            value: "Medium",
+          },
+          // { label: "Large", value: "Large" },
+          {
+            label: (
+              <div className="flex items-center gap-2">
+                <MusicLargeIcon className="w-5 h-5" />
+                <span>Large</span>
+              </div>
+            ),
+            value: "Large",
+          },
+          // { label: "Audiogen", value: "Audiogen" },
+          {
+            label: (
+              <div className="flex items-center gap-2">
+                <AudioLinesIcon className="w-5 h-5" />
+                <span>Audiogen</span>
+              </div>
+            ),
+            value: "Audiogen",
+          },
+        ]}
+      />
+      <div className="flex gap-4 items-center">
+        <Label>Features: </Label>
+        <SwitchWithLabel
+          // label="Stereo"
+          label={
+            <div className="flex items-center gap-2">
+              <MonitorSpeakerIcon className="w-5 h-5" />
+              <span>Stereo</span>
             </div>
-          ))}
-        </div>
-      </div>
-      <div className="flex gap-2">
-        <label className="text-md">Stereo:</label>
-        <input
-          type="checkbox"
+          }
           name="stereo"
-          checked={stereo}
-          onChange={() => {
-            setMusicgenParams({
-              ...musicgenParams,
-              model: computeModel(modelType, !stereo, melody),
-            });
-          }}
-          className="border border-gray-300 p-2 rounded"
+          value={stereo}
           disabled={!stereoAvailable}
-        />
-        <label className="text-md">Use Melody:</label>
-        <input
-          type="checkbox"
-          name="melody"
-          checked={melody}
-          onChange={() => {
+          onChange={() =>
             setMusicgenParams({
               ...musicgenParams,
-              model: computeModel(modelType, stereo, !melody),
-            });
-          }}
-          className="border border-gray-300 p-2 rounded"
+              model_name: computeModel(modelType, !stereo, melody),
+            })
+          }
+        />
+
+        <SwitchWithLabel
+          // label="Melody"
+          label={
+            <div className="flex items-center gap-2">
+              <FileAudio2Icon className="w-5 h-5" />
+              <span>Melody</span>
+            </div>
+          }
+          name="melody"
+          value={melody}
           disabled={!melodyAvailable}
+          onChange={() =>
+            setMusicgenParams({
+              ...musicgenParams,
+              model_name: computeModel(modelType, stereo, !melody),
+            })
+          }
         />
       </div>
     </div>

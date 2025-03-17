@@ -23,7 +23,7 @@ export interface GenerationRaw {
 
   hash?: string;
   name?: String;
-  history_bundle_name_data?: string;
+  folder_root?: string;
   api_filename?: string;
 }
 

@@ -1,15 +1,21 @@
-import { Dispatch, SetStateAction, useCallback, useEffect, useState } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 
-const defaultNamespace = "tts-generation-webui__";
+export const defaultNamespace = "tts-generation-webui__";
 
-const readLocalStorage = (key: string) => {
-  const prefixedKey = defaultNamespace + key;
+export const readLocalStorage = (key: string, namespace = defaultNamespace) => {
+  const prefixedKey = namespace + key;
   const item = localStorage.getItem(prefixedKey);
   return item ? (JSON.parse(item) as any) : undefined;
 };
 
-const updateLocalStorage = (key: string, value: any) => {
-  const prefixedKey = defaultNamespace + key;
+const updateLocalStorage = (key: string, value: any, namespace = defaultNamespace) => {
+  const prefixedKey = namespace + key;
   localStorage.setItem(prefixedKey, JSON.stringify(value));
 };
 
@@ -22,7 +28,8 @@ export const updateLocalStorageWithFunction = (key: string, value: any) =>
 export default function useLocalStorage<T>(
   key: string,
   initialValue: T,
-  namespace = defaultNamespace
+  namespace = defaultNamespace,
+  extend = false
 ): [T, Dispatch<SetStateAction<T>>] {
   const [storedValue, setStoredValue] = useState(initialValue);
   // We will use this flag to trigger the reading from localStorage
@@ -40,7 +47,11 @@ export default function useLocalStorage<T>(
       }
       try {
         const item = window.localStorage.getItem(prefixedKey);
-        return item ? (JSON.parse(item) as T) : initialValue;
+        return item
+          ? extend
+            ? ({ ...initialValue, ...JSON.parse(item) } as T)
+            : (JSON.parse(item) as T)
+          : initialValue;
       } catch (error) {
         console.error(error);
         return initialValue;
@@ -53,29 +64,35 @@ export default function useLocalStorage<T>(
     setFirstLoadDone(true);
   }, [initialValue, prefixedKey]);
 
-  const setLocalValue = useCallback((value: T) => {
-    if (!firstLoadDone) {
-      return;
-    }
-
-    try {
-      if (typeof window !== "undefined") {
-        window.localStorage.setItem(prefixedKey, JSON.stringify(value));
+  const setLocalValue = useCallback(
+    (value: T) => {
+      if (!firstLoadDone) {
+        return;
       }
-    } catch (error) {
-      console.log(error);
-    }
-  }, [firstLoadDone, prefixedKey]);
 
-  const setValue: Dispatch<SetStateAction<T>> = useCallback((value) => {
-    // Allow value to be a function so we have the same API as useState
-    // const valueToStore = value instanceof Function ? value(storedValue) : value;
-    setStoredValue(x => {
-      const newValue = value instanceof Function ? value(x) : value;
-      setLocalValue(newValue);
-      return newValue;
-    });
-  }, [setLocalValue]);
+      try {
+        if (typeof window !== "undefined") {
+          window.localStorage.setItem(prefixedKey, JSON.stringify(value));
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    [firstLoadDone, prefixedKey]
+  );
+
+  const setValue: Dispatch<SetStateAction<T>> = useCallback(
+    (value) => {
+      // Allow value to be a function so we have the same API as useState
+      // const valueToStore = value instanceof Function ? value(storedValue) : value;
+      setStoredValue((x) => {
+        const newValue = value instanceof Function ? value(x) : value;
+        setLocalValue(newValue);
+        return newValue;
+      });
+    },
+    [setLocalValue]
+  );
 
   // watch localStorage changes
   // useEffect(() => {

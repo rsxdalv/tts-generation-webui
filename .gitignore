@@ -1,9 +1,13 @@
 # Ignore Python bytecode
 __pycache__
 
+# Ignore Conda environment
+installer_files/
+
 # Ignore settings
 config.json
 .env
+.env.user
 
 # Ignore generated files
 /outputs/
@@ -14,7 +18,23 @@ config.json
 /voices-tortoise/
 
 # Ignore model checkpoints
-/data/models
+/data/models/hubert/
+/data/models/magnet/
+/data/models/maha-tts/
+/data/models/rvc/checkpoints/
+/data/models/rvc/rmvpe/
+/data/models/rvc/uvr5_weights/
+/data/models/stable-audio/*/
+/data/models/tortoise/
+/data/models/vall-e-x/
+/data/models/whisper/cache/
+/data/models/xtts/
+/data/models/hubert_base.pt
+/data/models/rmvpe.pt
+/data/models/audiocraft_plus/
+/data/models/parler_tts/
+/data/models/musicgen_audiogen/*/
+/data/models/resemble_enhance/ds/
 
 # Ignore temporary files
 temp/
@@ -29,3 +49,10 @@ node_modules/
 
 # Ignore temporary Jupiter notebooks
 *.temp.ipynb
+
+# Temporary files used by some modules
+output.wav
+log.out
+
+# Database
+/data/postgres/

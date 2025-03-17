@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Long Polling Example</title>
+  </head>
+  <body>
+    <h1>Long Polling Messages</h1>
+    <div id="messages"></div>
+
+    <script>
+      function poll() {
+        fetch("/poll")
+          .then((response) => response.json())
+          .then((data) => {
+            const messageDiv = document.getElementById("messages");
+            messageDiv.innerHTML = "";
+            data.messages.forEach((message) => {
+              const newMessage = document.createElement("div");
+              newMessage.textContent = message;
+              messageDiv.appendChild(newMessage);
+            });
+            setTimeout(poll, 200); // Make the next poll request after 200ms
+          })
+          .catch((error) => {
+            console.error("Polling error:", error);
+            setTimeout(poll, 5000); // Retry after 5 seconds if there's an error
+          });
+      }
+      // Start the first poll request
+      poll();
+    </script>
+  </body>
+</html>

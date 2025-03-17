@@ -1,11 +1,37 @@
 import React, { useState, useEffect } from "react";
 import { TortoiseGenerationParams } from "../tabs/TortoiseGenerationParams";
-import FileInput from "./FileInput";
 import { TortoiseResult } from "../tabs/TortoiseResult";
-import { GenericSlider } from "./GenericSlider";
+import { ParameterSlider } from "./GenericSlider";
 import { HandleChange } from "../types/HandleChange";
 import { PromptTextArea } from "./PromptTextArea";
 import { SeedInput } from "./SeedInput";
+import { splitAndRecombineText } from "../data/split-and-recombine";
+import { SwitchWithLabel } from "./SwitchWithLabel";
+import { RadioWithLabel } from "./component/RadioWithLabel";
+import { ModelDropdown } from "./component/ModelDropdown";
+import { cn } from "../lib/utils";
+import { Button } from "./ui/button";
+import { Separator } from "./ui/separator";
+import {
+  ActivityIcon,
+  AudioLinesIcon,
+  AudioWaveformIcon,
+  CircleCheckBigIcon,
+  MinusIcon,
+  RefreshCwIcon,
+  ServerOffIcon,
+  WrapTextIcon,
+} from "lucide-react";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
+import { SingleFileUpload } from "./SingleFileUpload";
+
+const SimpleGroup = ({ ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div
+    {...props}
+    className={cn("flex flex-col gap-y-2 cell", props.className)}
+  />
+);
 
 const presets = {
   ultra_fast: {
@@ -27,12 +53,6 @@ const presets = {
   },
 };
 
-const SimpleGroup = ({ children }: { children: React.ReactNode }) => (
-  <div className="flex flex-col space-y-2 border border-gray-300 p-2 rounded">
-    {children}
-  </div>
-);
-
 export const TortoiseInput = ({
   tortoiseGenerationParams,
   setTortoiseGenerationParams,
@@ -45,10 +65,31 @@ export const TortoiseInput = ({
   >;
   handleChange: HandleChange;
   data?: TortoiseResult | null;
-}) => (
-  <div className="flex flex-col w-full space-y-2">
-    <div className="flex flex-row space-x-2">
-      <div className="space-y-2 w-1/2">
+}) => {
+  const handlePresets = ({ target: { value: preset } }) => {
+    const { num_autoregressive_samples, diffusion_iterations, cond_free } =
+      presets[preset];
+    handleChange({ target: { name: "preset", value: preset } });
+    handleChange({
+      target: {
+        name: "samples",
+        value: num_autoregressive_samples,
+      },
+    });
+    handleChange({
+      target: {
+        name: "diffusion_iterations",
+        value: diffusion_iterations,
+      },
+    });
+    handleChange({
+      target: { name: "cond_free", value: cond_free ?? true },
+    });
+  };
+
+  return (
+    <div className="flex flex-row gap-x-2">
+      <div className="flex flex-col gap-y-2">
         <SimpleGroup>
           <Model
             tortoiseGenerationParams={tortoiseGenerationParams}
@@ -62,53 +103,79 @@ export const TortoiseInput = ({
           />
         </SimpleGroup>
         <SimpleGroup>
-          <Preset
-            tortoiseGenerationParams={tortoiseGenerationParams}
-            handleChange={handleChange}
+          <RadioWithLabel
+            label="Preset"
+            name="preset"
+            inline
+            value={tortoiseGenerationParams.preset}
+            onChange={handlePresets}
+            options={[
+              {
+                label: (
+                  <div className="flex items-center gap-2">
+                    <MinusIcon className="w-5 h-5" />
+                    <span>Ultra Fast</span>
+                  </div>
+                ),
+                value: "ultra_fast",
+              },
+              {
+                label: (
+                  <div className="flex items-center gap-2">
+                    <ActivityIcon className="w-5 h-5" />
+                    <span>Fast</span>
+                  </div>
+                ),
+                value: "fast",
+              },
+              {
+                label: (
+                  <div className="flex items-center gap-2">
+                    <AudioWaveformIcon className="w-5 h-5" />
+                    <span>Standard</span>
+                  </div>
+                ),
+                value: "standard",
+              },
+              {
+                label: (
+                  <div className="flex items-center gap-2">
+                    <AudioLinesIcon className="w-5 h-5" />
+                    <span>High Quality</span>
+                  </div>
+                ),
+                value: "high_quality",
+              },
+            ]}
           />
         </SimpleGroup>
         <AutoRegressiveParameters
           tortoiseGenerationParams={tortoiseGenerationParams}
           handleChange={handleChange}
         />
+        <PromptTextArea
+          name="text"
+          label="Prompt"
+          handleChange={handleChange}
+          params={tortoiseGenerationParams}
+          optimalLength={200}
+          softMaxLength={300}
+          hardMaxLength={500}
+        />
       </div>
-      <div className="space-y-2 w-1/2">
+      <div className="flex flex-col gap-y-2">
         <DiffusionParameters
           tortoiseGenerationParams={tortoiseGenerationParams}
           handleChange={handleChange}
         />
-        <SimpleGroup>
-          <CVVPAmount
-            tortoiseGenerationParams={tortoiseGenerationParams}
-            handleChange={handleChange}
-          />
-          <SplitPrompt
-            tortoiseGenerationParams={tortoiseGenerationParams}
-            handleChange={handleChange}
-          />
-          <SeedInput
-            params={tortoiseGenerationParams}
-            setParams={setTortoiseGenerationParams}
-            handleChange={handleChange}
-            seed={data?.seed}
-          />
-        </SimpleGroup>
-        <SimpleGroup>
-          <GenerationName
-            tortoiseGenerationParams={tortoiseGenerationParams}
-            handleChange={handleChange}
-          />
-        </SimpleGroup>
+        <GenerationParameters
+          tortoiseGenerationParams={tortoiseGenerationParams}
+          handleChange={handleChange}
+        />
       </div>
     </div>
-    <PromptTextArea
-      name="prompt"
-      label="Prompt"
-      handleChange={handleChange}
-      params={tortoiseGenerationParams}
-    />
-  </div>
-);
+  );
+};
 
 const Speaker = ({
   tortoiseGenerationParams,
@@ -143,132 +210,19 @@ const Speaker = ({
 
   const selected = tortoiseGenerationParams?.speaker;
   return (
-    <div className="flex gap-2">
-      <label className="text-sm">Speaker:</label>
-      <select
-        name="speaker"
-        id="speaker"
-        className="border border-gray-300 p-2 rounded text-black w-full"
-        value={selected}
-        onChange={handleChange}
-      >
-        {options
-          // concat to ensure selected is at the top and present
-          .filter((option) => option !== selected)
-          .concat(selected)
-          .map((bandwidth) => (
-            <option key={bandwidth} value={bandwidth}>
-              {bandwidth}
-            </option>
-          ))}
-      </select>
-      <button
-        className="border border-gray-300 p-2 rounded"
-        onClick={openVoices}
-      >
-        Open
-      </button>
-      <button
-        className="border border-gray-300 p-2 rounded"
-        onClick={fetchOptions}
-      >
-        {loading ? "Refreshing..." : "Refresh"}
-      </button>
-    </div>
+    <ModelDropdown
+      name="speaker"
+      label="Speaker"
+      options={options}
+      value={selected}
+      onChange={handleChange}
+      onRefresh={fetchOptions}
+      onOpen={openVoices}
+      loading={loading}
+    />
   );
 };
-const Preset = ({
-  tortoiseGenerationParams,
-  handleChange,
-}: {
-  tortoiseGenerationParams: TortoiseGenerationParams;
-  handleChange: HandleChange;
-}) => (
-  <div className="flex items-center space-x-2">
-    <label className="text-sm">Preset:</label>
-    <div className="flex flex-row space-x-2">
-      {["ultra_fast", "fast", "standard", "high_quality"].map((preset) => (
-        <div key={preset} className="flex items-center">
-          <input
-            type="radio"
-            name="preset"
-            id={preset}
-            value={preset}
-            checked={tortoiseGenerationParams.preset === preset}
-            onChange={() => {
-              handleChange({
-                target: {
-                  name: "preset",
-                  value: preset,
-                },
-              } as React.ChangeEvent<HTMLTextAreaElement>);
-              handleChange({
-                target: {
-                  name: "samples",
-                  value: presets[preset]["num_autoregressive_samples"],
-                },
-              } as React.ChangeEvent<HTMLTextAreaElement>);
-              handleChange({
-                target: {
-                  name: "diffusion_iterations",
-                  value: presets[preset]["diffusion_iterations"],
-                },
-              } as React.ChangeEvent<HTMLTextAreaElement>);
-              handleChange({
-                target: {
-                  name: "cond_free",
-                  value: presets[preset]["cond_free"] ?? true,
-                },
-              } as React.ChangeEvent<HTMLTextAreaElement>);
-            }}
-            className="border border-gray-300 p-2 rounded"
-          />
-          <label className="ml-1" htmlFor={preset}>
-            {preset}
-          </label>
-        </div>
-      ))}
-    </div>
-  </div>
-);
 
-const CVVPAmount = ({
-  tortoiseGenerationParams,
-  handleChange,
-}: {
-  tortoiseGenerationParams: TortoiseGenerationParams;
-  handleChange: HandleChange;
-}) => (
-  <GenericSlider
-    params={tortoiseGenerationParams}
-    handleChange={handleChange}
-    label="CVVP Amount"
-    name="cvvp_amount"
-    min="0.0"
-    max="1.0"
-    step="0.01"
-  />
-);
-const SplitPrompt = ({
-  tortoiseGenerationParams,
-  handleChange,
-}: {
-  tortoiseGenerationParams: TortoiseGenerationParams;
-  handleChange: HandleChange;
-}) => {
-  return (
-    <div className="flex items-center space-x-2">
-      <label className="text-sm">Split prompt by lines:</label>
-      <input
-        type="checkbox"
-        name="split_prompt"
-        checked={tortoiseGenerationParams.split_prompt}
-        onChange={handleChange}
-        className="border border-gray-300 p-2 rounded"
-      />
-    </div>
-  );
-};
 const Model = ({
   tortoiseGenerationParams,
   handleChange,
@@ -317,28 +271,13 @@ const Model = ({
     setApplyModelSettingsLoading(false);
   };
 
-  const BasicModelCheckbox = ({
-    name,
-    label,
-    handleChange,
-  }: {
-    name: string;
-    label: string;
-    handleChange: HandleChange;
-  }) => (
-    <div className="flex items-center space-x-2">
-      <label className="text-sm cursor-pointer" htmlFor={name}>
-        {label}:
-      </label>
-      <input
-        type="checkbox"
-        name={name}
-        id={name}
-        checked={tortoiseGenerationParams[name]}
-        onChange={handleChange}
-        className="border border-gray-300 p-2 rounded cursor-pointer"
-      />
-    </div>
+  const BasicSwitch = ({ name, label }: { name: string; label: string }) => (
+    <SwitchWithLabel
+      label={label}
+      name={name}
+      value={tortoiseGenerationParams[name]}
+      onChange={handleChange}
+    />
   );
 
   useEffect(() => {
@@ -347,116 +286,52 @@ const Model = ({
 
   const selected = tortoiseGenerationParams?.model;
   return (
-    <div className="flex flex-col space-y-2">
-      <div className="flex gap-2">
-        <label className="text-sm">Model:</label>
-        <select
-          name="model"
-          id="model"
-          className="border border-gray-300 p-2 rounded text-black w-full"
-          value={selected}
-          onChange={handleChange}
-        >
-          {options
-            // concat to ensure selected is at the top and present
-            .filter((option) => option !== selected)
-            .concat(selected)
-            .map((bandwidth) => (
-              <option key={bandwidth} value={bandwidth}>
-                {bandwidth}
-              </option>
-            ))}
-        </select>
-        <button
-          className="border border-gray-300 p-2 rounded"
-          onClick={openModels}
-        >
-          Open
-        </button>
-        <button
-          className="border border-gray-300 p-2 rounded"
-          onClick={fetchOptions}
-        >
-          {loading ? "Refreshing..." : "Refresh"}
-        </button>
-      </div>
-      {/* 2x2 */}
-      {/* <div className="grid grid-cols-2 gap-2"> */}
-      <div className="flex gap-4">
-        <BasicModelCheckbox
-          name="kv_cache"
-          label="KV Cache"
-          handleChange={handleChange}
-        />
-        <BasicModelCheckbox
-          name="use_deepspeed"
-          label="Use Deepspeed"
-          handleChange={handleChange}
-        />
-        <BasicModelCheckbox
-          name="half"
-          label="Half"
-          handleChange={handleChange}
-        />
-        <BasicModelCheckbox
-          name="use_basic_cleaners"
-          label="Use basic cleaners"
-          handleChange={handleChange}
-        />
-      </div>
+    <div className="flex flex-col gap-y-4">
+      <ModelDropdown
+        name="model"
+        label="Model"
+        options={options
+          .filter((option) => option !== selected)
+          .concat(selected)
+          .filter((x) => x !== "")}
+        value={selected}
+        onChange={handleChange}
+        onRefresh={fetchOptions}
+        onOpen={openModels}
+        onUnload={() =>
+          fetch("/api/gradio/tortoise_unload_model", { method: "POST" })
+        }
+        loading={loading}
+      />
 
-      <div className="flex gap-2">
-        <label className="text-sm">Tokenizer:</label>
-        {/* <input
-              type="text"
-              name="tokenizer"
-              value={tortoiseGenerationParams.tokenizer}
-              onChange={handleChange}
-              className="border border-gray-300 p-2 rounded"
-            /> */}
-        <FileInput
-          accept=".json"
-          callback={(tokenizer) => {
-            handleChange({
-              target: {
-                name: "tokenizer",
-                value: tokenizer,
-              },
-            } as React.ChangeEvent<HTMLInputElement>);
-          }}
-          hide_text={false}
-        />
-      </div>
-      <div className="flex flex-col space-y-2">
-        <button
-          className="border border-gray-300 p-2 rounded"
-          onClick={applyModelSettings}
-        >
-          {applyModelSettingsLoading ? "Applying..." : "Apply Model Settings"}
-        </button>
+      <div className="flex gap-4 justify-between">
+        <div className="w-52 flex flex-col gap-4 my-auto">
+          <BasicSwitch name="kv_cache" label="KV Cache" />
+          <BasicSwitch name="use_deepspeed" label="Deepspeed" />
+          <BasicSwitch name="half" label="Half precision" />
+          <BasicSwitch name="use_basic_cleaners" label="Basic Cleaners" />
+        </div>
+        <div className="w-full mb-auto order-2 gap-2 flex flex-col">
+          <SingleFileUpload
+            label="Tokenizer"
+            file={tortoiseGenerationParams.tokenizer}
+            callback={(tokenizer) => {
+              handleChange({ target: { name: "tokenizer", value: tokenizer } });
+            }}
+          />
+          <Button onClick={applyModelSettings} variant="outline">
+            {applyModelSettingsLoading ? "Applying..." : "Apply Model Settings"}
+            {applyModelSettingsLoading ? (
+              <RefreshCwIcon className="ml-2 w-5 h-5 animate-spin" />
+            ) : (
+              <CircleCheckBigIcon className="ml-2 w-5 h-5" />
+            )}
+          </Button>
+        </div>
       </div>
     </div>
   );
 };
-
-const GenerationName = ({
-  tortoiseGenerationParams,
-  handleChange,
-}: {
-  tortoiseGenerationParams: TortoiseGenerationParams;
-  handleChange: HandleChange;
-}) => (
-  <div className="flex items-center space-x-2">
-    <label className="text-sm">Generation Name:</label>
-    <input
-      type="text"
-      name="generation_name"
-      value={tortoiseGenerationParams.generation_name}
-      onChange={handleChange}
-      className="border border-gray-300 p-2 rounded"
-    />
-  </div>
-);
 
 const AutoRegressiveParameters = ({
   tortoiseGenerationParams,
@@ -465,86 +340,81 @@ const AutoRegressiveParameters = ({
   tortoiseGenerationParams: TortoiseGenerationParams;
   handleChange: HandleChange;
 }) => (
-  <SimpleGroup>
+  <div className="flex flex-col gap-y-0">
     <h2 className="text-md">Autoregressive Parameters</h2>
-    <GenericSlider
-      params={tortoiseGenerationParams}
-      handleChange={handleChange}
-      label="Samples"
-      name="samples"
-      // min="1" - needs to be at least GPU batch sized
-      min="4"
-      max="256"
-      step="1"
-    />
-    <GenericSlider
-      params={tortoiseGenerationParams}
-      handleChange={handleChange}
-      label="Temperature"
-      format={(x) => x.toFixed(2)}
-      name="temperature"
-      min="0.0"
-      max="1.0"
-      step="0.01"
-    />
-    <GenericSlider
-      params={tortoiseGenerationParams}
-      handleChange={handleChange}
-      label="Length Penalty"
-      name="length_penalty"
-      min="0.0"
-      max="10.0"
-      step="0.01"
-      format={(x) => x.toFixed(2)}
-    />
-    <GenericSlider
-      params={tortoiseGenerationParams}
-      handleChange={handleChange}
-      label="Repetition Penalty"
-      name="repetition_penalty"
-      min="0.0"
-      max="10.0"
-      step="0.01"
-      format={(x) => x.toFixed(2)}
-    />
-    <GenericSlider
-      params={tortoiseGenerationParams}
-      handleChange={handleChange}
-      label="Top P"
-      name="top_p"
-      min="0.0"
-      max="1.0"
-      step="0.01"
-      format={(x) => x.toFixed(2)}
-    />
-    <GenericSlider
-      params={tortoiseGenerationParams}
-      handleChange={handleChange}
-      label="Max Mel Tokens"
-      name="max_mel_tokens"
-      min="0"
-      max="600"
-      step="1"
-    />
-  </SimpleGroup>
-);
-
-const CondFree = ({
-  tortoiseGenerationParams,
-  handleChange,
-}: {
-  tortoiseGenerationParams: TortoiseGenerationParams;
-  handleChange: HandleChange;
-}) => (
-  <div className="flex items-center space-x-2">
-    <label className="text-sm">Cond Free:</label>
-    <input
-      type="checkbox"
-      name="cond_free"
-      checked={tortoiseGenerationParams.cond_free}
-      onChange={handleChange}
-      className="border border-gray-300 p-2 rounded"
-    />
+    <div className="grid grid-cols-6 gap-2 cell items-end">
+      <ParameterSlider
+        params={tortoiseGenerationParams}
+        onChange={handleChange}
+        label="Samples"
+        name="samples"
+        // min="1" - needs to be at least GPU batch sized
+        min="4"
+        max="256"
+        step="1"
+        orientation="vertical"
+        className="h-40"
+      />
+      <ParameterSlider
+        params={tortoiseGenerationParams}
+        onChange={handleChange}
+        label="Temperature"
+        name="temperature"
+        min="0.0"
+        max="1.0"
+        step="0.01"
+        decimals={2}
+        orientation="vertical"
+        className="h-40"
+      />
+      <ParameterSlider
+        params={tortoiseGenerationParams}
+        onChange={handleChange}
+        label="Length Penalty"
+        name="length_penalty"
+        min="0.0"
+        max="10.0"
+        step="0.01"
+        decimals={2}
+        orientation="vertical"
+        className="h-40"
+      />
+      <ParameterSlider
+        params={tortoiseGenerationParams}
+        onChange={handleChange}
+        label="Repetition Penalty"
+        name="repetition_penalty"
+        min="0.0"
+        max="10.0"
+        step="0.01"
+        decimals={2}
+        orientation="vertical"
+        className="h-40"
+      />
+      <ParameterSlider
+        params={tortoiseGenerationParams}
+        onChange={handleChange}
+        label="Top P"
+        name="top_p"
+        min="0.0"
+        max="1.0"
+        step="0.01"
+        decimals={2}
+        orientation="vertical"
+        className="h-40"
+      />
+      <ParameterSlider
+        params={tortoiseGenerationParams}
+        onChange={handleChange}
+        label="Max Mel Tokens"
+        name="max_mel_tokens"
+        min="0"
+        max="600"
+        step="1"
+        orientation="vertical"
+        className="h-40"
+      />
+    </div>
   </div>
 );
 
@@ -555,39 +425,132 @@ const DiffusionParameters = ({
   tortoiseGenerationParams: TortoiseGenerationParams;
   handleChange: HandleChange;
 }) => (
-  <SimpleGroup>
+  <div className="flex flex-col gap-y-0">
     <h2 className="text-md">Diffusion Parameters</h2>
-    <GenericSlider
-      params={tortoiseGenerationParams}
-      handleChange={handleChange}
-      label="Diffusion Iterations"
-      name="diffusion_iterations"
-      min="0"
-      max="400"
-      step="1"
-    />
-    <CondFree
-      tortoiseGenerationParams={tortoiseGenerationParams}
-      handleChange={handleChange}
-    />
-    <GenericSlider
-      params={tortoiseGenerationParams}
-      handleChange={handleChange}
-      label="Cond Free K"
-      name="cond_free_k"
-      min="0"
-      max="10"
-      step="1"
-    />
-    <GenericSlider
-      params={tortoiseGenerationParams}
-      handleChange={handleChange}
-      label="Diffusion Temperature"
-      format={(x) => x.toFixed(2)}
-      name="diffusion_temperature"
-      min="0.0"
-      max="1.0"
-      step="0.01"
-    />
-  </SimpleGroup>
+    <SimpleGroup>
+      <div className="flex gap-2 w-full justify-around">
+        <ParameterSlider
+          params={tortoiseGenerationParams}
+          onChange={handleChange}
+          label="Diffusion Iterations"
+          name="diffusion_iterations"
+          min="0"
+          max="400"
+          step="1"
+          orientation="vertical"
+          className="h-40"
+        />
+        <ParameterSlider
+          params={tortoiseGenerationParams}
+          onChange={handleChange}
+          label="Cond Free K"
+          name="cond_free_k"
+          min="0"
+          max="10"
+          step="1"
+          orientation="vertical"
+          className="h-40"
+        />
+        <ParameterSlider
+          params={tortoiseGenerationParams}
+          onChange={handleChange}
+          label="Diffusion Temperature"
+          decimals={2}
+          name="diffusion_temperature"
+          min="0.0"
+          max="1.0"
+          step="0.01"
+          orientation="vertical"
+          className="h-40"
+        />
+      </div>
+      <Separator />
+      <SwitchWithLabel
+        label="Use Cond Free"
+        name="cond_free"
+        value={tortoiseGenerationParams.cond_free}
+        onChange={handleChange}
+      />
+    </SimpleGroup>
+  </div>
 );
+
+function GenerationParameters({
+  tortoiseGenerationParams,
+  handleChange,
+}: {
+  tortoiseGenerationParams: TortoiseGenerationParams;
+  handleChange: HandleChange;
+}) {
+  return (
+    <div className="flex flex-col gap-y-0">
+      <h2 className="text-md">Generation Parameters</h2>
+      <SimpleGroup>
+        {/* <ParameterSlider
+            params={tortoiseGenerationParams}
+            onChange={handleChange}
+            label="CVVP Amount (Deprecated, always 0)"
+            name="cvvp_amount"
+            min="0.0"
+            max="1.0"
+            step="0.01"
+            disabled
+          /> */}
+        <SwitchWithLabel
+          label="Generate each line separately"
+          name="split_prompt"
+          value={tortoiseGenerationParams.split_prompt}
+          onChange={handleChange}
+        />
+        <Button
+          className="cell"
+          variant="outline"
+          onClick={() => {
+            handleChange({
+              target: {
+                name: "text",
+                value: splitAndRecombineText(
+                  tortoiseGenerationParams.text
+                ).join("\n"),
+              },
+            });
+            handleChange({
+              target: {
+                name: "split_prompt",
+                value: true as any,
+              },
+            });
+          }}
+        >
+          Split prompt into lines by length
+          <WrapTextIcon className="ml-2 w-5 h-5" />
+        </Button>
+        <Separator />
+        <ParameterSlider
+          params={tortoiseGenerationParams}
+          onChange={handleChange}
+          label="Candidates"
+          name="candidates"
+          min="1"
+          max="9"
+          step="1"
+        />
+        <Separator />
+        <SeedInput
+          params={tortoiseGenerationParams}
+          handleChange={handleChange}
+        />
+        <Separator />
+        <div className="flex items-center gap-x-2">
+          <Label>Generation name:</Label>
+          <Input
+            type="text"
+            name="generation_name"
+            value={tortoiseGenerationParams.generation_name}
+            onChange={handleChange}
+          />
+        </div>
+      </SimpleGroup>
+    </div>
+  );
+}

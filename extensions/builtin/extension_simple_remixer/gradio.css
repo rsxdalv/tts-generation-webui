@@ -1,0 +1,5 @@
+.studio-slots-row.studio-slots-row {
+  flex-wrap: nowrap;
+  overflow-x: scroll;
+  padding-bottom: var(--layout-gap);
+}
