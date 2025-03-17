@@ -61,8 +61,9 @@ const syncRepo = async () => {
       }
       return true;
     } catch (error) {
-      displayMessage("There was a problem while pulling updates. Aborting...");
-      throw error;
+      displayMessage("There was a problem while pulling updates. Warning: missing updates might cause issues. Continuing...");
+      displayError(error);
+      // throw error;
     }
   }
 };

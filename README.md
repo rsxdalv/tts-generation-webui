@@ -76,6 +76,7 @@
 
 Mar 17:
 * Upgrade Google Colab to PyTorch 2.6.0, add Conda to downgrade Python to 3.10
+* No longer abort when the automatic update fails to fetch the new code (Improving offline support #457)
 
 ## February 2025
 
