@@ -78,6 +78,7 @@ Mar 17:
 * Upgrade Google Colab to PyTorch 2.6.0, add Conda to downgrade Python to 3.10
 * No longer abort when the automatic update fails to fetch the new code (Improving offline support #457)
 * Upgrade Tortoise to v3.0.1 for transformers 4.49.0 #454
+* Prevent running in Windows/System32 folder #459
 
 ## February 2025
 

@@ -1,6 +1,13 @@
 $logFile = Join-Path -Path $PSScriptRoot -ChildPath "output.log"
 Start-Transcript -Path $logFile
 
+# Check if running from System32 directory
+if ($PWD.Path -eq "C:\Windows\System32") {
+    Write-Host "ERROR: Do not run this script as administrator!"
+    Write-Host "The script is running from C:\Windows\System32 which will cause the installation to fail."
+    exit 1
+}
+
 
 $title    = 'Confirmation'
 $question = 'Are you sure you want to proceed?'
