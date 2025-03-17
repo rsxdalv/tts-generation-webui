@@ -76,6 +76,7 @@
 
 Mar 18:
 * Remove old rvc files
+* Fix missing torchfcpe dependency for RVC
 
 Mar 17:
 * Upgrade Google Colab to PyTorch 2.6.0, add Conda to downgrade Python to 3.10
