@@ -74,6 +74,9 @@
 
 ## Changelog
 
+Mar 20:
+* Add executable macOS script for double-click launching
+
 Mar 18:
 * Remove old rvc files
 * Fix missing torchfcpe dependency for RVC
