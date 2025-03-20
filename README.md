@@ -76,6 +76,7 @@
 
 Mar 20:
 * Add executable macOS script for double-click launching
+* Add unstable CosyVoice extension
 
 Mar 18:
 * Remove old rvc files
