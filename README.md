@@ -74,6 +74,9 @@
 
 ## Changelog
 
+Mar 21:
+* Add CosyVoice extension [Unstable] and GPT-SoVITS [Alpha] extension
+
 Mar 20:
 * Add executable macOS script for double-click launching
 * Add unstable CosyVoice extension

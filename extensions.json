@@ -284,6 +284,21 @@
             "website": "https://github.com/rsxdalv/extension_resemble_enhance",
             "extension_website": "https://github.com/rsxdalv/extension_resemble_enhance",
             "extension_platform_version": "0.0.1"
+        },
+        {
+            "package_name": "extension_gpt_sovits",
+            "name": "GPT-SoVITS",
+            "version": "0.1.0",
+            "requirements": "git+https://github.com/rsxdalv/extension_gpt_sovits@main",
+            "description": "GPT-SoVITS: A TTS solution powered by GPT and SoftVC VITS Singing Voice Conversion.",
+            "extension_type": "interface",
+            "extension_class": "text-to-speech",
+            "author": "rsxdalv",
+            "extension_author": "rsxdalv",
+            "license": "MIT",
+            "website": "https://github.com/X-T-E-R/GPT-SoVITS-Inference",
+            "extension_website": "https://github.com/rsxdalv/extension_gpt_sovits",
+            "extension_platform_version": "0.0.1"
         }
     ],
     "decorators": [
