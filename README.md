@@ -77,6 +77,7 @@
 Apr 02:
 * Fix pydantic (#465, #468)
 * Add --no-react --no-database advanced flags
+* Add a fix to avoid directory errors on the very first React UI build (#466)
 
 ## March 2025
 

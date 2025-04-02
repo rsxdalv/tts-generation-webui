@@ -367,6 +367,8 @@ function setupReactUIExtensions() {
 exports.setupReactUI = () => {
   try {
     setupReactUIExtensions();
+    if (!fs.existsSync("outputs")) fs.mkdirSync("outputs");
+    if (!fs.existsSync("favorites")) fs.mkdirSync("favorites");
     displayMessage("Installing node_modules...");
     $sh("cd react-ui && npm install");
     displayMessage("Successfully installed node_modules");
