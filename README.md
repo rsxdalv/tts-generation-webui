@@ -74,6 +74,12 @@
 
 ## Changelog
 
+Apr 02:
+* Fix pydantic (#465, #468)
+* Add --no-react --no-database advanced flags
+
+## March 2025
+
 Mar 21:
 * Add CosyVoice extension [Unstable] and GPT-SoVITS [Alpha] extension
 

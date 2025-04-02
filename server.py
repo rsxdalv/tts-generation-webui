@@ -346,18 +346,28 @@ def server_hypervisor():
         stop_postgres(postgres_process)
         sys.exit(0)
 
-    print("Starting React UI...")
-    subprocess.Popen(
-        "npm start --prefix react-ui",
-        env={
-            **os.environ,
-            "GRADIO_BACKEND_AUTOMATIC": f"http://127.0.0.1:{gradio_interface_options['server_port']}",
-        },
-        shell=True,
-    )
-    if "--docker" in os.sys.argv:
-        print("Info: Docker mode: skipping Postgres")
+    # Check for --no-react flag
+    if "--no-react" not in os.sys.argv:
+        print("Starting React UI...")
+        subprocess.Popen(
+            "npm start --prefix react-ui",
+            env={
+                **os.environ,
+                "GRADIO_BACKEND_AUTOMATIC": f"http://127.0.0.1:{gradio_interface_options['server_port']}",
+            },
+            shell=True,
+        )
+    else:
+        print("Skipping React UI (--no-react flag detected)")
+
+    # Check for --no-database or docker flag
+    if "--no-database" in os.sys.argv or "--docker" in os.sys.argv:
+        if "--docker" in os.sys.argv:
+            print("Info: Docker mode: skipping Postgres")
+        else:
+            print("Skipping Postgres (--no-database flag detected)")
         return
+
     print("Starting Postgres...")
     postgres_process = subprocess.Popen(f"postgres -D {postgres_dir} -p 7773", shell=True)
     try:
@@ -386,7 +396,7 @@ if __name__ == "__main__":
     server_hypervisor()
     import webbrowser
 
-    if gradio_interface_options["inbrowser"]:
+    if gradio_interface_options["inbrowser"] and "--no-react" not in os.sys.argv:
         webbrowser.open("http://localhost:3000")
 
     start_gradio_server()
