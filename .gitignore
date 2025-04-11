@@ -36,6 +36,7 @@ config.json
 /data/models/musicgen_audiogen/*/
 /data/models/gpt_sovits/
 /data/models/resemble_enhance/ds/
+/data/models/ap_bwe/weights/
 
 # Ignore temporary files
 temp/

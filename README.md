@@ -74,6 +74,9 @@
 
 ## Changelog
 
+Apr 11:
+* Add AP BWE upscaling extension
+
 Apr 02:
 * Fix pydantic (#465, #468)
 * Add --no-react --no-database advanced flags
