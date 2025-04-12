@@ -1,6 +1,11 @@
 # ruff: noqa: E402
 # %%
 print("Starting server...\n")
+
+# Apply torch.load monkeypatch early to ensure it's in place before any models are loaded
+from tts_webui.utils.torch_load_patch import apply_torch_load_patch
+apply_torch_load_patch()
+
 import tts_webui.utils.setup_or_recover as setup_or_recover
 
 setup_or_recover.setup_or_recover()
@@ -133,6 +138,30 @@ def main_ui(theme_choice="Base"):
 def all_tabs():
     with gr.Tab("Text-to-Speech"), gr.Tabs():
         tts_tabs = [
+            (
+                "tts_webui.vall_e_x.vall_e_x_tab",
+                "valle_x_tab",
+                "Valle-X",
+                "-r requirements_vall_e.txt",
+            ),
+            (
+                "tts_webui.styletts2.styletts2_tab",
+                "style_tts2_tab",
+                "StyleTTS2",
+                "-r requirements_styletts2.txt",
+            ),
+            (
+                "tts_webui.seamlessM4T.seamless_tab",
+                "seamless_tab",
+                "SeamlessM4Tv2Model",
+            ),
+            ("tts_webui.mms.mms_tab", "mms_tab", "MMS"),
+            (
+                "tts_webui.maha_tts.maha_tts_tab",
+                "maha_tts_tab",
+                "MahaTTS",
+                "-r requirements_maha_tts.txt",
+            ),
             ("tts_webui.bark.bark_tab", "bark_tab", "Bark TTS"),
             (
                 "tts_webui.bark.clone.tab_voice_clone",
@@ -144,30 +173,6 @@ def all_tabs():
                 "tts_webui.tortoise.tortoise_tab",
                 "tortoise_tab",
                 "Tortoise TTS",
-            ),
-            (
-                "tts_webui.seamlessM4T.seamless_tab",
-                "seamless_tab",
-                "SeamlessM4Tv2Model",
-            ),
-            (
-                "tts_webui.vall_e_x.vall_e_x_tab",
-                "valle_x_tab",
-                "Valle-X",
-                "-r requirements_vall_e.txt",
-            ),
-            ("tts_webui.mms.mms_tab", "mms_tab", "MMS"),
-            (
-                "tts_webui.maha_tts.maha_tts_tab",
-                "maha_tts_tab",
-                "MahaTTS",
-                "-r requirements_maha_tts.txt",
-            ),
-            (
-                "tts_webui.styletts2.styletts2_tab",
-                "style_tts2_tab",
-                "StyleTTS2",
-                "-r requirements_styletts2.txt",
             ),
         ]
         load_tabs(tts_tabs)

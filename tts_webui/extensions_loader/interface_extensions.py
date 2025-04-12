@@ -6,6 +6,7 @@ import time
 
 import gradio as gr
 
+from tts_webui.config.config import config
 from tts_webui.utils.pip_install import pip_install_wrapper, pip_uninstall_wrapper
 from tts_webui.utils.generic_error_tab_advanced import generic_error_tab_advanced
 
@@ -19,43 +20,8 @@ def check_if_package_installed(package_name):
     return spec is not None
 
 
-# disabled_extensions = ["extension_xtts_rvc_ui"]
-disabled_extensions = []
-
-
 def _handle_package(package_name, title_name, requirements):
-    if package_name in disabled_extensions:
-        print(f"Skipping disabled {title_name} Extension...")
-        return
-    if check_if_package_installed(package_name):
-        print(f"Loading {title_name} Extension...")
-        start_time = time.time()
-        try:
-            module = importlib.import_module(f"{package_name}.main")
-            if "builtin" in package_name:
-                package_version = "0.0.1"
-            else:
-                package_version = version(package_name)
-            main_tab = getattr(module, "extension__tts_generation_webui")
-            with gr.Tab(f"{title_name} (v{package_version}) Extension"):
-                if "builtin" in package_name:
-                    gr.Markdown(f"{title_name} Extension is up to date")
-                else:
-                    if hasattr(module, "update_button"):
-                        update_button = getattr(module, "update_button")
-                        update_button()
-                    else:
-                        _extension_management_ui(package_name, title_name, requirements)
-                # with gr.Tabs():
-                main_tab()
-        except Exception as e:
-            generic_error_tab_advanced(
-                e, name=title_name + " Extension", requirements=requirements
-            )
-        finally:
-            elapsed_time = time.time() - start_time
-            print(f"  Done in {elapsed_time:.2f} seconds. ({title_name} Extension)\n")
-    else:
+    if not check_if_package_installed(package_name):
         with gr.Tab(f"[Available] {title_name} Extension"):
             gr.Markdown(f"{title_name} Extension not installed")
             install_btn = gr.Button(f"Install {title_name} Extension")
@@ -65,6 +31,34 @@ def _handle_package(package_name, title_name, requirements):
                 pip_install_wrapper(requirements, title_name),
                 outputs=[console_text],
             )
+        return
+
+    print(f"Loading {title_name} Extension...")
+    start_time = time.time()
+    try:
+        module = importlib.import_module(f"{package_name}.main")
+        package_version = (
+            "0.0.1" if "builtin" in package_name else version(package_name)
+        )
+        main_tab = getattr(module, "extension__tts_generation_webui")
+        with gr.Tab(f"{title_name} (v{package_version}) Extension"):
+            if "builtin" in package_name:
+                gr.Markdown(f"{title_name} Extension is up to date")
+            else:
+                if hasattr(module, "update_button"):
+                    update_button = getattr(module, "update_button")
+                    update_button()
+                else:
+                    _extension_management_ui(package_name, title_name, requirements)
+            # with gr.Tabs():
+            main_tab()
+    except Exception as e:
+        generic_error_tab_advanced(
+            e, name=title_name + " Extension", requirements=requirements
+        )
+    finally:
+        elapsed_time = time.time() - start_time
+        print(f"  Done in {elapsed_time:.2f} seconds. ({title_name} Extension)\n")
 
 
 def disable_extension(package_name):
@@ -123,6 +117,10 @@ def get_extension_list_json():
 
 
 extension_list_json = get_extension_list_json()
+try:
+    disabled_extensions = config["extensions"]["disabled"]
+except KeyError:
+    disabled_extensions = []
 
 
 def handle_extension_class(extension_class, config):
@@ -132,6 +130,9 @@ def handle_extension_class(extension_class, config):
             and x["extension_class"] == extension_class
         ):
             # x["package_name"], f"{x['name']} (v{x['version']})", x["requirements"]
+            if x["package_name"] in disabled_extensions:
+                print(f"Skipping disabled {x['name']} Extension...")
+                continue
             _handle_package(x["package_name"], x["name"], x["requirements"])
 
 

@@ -29,7 +29,7 @@ const nextConfig = (phase, { defaultConfig }) => ({
 
   //   return config
   // },
-  output: phase === PHASE_EXPORT ? "export" : undefined,
+  // output: phase === PHASE_EXPORT ? "export" : undefined,
   reactStrictMode: true,
 });
 
