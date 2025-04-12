@@ -1,29 +1,28 @@
 # ruff: noqa: E402
 # %%
 print("Starting server...\n")
+
+# Apply torch.load monkeypatch early to ensure it's in place before any models are loaded
+from tts_webui.utils.torch_load_patch import apply_torch_load_patch
+
+apply_torch_load_patch()
 import tts_webui.utils.setup_or_recover as setup_or_recover
 
 setup_or_recover.setup_or_recover()
-
 import tts_webui.utils.dotenv_init as dotenv_init
 
 dotenv_init.init()
-
 import os
 import gradio as gr
 from tts_webui.utils.suppress_warnings import suppress_warnings
 
 suppress_warnings()
-
 from tts_webui.config.load_config import default_config
 from tts_webui.config.config import config
-
 from tts_webui.css.css import full_css
 from tts_webui.history_tab.collections_directories_atom import (
     collections_directories_atom,
 )
-
-
 from tts_webui.utils.generic_error_tab_advanced import generic_error_tab_advanced
 from tts_webui.extensions_loader.interface_extensions import (
     extension_list_tab,
@@ -51,11 +50,10 @@ gradio_interface_options = (
 )
 
 
-import time
-import importlib
-
-
 def run_tab(module_name, function_name, name, requirements=None):
+    import time
+    import importlib
+
     print(f"Loading {name} tab...")
     start_time = time.time()
     try:
@@ -133,6 +131,30 @@ def main_ui(theme_choice="Base"):
 def all_tabs():
     with gr.Tab("Text-to-Speech"), gr.Tabs():
         tts_tabs = [
+            (
+                "tts_webui.vall_e_x.vall_e_x_tab",
+                "valle_x_tab",
+                "Valle-X",
+                "-r requirements_vall_e.txt",
+            ),
+            (
+                "tts_webui.styletts2.styletts2_tab",
+                "style_tts2_tab",
+                "StyleTTS2",
+                "-r requirements_styletts2.txt",
+            ),
+            (
+                "tts_webui.seamlessM4T.seamless_tab",
+                "seamless_tab",
+                "SeamlessM4Tv2Model",
+            ),
+            ("tts_webui.mms.mms_tab", "mms_tab", "MMS"),
+            (
+                "tts_webui.maha_tts.maha_tts_tab",
+                "maha_tts_tab",
+                "MahaTTS",
+                "-r requirements_maha_tts.txt",
+            ),
             ("tts_webui.bark.bark_tab", "bark_tab", "Bark TTS"),
             (
                 "tts_webui.bark.clone.tab_voice_clone",
@@ -144,30 +166,6 @@ def all_tabs():
                 "tts_webui.tortoise.tortoise_tab",
                 "tortoise_tab",
                 "Tortoise TTS",
-            ),
-            (
-                "tts_webui.seamlessM4T.seamless_tab",
-                "seamless_tab",
-                "SeamlessM4Tv2Model",
-            ),
-            (
-                "tts_webui.vall_e_x.vall_e_x_tab",
-                "valle_x_tab",
-                "Valle-X",
-                "-r requirements_vall_e.txt",
-            ),
-            ("tts_webui.mms.mms_tab", "mms_tab", "MMS"),
-            (
-                "tts_webui.maha_tts.maha_tts_tab",
-                "maha_tts_tab",
-                "MahaTTS",
-                "-r requirements_maha_tts.txt",
-            ),
-            (
-                "tts_webui.styletts2.styletts2_tab",
-                "style_tts2_tab",
-                "StyleTTS2",
-                "-r requirements_styletts2.txt",
             ),
         ]
         load_tabs(tts_tabs)
@@ -369,7 +367,9 @@ def server_hypervisor():
         return
 
     print("Starting Postgres...")
-    postgres_process = subprocess.Popen(f"postgres -D {postgres_dir} -p 7773", shell=True)
+    postgres_process = subprocess.Popen(
+        f"postgres -D {postgres_dir} -p 7773", shell=True
+    )
     try:
         signal.signal(
             signal.SIGINT,

@@ -1,32 +1,226 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Long Polling Example</title>
+    <title>TTS Generation WebUI - Log Viewer</title>
+    <style>
+      body {
+        font-family: monospace;
+        background-color: #1e1e1e;
+        color: #d4d4d4;
+        margin: 0;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      #log-container {
+        white-space: pre-wrap;
+        overflow-y: auto;
+        height: 60vh;
+        border: 1px solid #333;
+        padding: 10px;
+        background-color: #252526;
+      }
+      h1, h2, h3 {
+        margin-top: 0;
+        color: #9cdcfe;
+      }
+      #messages {
+        margin-top: 10px;
+        padding: 10px;
+        border: 1px solid #333;
+        background-color: #252526;
+        max-height: 200px;
+        overflow-y: auto;
+        font-size: 1.2em;
+      }
+      #state-container {
+        padding: 10px;
+        border: 1px solid #333;
+        background-color: #252526;
+      }
+      .status-badge {
+        display: inline-block;
+        padding: 3px 8px;
+        border-radius: 4px;
+        font-weight: bold;
+        margin-right: 10px;
+        color: black;
+      }
+      .status-initializing { background-color: #2d7dd2; }
+      .status-checking_dependencies { background-color: #97cc04; }
+      .status-updating_repo { background-color: #eeb902; }
+      .status-installing { background-color: #f45d01; }
+      .status-ready { background-color: #00b2ca; }
+      .status-error { background-color: #f45d01; }
+
+      .progress-bar {
+        width: 100%;
+        background-color: #333;
+        height: 20px;
+        border-radius: 4px;
+        margin-top: 10px;
+        overflow: hidden;
+      }
+      .progress-fill {
+        height: 100%;
+        background-color: #00b2ca;
+        transition: width 0.3s ease;
+      }
+      .state-item {
+        margin: 5px 0;
+      }
+      .state-label {
+        font-weight: bold;
+        color: #9cdcfe;
+        display: inline-block;
+        width: 150px;
+      }
+    </style>
   </head>
   <body>
-    <h1>Long Polling Messages</h1>
+    <h1>TTS Generation WebUI - Log Viewer</h1>
+
+    <p>
+      This page is purely informational. You can close this window and continue using the TTS WebUI once it has started. Any inputs need to be done in the terminal.
+    </p>
+
+    <!-- Installer State Section -->
+    <h2>Installer State</h2>
+    <div id="state-container">
+      <div class="state-item">
+        <span class="state-label">Status:</span>
+        <span id="status-badge" class="status-badge status-initializing">Initializing</span>
+      </div>
+      <div class="state-item">
+        <span class="state-label">Progress:</span>
+        <span id="progress-text">0/5</span>
+        <div class="progress-bar">
+          <div id="progress-fill" class="progress-fill" style="width: 0%"></div>
+        </div>
+      </div>
+      <div class="state-item">
+        <span class="state-label">Conda Ready:</span>
+        <span id="conda-ready">No</span>
+      </div>
+      <div class="state-item">
+        <span class="state-label">Torch Ready:</span>
+        <span id="torch-ready">No</span>
+      </div>
+      <div class="state-item">
+        <span class="state-label">React UI Ready:</span>
+        <span id="react-ui-ready">No</span>
+      </div>
+      <div class="state-item">
+        <span class="state-label">Last Error:</span>
+        <span id="last-error">None</span>
+      </div>
+      <div class="state-item">
+        <span class="state-label">Git Hash:</span>
+        <span id="git-hash">None</span>
+      </div>
+      <div class="state-item">
+        <span class="state-label">Last Updated:</span>
+        <span id="timestamp">-</span>
+      </div>
+    </div>
+
+    <h2>Messages</h2>
     <div id="messages"></div>
 
+    <label>
+      <input type="checkbox" id="auto-scroll" checked /> Auto-scroll to bottom
+    </label>
+
+    <h2>Log Output</h2>
+    <div id="log-container"></div>
+
     <script>
+      // Log streaming functionality
+      const logContainer = document.getElementById("log-container");
+      const autoScrollCheckbox = document.getElementById("auto-scroll");
+      let isFirstLoad = true;
+
+      function fetchLogs() {
+        const xhr = new XMLHttpRequest();
+        xhr.open("GET", "/stream-log", true);
+        xhr.onprogress = function () {
+          if (xhr.responseText) {
+            logContainer.textContent = xhr.responseText;
+            if (autoScrollCheckbox.checked || isFirstLoad) {
+              logContainer.scrollTop = logContainer.scrollHeight;
+              isFirstLoad = false;
+            }
+          }
+        };
+        xhr.onloadend = function () {
+          // Reconnect after a short delay
+          setTimeout(fetchLogs, 1000);
+        };
+        xhr.send();
+      }
+
+      // Start fetching logs
+      fetchLogs();
+
+      // Long polling functionality
       function poll() {
         fetch("/poll")
           .then((response) => response.json())
           .then((data) => {
+            // Update messages
             const messageDiv = document.getElementById("messages");
             messageDiv.innerHTML = "";
-            data.messages.forEach((message) => {
-              const newMessage = document.createElement("div");
-              newMessage.textContent = message;
-              messageDiv.appendChild(newMessage);
-            });
-            setTimeout(poll, 200); // Make the next poll request after 200ms
+            if (data.messages && data.messages.length > 0) {
+              data.messages.forEach((message) => {
+                const newMessage = document.createElement("div");
+                newMessage.textContent = message;
+                messageDiv.appendChild(newMessage);
+              });
+            }
+
+            // Update state if available
+            if (data.state) {
+              updateStateDisplay(data.state);
+            }
+
+            setTimeout(poll, 50); // Make the next poll request after 200ms
           })
           .catch((error) => {
             console.error("Polling error:", error);
             setTimeout(poll, 5000); // Retry after 5 seconds if there's an error
           });
       }
-      // Start the first poll request
+
+      // Function to update the state display
+      function updateStateDisplay(state) {
+        // Update status badge
+        const statusBadge = document.getElementById('status-badge');
+        statusBadge.textContent = state.status.charAt(0).toUpperCase() + state.status.slice(1).replace('_', ' ');
+        statusBadge.className = 'status-badge status-' + state.status;
+
+        // Update progress
+        const progressText = document.getElementById('progress-text');
+        progressText.textContent = `${state.currentStep}/${state.totalSteps}`;
+
+        const progressFill = document.getElementById('progress-fill');
+        const progressPercentage = (state.currentStep / state.totalSteps) * 100;
+        progressFill.style.width = `${progressPercentage}%`;
+
+        // Update ready states
+        document.getElementById('conda-ready').textContent = state.condaReady ? 'Yes' : 'No';
+        document.getElementById('torch-ready').textContent = state.torchReady ? 'Yes' : 'No';
+        document.getElementById('react-ui-ready').textContent = state.reactUIReady ? 'Yes' : 'No';
+
+        // Update error and git hash
+        document.getElementById('last-error').textContent = state.lastError || 'None';
+        document.getElementById('git-hash').textContent = state.gitHash || 'None';
+
+        // Update timestamp
+        document.getElementById('timestamp').textContent = new Date(state.timestamp).toLocaleString();
+      }
+
+      // Start the long polling
       poll();
     </script>
   </body>

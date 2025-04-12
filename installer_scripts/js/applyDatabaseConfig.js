@@ -104,7 +104,7 @@ async function applyDatabaseConfig() {
           const psqlCommand = `psql -U ${db_conf.username} -d ${
             db_conf.database
           } -c "${query.replace(/"/g, '\\"').replace(/\n/g, " ")}"`;
-          $sh(psqlCommand);
+          await $sh(psqlCommand);
         };
 
         await sql`CREATE TABLE IF NOT EXISTS generations (

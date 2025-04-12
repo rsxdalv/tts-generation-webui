@@ -3,59 +3,17 @@ const { resolve } = require("path");
 const { displayError, displayMessage } = require("./displayMessage.js");
 const { processExit } = require("./processExit.js");
 const { menu } = require("./menu.js");
-const { $, $$, $sh } = require("./shell.js");
+const { $, $$, $sh  } = require("./shell.js");
 const { applyDatabaseConfig } = require("./applyDatabaseConfig.js");
 
 const DEBUG_DRY_RUN = false;
 
-const torchVersion = "2.3.1"; // 2.4.1+cu118
-const cudaVersion = "11.8";
+const torchVersion = "2.6.0";
+const cudaVersion = "12.4";
+const cudaVersionTag = `cu124`;
 
 const pythonVersion = `3.10.11`;
 const pythonPackage = `python=${pythonVersion}`;
-const ffmpegPackage = `conda-forge::ffmpeg=4.4.2[build=lgpl*]`;
-const nodePackage = `conda-forge::nodejs=22.9.0`;
-const anacondaPostgresqlPackage = `conda-forge::postgresql=16.4`;
-// const terraformPackage = `conda-forge::terraform=1.8.2`;
-const terraformPackage = ``;
-
-const cudaChannels = [
-  "",
-  "pytorch",
-  `nvidia/label/cuda-${cudaVersion}.0`,
-  "nvidia",
-].join(" -c ");
-const cpuChannels = ["", "pytorch"].join(" -c ");
-
-const windowsOnlyPackages =
-  process.platform === "win32" ? ["conda-forge::vswhere"] : [];
-
-const commonPackages = [
-  "conda-forge::uv=0.4.17",
-  ...windowsOnlyPackages,
-  terraformPackage,
-  anacondaPostgresqlPackage,
-  nodePackage,
-  ffmpegPackage,
-];
-
-const cudaPackages = `pytorch[version=${torchVersion},build=py3.10_cuda${cudaVersion}.*] pytorch-cuda=${cudaVersion} torchvision torchaudio cuda-toolkit ninja`;
-const cudaPytorchInstall$ = [
-  "conda install -y -k",
-  ...commonPackages,
-  cudaPackages,
-  cudaChannels,
-].join(" ");
-
-const cpuPackages = `pytorch=${torchVersion} torchvision torchaudio cpuonly`;
-const pytorchCPUInstall$ = [
-  "conda install -y -k",
-  ...commonPackages,
-  cpuPackages,
-  cpuChannels,
-].join(" ");
-
-const baseOnlyInstall$ = ["conda install -y -k", ...commonPackages].join(" ");
 
 const ensurePythonVersion = async () => {
   try {
@@ -65,7 +23,6 @@ const ensurePythonVersion = async () => {
       displayMessage(`Current python version is """${version}"""`);
       displayMessage(`Python version is not ${pythonVersion}. Reinstalling...`);
       await $(`conda install -y -k -c conda-forge ${pythonPackage}`);
-      await $(`conda install -y -k -c conda-forge pip==23.3.2`);
     }
   } catch (error) {
     displayError("Failed to check/install python version");
@@ -80,22 +37,27 @@ const ensurePythonVersion = async () => {
 const installDependencies = async (gpuchoice) => {
   try {
     if (gpuchoice === "NVIDIA GPU") {
-      await $(cudaPytorchInstall$);
+      await $(
+        `pip install -U torch==${torchVersion}+${cudaVersionTag} torchvision torchaudio --index-url https://download.pytorch.org/whl/${cudaVersionTag}`
+      );
+
+      await pip_install(
+        `-U xformers==0.0.29.post3 --index-url https://download.pytorch.org/whl/${cudaVersionTag}`,
+        "xformers",
+        true
+      );
     } else if (gpuchoice === "Apple M Series Chip" || gpuchoice === "CPU") {
-      await $(pytorchCPUInstall$);
-    } else if (gpuchoice === "AMD GPU (ROCM, Linux only, potentially broken)") {
+      await $(
+        `pip install torch==${torchVersion}+cpu torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu`
+      );
+    } else if (gpuchoice === "AMD GPU (ROCM, Linux only)") {
       displayMessage(
         "ROCM is experimental and not well supported yet, installing..."
       );
       displayMessage("Linux only!");
-      await $(baseOnlyInstall$);
       await $(
         `pip install torch==${torchVersion} torchvision torchaudio --index-url https://download.pytorch.org/whl/rocm6.0`
       );
-    } else if (gpuchoice === "pip torch cpu (experimental, faster install)") {
-      await $(baseOnlyInstall$);
-      await $(`pip install torch==${torchVersion} torchvision torchaudio`);
-      // uv pip install torch==2.5.0+cu118 torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
     } else {
       displayMessage("Unsupported or cancelled. Exiting...");
       removeGPUChoice();
@@ -118,10 +80,9 @@ const askForGPUChoice = () =>
       "Apple M Series Chip",
       "CPU",
       "Cancel",
-      "AMD GPU (ROCM, Linux only, potentially broken)",
+      "AMD GPU (ROCM, Linux only)",
       "Intel GPU (unsupported)",
       "Integrated GPU (unsupported)",
-      "pip torch cpu (experimental, faster install)",
     ],
     `
 These are not yet automatically supported: AMD GPU, Intel GPU, Integrated GPU.
@@ -135,7 +96,7 @@ const getInstallerFilesPath = (...files) => resolve(__dirname, "..", ...files);
 const gpuFile = getInstallerFilesPath(".gpu");
 const majorVersionFile = getInstallerFilesPath(".major_version");
 const pipPackagesFile = getInstallerFilesPath(".pip_packages");
-const majorVersion = "4";
+const majorVersion = "5";
 
 const versions = JSON.parse(
   fs.readFileSync(getInstallerFilesPath("versions.json"))
@@ -164,10 +125,10 @@ const removeGPUChoice = () => {
 
 const dry_run_flag = DEBUG_DRY_RUN ? "--dry-run " : "";
 
-function pip_install(requirements, name = "", pipFallback = false) {
+async function pip_install(requirements, name = "", pipFallback = false) {
   try {
     displayMessage(`Installing ${name || requirements} dependencies...`);
-    $sh(
+    await $sh(
       `${
         pipFallback ? "pip" : "uv pip"
       } install ${dry_run_flag}${requirements} torch==${torchVersion}`
@@ -197,14 +158,11 @@ async function pip_install_all(first_install = false) {
     try {
       displayMessage("Attempting single pip install of all dependencies...");
 
-      pip_install(
-        "xformers==0.0.27+cu118 --index-url https://download.pytorch.org/whl/cu118",
-        "xformers"
-      );
-      pip_install(
+      await pip_install(
         "-r requirements.txt -r requirements_bark_hubert_quantizer.txt -r requirements_rvc.txt -r requirements_audiocraft.txt -r requirements_styletts2.txt -r requirements_vall_e.txt -r requirements_maha_tts.txt -r requirements_stable_audio.txt hydra-core==1.3.2 nvidia-ml-py",
         "All dependencies",
-        first_install
+        // first_install
+        true
       );
       savePipPackagesVersion(newPipPackagesVersion);
       displayMessage("");
@@ -218,33 +176,30 @@ async function pip_install_all(first_install = false) {
 
   displayMessage("Updating dependencies...");
   // pip_install_all(false); // potential speed optimization
-  pip_install(
+
+  await pip_install(
     "-r requirements.txt",
     "Core Packages, Bark, Tortoise",
     first_install
   );
-  pip_install(
-    "xformers==0.0.27+cu118 --index-url https://download.pytorch.org/whl/cu118",
-    "xformers"
-  );
-  pip_install(
+  await pip_install(
     "-r requirements_bark_hubert_quantizer.txt",
     "Bark Voice Clone",
     first_install
   );
-  pip_install("-r requirements_rvc.txt", "RVC", first_install);
-  pip_install("-r requirements_audiocraft.txt", "Audiocraft", first_install);
-  pip_install("-r requirements_styletts2.txt", "StyleTTS", first_install);
-  pip_install("-r requirements_vall_e.txt", "Vall-E-X", first_install);
-  pip_install("-r requirements_maha_tts.txt", "Maha TTS", first_install);
-  pip_install("-r requirements_stable_audio.txt", "Stable Audio", true);
+  await pip_install("-r requirements_rvc.txt", "RVC", first_install);
+  await pip_install("-r requirements_audiocraft.txt", "Audiocraft", first_install);
+  await pip_install("-r requirements_styletts2.txt", "StyleTTS", first_install);
+  await pip_install("-r requirements_vall_e.txt", "Vall-E-X", first_install);
+  await pip_install("-r requirements_maha_tts.txt", "Maha TTS", first_install);
+  await pip_install("-r requirements_stable_audio.txt", "Stable Audio", true);
   // reinstall hydra-core==1.3.2 because of fairseq
-  pip_install(
+  await pip_install(
     "hydra-core==1.3.2",
     "hydra-core fix due to fairseq",
     first_install
   );
-  pip_install("nvidia-ml-py", "nvidia-ml-py", first_install);
+  await pip_install("nvidia-ml-py", "nvidia-ml-py", first_install);
   savePipPackagesVersion(newPipPackagesVersion);
   displayMessage("");
 }
@@ -364,16 +319,16 @@ function setupReactUIExtensions() {
   }
 }
 
-exports.setupReactUI = () => {
+exports.setupReactUI = async () => {
   try {
     setupReactUIExtensions();
     if (!fs.existsSync("outputs")) fs.mkdirSync("outputs");
     if (!fs.existsSync("favorites")) fs.mkdirSync("favorites");
     displayMessage("Installing node_modules...");
-    $sh("cd react-ui && npm install");
+    await $sh("cd react-ui && npm install");
     displayMessage("Successfully installed node_modules");
     displayMessage("Building react-ui...");
-    $sh("cd react-ui && npm run build");
+    await $sh("cd react-ui && npm run build");
     displayMessage("Successfully built react-ui");
   } catch (error) {
     displayMessage("Failed to install node_modules or build react-ui");

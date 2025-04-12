@@ -24,6 +24,15 @@ SAMPLE_RATE = 24_000
 def get_model(model_name=""):
     from styletts2.tts import StyleTTS2
 
+    # ensure that nltk punkt_tab is downloaded
+    import nltk
+
+    try:
+        nltk.data.find("tokenizers/punkt_tab")
+    except LookupError:
+        print("Downloading NLTK punkt resource...")
+        nltk.download("punkt_tab")
+
     return StyleTTS2(
         model_checkpoint_path=None if model_name == "" else model_name,
         config_path=None,
@@ -82,7 +91,7 @@ def style_tts2_ui():
         The model will generate audio from the text.
         It uses the [StyleTTS2](https://styletts2.github.io/) model via the [Python Package](https://github.com/sidharthrajaram/StyleTTS2).
         As a result, the phonemizer is a MIT licensed subsitute.
-        
+
         Parameters:
         * text: Input text to turn into speech.
         * alpha: Determines timbre of speech, higher means style is more suitable to text than to the target voice.

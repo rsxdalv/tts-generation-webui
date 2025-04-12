@@ -74,6 +74,16 @@
 
 ## Changelog
 
+Apr 12:
+* Upgrade to PyTorch 2.6.0 Cuda 12.4, switch to pip for pytorch install
+* Add compatibility layer for older models
+* Fix StyleTTS2 missing nlkt downloader
+* Reorder TTS tabs
+* Allow disabled extensions to be configured in config.json
+* Remove PyTorch CPU via pip option, redundant
+* Move all core conda packages to init_mamba scripts.
+* Upgrade the installer to include a web-based UI
+
 Apr 11:
 * Add AP BWE upscaling extension
 
