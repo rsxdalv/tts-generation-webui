@@ -3,7 +3,7 @@ const { resolve } = require("path");
 const { displayError, displayMessage } = require("./displayMessage.js");
 const { processExit } = require("./processExit.js");
 const { menu } = require("./menu.js");
-const { $, $$, $sh } = require("./shell.js");
+const { $, $$, $sh  } = require("./shell.js");
 const { applyDatabaseConfig } = require("./applyDatabaseConfig.js");
 
 const DEBUG_DRY_RUN = false;
@@ -41,7 +41,7 @@ const installDependencies = async (gpuchoice) => {
         `pip install -U torch==${torchVersion}+${cudaVersionTag} torchvision torchaudio --index-url https://download.pytorch.org/whl/${cudaVersionTag}`
       );
 
-      pip_install(
+      await pip_install(
         `-U xformers==0.0.29.post3 --index-url https://download.pytorch.org/whl/${cudaVersionTag}`,
         "xformers",
         true
@@ -125,10 +125,10 @@ const removeGPUChoice = () => {
 
 const dry_run_flag = DEBUG_DRY_RUN ? "--dry-run " : "";
 
-function pip_install(requirements, name = "", pipFallback = false) {
+async function pip_install(requirements, name = "", pipFallback = false) {
   try {
     displayMessage(`Installing ${name || requirements} dependencies...`);
-    $sh(
+    await $sh(
       `${
         pipFallback ? "pip" : "uv pip"
       } install ${dry_run_flag}${requirements} torch==${torchVersion}`
@@ -158,7 +158,7 @@ async function pip_install_all(first_install = false) {
     try {
       displayMessage("Attempting single pip install of all dependencies...");
 
-      pip_install(
+      await pip_install(
         "-r requirements.txt -r requirements_bark_hubert_quantizer.txt -r requirements_rvc.txt -r requirements_audiocraft.txt -r requirements_styletts2.txt -r requirements_vall_e.txt -r requirements_maha_tts.txt -r requirements_stable_audio.txt hydra-core==1.3.2 nvidia-ml-py",
         "All dependencies",
         // first_install
@@ -177,29 +177,29 @@ async function pip_install_all(first_install = false) {
   displayMessage("Updating dependencies...");
   // pip_install_all(false); // potential speed optimization
 
-  pip_install(
+  await pip_install(
     "-r requirements.txt",
     "Core Packages, Bark, Tortoise",
     first_install
   );
-  pip_install(
+  await pip_install(
     "-r requirements_bark_hubert_quantizer.txt",
     "Bark Voice Clone",
     first_install
   );
-  pip_install("-r requirements_rvc.txt", "RVC", first_install);
-  pip_install("-r requirements_audiocraft.txt", "Audiocraft", first_install);
-  pip_install("-r requirements_styletts2.txt", "StyleTTS", first_install);
-  pip_install("-r requirements_vall_e.txt", "Vall-E-X", first_install);
-  pip_install("-r requirements_maha_tts.txt", "Maha TTS", first_install);
-  pip_install("-r requirements_stable_audio.txt", "Stable Audio", true);
+  await pip_install("-r requirements_rvc.txt", "RVC", first_install);
+  await pip_install("-r requirements_audiocraft.txt", "Audiocraft", first_install);
+  await pip_install("-r requirements_styletts2.txt", "StyleTTS", first_install);
+  await pip_install("-r requirements_vall_e.txt", "Vall-E-X", first_install);
+  await pip_install("-r requirements_maha_tts.txt", "Maha TTS", first_install);
+  await pip_install("-r requirements_stable_audio.txt", "Stable Audio", true);
   // reinstall hydra-core==1.3.2 because of fairseq
-  pip_install(
+  await pip_install(
     "hydra-core==1.3.2",
     "hydra-core fix due to fairseq",
     first_install
   );
-  pip_install("nvidia-ml-py", "nvidia-ml-py", first_install);
+  await pip_install("nvidia-ml-py", "nvidia-ml-py", first_install);
   savePipPackagesVersion(newPipPackagesVersion);
   displayMessage("");
 }
@@ -319,16 +319,16 @@ function setupReactUIExtensions() {
   }
 }
 
-exports.setupReactUI = () => {
+exports.setupReactUI = async () => {
   try {
     setupReactUIExtensions();
     if (!fs.existsSync("outputs")) fs.mkdirSync("outputs");
     if (!fs.existsSync("favorites")) fs.mkdirSync("favorites");
     displayMessage("Installing node_modules...");
-    $sh("cd react-ui && npm install");
+    await $sh("cd react-ui && npm install");
     displayMessage("Successfully installed node_modules");
     displayMessage("Building react-ui...");
-    $sh("cd react-ui && npm run build");
+    await $sh("cd react-ui && npm run build");
     displayMessage("Successfully built react-ui");
   } catch (error) {
     displayMessage("Failed to install node_modules or build react-ui");
