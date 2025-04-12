@@ -4,31 +4,25 @@ print("Starting server...\n")
 
 # Apply torch.load monkeypatch early to ensure it's in place before any models are loaded
 from tts_webui.utils.torch_load_patch import apply_torch_load_patch
-apply_torch_load_patch()
 
+apply_torch_load_patch()
 import tts_webui.utils.setup_or_recover as setup_or_recover
 
 setup_or_recover.setup_or_recover()
-
 import tts_webui.utils.dotenv_init as dotenv_init
 
 dotenv_init.init()
-
 import os
 import gradio as gr
 from tts_webui.utils.suppress_warnings import suppress_warnings
 
 suppress_warnings()
-
 from tts_webui.config.load_config import default_config
 from tts_webui.config.config import config
-
 from tts_webui.css.css import full_css
 from tts_webui.history_tab.collections_directories_atom import (
     collections_directories_atom,
 )
-
-
 from tts_webui.utils.generic_error_tab_advanced import generic_error_tab_advanced
 from tts_webui.extensions_loader.interface_extensions import (
     extension_list_tab,
@@ -56,11 +50,10 @@ gradio_interface_options = (
 )
 
 
-import time
-import importlib
-
-
 def run_tab(module_name, function_name, name, requirements=None):
+    import time
+    import importlib
+
     print(f"Loading {name} tab...")
     start_time = time.time()
     try:
@@ -374,7 +367,9 @@ def server_hypervisor():
         return
 
     print("Starting Postgres...")
-    postgres_process = subprocess.Popen(f"postgres -D {postgres_dir} -p 7773", shell=True)
+    postgres_process = subprocess.Popen(
+        f"postgres -D {postgres_dir} -p 7773", shell=True
+    )
     try:
         signal.signal(
             signal.SIGINT,
