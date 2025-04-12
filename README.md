@@ -83,6 +83,7 @@ Apr 12:
 * Remove PyTorch CPU via pip option, redundant
 * Move all core conda packages to init_mamba scripts.
 * Upgrade the installer to include a web-based UI
+* Add conda storage optimizer extension
 
 Apr 11:
 * Add AP BWE upscaling extension
