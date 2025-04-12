@@ -104,7 +104,7 @@ const syncRepo = async () => {
 async function main() {
   startServer();
 
-  const version = "0.0.6";
+  const version = "0.1.0";
   displayMessage("\n\nStarting init app (version: " + version + ")...\n\n");
 
   updateState({ status: "initializing", currentStep: 0, totalSteps: 5 });
@@ -117,7 +117,10 @@ async function main() {
     // await updateConda();
     // check if there are any packages actually installed inside of conda
     const isUpdated = await syncRepo();
-    if (!isUpdated) return;
+    if (!isUpdated) {
+      updateState({ status: "ready", currentStep: 5, totalSteps: 5 });
+      return true;
+    }
 
     updateState({ status: "installing", currentStep: 3 });
     const {
@@ -133,14 +136,15 @@ async function main() {
 
     AppliedGitVersion.save();
     updateState({ status: "ready", currentStep: 5, totalSteps: 5 });
+    return true;
   } catch (error) {
     updateState({ status: "error", lastError: error.message });
-
     displayError(error.message);
-    setTimeout(() => processExit(1), 100);
+    return false;
   }
-  displayMessage("\n\nFinished init app.\n");
-  setTimeout(() => processExit(0), 100);
 }
 
-main();
+main().then((result) => {
+  displayMessage("\n\nFinished init app.\n");
+  return setTimeout(() => processExit(result ? 0 : 1), 100);
+});
