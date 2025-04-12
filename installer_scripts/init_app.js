@@ -1,4 +1,5 @@
 const fs = require("fs");
+const http = require("http");
 const { resolve } = require("path");
 const { $ } = require("./js/shell");
 const { displayError, displayMessage } = require("./js/displayMessage.js");
@@ -61,7 +62,9 @@ const syncRepo = async () => {
       }
       return true;
     } catch (error) {
-      displayMessage("There was a problem while pulling updates. Warning: missing updates might cause issues. Continuing...");
+      displayMessage(
+        "There was a problem while pulling updates. Warning: missing updates might cause issues. Continuing..."
+      );
       displayError(error);
       // throw error;
     }
@@ -69,15 +72,8 @@ const syncRepo = async () => {
 };
 
 async function main() {
-  // http
-  //   .createServer(function (req, res) {
-  //     // res.writeHead(200, { "Content-Type": "text/html" });
-  //     res.writeHead(200, { "Content-Type": "text/plain" });
-  //     process.stdout.on("data", (data) => {
-  //       res.write(data);
-  //     });
-  //   })
-  //   .listen(8080);
+  // streamOutput();
+
   const version = "0.0.6";
   displayMessage("\n\nStarting init app (version: " + version + ")...\n\n");
 
@@ -111,3 +107,72 @@ async function main() {
 }
 
 main();
+
+function streamOutput() {
+  // Create a buffer to store output for new connections
+  let outputBuffer = [];
+  let clients = [];
+
+  // Hook into stdout to capture output
+  const originalStdoutWrite = process.stdout.write;
+  process.stdout.write = function (chunk, encoding, callback) {
+    // Convert chunk to string
+    const data = chunk.toString();
+
+    // Store in our buffer for new connections
+    outputBuffer.push(data);
+    // Keep the buffer at a reasonable size
+    if (outputBuffer.length > 1000) {
+      outputBuffer.shift();
+    }
+
+    // Send to all connected clients
+    clients.forEach((client, index) => {
+      try {
+        client.write(data);
+      } catch (error) {
+        // If we can't write to the client, remove it from our list
+        clients.splice(index, 1);
+      }
+    });
+
+    // Pass through to original stdout
+    return originalStdoutWrite.apply(process.stdout, arguments);
+  };
+
+  // Create HTTP server that streams stdout
+  const server = http
+    .createServer(function (req, res) {
+      res.writeHead(200, {
+        "Content-Type": "text/plain",
+        "Cache-Control": "no-cache",
+        Connection: "keep-alive",
+      });
+
+      // Send the current buffer first
+      outputBuffer.forEach((chunk) => {
+        res.write(chunk);
+      });
+
+      // Add this client to our list
+      clients.push(res);
+
+      // Handle client disconnect
+      req.on("close", function () {
+        const index = clients.indexOf(res);
+        if (index !== -1) {
+          clients.splice(index, 1);
+        }
+      });
+
+      // Close the connection after 5 seconds
+      setTimeout(() => {
+        res.end();
+        const index = clients.indexOf(res);
+        if (index !== -1) {
+          clients.splice(index, 1);
+        }
+      }, 5000);
+    })
+    .listen(8080);
+}

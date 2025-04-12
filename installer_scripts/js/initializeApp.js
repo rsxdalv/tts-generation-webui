@@ -8,18 +8,12 @@ const { applyDatabaseConfig } = require("./applyDatabaseConfig.js");
 
 const DEBUG_DRY_RUN = false;
 
-const torchVersion = "2.6.0"; // 2.4.1+cu118
+const torchVersion = "2.6.0";
 const cudaVersion = "12.4";
 const cudaVersionTag = `cu124`;
 
 const pythonVersion = `3.10.11`;
 const pythonPackage = `python=${pythonVersion}`;
-
-const baseOnlyInstall$ = [
-  "conda install -y -k conda-forge::uv=0.4.17 conda-forge::postgresql=16.4 conda-forge::nodejs=22.9.0 conda-forge::ffmpeg=4.4.2[build=lgpl*] ninja",
-  ...(process.platform === "win32" ? ["conda-forge::vswhere"] : []),
-  "-c defaults",
-].join(" ");
 
 const ensurePythonVersion = async () => {
   try {
@@ -29,7 +23,6 @@ const ensurePythonVersion = async () => {
       displayMessage(`Current python version is """${version}"""`);
       displayMessage(`Python version is not ${pythonVersion}. Reinstalling...`);
       await $(`conda install -y -k -c conda-forge ${pythonPackage}`);
-      await $(`conda install -y -k -c conda-forge pip==23.3.2`);
     }
   } catch (error) {
     displayError("Failed to check/install python version");
@@ -44,35 +37,27 @@ const ensurePythonVersion = async () => {
 const installDependencies = async (gpuchoice) => {
   try {
     if (gpuchoice === "NVIDIA GPU") {
-      await $(baseOnlyInstall$); // deduplicate
       await $(
         `pip install -U torch==${torchVersion}+${cudaVersionTag} torchvision torchaudio --index-url https://download.pytorch.org/whl/${cudaVersionTag}`
       );
 
       pip_install(
         `-U xformers==0.0.29.post3 --index-url https://download.pytorch.org/whl/${cudaVersionTag}`,
-        // "xformers==0.0.27+cu118 --index-url https://download.pytorch.org/whl/cu118",
         "xformers",
         true
       );
     } else if (gpuchoice === "Apple M Series Chip" || gpuchoice === "CPU") {
-      await $(baseOnlyInstall$); // deduplicate
       await $(
         `pip install torch==${torchVersion}+cpu torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu`
       );
-    } else if (gpuchoice === "AMD GPU (ROCM, Linux only, potentially broken)") {
+    } else if (gpuchoice === "AMD GPU (ROCM, Linux only)") {
       displayMessage(
         "ROCM is experimental and not well supported yet, installing..."
       );
       displayMessage("Linux only!");
-      await $(baseOnlyInstall$); // deduplicate
       await $(
         `pip install torch==${torchVersion} torchvision torchaudio --index-url https://download.pytorch.org/whl/rocm6.0`
       );
-    } else if (gpuchoice === "pip torch cpu (experimental, faster install)") {
-      await $(baseOnlyInstall$); // deduplicate
-      await $(`pip install torch==${torchVersion} torchvision torchaudio`);
-      // uv pip install torch==2.5.0+cu118 torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
     } else {
       displayMessage("Unsupported or cancelled. Exiting...");
       removeGPUChoice();
@@ -95,10 +80,9 @@ const askForGPUChoice = () =>
       "Apple M Series Chip",
       "CPU",
       "Cancel",
-      "AMD GPU (ROCM, Linux only, potentially broken)",
+      "AMD GPU (ROCM, Linux only)",
       "Intel GPU (unsupported)",
       "Integrated GPU (unsupported)",
-      "pip torch cpu (experimental, faster install)",
     ],
     `
 These are not yet automatically supported: AMD GPU, Intel GPU, Integrated GPU.
