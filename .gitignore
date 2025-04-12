@@ -58,3 +58,6 @@ log.out
 
 # Database
 /data/postgres/
+
+# Ignore integration workspace
+workspace/
