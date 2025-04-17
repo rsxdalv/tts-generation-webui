@@ -10,5 +10,6 @@ call node --version
 call python --version
 
 echo Starting Extension Management UI...
-python extension_manager.py
+python ./tools/extension_manager.py
+
 pause
