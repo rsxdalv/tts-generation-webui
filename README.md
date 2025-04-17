@@ -11,7 +11,7 @@
 
   </h3>
 
-  [![banner](./screenshots/banner.png)](https://github.com/rsxdalv/tts-generation-webui)
+  [![banner](./documentation/screenshots/banner.png)](https://github.com/rsxdalv/tts-generation-webui)
 
   [![GitHub stars](https://img.shields.io/github/stars/rsxdalv/tts-generation-webui?style=social)](https://github.com/rsxdalv/tts-generation-webui/stargazers)
   [![GitHub](https://img.shields.io/github/license/rsxdalv/tts-generation-webui)](https://github.com/rsxdalv/tts-generation-webui/blob/main/LICENSE)
