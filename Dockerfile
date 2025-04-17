@@ -21,7 +21,7 @@ RUN npm --version
 # RUN /install.sh && rm /install.sh
 
 # Define PyTorch version
-ENV TORCH_VERSION=2.3.1
+ENV TORCH_VERSION=2.6.0
 
 ENV PATH="/root/.cargo/bin:$PATH"
 RUN pip install --no-cache-dir setuptools torch==$TORCH_VERSION torchvision torchaudio 

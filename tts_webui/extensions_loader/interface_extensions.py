@@ -1,4 +1,3 @@
-import json
 import importlib
 import importlib.util
 from importlib.metadata import version
@@ -9,6 +8,7 @@ import gradio as gr
 from tts_webui.config.config import config
 from tts_webui.utils.pip_install import pip_install_wrapper, pip_uninstall_wrapper
 from tts_webui.utils.generic_error_tab_advanced import generic_error_tab_advanced
+from tts_webui.extensions_loader.extensions_data_loader import get_interface_extensions, filter_extensions_by_type_and_class
 
 
 def uninstall_extension(package_name):
@@ -108,15 +108,8 @@ def _extension_management_ui(package_name, title_name, requirements):
         output.render()
 
 
-def get_extension_list_json():
-    try:
-        return json.load(open("extensions.json"))["tabs"]
-    except Exception as e:
-        print("\n! Failed to load extensions.json:", e)
-        return []
-
-
-extension_list_json = get_extension_list_json()
+# Get the interface extensions list from the data loader
+extension_list_json = get_interface_extensions()
 try:
     disabled_extensions = config["extensions"]["disabled"]
 except KeyError:
@@ -124,11 +117,9 @@ except KeyError:
 
 
 def handle_extension_class(extension_class, config):
-    for x in extension_list_json:
-        if (
-            x["extension_type"] == "interface"
-            and x["extension_class"] == extension_class
-        ):
+    # Get interface extensions filtered by class from the data loader
+    filtered_extensions = filter_extensions_by_type_and_class(extension_list_json, "interface", extension_class)
+    for x in filtered_extensions:
             # x["package_name"], f"{x['name']} (v{x['version']})", x["requirements"]
             if x["package_name"] in disabled_extensions:
                 print(f"Skipping disabled {x['name']} Extension...")
