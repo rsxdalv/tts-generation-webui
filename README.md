@@ -74,6 +74,9 @@
 
 ## Changelog
 
+Apr 17:
+* Create extension manager
+
 Apr 12:
 * Upgrade to PyTorch 2.6.0 Cuda 12.4, switch to pip for pytorch install
 * Add compatibility layer for older models

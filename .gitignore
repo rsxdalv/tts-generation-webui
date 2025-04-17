@@ -8,6 +8,7 @@ installer_files/
 config.json
 .env
 .env.user
+extensions.external.json
 
 # Ignore generated files
 /outputs/

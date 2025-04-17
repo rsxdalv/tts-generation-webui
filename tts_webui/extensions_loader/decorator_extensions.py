@@ -1,4 +1,3 @@
-import json
 import importlib
 import importlib.util
 from importlib.metadata import version
@@ -10,6 +9,7 @@ import gradio as gr
 
 from tts_webui.utils.pip_install import pip_install_wrapper, pip_uninstall_wrapper
 from tts_webui.utils.generic_error_tab_advanced import generic_error_tab_advanced
+from tts_webui.extensions_loader.extensions_data_loader import get_decorator_extensions, get_decorator_extensions_by_class
 
 
 def check_if_package_installed(package_name):
@@ -21,15 +21,8 @@ def check_if_package_installed(package_name):
 disabled_extensions = ["decorator_disabled"]
 
 
-def get_extension_list_json():
-    try:
-        return json.load(open("extensions.json"))["decorators"]
-    except Exception as e:
-        print("\n! Failed to load extensions.json:", e)
-        return []
-
-
-extension_list_json = get_extension_list_json()
+# Get the decorator extensions list from the data loader
+extension_list_json = get_decorator_extensions()
 
 
 def extension_decorator_list_tab():
@@ -142,11 +135,8 @@ def _load_decorators(class_name: Literal["outer", "inner"]):
         for name in dir(module):
             _parse_module(module, name)
 
-    filtered_extensions = [
-        x
-        for x in extension_list_json
-        if x["extension_type"] == "decorator" and x["extension_class"] == class_name
-    ]
+    # Get decorator extensions filtered by class from the data loader
+    filtered_extensions = get_decorator_extensions_by_class(class_name)
 
     for x in filtered_extensions:
         print(f"Loading decorator extension {x['name']}")
