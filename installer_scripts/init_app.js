@@ -16,6 +16,12 @@ const checkConda = async () => {
     updateState({ condaReady: true });
 
     displayMessage("");
+    // verify conda paths
+    await $("conda info --envs");
+    // expect
+    // # conda environments:
+    // #
+    // base                 * .. ..\tts-generation-webui-main\installer_files\env
   } catch (error) {
     updateState({ status: "error", lastError: "Conda installation not found" });
 
