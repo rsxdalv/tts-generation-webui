@@ -40,6 +40,15 @@ if ($longPathsEnabled -ne 1) {
     }
 }
 
+# check if conda is already installed
+if (Get-Command "conda" -ErrorAction SilentlyContinue) {
+    # conda might interfere, warn the user and ask if they want to continue
+    Write-Host "Warning: Conda is already installed, this might interfere with the installation."
+    # $decision = $Host.UI.PromptForChoice($title, $question, $choices, 1)
+    # if ($decision -eq 1) {
+    #     exit 1
+    # }
+}
 
 & "$PSScriptRoot\init_mamba.bat"
 if ($LASTEXITCODE -ne 0) {
