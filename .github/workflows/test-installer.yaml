@@ -16,5 +16,6 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: "22"
+      # Can't be run because it requires user input
       - name: Run installer
         run: node installer_scripts/init_app.js
