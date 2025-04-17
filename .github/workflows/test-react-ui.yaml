@@ -53,6 +53,6 @@ jobs:
       - name: Build with Next.js
         working-directory: react-ui
         run: ${{ steps.detect-package-manager.outputs.runner }} npm run build
-      - name: Static HTML export with Next.js
-        working-directory: react-ui
-        run: ${{ steps.detect-package-manager.outputs.runner }} next export
+      # - name: Static HTML export with Next.js
+      #   working-directory: react-ui
+      #   run: ${{ steps.detect-package-manager.outputs.runner }} next export

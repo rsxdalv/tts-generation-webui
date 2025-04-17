@@ -3,7 +3,7 @@ const { resolve } = require("path");
 const { displayError, displayMessage } = require("./displayMessage.js");
 const { processExit } = require("./processExit.js");
 const { menu } = require("./menu.js");
-const { $, $$, $sh  } = require("./shell.js");
+const { $, $$, $sh } = require("./shell.js");
 const { applyDatabaseConfig } = require("./applyDatabaseConfig.js");
 
 const DEBUG_DRY_RUN = false;
@@ -142,7 +142,7 @@ async function pip_install(requirements, name = "", pipFallback = false) {
 }
 
 // The first install is a temporary safeguard due to mysterious issues with uv
-async function pip_install_all(first_install = false) {
+async function pip_install_all(fi = false) {
   if (readPipPackagesVersion() === newPipPackagesVersion)
     return displayMessage(
       "Dependencies are already up to date, skipping pip installs..."
@@ -177,29 +177,16 @@ async function pip_install_all(first_install = false) {
   displayMessage("Updating dependencies...");
   // pip_install_all(false); // potential speed optimization
 
-  await pip_install(
-    "-r requirements.txt",
-    "Core Packages, Bark, Tortoise",
-    first_install
-  );
-  await pip_install(
-    "-r requirements_bark_hubert_quantizer.txt",
-    "Bark Voice Clone",
-    first_install
-  );
-  await pip_install("-r requirements_rvc.txt", "RVC", first_install);
-  await pip_install("-r requirements_audiocraft.txt", "Audiocraft", first_install);
-  await pip_install("-r requirements_styletts2.txt", "StyleTTS", first_install);
-  await pip_install("-r requirements_vall_e.txt", "Vall-E-X", first_install);
-  await pip_install("-r requirements_maha_tts.txt", "Maha TTS", first_install);
+  await pip_install("-r requirements.txt", "Core Packages, Bark, Tortoise", fi);
+  await pip_install("-r requirements_bark_hubert_quantizer.txt", "Bark Voice Clone", fi); // prettier-ignore
+  await pip_install("-r requirements_rvc.txt", "RVC", fi);
+  await pip_install("-r requirements_audiocraft.txt", "Audiocraft", fi);
+  await pip_install("-r requirements_styletts2.txt", "StyleTTS", fi);
+  await pip_install("-r requirements_vall_e.txt", "Vall-E-X", fi);
+  await pip_install("-r requirements_maha_tts.txt", "Maha TTS", fi);
   await pip_install("-r requirements_stable_audio.txt", "Stable Audio", true);
-  // reinstall hydra-core==1.3.2 because of fairseq
-  await pip_install(
-    "hydra-core==1.3.2",
-    "hydra-core fix due to fairseq",
-    first_install
-  );
-  await pip_install("nvidia-ml-py", "nvidia-ml-py", first_install);
+  await pip_install("hydra-core==1.3.2", "hydra-core fix due to fairseq", fi); // reinstall hydra-core==1.3.2 because of fairseq
+  await pip_install("nvidia-ml-py", "nvidia-ml-py", fi);
   savePipPackagesVersion(newPipPackagesVersion);
   displayMessage("");
 }

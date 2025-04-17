@@ -68,9 +68,7 @@ const syncRepo = async () => {
       await $("git branch --set-upstream-to=origin/main");
 
       const newHash = getGitCommitHash();
-      updateState({
-        gitHash: newHash,
-      });
+      updateState({ gitHash: newHash });
 
       return true;
     } catch (error) {

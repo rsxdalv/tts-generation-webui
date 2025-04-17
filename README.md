@@ -77,6 +77,7 @@
 Apr 17:
 * Create extension manager
 * Warn Windows users if conda is installed
+* upgrade dockerfile to PyTorch 2.6.0
 
 Apr 12:
 * Upgrade to PyTorch 2.6.0 Cuda 12.4, switch to pip for pytorch install
