@@ -1,8 +1,7 @@
-from tts_webui.bark.FullGeneration import FullGeneration
-from tts_webui.bark.BarkParams import BarkParams
+from extension_bark.FullGeneration import FullGeneration
+from extension_bark.BarkParams import BarkParams
 from bark.generation import models
-
-from tts_webui.history_tab.get_hash_memoized import get_hash_memoized
+from extension_bark.voices.get_hash_memoized import get_hash_memoized
 
 
 def _is_big_model(model):

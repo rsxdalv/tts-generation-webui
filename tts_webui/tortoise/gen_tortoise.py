@@ -4,7 +4,7 @@ import gradio as gr
 from scipy.io.wavfile import write as write_wav
 
 from tts_webui.tortoise.save_json import save_json
-from tts_webui.bark.split_text_functions import split_by_lines
+from tts_webui.utils.split_text_functions import split_by_lines
 from tts_webui.utils.create_base_filename import create_base_filename
 from tts_webui.utils.date import get_date_string
 from tts_webui.utils.save_waveform_plot import middleware_save_waveform_plot

@@ -12,7 +12,7 @@ from tts_webui.tortoise.TortoiseParameters import (
 from tts_webui.tortoise.autoregressive_params import autoregressive_params
 from tts_webui.tortoise.diffusion_params import diffusion_params
 from tts_webui.tortoise.presets import presets
-from tts_webui.tortoise.gr_reload_button import gr_open_button_simple, gr_reload_button
+from tts_webui.utils.gr_reload_button import gr_open_button_simple, gr_reload_button
 from tts_webui.tortoise.tortoise_model_settings_ui import tortoise_model_settings_ui
 from tts_webui.utils.randomize_seed import randomize_seed_ui
 

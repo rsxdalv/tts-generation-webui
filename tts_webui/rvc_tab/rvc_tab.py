@@ -6,7 +6,7 @@ from huggingface_hub import hf_hub_download
 
 from tts_webui.history_tab.open_folder import open_folder
 from tts_webui.utils.get_path_from_root import get_path_from_root
-from tts_webui.tortoise.gr_reload_button import gr_reload_button, gr_open_button_simple
+from tts_webui.utils.gr_reload_button import gr_reload_button, gr_open_button_simple
 
 from tts_webui.rvc_tab.get_and_load_hubert import download_rmvpe
 

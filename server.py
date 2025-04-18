@@ -131,42 +131,50 @@ def main_ui(theme_choice="Base"):
 def all_tabs():
     with gr.Tab("Text-to-Speech"), gr.Tabs():
         tts_tabs = [
-            (
-                "tts_webui.vall_e_x.vall_e_x_tab",
-                "valle_x_tab",
-                "Valle-X",
-                "-r requirements_vall_e.txt",
-            ),
-            (
-                "tts_webui.styletts2.styletts2_tab",
-                "style_tts2_tab",
-                "StyleTTS2",
-                "-r requirements_styletts2.txt",
-            ),
-            (
-                "tts_webui.seamlessM4T.seamless_tab",
-                "seamless_tab",
-                "SeamlessM4Tv2Model",
-            ),
-            ("tts_webui.mms.mms_tab", "mms_tab", "MMS"),
-            (
-                "tts_webui.maha_tts.maha_tts_tab",
-                "maha_tts_tab",
-                "MahaTTS",
-                "-r requirements_maha_tts.txt",
-            ),
-            ("tts_webui.bark.bark_tab", "bark_tab", "Bark TTS"),
-            (
-                "tts_webui.bark.clone.tab_voice_clone",
-                "tab_voice_clone",
-                "Bark Voice Clone",
-                "-r requirements_bark_hubert_quantizer.txt",
-            ),
-            (
-                "tts_webui.tortoise.tortoise_tab",
-                "tortoise_tab",
-                "Tortoise TTS",
-            ),
+            # Valle-X is now an external extension
+            # (
+            #     "tts_webui.vall_e_x.vall_e_x_tab",
+            #     "valle_x_tab",
+            #     "Valle-X",
+            #     "-r requirements_vall_e.txt",
+            # ),
+            # StyleTTS2 is now an external extension
+            # (
+            #     "tts_webui.styletts2.styletts2_tab",
+            #     "style_tts2_tab",
+            #     "StyleTTS2",
+            #     "-r requirements_styletts2.txt",
+            # ),
+            # SeamlessM4T is now an external extension
+            # (
+            #     "tts_webui.seamlessM4T.seamless_tab",
+            #     "seamless_tab",
+            #     "SeamlessM4Tv2Model",
+            # ),
+            # MMS is now an external extension
+            # ("tts_webui.mms.mms_tab", "mms_tab", "MMS"),
+            # MahaTTS is now a builtin extension
+            # (
+            #     "tts_webui.maha_tts.maha_tts_tab",
+            #     "maha_tts_tab",
+            #     "MahaTTS",
+            #     "-r requirements_maha_tts.txt",
+            # ),
+            # Bark TTS is now an external extension
+            # ("tts_webui.bark.bark_tab", "bark_tab", "Bark TTS"),
+            # Bark Voice Clone is now an external extension
+            # (
+            #     "tts_webui.bark.clone.tab_voice_clone",
+            #     "tab_voice_clone",
+            #     "Bark Voice Clone",
+            #     "-r requirements_bark_hubert_quantizer.txt",
+            # ),
+            # Tortoise TTS is now an external extension
+            # (
+            #     "tts_webui.tortoise.tortoise_tab",
+            #     "tortoise_tab",
+            #     "Tortoise TTS",
+            # ),
         ]
         load_tabs(tts_tabs)
 

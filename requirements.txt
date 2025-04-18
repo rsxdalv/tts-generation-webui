@@ -4,12 +4,9 @@ gradio==5.5.0 # MIT License
 python-dotenv==1.0.0
 soundfile==0.12.1; sys_platform == 'win32' # torchaudio
 # sox # torchaudio for linux
-suno-bark @ https://github.com/rsxdalv/bark/releases/download/v0.1.0/suno_bark-0.1.0-py3-none-any.whl # MIT License
 vocos==0.1.0 # MIT License
-tortoise-tts @ https://github.com/rsxdalv/tortoise-tts/releases/download/v3.0.1/tortoise_tts-3.0.1-py3-none-any.whl # Apache 2.0
 beartype>=0.16.1 # workaround for a bug
 # no longer required directly # transformers==4.36.1 # cross-compatibility
-iso639-lang==2.2.3
 pillow==10.3.0 # for gradio, conda fix
 deepspeed @ https://github.com/rsxdalv/DeepSpeed/releases/download/v0.15.5-test/deepspeed-0.15.5+unknown-cp310-cp310-win_amd64.whl ; sys_platform == 'win32' # Apache 2.0
 fairseq @ https://github.com/rsxdalv/fairseq/releases/download/v0.12.3/fairseq-0.12.13-cp310-cp310-win_amd64.whl ; sys_platform == 'win32' # MIT License

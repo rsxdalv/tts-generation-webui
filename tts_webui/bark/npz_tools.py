@@ -1,9 +1,9 @@
 import glob
 from typing import Any
 import numpy as np
+
 from tts_webui.bark.FullGeneration import FullGeneration
-import json
-import torch
+from tts_webui.utils.pack_metadata import pack_metadata, unpack_metadata
 
 
 def compress_history(full_generation: FullGeneration):
@@ -12,16 +12,6 @@ def compress_history(full_generation: FullGeneration):
         "coarse_prompt": full_generation["coarse_prompt"].astype(np.int16),
         "fine_prompt": full_generation["fine_prompt"].astype(np.int16),
     }
-
-
-def pack_metadata(metadata: dict[str, Any]):
-    # return list(json.dumps(metadata))
-    def default(o):
-        if isinstance(o, np.ndarray):
-            return o.tolist()
-        return o.__dict__
-
-    return np.array(json.dumps(metadata, default=default))
 
 
 def save_npz(filename: str, full_generation: FullGeneration, metadata: dict[str, Any]):
@@ -34,25 +24,7 @@ def save_npz(filename: str, full_generation: FullGeneration, metadata: dict[str,
     )
 
 
-def save_npz_musicgen(filename: str, tokens: torch.Tensor, metadata: dict[str, Any]):
-    np.savez(
-        filename,
-        **{
-            "tokens": tokens.cpu().numpy(),
-            "metadata": pack_metadata(metadata),
-        },
-    )
-
-
 def load_npz(filename):
-    def unpack_metadata(metadata: np.ndarray):
-        def join_list(x: list | np.ndarray):
-            if isinstance(x, np.ndarray):
-                x = x.tolist()
-            return "".join(x)
-
-        return json.loads(join_list(metadata))
-
     with np.load(filename, allow_pickle=True) as data:
         result = {key: data[key] for key in data}
         if "metadata" in result:

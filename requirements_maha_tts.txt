@@ -1,1 +1,0 @@
-maha-tts @ https://github.com/rsxdalv/MahaTTS/releases/download/v1.0.0/maha_tts-1.0.0-py3-none-any.whl # Apache 2.0

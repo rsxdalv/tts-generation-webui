@@ -1,7 +1,7 @@
 import os
 import gradio as gr
 
-from tts_webui.tortoise.gr_reload_button import gr_open_button_simple, gr_reload_button
+from tts_webui.utils.gr_reload_button import gr_open_button_simple, gr_reload_button
 from tts_webui.utils.get_path_from_root import get_path_from_root
 from tts_webui.utils.manage_model_state import unload_model
 

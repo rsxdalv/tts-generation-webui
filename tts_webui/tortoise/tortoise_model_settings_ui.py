@@ -4,7 +4,7 @@ from tts_webui.tortoise.gen_tortoise import (
     switch_model,
     unload_tortoise_model,
 )
-from tts_webui.tortoise.gr_reload_button import gr_open_button_simple, gr_reload_button
+from tts_webui.utils.gr_reload_button import gr_open_button_simple, gr_reload_button
 import gradio as gr
 
 

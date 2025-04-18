@@ -22,7 +22,7 @@ def check_if_package_installed(package_name):
 
 def _handle_package(package_name, title_name, requirements):
     if not check_if_package_installed(package_name):
-        with gr.Tab(f"[Available] {title_name} Extension"):
+        with gr.Tab(f"[Available] {title_name}"):
             gr.Markdown(f"{title_name} Extension not installed")
             install_btn = gr.Button(f"Install {title_name} Extension")
             gr.Markdown("Installation console:")
@@ -41,7 +41,8 @@ def _handle_package(package_name, title_name, requirements):
             "0.0.1" if "builtin" in package_name else version(package_name)
         )
         main_tab = getattr(module, "extension__tts_generation_webui")
-        with gr.Tab(f"{title_name} (v{package_version}) Extension"):
+        with gr.Tab(title_name):
+            gr.Markdown(f"Version: {package_version}")
             if "builtin" in package_name:
                 gr.Markdown(f"{title_name} Extension is up to date")
             else:
@@ -50,11 +51,10 @@ def _handle_package(package_name, title_name, requirements):
                     update_button()
                 else:
                     _extension_management_ui(package_name, title_name, requirements)
-            # with gr.Tabs():
             main_tab()
     except Exception as e:
         generic_error_tab_advanced(
-            e, name=title_name + " Extension", requirements=requirements
+            e, name=title_name, requirements=requirements
         )
     finally:
         elapsed_time = time.time() - start_time
@@ -122,7 +122,7 @@ def handle_extension_class(extension_class, config):
     for x in filtered_extensions:
             # x["package_name"], f"{x['name']} (v{x['version']})", x["requirements"]
             if x["package_name"] in disabled_extensions:
-                print(f"Skipping disabled {x['name']} Extension...")
+                print(f"Skipping disabled {x['name']} Extension...\n")
                 continue
             _handle_package(x["package_name"], x["name"], x["requirements"])
 

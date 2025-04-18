@@ -6,12 +6,12 @@ import gradio as gr
 
 from tts_webui.config.config import config
 # from tts_webui.bark.clone.tab_voice_clone import tab_voice_clone
-from tts_webui.history_tab.voices_tab import voices_tab
+from tts_webui.bark.voices.voices_tab import voices_tab
 from tts_webui.bark.settings_tab_bark import settings_tab_bark
 
 from tts_webui.bark.get_speaker_gender import get_speaker_gender
 from tts_webui.bark.npz_tools import get_npz_files, save_npz
-from tts_webui.bark.split_text_functions import split_by_length_simple, split_by_lines
+from tts_webui.utils.split_text_functions import split_by_length_simple, split_by_lines
 from tts_webui.bark.generation_settings import (
     PromptSplitSettings,
     LongPromptHistorySettings,

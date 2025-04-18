@@ -1,1 +1,0 @@
-valle-x @ https://github.com/rsxdalv/VALL-E-X/releases/download/v0.0.1/valle_x-0.0.1-py3-none-any.whl # MIT License
