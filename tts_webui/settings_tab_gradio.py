@@ -7,7 +7,7 @@ def settings_tab_gradio(
     reload_config_and_restart_ui: Callable[[], None],
     gradio_interface_options: Dict[str, Any],
 ):
-    with gr.Tab("Settings (Gradio)"), gr.Row(), gr.Column():
+    with gr.Tab("Gradio"):
         # inline: whether to display in the interface inline in an iframe. Defaults to True in python notebooks; False otherwise.
         # inbrowser: whether to automatically launch the interface in a new tab on the default browser.
         # share: whether to create a publicly shareable link for the interface. Creates an SSH tunnel to make your UI accessible from anywhere. If not provided, it is set to False by default every time, except when running in Google Colab. When localhost is not accessible (e.g. Google Colab), setting share=False is not supported.

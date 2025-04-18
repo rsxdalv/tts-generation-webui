@@ -1,5 +1,18 @@
+from typing import Any
+import torch
+import numpy as np
 from tts_webui.utils.outputs.path import get_relative_output_path_ext
-from tts_webui.bark.npz_tools import save_npz_musicgen
+from tts_webui.utils.pack_metadata import pack_metadata
+
+
+def save_npz_musicgen(filename: str, tokens: torch.Tensor, metadata: dict[str, Any]):
+    np.savez(
+        filename,
+        **{
+            "tokens": tokens.cpu().numpy(),
+            "metadata": pack_metadata(metadata),
+        },
+    )
 
 
 def decorator_save_musicgen_npz(fn):

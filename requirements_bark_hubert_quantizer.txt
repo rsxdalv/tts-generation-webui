@@ -1,1 +1,1 @@
-bark_hubert_quantizer @ https://github.com/rsxdalv/bark-voice-cloning-HuBERT-quantizer/releases/download/v0.0.5/bark_hubert_quantizer-0.0.5-py3-none-any.whl # MIT License
+extension_bark_voice_clone @ git+https://github.com/rsxdalv/extension_bark_voice_clone@main

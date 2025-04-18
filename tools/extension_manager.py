@@ -1,9 +1,13 @@
 #!/usr/bin/env python
 print("Starting Extension Management UI...\n")
 # Import necessary modules
+import os
+import sys
 import gradio as gr
 import importlib
 
+# Add the project root directory to the Python path
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from tts_webui.css.css import full_css
 

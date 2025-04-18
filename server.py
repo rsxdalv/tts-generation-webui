@@ -54,7 +54,7 @@ def run_tab(module_name, function_name, name, requirements=None):
     import time
     import importlib
 
-    print(f"Loading {name} tab...")
+    print(f"Loading {name} tab...", end="")
     start_time = time.time()
     try:
         module = importlib.import_module(module_name)
@@ -64,7 +64,7 @@ def run_tab(module_name, function_name, name, requirements=None):
         generic_error_tab_advanced(e, name=name, requirements=requirements)
     finally:
         elapsed_time = time.time() - start_time
-        print(f"  Done in {elapsed_time:.2f} seconds. ({name})\n")
+        print(f" done in {elapsed_time:.2f} seconds.")
 
 
 def load_tabs(list_of_tabs):
@@ -130,95 +130,10 @@ def main_ui(theme_choice="Base"):
 
 def all_tabs():
     with gr.Tab("Text-to-Speech"), gr.Tabs():
-        tts_tabs = [
-            (
-                "tts_webui.vall_e_x.vall_e_x_tab",
-                "valle_x_tab",
-                "Valle-X",
-                "-r requirements_vall_e.txt",
-            ),
-            (
-                "tts_webui.styletts2.styletts2_tab",
-                "style_tts2_tab",
-                "StyleTTS2",
-                "-r requirements_styletts2.txt",
-            ),
-            (
-                "tts_webui.seamlessM4T.seamless_tab",
-                "seamless_tab",
-                "SeamlessM4Tv2Model",
-            ),
-            ("tts_webui.mms.mms_tab", "mms_tab", "MMS"),
-            (
-                "tts_webui.maha_tts.maha_tts_tab",
-                "maha_tts_tab",
-                "MahaTTS",
-                "-r requirements_maha_tts.txt",
-            ),
-            ("tts_webui.bark.bark_tab", "bark_tab", "Bark TTS"),
-            (
-                "tts_webui.bark.clone.tab_voice_clone",
-                "tab_voice_clone",
-                "Bark Voice Clone",
-                "-r requirements_bark_hubert_quantizer.txt",
-            ),
-            (
-                "tts_webui.tortoise.tortoise_tab",
-                "tortoise_tab",
-                "Tortoise TTS",
-            ),
-        ]
-        load_tabs(tts_tabs)
-
         handle_extension_class("text-to-speech", config)
     with gr.Tab("Audio/Music Generation"), gr.Tabs():
-        audio_music_generation_tabs = [
-            (
-                "tts_webui.stable_audio.stable_audio_tab",
-                "stable_audio_tab",
-                "Stable Audio",
-                "-r requirements_stable_audio.txt",
-            ),
-            (
-                "tts_webui.magnet.magnet_tab",
-                "magnet_tab",
-                "MAGNeT",
-                "-r requirements_audiocraft.txt",
-            ),
-            (
-                "tts_webui.musicgen.musicgen_tab",
-                "musicgen_tab",
-                "MusicGen",
-                "-r requirements_audiocraft.txt",
-            ),
-        ]
-        load_tabs(audio_music_generation_tabs)
-
         handle_extension_class("audio-music-generation", config)
     with gr.Tab("Audio Conversion"), gr.Tabs():
-        audio_conversion_tabs = [
-            (
-                "tts_webui.rvc_tab.rvc_tab",
-                "rvc_conversion_tab",
-                "RVC",
-                "-r requirements_rvc.txt",
-            ),
-            (
-                "tts_webui.rvc_tab.uvr5_tab",
-                "uvr5_tab",
-                "UVR5",
-                "-r requirements_rvc.txt",
-            ),
-            (
-                "tts_webui.demucs.demucs_tab",
-                "demucs_tab",
-                "Demucs",
-                "-r requirements_audiocraft.txt",
-            ),
-            ("tts_webui.vocos.vocos_tabs", "vocos_tabs", "Vocos"),
-        ]
-        load_tabs(audio_conversion_tabs)
-
         handle_extension_class("audio-conversion", config)
     with gr.Tab("Outputs"), gr.Tabs():
         from tts_webui.history_tab.main import history_tab
@@ -235,17 +150,12 @@ def all_tabs():
             generic_error_tab_advanced(e, name="History", requirements=None)
 
         outputs_tabs = [
-            # voices
-            # ("tts_webui.history_tab.voices_tab", "voices_tab", "Voices"),
         ]
         load_tabs(outputs_tabs)
 
         handle_extension_class("outputs", config)
 
     with gr.Tab("Tools"), gr.Tabs():
-        tools_tabs = []
-        load_tabs(tools_tabs)
-
         handle_extension_class("tools", config)
     with gr.Tab("Settings"), gr.Tabs():
         from tts_webui.settings_tab_gradio import settings_tab_gradio
@@ -253,11 +163,6 @@ def all_tabs():
         settings_tab_gradio(reload_config_and_restart_ui, gradio_interface_options)
 
         settings_tabs = [
-            # (
-            #     "tts_webui.bark.settings_tab_bark",
-            #     "settings_tab_bark",
-            #     "Settings (Bark)",
-            # ),
             (
                 "tts_webui.utils.model_location_settings_tab",
                 "model_location_settings_tab",
@@ -283,6 +188,7 @@ def start_gradio_server():
                 print(f"  {key}:{' ' * (max_key_length - len(key))} {value[0]}:******")
             else:
                 print(f"  {key}:{' ' * (max_key_length - len(key))} {value}")
+        print("")
 
     # detect if --share is passed
     if "--share" in os.sys.argv:

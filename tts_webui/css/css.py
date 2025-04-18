@@ -1,6 +1,4 @@
-from tts_webui.css.material_symbols_css import material_symbols_css
-from tts_webui.history_tab.history_css import history_css
-from tts_webui.tortoise.css_tortoise import css_tortoise
+import os
 
 
 def load_css(filename: str):
@@ -8,7 +6,4 @@ def load_css(filename: str):
         return f.read()
 
 
-full_css = ""
-full_css += material_symbols_css
-full_css += css_tortoise
-full_css += history_css
+full_css = load_css(os.path.join(os.path.dirname(__file__), "tts_webui.css"))

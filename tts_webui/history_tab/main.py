@@ -14,7 +14,7 @@ from tts_webui.history_tab.save_to_favorites import (
     save_to_collection,
     save_to_favorites,
 )
-from tts_webui.history_tab.open_folder import open_folder
+from tts_webui.utils.open_folder import open_folder
 
 
 def _get_row_index(evt: gr.SelectData):
