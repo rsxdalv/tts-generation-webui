@@ -78,6 +78,7 @@ Apr 18:
 * Fix extension manager startup
 * Convert most models to extensions, install the classic ones by default
 * Attempt to fix linux installer
+* Add 'recommended' flag for extensions
 
 Apr 17:
 * Create extension manager

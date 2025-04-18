@@ -2,6 +2,7 @@
     "tabs": [
         {
             "package_name": "extension_vall_e_x",
+            "recommended": true,
             "name": "Vall-E-X",
             "version": "0.0.1",
             "requirements": "git+https://github.com/rsxdalv/extension_vall_e_x@main",
@@ -17,6 +18,7 @@
         },
         {
             "package_name": "extension_styletts2",
+            "recommended": true,
             "name": "StyleTTS2",
             "version": "0.0.1",
             "requirements": "git+https://github.com/rsxdalv/extension_styletts2@main",
@@ -32,6 +34,7 @@
         },
         {
             "package_name": "extension_seamless_m4t",
+            "recommended": true,
             "name": "Seamless M4T",
             "version": "0.0.1",
             "requirements": "git+https://github.com/rsxdalv/extension_seamless_m4t@main",
@@ -47,6 +50,7 @@
         },
         {
             "package_name": "extension_mms",
+            "recommended": true,
             "name": "MMS",
             "version": "0.0.1",
             "requirements": "git+https://github.com/rsxdalv/extension_mms@main",
@@ -62,6 +66,7 @@
         },
         {
             "package_name": "extension_tortoise",
+            "recommended": true,
             "name": "Tortoise TTS",
             "version": "0.0.1",
             "requirements": "git+https://github.com/rsxdalv/extension_tortoise@main",
@@ -77,6 +82,7 @@
         },
         {
             "package_name": "extension_f5_tts",
+            "recommended": true,
             "name": "F5-TTS",
             "version": "0.0.1",
             "requirements": "git+https://github.com/rsxdalv/extension_f5_tts@main",
@@ -92,6 +98,7 @@
         },
         {
             "package_name": "extension_bark",
+            "recommended": true,
             "name": "Bark",
             "version": "0.0.1",
             "requirements": "git+https://github.com/rsxdalv/extension_bark@main",
@@ -107,6 +114,7 @@
         },
         {
             "package_name": "extension_bark_voice_clone",
+            "recommended": true,
             "name": "Bark Voice Clone",
             "version": "0.0.1",
             "requirements": "git+https://github.com/rsxdalv/extension_bark_voice_clone@main",
@@ -122,6 +130,7 @@
         },
         {
             "package_name": "extension_stable_audio",
+            "recommended": true,
             "name": "Stable Audio",
             "version": "0.0.1",
             "requirements": "git+https://github.com/rsxdalv/extension_stable_audio@main",
@@ -137,6 +146,7 @@
         },
         {
             "package_name": "extension_vocos",
+            "recommended": true,
             "name": "Vocos",
             "version": "0.0.1",
             "requirements": "git+https://github.com/rsxdalv/extension_vocos@main",
@@ -152,6 +162,7 @@
         },
         {
             "package_name": "extension_audiocraft",
+            "recommended": true,
             "name": "Audiocraft",
             "version": "0.0.1",
             "requirements": "git+https://github.com/rsxdalv/extension_audiocraft@main",
@@ -167,6 +178,7 @@
         },
         {
             "package_name": "extension_rvc",
+            "recommended": true,
             "name": "RVC",
             "version": "0.0.1",
             "requirements": "git+https://github.com/rsxdalv/extension_rvc@main",
@@ -182,6 +194,7 @@
         },
         {
             "package_name": "extension_demucs",
+            "recommended": true,
             "name": "Demucs",
             "version": "0.0.1",
             "requirements": "git+https://github.com/rsxdalv/extension_demucs@main",
