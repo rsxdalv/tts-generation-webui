@@ -74,6 +74,11 @@
 
 ## Changelog
 
+Apr 18:
+* Fix extension manager startup
+* Convert most models to extensions
+* Attempt to fix linux installer
+
 Apr 17:
 * Create extension manager
 * Warn Windows users if conda is installed
