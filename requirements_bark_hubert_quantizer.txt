@@ -1,0 +1,1 @@
+extension_bark_voice_clone @ git+https://github.com/rsxdalv/extension_bark_voice_clone@main

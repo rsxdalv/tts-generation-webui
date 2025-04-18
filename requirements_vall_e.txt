@@ -1,0 +1,1 @@
+extension_vall_e_x @ git+https://github.com/rsxdalv/extension_vall_e_x@main

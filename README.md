@@ -76,7 +76,7 @@
 
 Apr 18:
 * Fix extension manager startup
-* Convert most models to extensions
+* Convert most models to extensions, install the classic ones by default
 * Attempt to fix linux installer
 
 Apr 17:

@@ -1,0 +1,1 @@
+extension_styletts2 @ git+https://github.com/rsxdalv/extension_styletts2@main

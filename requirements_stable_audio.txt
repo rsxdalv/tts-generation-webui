@@ -1,0 +1,1 @@
+extension_stable_audio @ git+https://github.com/rsxdalv/extension_stable_audio@main
