@@ -236,11 +236,28 @@ async function applyCondaConfig() {
   }
 }
 
+const extensionsToInstall = [
+  "bark",
+  "bark_voice_clone",
+  "rvc",
+  "audiocraft",
+  "styletts2",
+  "vall_e",
+  "maha_tts",
+  "stable_audio",
+];
+
+async function chooseExtensions() {
+  displayMessage("Choose extensions to install...");
+}
+
 exports.initializeApp = async () => {
   displayMessage("Ensuring that python has the correct version...");
   await ensurePythonVersion();
   displayMessage("");
   await applyCondaConfig();
+  displayMessage("");
+  await chooseExtensions();
   displayMessage("");
   try {
     await applyDatabaseConfig();

@@ -54,7 +54,7 @@ def run_tab(module_name, function_name, name, requirements=None):
     import time
     import importlib
 
-    print(f"Loading {name} tab...")
+    print(f"Loading {name} tab...", end="")
     start_time = time.time()
     try:
         module = importlib.import_module(module_name)
@@ -64,7 +64,7 @@ def run_tab(module_name, function_name, name, requirements=None):
         generic_error_tab_advanced(e, name=name, requirements=requirements)
     finally:
         elapsed_time = time.time() - start_time
-        print(f"  Done in {elapsed_time:.2f} seconds. ({name})\n")
+        print(f" done in {elapsed_time:.2f} seconds.")
 
 
 def load_tabs(list_of_tabs):
@@ -181,49 +181,56 @@ def all_tabs():
         handle_extension_class("text-to-speech", config)
     with gr.Tab("Audio/Music Generation"), gr.Tabs():
         audio_music_generation_tabs = [
-            (
-                "tts_webui.stable_audio.stable_audio_tab",
-                "stable_audio_tab",
-                "Stable Audio",
-                "-r requirements_stable_audio.txt",
-            ),
-            (
-                "tts_webui.magnet.magnet_tab",
-                "magnet_tab",
-                "MAGNeT",
-                "-r requirements_audiocraft.txt",
-            ),
-            (
-                "tts_webui.musicgen.musicgen_tab",
-                "musicgen_tab",
-                "MusicGen",
-                "-r requirements_audiocraft.txt",
-            ),
+            # Stable Audio is now an external extension
+            # (
+            #     "tts_webui.stable_audio.stable_audio_tab",
+            #     "stable_audio_tab",
+            #     "Stable Audio",
+            #     "-r requirements_stable_audio.txt",
+            # ),
+            # Audiocraft MAGNeT is now an external extension
+            # (
+            #     "tts_webui.magnet.magnet_tab",
+            #     "magnet_tab",
+            #     "MAGNeT",
+            #     "-r requirements_audiocraft.txt",
+            # ),
+            # Audiocraft MusicGen is now an external extension
+            # (
+            #     "tts_webui.musicgen.musicgen_tab",
+            #     "musicgen_tab",
+            #     "MusicGen",
+            #     "-r requirements_audiocraft.txt",
+            # ),
         ]
         load_tabs(audio_music_generation_tabs)
 
         handle_extension_class("audio-music-generation", config)
     with gr.Tab("Audio Conversion"), gr.Tabs():
         audio_conversion_tabs = [
-            (
-                "tts_webui.rvc_tab.rvc_tab",
-                "rvc_conversion_tab",
-                "RVC",
-                "-r requirements_rvc.txt",
-            ),
-            (
-                "tts_webui.rvc_tab.uvr5_tab",
-                "uvr5_tab",
-                "UVR5",
-                "-r requirements_rvc.txt",
-            ),
-            (
-                "tts_webui.demucs.demucs_tab",
-                "demucs_tab",
-                "Demucs",
-                "-r requirements_audiocraft.txt",
-            ),
-            ("tts_webui.vocos.vocos_tabs", "vocos_tabs", "Vocos"),
+            # RVC is now an external extension
+            # (
+            #     "tts_webui.rvc_tab.rvc_tab",
+            #     "rvc_conversion_tab",
+            #     "RVC",
+            #     "-r requirements_rvc.txt",
+            # ),
+            # UVR5 is now an external extension
+            # (
+            #     "tts_webui.rvc_tab.uvr5_tab",
+            #     "uvr5_tab",
+            #     "UVR5",
+            #     "-r requirements_rvc.txt",
+            # ),
+            # Demucs is now an external extension
+            # (
+            #     "tts_webui.demucs.demucs_tab",
+            #     "demucs_tab",
+            #     "Demucs",
+            #     "-r requirements_audiocraft.txt",
+            # ),
+            # Vocos is now an external extension
+            # ("tts_webui.vocos.vocos_tabs", "vocos_tabs", "Vocos"),
         ]
         load_tabs(audio_conversion_tabs)
 
@@ -291,6 +298,7 @@ def start_gradio_server():
                 print(f"  {key}:{' ' * (max_key_length - len(key))} {value[0]}:******")
             else:
                 print(f"  {key}:{' ' * (max_key_length - len(key))} {value}")
+        print("")
 
     # detect if --share is passed
     if "--share" in os.sys.argv:

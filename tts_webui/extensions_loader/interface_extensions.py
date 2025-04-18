@@ -33,7 +33,7 @@ def _handle_package(package_name, title_name, requirements):
             )
         return
 
-    print(f"Loading {title_name} Extension...")
+    print(f"Loading {title_name} Extension...", end="")
     start_time = time.time()
     try:
         module = importlib.import_module(f"{package_name}.main")
@@ -58,7 +58,7 @@ def _handle_package(package_name, title_name, requirements):
         )
     finally:
         elapsed_time = time.time() - start_time
-        print(f"  Done in {elapsed_time:.2f} seconds. ({title_name} Extension)\n")
+        print(f" done in {elapsed_time:.2f} seconds.")
 
 
 def disable_extension(package_name):
@@ -122,7 +122,7 @@ def handle_extension_class(extension_class, config):
     for x in filtered_extensions:
             # x["package_name"], f"{x['name']} (v{x['version']})", x["requirements"]
             if x["package_name"] in disabled_extensions:
-                print(f"Skipping disabled {x['name']} Extension...\n")
+                print(f"Skipping disabled {x['name']} Extension...")
                 continue
             _handle_package(x["package_name"], x["name"], x["requirements"])
 

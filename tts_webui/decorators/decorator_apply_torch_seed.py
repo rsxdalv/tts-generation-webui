@@ -1,4 +1,4 @@
-from tts_webui.magnet.utils import Seed
+from tts_webui.utils.timer_seed_contexts import Seed
 
 
 def decorator_apply_torch_seed(fn):

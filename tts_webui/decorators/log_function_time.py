@@ -1,4 +1,4 @@
-from tts_webui.magnet.utils import Timer
+from tts_webui.utils.timer_seed_contexts import Timer
 
 
 def log_function_time(fn):
