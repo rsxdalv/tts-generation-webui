@@ -1,5 +1,5 @@
 import gradio as gr
-from tts_webui.history_tab.open_folder import open_folder
+from tts_webui.utils.open_folder import open_folder
 
 
 def gr_icon_button(value="refresh", **kwargs):
