@@ -16,7 +16,7 @@
 
 2. Install required packages:
    ```bash
-   conda install -y -c conda-forge git python=3.10.11 conda-forge::nodejs=22.9.0 conda pip==23.3.2 conda-forge::uv=0.4.17 ninja conda-forge::postgresql=16.4 conda-forge::vswhere "conda-forge::ffmpeg=4.4.2[build=lgpl*]"
+   conda install -y -c conda-forge git python=3.10.11 conda-forge::nodejs=22.9.0 conda conda-forge::uv=0.4.17 ninja conda-forge::postgresql=16.4 conda-forge::vswhere "conda-forge::ffmpeg=4.4.2[build=lgpl*]"
    ```
 
 ## Installation Options

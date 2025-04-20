@@ -74,6 +74,9 @@
 
 ## Changelog
 
+Apr 21:
+* Allow newer versions of pip
+
 Apr 20:
 * Fix install/uninstall in extension manager
 * Add Kokoro TTS extension

@@ -35,8 +35,6 @@ RUN git clone https://github.com/rsxdalv/tts-generation-webui.git
 # Set working directory to the cloned repo
 WORKDIR /app/tts-generation-webui
 
-RUN pip3 install --no-cache-dir --upgrade pip==23.3.2 setuptools
-
 # Install all requirements
 RUN pip3 install --no-cache-dir torch==$TORCH_VERSION -r requirements.txt
 # RUN pip install --no-cache-dir --verbose torch==$TORCH_VERSION -r requirements.txt
