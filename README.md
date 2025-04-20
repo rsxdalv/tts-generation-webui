@@ -74,6 +74,10 @@
 
 ## Changelog
 
+Apr 20:
+* Fix install/uninstall in extension manager
+* Add Kokoro TTS extension
+
 Apr 18:
 * Fix extension manager startup
 * Convert most models to extensions, install the classic ones by default

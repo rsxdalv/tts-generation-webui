@@ -7,7 +7,7 @@ import gradio as gr
 import importlib
 
 # Add the project root directory to the Python path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from tts_webui.css.css import full_css
 
@@ -321,23 +321,27 @@ def display_extension_ui(x, is_installed, is_disabled):
                 # Check if this is a built-in extension
                 is_builtin = package_name.startswith("extensions.builtin")
 
+                def install_extension():
+                    yield from pip_install_wrapper(x["requirements"], package_name)()
+
                 if is_installed:
                     if not is_builtin:
                         # Update button (only for non-builtin extensions)
                         update_btn = gr.Button("Update", variant="primary")
                         update_btn.click(
-                            fn=lambda pkg=package_name, req=x[
-                                "requirements"
-                            ]: pip_install_wrapper(req, pkg)(),
+                            fn=install_extension,
                             outputs=[gr.HTML()],
                         )
+
+                        def uninstall_extension():
+                            yield from pip_uninstall_wrapper(
+                                package_name, package_name
+                            )()
 
                         # Uninstall button (only for non-builtin extensions)
                         uninstall_btn = gr.Button("Uninstall", variant="stop")
                         uninstall_btn.click(
-                            fn=lambda pkg=package_name: pip_uninstall_wrapper(
-                                pkg, pkg
-                            )(),
+                            fn=uninstall_extension,
                             outputs=[gr.HTML()],
                         )
 
@@ -361,6 +365,12 @@ def display_extension_ui(x, is_installed, is_disabled):
                     toggle_btn.click(
                         fn=toggle_extension,
                         outputs=[gr.HTML()],
+                    ).then(
+                        fn=lambda button_text: gr.Button(
+                            "Enable" if button_text == "Disable" else "Disable"
+                        ),
+                        inputs=[toggle_btn],
+                        outputs=[toggle_btn],
                     )
 
                     if is_builtin:
@@ -371,9 +381,7 @@ def display_extension_ui(x, is_installed, is_disabled):
                     # Install button
                     install_btn = gr.Button("Install", variant="primary")
                     install_btn.click(
-                        fn=lambda pkg=package_name, req=x[
-                            "requirements"
-                        ]: pip_install_wrapper(req, pkg)(),
+                        fn=install_extension,
                         outputs=[gr.HTML()],
                     )
 
