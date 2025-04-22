@@ -46,7 +46,11 @@ const installDependencies = async (gpuchoice) => {
         "xformers",
         true
       );
-    } else if (gpuchoice === "Apple M Series Chip" || gpuchoice === "CPU") {
+    } else if (gpuchoice === "Apple M Series Chip") {
+      await $(
+        `pip install torch==${torchVersion} torchvision torchaudio`
+      );
+    } else if (gpuchoice === "CPU") {
       await $(
         `pip install torch==${torchVersion}+cpu torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu`
       );
@@ -125,7 +129,11 @@ const removeGPUChoice = () => {
 
 const dry_run_flag = DEBUG_DRY_RUN ? "--dry-run " : "";
 
-async function pip_install_or_fail(requirements, name = "", pipFallback = false) {
+async function pip_install_or_fail(
+  requirements,
+  name = "",
+  pipFallback = false
+) {
   displayMessage(`Installing ${name || requirements} dependencies...`);
   await $sh(
     `${
@@ -182,9 +190,12 @@ async function pip_install_all(fi = false) {
   // pip_install_all(false); // potential speed optimization
 
   try {
-    await pip_install_or_fail("-r requirements.txt", "Core Packages, Bark, Tortoise", fi);
-  }
-  catch (error) {
+    await pip_install_or_fail(
+      "-r requirements.txt",
+      "Core Packages, Bark, Tortoise",
+      fi
+    );
+  } catch (error) {
     displayMessage("Failed to install core packages");
     displayMessage("Please check the log file for more information");
     displayMessage("Exiting...");
@@ -298,14 +309,16 @@ exports.repairTorch = async () => {
   if (!checkIfTorchHasCuda() && gpuChoice === "NVIDIA GPU") {
     displayMessage("Backend is NVIDIA GPU, fixing PyTorch");
     try {
-      await $(`conda install -y -k --force-reinstall ${cudaPackages}`);
+      // await $(`conda install -y -k --force-reinstall ${cudaPackages}`);
+      throw new Error("Torch fixing disabled");
     } catch (error) {
       displayError("Failed to fix torch");
     }
   } else if (gpuChoice === "CPU" || gpuChoice === "Apple M Series Chip") {
     displayMessage("Backend is CPU/Apple M Series Chip, fixing PyTorch");
     try {
-      await $(`conda install -y -k --force-reinstall ${cpuPackages}`);
+      // await $(`conda install -y -k --force-reinstall ${cpuPackages}`);
+      throw new Error("Torch fixing disabled");
     } catch (error) {
       displayError("Failed to fix torch");
     }
