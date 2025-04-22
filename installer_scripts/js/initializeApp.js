@@ -47,9 +47,7 @@ const installDependencies = async (gpuchoice) => {
         true
       );
     } else if (gpuchoice === "Apple M Series Chip") {
-      await $(
-        `pip install torch==${torchVersion} torchvision torchaudio`
-      );
+      await $(`pip install torch==${torchVersion} torchvision torchaudio`);
     } else if (gpuchoice === "CPU") {
       await $(
         `pip install torch==${torchVersion}+cpu torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu`
@@ -70,7 +68,6 @@ const installDependencies = async (gpuchoice) => {
 
     saveMajorVersion(majorVersion);
     displayMessage("  Successfully installed torch");
-    await pip_install_all(true); // approximate first install
   } catch (error) {
     displayError(`Error during installation: ${error.message}`);
     throw error;
@@ -229,6 +226,19 @@ const checkIfTorchInstalled = async () => {
 
 const FORCE_REINSTALL = process.env.FORCE_REINSTALL ? true : false;
 
+const getGPUChoice = async () => {
+  if (fs.existsSync(gpuFile)) {
+    const gpuchoice = readGPUChoice();
+    displayMessage(`  Using saved GPU choice: ${gpuchoice}`);
+    return gpuchoice;
+  } else {
+    const gpuchoice = await askForGPUChoice();
+    displayMessage(`  You selected: ${gpuchoice}`);
+    saveGPUChoice(gpuchoice);
+    return gpuchoice;
+  }
+};
+
 async function applyCondaConfig() {
   displayMessage("Applying conda config...");
   displayMessage("  Checking if Torch is installed...");
@@ -246,17 +256,9 @@ async function applyCondaConfig() {
     );
   }
 
-  if (fs.existsSync(gpuFile)) {
-    const gpuchoice = readGPUChoice();
-    displayMessage(`  Using saved GPU choice: ${gpuchoice}`);
-    await installDependencies(gpuchoice);
-    return;
-  } else {
-    const gpuchoice = await askForGPUChoice();
-    displayMessage(`  You selected: ${gpuchoice}`);
-    saveGPUChoice(gpuchoice);
-    await installDependencies(gpuchoice);
-  }
+  const gpuchoice = await getGPUChoice();
+  await installDependencies(gpuchoice);
+  await pip_install_all(true); // approximate first install
 }
 
 const extensionsToInstall = [
@@ -309,20 +311,10 @@ exports.repairTorch = async () => {
   if (!checkIfTorchHasCuda() && gpuChoice === "NVIDIA GPU") {
     displayMessage("Backend is NVIDIA GPU, fixing PyTorch");
     try {
-      // await $(`conda install -y -k --force-reinstall ${cudaPackages}`);
-      throw new Error("Torch fixing disabled");
+      await installDependencies(gpuChoice);
     } catch (error) {
       displayError("Failed to fix torch");
     }
-  } else if (gpuChoice === "CPU" || gpuChoice === "Apple M Series Chip") {
-    displayMessage("Backend is CPU/Apple M Series Chip, fixing PyTorch");
-    try {
-      // await $(`conda install -y -k --force-reinstall ${cpuPackages}`);
-      throw new Error("Torch fixing disabled");
-    } catch (error) {
-      displayError("Failed to fix torch");
-    }
-    displayMessage("Torch has CUDA, skipping reinstall");
   }
 };
 
