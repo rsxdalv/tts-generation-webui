@@ -125,17 +125,21 @@ const removeGPUChoice = () => {
 
 const dry_run_flag = DEBUG_DRY_RUN ? "--dry-run " : "";
 
+async function pip_install_or_fail(requirements, name = "", pipFallback = false) {
+  displayMessage(`Installing ${name || requirements} dependencies...`);
+  await $sh(
+    `${
+      pipFallback ? "pip" : "uv pip"
+    } install ${dry_run_flag}${requirements} torch==${torchVersion}`
+  );
+  displayMessage(
+    `Successfully installed ${name || requirements} dependencies\n`
+  );
+}
+
 async function pip_install(requirements, name = "", pipFallback = false) {
   try {
-    displayMessage(`Installing ${name || requirements} dependencies...`);
-    await $sh(
-      `${
-        pipFallback ? "pip" : "uv pip"
-      } install ${dry_run_flag}${requirements} torch==${torchVersion}`
-    );
-    displayMessage(
-      `Successfully installed ${name || requirements} dependencies\n`
-    );
+    await pip_install_or_fail(requirements, name, pipFallback);
   } catch (error) {
     displayMessage(`Failed to install ${name || requirements} dependencies\n`);
   }
@@ -158,7 +162,7 @@ async function pip_install_all(fi = false) {
     try {
       displayMessage("Attempting single pip install of all dependencies...");
 
-      await pip_install(
+      await pip_install_or_fail(
         "-r requirements.txt -r requirements_bark_hubert_quantizer.txt -r requirements_rvc.txt -r requirements_audiocraft.txt -r requirements_styletts2.txt -r requirements_vall_e.txt -r requirements_maha_tts.txt -r requirements_stable_audio.txt hydra-core==1.3.2 nvidia-ml-py",
         "All dependencies",
         // first_install
@@ -177,7 +181,15 @@ async function pip_install_all(fi = false) {
   displayMessage("Updating dependencies...");
   // pip_install_all(false); // potential speed optimization
 
-  await pip_install("-r requirements.txt", "Core Packages, Bark, Tortoise", fi);
+  try {
+    await pip_install_or_fail("-r requirements.txt", "Core Packages, Bark, Tortoise", fi);
+  }
+  catch (error) {
+    displayMessage("Failed to install core packages");
+    displayMessage("Please check the log file for more information");
+    displayMessage("Exiting...");
+    throw error;
+  }
   await pip_install("-r requirements_bark_hubert_quantizer.txt", "Bark Voice Clone", fi); // prettier-ignore
   await pip_install("-r requirements_rvc.txt", "RVC", fi);
   await pip_install("-r requirements_audiocraft.txt", "Audiocraft", fi);
