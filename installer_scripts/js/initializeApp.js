@@ -322,7 +322,7 @@ function setupReactUIExtensions() {
   try {
     displayMessage("Initializing extensions...");
     const packageJSONpath = getInstallerFilesPath(
-      "../react-ui/src/extensions/package.json".split("/")
+      "../react-ui/src/extensions/package.json"
     );
 
     if (!fs.existsSync(packageJSONpath)) {
