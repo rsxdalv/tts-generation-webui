@@ -6,13 +6,26 @@ logFile="$(dirname "$0")/output.log"
 # Start logging
 exec > >(tee -i "$logFile") 2>&1
 
-# "$(dirname "$0")/init_mamba.sh"
-./init_mamba.sh
+"$(dirname "$0")/init_mamba.sh"
 if [ $? -ne 0 ]; then
     echo "Failed to init mamba, exiting..."
     exit 1
 fi
 
+# check if gcc is installed
+if ! which gcc; then
+    echo 
+    echo "############################################################"
+    echo "Warning: gcc is not installed, pip install might fail."
+    echo "Example installation for APT:"
+    echo "sudo apt update"
+    echo "sudo apt install build-essential"
+    echo "Continuing..."
+    echo "############################################################"
+    echo
+    # store GCC availablility
+    export GCC_AVAILABLE="F"
+fi
 
 export MICROMAMBA_ROOT_PREFIX="./installer_files/mamba"
 export MICROMAMBA_EXE="./installer_files/mamba/micromamba"

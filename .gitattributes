@@ -1,2 +1,10 @@
+* text=auto eol=lf
 *.command text eol=lf
+*.sh text eol=lf
 
+# INI file extension
+*.[iI][nN][iI]              text eol=crlf
+
+# Batch scripts (cmd, bat)
+*.[cC][mM][dD]              text eol=crlf
+*.[bB][aA][tT]              text eol=crlf

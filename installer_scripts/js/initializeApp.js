@@ -46,7 +46,9 @@ const installDependencies = async (gpuchoice) => {
         "xformers",
         true
       );
-    } else if (gpuchoice === "Apple M Series Chip" || gpuchoice === "CPU") {
+    } else if (gpuchoice === "Apple M Series Chip") {
+      await $(`pip install torch==${torchVersion} torchvision torchaudio`);
+    } else if (gpuchoice === "CPU") {
       await $(
         `pip install torch==${torchVersion}+cpu torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu`
       );
@@ -66,7 +68,6 @@ const installDependencies = async (gpuchoice) => {
 
     saveMajorVersion(majorVersion);
     displayMessage("  Successfully installed torch");
-    await pip_install_all(true); // approximate first install
   } catch (error) {
     displayError(`Error during installation: ${error.message}`);
     throw error;
@@ -125,17 +126,25 @@ const removeGPUChoice = () => {
 
 const dry_run_flag = DEBUG_DRY_RUN ? "--dry-run " : "";
 
+async function pip_install_or_fail(
+  requirements,
+  name = "",
+  pipFallback = false
+) {
+  displayMessage(`Installing ${name || requirements} dependencies...`);
+  await $sh(
+    `${
+      pipFallback ? "pip" : "uv pip"
+    } install ${dry_run_flag}${requirements} torch==${torchVersion}`
+  );
+  displayMessage(
+    `Successfully installed ${name || requirements} dependencies\n`
+  );
+}
+
 async function pip_install(requirements, name = "", pipFallback = false) {
   try {
-    displayMessage(`Installing ${name || requirements} dependencies...`);
-    await $sh(
-      `${
-        pipFallback ? "pip" : "uv pip"
-      } install ${dry_run_flag}${requirements} torch==${torchVersion}`
-    );
-    displayMessage(
-      `Successfully installed ${name || requirements} dependencies\n`
-    );
+    await pip_install_or_fail(requirements, name, pipFallback);
   } catch (error) {
     displayMessage(`Failed to install ${name || requirements} dependencies\n`);
   }
@@ -158,7 +167,7 @@ async function pip_install_all(fi = false) {
     try {
       displayMessage("Attempting single pip install of all dependencies...");
 
-      await pip_install(
+      await pip_install_or_fail(
         "-r requirements.txt -r requirements_bark_hubert_quantizer.txt -r requirements_rvc.txt -r requirements_audiocraft.txt -r requirements_styletts2.txt -r requirements_vall_e.txt -r requirements_maha_tts.txt -r requirements_stable_audio.txt hydra-core==1.3.2 nvidia-ml-py",
         "All dependencies",
         // first_install
@@ -177,7 +186,18 @@ async function pip_install_all(fi = false) {
   displayMessage("Updating dependencies...");
   // pip_install_all(false); // potential speed optimization
 
-  await pip_install("-r requirements.txt", "Core Packages, Bark, Tortoise", fi);
+  try {
+    await pip_install_or_fail(
+      "-r requirements.txt",
+      "Core Packages, Bark, Tortoise",
+      fi
+    );
+  } catch (error) {
+    displayMessage("Failed to install core packages");
+    displayMessage("Please check the log file for more information");
+    displayMessage("Exiting...");
+    throw error;
+  }
   await pip_install("-r requirements_bark_hubert_quantizer.txt", "Bark Voice Clone", fi); // prettier-ignore
   await pip_install("-r requirements_rvc.txt", "RVC", fi);
   await pip_install("-r requirements_audiocraft.txt", "Audiocraft", fi);
@@ -206,6 +226,19 @@ const checkIfTorchInstalled = async () => {
 
 const FORCE_REINSTALL = process.env.FORCE_REINSTALL ? true : false;
 
+const getGPUChoice = async () => {
+  if (fs.existsSync(gpuFile)) {
+    const gpuchoice = readGPUChoice();
+    displayMessage(`  Using saved GPU choice: ${gpuchoice}`);
+    return gpuchoice;
+  } else {
+    const gpuchoice = await askForGPUChoice();
+    displayMessage(`  You selected: ${gpuchoice}`);
+    saveGPUChoice(gpuchoice);
+    return gpuchoice;
+  }
+};
+
 async function applyCondaConfig() {
   displayMessage("Applying conda config...");
   displayMessage("  Checking if Torch is installed...");
@@ -223,17 +256,9 @@ async function applyCondaConfig() {
     );
   }
 
-  if (fs.existsSync(gpuFile)) {
-    const gpuchoice = readGPUChoice();
-    displayMessage(`  Using saved GPU choice: ${gpuchoice}`);
-    await installDependencies(gpuchoice);
-    return;
-  } else {
-    const gpuchoice = await askForGPUChoice();
-    displayMessage(`  You selected: ${gpuchoice}`);
-    saveGPUChoice(gpuchoice);
-    await installDependencies(gpuchoice);
-  }
+  const gpuchoice = await getGPUChoice();
+  await installDependencies(gpuchoice);
+  await pip_install_all(true); // approximate first install
 }
 
 const extensionsToInstall = [
@@ -286,18 +311,10 @@ exports.repairTorch = async () => {
   if (!checkIfTorchHasCuda() && gpuChoice === "NVIDIA GPU") {
     displayMessage("Backend is NVIDIA GPU, fixing PyTorch");
     try {
-      await $(`conda install -y -k --force-reinstall ${cudaPackages}`);
+      await installDependencies(gpuChoice);
     } catch (error) {
       displayError("Failed to fix torch");
     }
-  } else if (gpuChoice === "CPU" || gpuChoice === "Apple M Series Chip") {
-    displayMessage("Backend is CPU/Apple M Series Chip, fixing PyTorch");
-    try {
-      await $(`conda install -y -k --force-reinstall ${cpuPackages}`);
-    } catch (error) {
-      displayError("Failed to fix torch");
-    }
-    displayMessage("Torch has CUDA, skipping reinstall");
   }
 };
 
@@ -305,11 +322,7 @@ function setupReactUIExtensions() {
   try {
     displayMessage("Initializing extensions...");
     const packageJSONpath = getInstallerFilesPath(
-      "..",
-      "react-ui",
-      "src",
-      "extensions",
-      "package.json"
+      "../react-ui/src/extensions/package.json".split("/")
     );
 
     if (!fs.existsSync(packageJSONpath)) {

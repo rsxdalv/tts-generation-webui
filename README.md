@@ -74,6 +74,12 @@
 
 ## Changelog
 
+
+Apr 22:
+* Allow newer versions of pip
+* Remove PyTorch's +cpu for Apple M Series Chip
+* Installer fixes - fix CUDA repair, CRLF, warn about GCC, terminate if pip fails.
+
 Apr 20:
 * Fix install/uninstall in extension manager
 * Add Kokoro TTS extension
