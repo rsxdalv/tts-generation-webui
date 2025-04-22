@@ -1,3 +1,5 @@
+#!/bin/bash
+
 cd "$(dirname "$0")/.."
 
 export MICROMAMBA_EXE="./installer_files/mamba/micromamba"
