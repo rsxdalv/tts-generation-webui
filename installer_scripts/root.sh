@@ -6,8 +6,7 @@ logFile="$(dirname "$0")/output.log"
 # Start logging
 exec > >(tee -i "$logFile") 2>&1
 
-# "$(dirname "$0")/init_mamba.sh"
-./init_mamba.sh
+"$(dirname "$0")/init_mamba.sh"
 if [ $? -ne 0 ]; then
     echo "Failed to init mamba, exiting..."
     exit 1
