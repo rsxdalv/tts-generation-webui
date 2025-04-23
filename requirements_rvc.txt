@@ -1,1 +1,0 @@
-extension_rvc @ git+https://github.com/rsxdalv/extension_rvc@main

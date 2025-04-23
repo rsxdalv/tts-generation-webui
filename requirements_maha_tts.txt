@@ -1,1 +1,0 @@
-extension_maha_tts @ git+https://github.com/rsxdalv/extension_maha_tts@main
