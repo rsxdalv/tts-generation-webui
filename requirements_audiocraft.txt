@@ -1,1 +1,0 @@
-extension_audiocraft @ git+https://github.com/rsxdalv/extension_audiocraft@main

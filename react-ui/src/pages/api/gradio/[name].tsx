@@ -8,6 +8,8 @@ import {
   PredictFunction,
   SubmitIterable,
 } from "@gradio/client/dist/types";
+import { proxyGradioFilesInResult } from "../../../backend-utils/proxyGradioFile";
+import { defaultBackend } from "../../../backend-utils/defaultBackend";
 
 type Data = { data: any };
 
@@ -40,11 +42,6 @@ export default async function handler(
   res.status(200).json(result);
 }
 
-const defaultBackend =
-  process.env.GRADIO_BACKEND ||
-  process.env.GRADIO_BACKEND_AUTOMATIC ||
-  "http://127.0.0.1:7770/";
-
 const getClient = () => Client.connect(defaultBackend, {});
 
 type GradioChoices = {
@@ -58,32 +55,10 @@ const extractChoicesTuple = ({ choices }: GradioChoices) =>
 const getChoices = (result: { data: GradioChoices[] }) =>
   extractChoices(result?.data[0]);
 
-const proxyGradioFile = (data: any) =>
-  // typeof data === "object" && data.__type__ === "file"
-  //   // ? new GradioFile(data.url, data.name)
-  //   : data;
-  data
-
-const proxyGradioFiles = (data: any[]) =>
-  Array.isArray(data)
-    ? data.map(proxyGradioFile)
-    : // : typeof data === "object"
-      //   ? Object.fromEntries(
-      //       Object.entries(data).map(([key, value]) => [
-      //         key,
-      //         proxyGradioFiles(value),
-      //       ])
-      //     )
-      data;
-
 const gradioPredict = <T extends any[]>(...args: Parameters<PredictFunction>) =>
-  // getClient().then((app) => app.predict(...args)) as Promise<{ data: T }>;
   getClient()
     .then((app) => app.predict(...args) as Promise<{ data: T }>)
-    .then((result: { data: T }) => ({
-      ...result,
-      data: proxyGradioFiles(result?.data) as T,
-    }));
+    .then<{ data: T }>(proxyGradioFilesInResult);
 
 const gradioSubmit = <T extends any[]>(...args: Parameters<PredictFunction>) =>
   getClient().then(
@@ -253,6 +228,7 @@ async function tortoise({
   const events = await Array__fromAsync(job);
   const results = events
     .filter<PayloadMessage>((x): x is PayloadMessage => x.type === "data")
+    .map<any>(proxyGradioFilesInResult)
     .map((x: PayloadMessage) => {
       const [audio, bundle_name, metadata] = x.data;
       return {
@@ -370,7 +346,7 @@ const simpleOutputMap = (result: { data: [GradioFile, Object, string] }) => {
   return { audio, metadata, folder_root };
 };
 
-const simpleEndpoint = (endpoint) => (params) =>
+const simpleEndpoint = (endpoint: string) => (params: Record<string, any>) =>
   gradioPredict<[GradioFile, Object, string]>(endpoint, params).then(
     simpleOutputMap
   );
@@ -383,7 +359,7 @@ const scan_huggingface_cache_api = () =>
 const delete_huggingface_cache_revisions = ({ commit_hash }) =>
   gradioPredict<[]>("/delete_huggingface_cache_revisions", [commit_hash]);
 
-const passThrough = (endpoint) => (params) =>
+const passThrough = (endpoint: string) => (params: Record<string, any>) =>
   gradioPredict<any>(endpoint, params);
 
 type LocalCacheFile = {
@@ -394,7 +370,7 @@ type LocalCacheFile = {
 const isLocalCacheFile = (x: any): x is LocalCacheFile =>
   typeof x === "object" && x.__type === "local_cache_file";
 
-const resolveParam = async (key: string, value: any) =>
+const resolveParam = async (_key: string, value: any) =>
   isLocalCacheFile(value) ? await getFile(value.path) : value;
 
 const resolveFileParams = async (params: Record<string, any>) =>
@@ -408,7 +384,7 @@ const resolveFileParams = async (params: Record<string, any>) =>
   );
 
 const resolvedPassThrough =
-  (endpoint: string, map = (x) => x) =>
+  (endpoint: string, map = (x: any) => x) =>
   (params: Record<string, any>) =>
     resolveFileParams(params)
       .then((resolvedParams) => gradioPredict<any>(endpoint, resolvedParams))
