@@ -15,6 +15,8 @@ fairseq @ https://github.com/rsxdalv/fairseq/releases/download/v0.12.3/fairseq-0
 fairseq @ https://github.com/rsxdalv/fairseq/releases/download/v0.12.3/fairseq-0.12.13-cp310-cp310-macosx_11_0_universal2.whl ; sys_platform == 'darwin' # MIT License
 accelerate>=0.33.0
 # optimum-quanto==0.2.6
+# triton>=3.2.0 ; sys_platform == 'linux',
+# triton-windows>=3.2.0.post18 ; sys_platform == 'win32',
 
 extension_bark @ git+https://github.com/rsxdalv/extension_bark@main
 extension_tortoise @ git+https://github.com/rsxdalv/extension_tortoise@main
