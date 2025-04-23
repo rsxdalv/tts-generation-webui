@@ -77,6 +77,7 @@
 Apr 23:
 * Deprecate requirements_* files using direct extension installation instead.
 * Add proxy for gradio files in React UI.
+* Added [DIA extension](https://github.com/nari-labs/dia).
 
 Apr 22:
 * Allow newer versions of pip
