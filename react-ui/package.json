@@ -10,7 +10,9 @@
     "lint": "next lint",
     "dev-error": "tsc --noEmit --pretty --watch",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "test": "jest",
+    "test:watch": "jest --watch"
   },
   "dependencies": {
     "@emotion/css": "^11.10.8",
@@ -72,8 +74,12 @@
     "@storybook/test": "^8.2.9",
     "@types/adm-zip": "^0.5.0",
     "@types/express": "^4.17.20",
+    "@types/jest": "^29.5.12",
     "eslint-plugin-storybook": "^0.8.0",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
     "storybook": "^8.2.9",
+    "ts-jest": "^29.1.2",
     "typescript": "^5.4.5"
   }
 }
