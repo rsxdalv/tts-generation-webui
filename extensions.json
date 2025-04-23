@@ -449,6 +449,21 @@
             "extension_platform_version": "0.0.1"
         },
         {
+            "package_name": "extension_dia",
+            "name": "DIA",
+            "version": "0.0.1",
+            "requirements": "git+https://github.com/rsxdalv/extension_dia@main",
+            "description": "DIA: A text-to-dialogue model",
+            "extension_type": "interface",
+            "extension_class": "text-to-speech",
+            "author": "Nari Labs",
+            "extension_author": "rsxdalv",
+            "license": "MIT",
+            "website": "https://github.com/nari-labs/Dia",
+            "extension_website": "https://github.com/rsxdalv/extension_dia",
+            "extension_platform_version": "0.0.1"
+        },
+        {
             "package_name": "extensions.builtin.extension_model_downloader",
             "name": "Model Downloader",
             "version": "0.0.1",
