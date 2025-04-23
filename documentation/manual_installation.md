@@ -73,20 +73,20 @@ Choose the appropriate PyTorch installation for your hardware:
    You can install each requirement file individually:
    ```bash
    pip install -r requirements.txt
-   pip install -r requirements_bark_hubert_quantizer.txt
-   pip install -r requirements_rvc.txt
-   pip install -r requirements_audiocraft.txt
-   pip install -r requirements_styletts2.txt
-   pip install -r requirements_vall_e.txt
-   pip install -r requirements_maha_tts.txt
-   pip install -r requirements_stable_audio.txt
+   pip install git+https://github.com/rsxdalv/extension_bark_voice_clone@main
+   pip install git+https://github.com/rsxdalv/extension_rvc@main
+   pip install git+https://github.com/rsxdalv/extension_audiocraft@main
+   pip install git+https://github.com/rsxdalv/extension_styletts2@main
+   pip install git+https://github.com/rsxdalv/extension_vall_e_x@main
+   pip install git+https://github.com/rsxdalv/extension_maha_tts@main
+   pip install git+https://github.com/rsxdalv/extension_stable_audio@main
    pip install hydra-core==1.3.2
    pip install nvidia-ml-py
    ```
 
    Or optionally install all requirements at once (may fail on some systems):
    ```bash
-   pip install -r requirements.txt -r requirements_bark_hubert_quantizer.txt -r requirements_rvc.txt -r requirements_audiocraft.txt -r requirements_styletts2.txt -r requirements_vall_e.txt -r requirements_maha_tts.txt -r requirements_stable_audio.txt hydra-core==1.3.2 nvidia-ml-py
+   pip install -r requirements.txt git+https://github.com/rsxdalv/extension_audiocraft@main git+https://github.com/rsxdalv/extension_bark_voice_clone@main git+https://github.com/rsxdalv/extension_maha_tts@main git+https://github.com/rsxdalv/extension_rvc@main git+https://github.com/rsxdalv/extension_stable_audio@main git+https://github.com/rsxdalv/extension_styletts2@main git+https://github.com/rsxdalv/extension_vall_e_x@main hydra-core==1.3.2 nvidia-ml-py
    ```
 
    > Note: This list might not be up to date. Check the [Dockerfile](https://github.com/rsxdalv/tts-generation-webui/blob/main/Dockerfile#L39-L40) for the latest requirements.

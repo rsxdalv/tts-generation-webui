@@ -168,7 +168,7 @@ async function pip_install_all(fi = false) {
       displayMessage("Attempting single pip install of all dependencies...");
 
       await pip_install_or_fail(
-        "-r requirements.txt -r requirements_bark_hubert_quantizer.txt -r requirements_rvc.txt -r requirements_audiocraft.txt -r requirements_styletts2.txt -r requirements_vall_e.txt -r requirements_maha_tts.txt -r requirements_stable_audio.txt hydra-core==1.3.2 nvidia-ml-py",
+        "-r requirements.txt git+https://github.com/rsxdalv/extension_audiocraft@main git+https://github.com/rsxdalv/extension_bark_voice_clone@main git+https://github.com/rsxdalv/extension_maha_tts@main git+https://github.com/rsxdalv/extension_rvc@main git+https://github.com/rsxdalv/extension_stable_audio@main git+https://github.com/rsxdalv/extension_styletts2@main git+https://github.com/rsxdalv/extension_vall_e_x@main hydra-core==1.3.2 nvidia-ml-py",
         "All dependencies",
         // first_install
         true
@@ -187,24 +187,20 @@ async function pip_install_all(fi = false) {
   // pip_install_all(false); // potential speed optimization
 
   try {
-    await pip_install_or_fail(
-      "-r requirements.txt",
-      "Core Packages, Bark, Tortoise",
-      fi
-    );
+    await pip_install_or_fail("-r requirements.txt", "Core Packages", fi);
   } catch (error) {
     displayMessage("Failed to install core packages");
     displayMessage("Please check the log file for more information");
     displayMessage("Exiting...");
     throw error;
   }
-  await pip_install("-r requirements_bark_hubert_quantizer.txt", "Bark Voice Clone", fi); // prettier-ignore
-  await pip_install("-r requirements_rvc.txt", "RVC", fi);
-  await pip_install("-r requirements_audiocraft.txt", "Audiocraft", fi);
-  await pip_install("-r requirements_styletts2.txt", "StyleTTS", fi);
-  await pip_install("-r requirements_vall_e.txt", "Vall-E-X", fi);
-  await pip_install("-r requirements_maha_tts.txt", "Maha TTS", fi);
-  await pip_install("-r requirements_stable_audio.txt", "Stable Audio", true);
+  await pip_install("git+https://github.com/rsxdalv/extension_bark_voice_clone@main", "Bark Voice Clone", fi); // prettier-ignore
+  await pip_install("git+https://github.com/rsxdalv/extension_rvc@main", "RVC", fi); // prettier-ignore
+  await pip_install("git+https://github.com/rsxdalv/extension_audiocraft@main", "Audiocraft", fi); // prettier-ignore
+  await pip_install("git+https://github.com/rsxdalv/extension_styletts2@main", "StyleTTS", fi); // prettier-ignore
+  await pip_install("git+https://github.com/rsxdalv/extension_vall_e_x@main", "Vall-E-X", fi); // prettier-ignore
+  await pip_install("git+https://github.com/rsxdalv/extension_maha_tts@main", "Maha TTS", fi); // prettier-ignore
+  await pip_install("git+https://github.com/rsxdalv/extension_stable_audio@main", "Stable Audio", fi); // prettier-ignore
   await pip_install("hydra-core==1.3.2", "hydra-core fix due to fairseq", fi); // reinstall hydra-core==1.3.2 because of fairseq
   await pip_install("nvidia-ml-py", "nvidia-ml-py", fi);
   savePipPackagesVersion(newPipPackagesVersion);

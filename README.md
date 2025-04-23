@@ -74,6 +74,8 @@
 
 ## Changelog
 
+Apr 23:
+* Deprecate requirements_* files using direct extension installation instead.
 
 Apr 22:
 * Allow newer versions of pip
