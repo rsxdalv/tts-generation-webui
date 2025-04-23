@@ -76,6 +76,7 @@
 
 Apr 23:
 * Deprecate requirements_* files using direct extension installation instead.
+* Add proxy for gradio files in React UI.
 
 Apr 22:
 * Allow newer versions of pip
