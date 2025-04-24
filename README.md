@@ -74,6 +74,9 @@
 
 ## Changelog
 
+Apr 24:
+* Add OpenVoice V1 extension
+
 Apr 23:
 * Deprecate requirements_* files using direct extension installation instead.
 * Add proxy for gradio files in React UI.

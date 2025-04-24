@@ -567,6 +567,21 @@
             "website": "https://huggingface.co/Dubverse/MahaTTS",
             "extension_website": "https://github.com/rsxdalv/extension_maha_tts",
             "extension_platform_version": "0.0.1"
+        },
+        {
+            "package_name": "extension_openvoice",
+            "name": "OpenVoice",
+            "version": "0.0.1",
+            "requirements": "git+https://github.com/rsxdalv/extension_openvoice@main",
+            "description": "OpenVoice: A versatile instant voice cloning approach",
+            "extension_type": "interface",
+            "extension_class": "text-to-speech",
+            "author": "MyShell AI",
+            "extension_author": "rsxdalv",
+            "license": "MIT",
+            "website": "https://github.com/myshell-ai/OpenVoice",
+            "extension_website": "https://github.com/rsxdalv/extension_openvoice",
+            "extension_platform_version": "0.0.1"
         }
     ],
     "decorators": [

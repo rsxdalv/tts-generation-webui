@@ -38,6 +38,7 @@ extensions.external.json
 /data/models/gpt_sovits/
 /data/models/resemble_enhance/ds/
 /data/models/ap_bwe/weights/
+/data/models/openvoice/
 
 # Ignore temporary files
 temp/
