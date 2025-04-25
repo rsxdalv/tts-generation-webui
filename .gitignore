@@ -39,6 +39,7 @@ extensions.external.json
 /data/models/resemble_enhance/ds/
 /data/models/ap_bwe/weights/
 /data/models/openvoice/
+/data/models/openvoice_v2/
 
 # Ignore temporary files
 temp/

@@ -40,13 +40,19 @@
 | [Tortoise](https://github.com/neonbjb/tortoise-tts) | [MAGNeT](https://github.com/facebookresearch/audiocraft/blob/main/docs/MAGNET.md) | [Demucs](https://github.com/facebookresearch/demucs) |
 | [Maha TTS](https://github.com/dubverse-ai/MahaTTS) | [Stable Audio](https://github.com/Stability-AI/stable-audio-tools) | [Vocos](https://github.com/gemelo-ai/vocos) |
 | [MMS](https://github.com/facebookresearch/fairseq/blob/main/examples/mms/README.md) | [(Extension) Riffusion](https://github.com/riffusion/riffusion-hobby) | [Whisper](https://github.com/openai/whisper) |
-| [Vall-E X](https://github.com/Plachtaa/VALL-E-X) | [(Extension) AudioCraft Mac](https://github.com/trizko/audiocraft) |
-| [StyleTTS2](https://github.com/sidharthrajaram/StyleTTS2) | [(Extension) AudioCraft Plus](https://github.com/GrandaddyShmax/audiocraft_plus) |
-| [SeamlessM4T](https://github.com/facebookresearch/seamless_communication) | | |
+| [Vall-E X](https://github.com/Plachtaa/VALL-E-X) | [(Extension) AudioCraft Mac](https://github.com/trizko/audiocraft) | [AP BWE](https://github.com/yxlu-0102/AP-BWE) |
+| [StyleTTS2](https://github.com/sidharthrajaram/StyleTTS2) | [(Extension) AudioCraft Plus](https://github.com/GrandaddyShmax/audiocraft_plus) | [Resemble Enhance](https://github.com/resemble-ai/resemble-enhance) |
+| [SeamlessM4T](https://github.com/facebookresearch/seamless_communication) | | [Audio Separator](https://github.com/nomadkaraoke/python-audio-separator) |]
 | [(Extension) XTTSv2](https://github.com/coqui-ai/TTS) | | |
 | [(Extension) MARS5](https://github.com/camb-ai/mars5-tts) | | |
 | [(Extension) F5-TTS](https://github.com/SWivid/F5-TTS) | | |
 | [(Extension) Parler TTS](https://github.com/huggingface/parler-tts) | | |
+| [(Extension) OpenVoice](https://github.com/myshell-ai/OpenVoice) | | |
+| [(Extension) OpenVoice V2](https://github.com/myshell-ai/OpenVoice) | | |
+| [(Extension) Kokoro TTS](https://github.com/hexgrad/kokoro) | | |
+| [(Extension) DIA](https://github.com/nari-labs/dia) | | |
+| [(Extension) CosyVoice](https://github.com/FunAudioLLM/CosyVoice) | | |
+| [(Extension) GPT-SoVITS](https://github.com/X-T-E-R/GPT-SoVITS-Inference) | | |
 
 </div>
 
@@ -73,6 +79,9 @@
 | :-----------------------------------------: | :-----------------------------------------: | :-------------------------------: |
 
 ## Changelog
+
+Apr 25:
+* Add OpenVoice V2 extension
 
 Apr 24:
 * Add OpenVoice V1 extension

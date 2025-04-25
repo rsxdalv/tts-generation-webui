@@ -399,7 +399,7 @@
             "author": "rsxdalv",
             "extension_author": "rsxdalv",
             "license": "MIT",
-            "website": "https://github.com/rsxdalv/extension_audio_separator",
+            "website": "https://github.com/nomadkaraoke/python-audio-separator",
             "extension_website": "https://github.com/rsxdalv/extension_audio_separator",
             "extension_platform_version": "0.0.1"
         },
@@ -414,7 +414,7 @@
             "author": "rsxdalv",
             "extension_author": "rsxdalv",
             "license": "MIT",
-            "website": "https://github.com/rsxdalv/extension_cosyvoice",
+            "website": "https://github.com/FunAudioLLM/CosyVoice",
             "extension_website": "https://github.com/rsxdalv/extension_cosyvoice",
             "extension_platform_version": "0.0.1"
         },
@@ -489,7 +489,7 @@
             "author": "rsxdalv",
             "extension_author": "rsxdalv",
             "license": "MIT",
-            "website": "https://github.com/rsxdalv/extension_resemble_enhance",
+            "website": "https://github.com/resemble-ai/resemble-enhance",
             "extension_website": "https://github.com/rsxdalv/extension_resemble_enhance",
             "extension_platform_version": "0.0.1"
         },
@@ -581,6 +581,21 @@
             "license": "MIT",
             "website": "https://github.com/myshell-ai/OpenVoice",
             "extension_website": "https://github.com/rsxdalv/extension_openvoice",
+            "extension_platform_version": "0.0.1"
+        },
+        {
+            "package_name": "extension_openvoice_v2",
+            "name": "OpenVoice V2",
+            "version": "0.0.1",
+            "requirements": "git+https://github.com/rsxdalv/extension_openvoice_v2@main",
+            "description": "OpenVoice: A versatile instant voice cloning approach",
+            "extension_type": "interface",
+            "extension_class": "text-to-speech",
+            "author": "MyShell AI",
+            "extension_author": "rsxdalv",
+            "license": "MIT",
+            "website": "https://github.com/myshell-ai/OpenVoice",
+            "extension_website": "https://github.com/rsxdalv/extension_openvoice_v2",
             "extension_platform_version": "0.0.1"
         }
     ],
