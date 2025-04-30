@@ -40,6 +40,7 @@ extensions.external.json
 /data/models/ap_bwe/weights/
 /data/models/openvoice/
 /data/models/openvoice_v2/
+/data/models/kimi-audio/
 
 # Ignore temporary files
 temp/
