@@ -18,6 +18,11 @@ accelerate>=0.33.0
 # triton>=3.2.0 ; sys_platform == 'linux',
 # triton-windows>=3.2.0.post18 ; sys_platform == 'win32',
 
+# experimental
+# flash-attn @ https://github.com/kingbri1/flash-attention/releases/download/v2.7.4.post1/flash_attn-2.7.4.post1+cu124torch2.6.0cxx11abiFALSE-cp310-cp310-win_amd64.whl ; sys_platform == 'win32'
+# https://github.com/Dao-AILab/flash-attention/releases/download/v2.7.4.post1/flash_attn-2.7.4.post1+cu12torch2.6cxx11abiFALSE-cp310-cp310-linux_x86_64.whl
+# flash-attn @ https://github.com/Dao-AILab/flash-attention/releases/download/v2.7.4.post1/flash_attn-2.7.4.post1+cu12torch2.6cxx11abiFALSE-cp310-cp310-linux_x86_64.whl ; sys_platform == 'linux'
+
 extension_bark @ git+https://github.com/rsxdalv/extension_bark@main
 extension_tortoise @ git+https://github.com/rsxdalv/extension_tortoise@main
 extension_demucs @ git+https://github.com/rsxdalv/extension_demucs@main
