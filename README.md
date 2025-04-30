@@ -80,6 +80,10 @@
 
 ## Changelog
 
+Apr 30:
+* Add Kimi Audio 7B Instruct extension
+* Fix React-Gradio file proxy missing slash
+
 Apr 25:
 * Add OpenVoice V2 extension
 
