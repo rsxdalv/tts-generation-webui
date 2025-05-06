@@ -41,6 +41,7 @@ extensions.external.json
 /data/models/openvoice/
 /data/models/openvoice_v2/
 /data/models/kimi-audio/
+/data/models/piper/
 
 # Ignore temporary files
 temp/
