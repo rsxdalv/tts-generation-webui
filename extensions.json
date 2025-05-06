@@ -600,7 +600,7 @@
         },
         {
             "package_name": "extension_kimi_audio",
-            "name": "Kimi Audio Experiment",
+            "name": "Kimi Audio",
             "version": "0.0.1",
             "requirements": "git+https://github.com/rsxdalv/extension_kimi_audio@main",
             "description": "Kimi Audio is a powerful text-to-speech and speech-to-text model by Moonshot AI",
@@ -615,7 +615,7 @@
         },
         {
             "package_name": "extension_kokoro_tts_api",
-            "name": "Kokoro TTS API Experiment",
+            "name": "Kokoro TTS API",
             "version": "0.0.1",
             "requirements": "git+https://github.com/rsxdalv/extension_kokoro_tts_api@main",
             "description": "Kokoro TTS API is a text-to-speech model by hexgrad",
