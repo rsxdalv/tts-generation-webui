@@ -83,6 +83,7 @@
 May 6:
 * Add Kimi Audio 7B Instruct extension
 * Fix React-Gradio file proxy missing slash
+* Add Kokoro TTS API extension
 
 ## April 2025
 
