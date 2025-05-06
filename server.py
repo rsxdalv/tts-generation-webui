@@ -31,6 +31,7 @@ from tts_webui.extensions_loader.interface_extensions import (
 from tts_webui.extensions_loader.decorator_extensions import (
     extension_decorator_list_tab,
 )
+from tts_webui.utils.print_gradio_options import print_gradio_options
 
 
 def reload_config_and_restart_ui():
@@ -149,8 +150,7 @@ def all_tabs():
         except Exception as e:
             generic_error_tab_advanced(e, name="History", requirements=None)
 
-        outputs_tabs = [
-        ]
+        outputs_tabs = []
         load_tabs(outputs_tabs)
 
         handle_extension_class("outputs", config)
@@ -180,15 +180,6 @@ def all_tabs():
 
 
 def start_gradio_server():
-    def print_pretty_options(options):
-        print(" Gradio interface options:")
-        max_key_length = max(len(key) for key in options.keys())
-        for key, value in options.items():
-            if key == "auth" and value is not None:
-                print(f"  {key}:{' ' * (max_key_length - len(key))} {value[0]}:******")
-            else:
-                print(f"  {key}:{' ' * (max_key_length - len(key))} {value}")
-        print("")
 
     # detect if --share is passed
     if "--share" in os.sys.argv:
@@ -214,7 +205,7 @@ def start_gradio_server():
     # TypeError: Blocks.launch() got an unexpected keyword argument 'file_directories'
     if "file_directories" in gradio_interface_options:
         del gradio_interface_options["file_directories"]
-    print_pretty_options(gradio_interface_options)
+    print_gradio_options(gradio_interface_options)
 
     demo = main_ui()
 

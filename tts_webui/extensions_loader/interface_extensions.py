@@ -8,7 +8,10 @@ import gradio as gr
 from tts_webui.config.config import config
 from tts_webui.utils.pip_install import pip_install_wrapper, pip_uninstall_wrapper
 from tts_webui.utils.generic_error_tab_advanced import generic_error_tab_advanced
-from tts_webui.extensions_loader.extensions_data_loader import get_interface_extensions, filter_extensions_by_type_and_class
+from tts_webui.extensions_loader.extensions_data_loader import (
+    get_interface_extensions,
+    filter_extensions_by_type_and_class,
+)
 
 
 def uninstall_extension(package_name):
@@ -42,7 +45,6 @@ def _handle_package(package_name, title_name, requirements):
         )
         main_tab = getattr(module, "extension__tts_generation_webui")
         with gr.Tab(title_name):
-            gr.Markdown(f"Version: {package_version}")
             if "builtin" in package_name:
                 gr.Markdown(f"{title_name} Extension is up to date")
             else:
@@ -50,12 +52,16 @@ def _handle_package(package_name, title_name, requirements):
                     update_button = getattr(module, "update_button")
                     update_button()
                 else:
-                    _extension_management_ui(package_name, title_name, requirements)
+                    _extension_management_ui(
+                        package_name,
+                        title_name,
+                        requirements,
+                        package_version,
+                        show=False,
+                    )
             main_tab()
     except Exception as e:
-        generic_error_tab_advanced(
-            e, name=title_name, requirements=requirements
-        )
+        generic_error_tab_advanced(e, name=title_name, requirements=requirements)
     finally:
         elapsed_time = time.time() - start_time
         print(f" done in {elapsed_time:.2f} seconds.")
@@ -84,8 +90,10 @@ def get_latest_version(package_name):
     return _get_latest_version
 
 
-def _extension_management_ui(package_name, title_name, requirements):
-    with gr.Accordion("Manage Extension", open=True):
+def _extension_management_ui(
+    package_name, title_name, requirements, version, show=True
+):
+    with gr.Accordion(f"Manage {title_name} v{version} Extension", open=show):
         output = gr.HTML(render=False)
         with gr.Row():
             gr.Button("Check for updates").click(
@@ -118,13 +126,15 @@ except KeyError:
 
 def handle_extension_class(extension_class, config):
     # Get interface extensions filtered by class from the data loader
-    filtered_extensions = filter_extensions_by_type_and_class(extension_list_json, "interface", extension_class)
+    filtered_extensions = filter_extensions_by_type_and_class(
+        extension_list_json, "interface", extension_class
+    )
     for x in filtered_extensions:
-            # x["package_name"], f"{x['name']} (v{x['version']})", x["requirements"]
-            if x["package_name"] in disabled_extensions:
-                print(f"Skipping disabled {x['name']} Extension...")
-                continue
-            _handle_package(x["package_name"], x["name"], x["requirements"])
+        # x["package_name"], f"{x['name']} (v{x['version']})", x["requirements"]
+        if x["package_name"] in disabled_extensions:
+            print(f"Skipping disabled {x['name']} Extension...")
+            continue
+        _handle_package(x["package_name"], x["name"], x["requirements"])
 
 
 def extension_list_tab():
