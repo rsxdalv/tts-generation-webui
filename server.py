@@ -257,7 +257,7 @@ def server_hypervisor():
             "npm start --prefix react-ui",
             env={
                 **os.environ,
-                "GRADIO_BACKEND_AUTOMATIC": f"http://127.0.0.1:{gradio_interface_options['server_port']}",
+                "GRADIO_BACKEND_AUTOMATIC": f"http://127.0.0.1:{gradio_interface_options['server_port']}/",
             },
             shell=True,
         )
