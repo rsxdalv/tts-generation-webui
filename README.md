@@ -53,6 +53,9 @@
 | [(Extension) DIA](https://github.com/nari-labs/dia) | | |
 | [(Extension) CosyVoice](https://github.com/FunAudioLLM/CosyVoice) | | |
 | [(Extension) GPT-SoVITS](https://github.com/X-T-E-R/GPT-SoVITS-Inference) | | |
+| [(Extension) Piper TTS](https://github.com/rhasspy/piper) | | |
+| [(Extension) Kimi Audio 7B Instruct](https://github.com/Dao-AILab/Kimi-Audio) | | |
+| [(Extension) ACE-Step](https://github.com/ACE-Step/ACE-Step) | | |
 
 </div>
 
@@ -82,6 +85,7 @@
 
 May 7:
 * Add [Piper TTS](https://github.com/rhasspy/piper) extension
+* Add [ACE-Step](https://github.com/ACE-Step/ACE-Step) extension
 
 May 6:
 * Add Kimi Audio 7B Instruct extension
