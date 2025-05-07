@@ -138,6 +138,14 @@ def generate_env(
 
     env += "\n"
 
+    # CUDA_VISIBLE_DEVICES
+    # env += env_entry(
+    #     "CUDA_VISIBLE_DEVICES",
+    #     "0",
+    #     "CUDA device to use (0,1,2,3, etc.)",
+    #     null=False,
+    # )
+
     return env
 
 
