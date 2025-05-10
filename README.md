@@ -88,6 +88,7 @@ May 10:
 * Add ACE-Step to React UI.
 * Add emoji to Gradio UI categories for simplicity.
 * Add enhanced logging for every update and app startup, allowing for easier debugging once issues happen.
+* Show gr.Info when models are being loaded or unloaded.
 
 May 7:
 * Add [Piper TTS](https://github.com/rhasspy/piper) extension
