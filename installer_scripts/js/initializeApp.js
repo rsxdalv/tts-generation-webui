@@ -304,6 +304,7 @@ const checkIfTorchHasCuda = async () => {
 
 exports.repairTorch = async () => {
   const gpuChoice = readGPUChoice();
+  $sh("pip show torch torchvision torchaudio");
   if (!checkIfTorchHasCuda() && gpuChoice === "NVIDIA GPU") {
     displayMessage("Backend is NVIDIA GPU, fixing PyTorch");
     try {
