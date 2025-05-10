@@ -119,8 +119,8 @@ def main_ui(theme_choice="Base"):
     ) as blocks:
         gr.Markdown(
             """
-            # TTS Generation WebUI (Legacy - Gradio) [React UI](http://localhost:3000) [Feedback / Bug reports](https://forms.gle/2L62owhBsGFzdFBC8) [Discord Server](https://discord.gg/V8BKTVRtJ9)
-            ### _(Text To Speech, Audio & Music Generation, Conversion)_
+            # TTS Generation WebUI
+            ### (This is the Gradio UI with more tools but more basic UI) | [React UI](http://localhost:3000) | [Feedback / Bug reports](https://forms.gle/2L62owhBsGFzdFBC8) | [Discord Server](https://discord.gg/V8BKTVRtJ9)
             """
         )
         with gr.Tabs():
