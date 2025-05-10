@@ -301,6 +301,59 @@ async function rvc({
   return { audio, metadata };
 }
 
+async function ace_step_infer({
+  audio_duration,
+  tags,
+  lyrics,
+  infer_steps,
+  guidance_scale,
+  scheduler_type,
+  cfg_type,
+  granularity_scale,
+  manual_seeds,
+  guidance_interval,
+  guidance_interval_decay,
+  min_guidance_scale,
+  use_erg_for_tag,
+  use_erg_for_lyric,
+  use_erg_for_diffusion,
+  oss_steps,
+  guidance_scale_text,
+  guidance_scale_lyric,
+  audio2audio_enable,
+  ref_audio_strength,
+  ref_audio_input,
+}) {
+  const ref_audio_inputBlob = await getFile(ref_audio_input);
+
+  const result = await gradioPredict<any>("/ace_step_infer", {
+    audio_duration, // number (numeric value between 0.0 and 10.0) in 'Audio Duration' Slider component
+    prompt: tags, // string  in 'Tags' Textbox component
+    lyrics, // string  in 'Lyrics' Textbox component
+    infer_step: infer_steps, // number (numeric value between 1 and 1000) in 'Infer Steps' Slider component
+    guidance_scale, // number (numeric value between 0.0 and 10.0) in 'Guidance Scale' Slider component
+    scheduler_type, // string (Option from: ['euler', 'heun']) in 'Scheduler Type' Radio component
+    cfg_type, // string (Option from: ['cfg', 'apg', 'cfg_star']) in 'CFG Type' Radio component
+    omega_scale: granularity_scale, // number (numeric value between 0.0 and 10.0) in 'Granularity Scale' Slider component
+    manual_seeds, // string  in 'manual seeds (default None)' Textbox component
+    guidance_interval, // number (numeric value between 0.0 and 1.0) in 'Guidance Interval' Slider component
+    guidance_interval_decay, // number (numeric value between 0.0 and 1.0) in 'Guidance Interval Decay' Slider component
+    min_guidance_scale, // number (numeric value between 0.0 and 10.0) in 'Min Guidance Scale' Slider component
+    use_erg_tag: use_erg_for_tag, // boolean  in 'use ERG for tag' Checkbox component
+    use_erg_lyric: use_erg_for_lyric, // boolean  in 'use ERG for lyric' Checkbox component
+    use_erg_diffusion: use_erg_for_diffusion, // boolean  in 'use ERG for diffusion' Checkbox component
+    oss_steps, // string  in 'OSS Steps' Textbox component
+    guidance_scale_text, // number (numeric value between 0.0 and 10.0) in 'Guidance Scale Text' Slider component
+    guidance_scale_lyric, // number (numeric value between 0.0 and 10.0) in 'Guidance Scale Lyric' Slider component
+    audio2audio_enable, // boolean  in 'Audio2Audio Enable' Checkbox component
+    ref_audio_strength, // number (numeric value between 0.0 and 1.0) in 'Ref Audio Strength' Slider component
+    ref_audio_input: ref_audio_inputBlob, // blob in 'Ref Audio Input' Audio component
+  });
+
+  const [audio, metadata] = result?.data;
+  return { audio, metadata };
+}
+
 const delete_generation = ({ folder_root }) =>
   gradioPredict<[]>("/delete_generation", [folder_root]);
 
@@ -498,4 +551,6 @@ const endpoints = {
     "/load_ffmpeg_metadata",
     (result) => result?.data[0]
   ),
+
+  ace_step_infer,
 };

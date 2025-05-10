@@ -93,7 +93,11 @@ export const routes: Route[] = [
       },
       {
         href: "/audio-music-generation/stable-audio",
-        text: "Stable Audio (Demo)",
+        text: "Stable Audio",
+      },
+      {
+        href: "/audio-music-generation/ace-step",
+        text: "ACE-Step",
       },
     ],
   },

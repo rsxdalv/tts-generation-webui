@@ -97,7 +97,7 @@ function CommandDialogContent({
         <CommandGroup heading="Navigation">
           {routes.map((route) => (
             <CommandItem
-              key={route.href}
+              key={route.href + route.text}
               onSelect={() => runCommand(() => router.push(route.href))}
             >
               {route.text}

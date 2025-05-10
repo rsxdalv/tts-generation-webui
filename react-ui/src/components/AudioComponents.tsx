@@ -6,6 +6,7 @@ import { sendToMusicgen } from "../tabs/MusicgenParams";
 import { sendToVocos } from "../tabs/VocosParams";
 import { GradioFile } from "../types/GradioFile";
 import { sendToBarkVoiceGeneration } from "../tabs/BarkVoiceGenerationParams";
+import { sendToAceStep } from "../tabs/AceStepParams";
 import { cn } from "../lib/utils";
 import { Button } from "./ui/button";
 import { DownloadIcon, XIcon } from "lucide-react";
@@ -101,6 +102,7 @@ const sendToFuncs = {
   sendToMusicgen,
   sendToVocos,
   sendToBarkVoiceGeneration,
+  sendToAceStep,
 } as Record<string, (audio: string | undefined) => void>;
 
 const listOfFuncs = Object.keys(sendToFuncs);

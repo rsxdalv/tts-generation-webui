@@ -83,6 +83,11 @@
 
 ## Changelog
 
+May 10:
+* Fix missing directory bug causing extensions to fail to load. Thanks Discord/Comstock for discovery of the bug.
+* Add ACE-Step to React UI.
+* Add emoji to Gradio UI categories for simplicity.
+
 May 7:
 * Add [Piper TTS](https://github.com/rhasspy/piper) extension
 * Add [ACE-Step](https://github.com/ACE-Step/ACE-Step) extension
