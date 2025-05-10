@@ -22,6 +22,12 @@ export const AudioMusicGenerationModelList = () => (
       href="/audio-music-generation/stable-audio"
       projectLink="https://github.com/facebookresearch/audiocraft"
     />
+    <ProjectCard
+      title="ACE-Step"
+      description="ACE-Step: A Step Towards Music Generation Foundation Model."
+      href="/audio-music-generation/ace-step"
+      projectLink="https://github.com/ACE-Step/ACE-Step"
+    />
   </div>
 );
 

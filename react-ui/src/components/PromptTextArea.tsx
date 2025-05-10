@@ -15,6 +15,8 @@ export const PromptTextArea = <
   optimalLength,
   softMaxLength,
   hardMaxLength,
+  placeholder,
+  rows,
 }: {
   params: T;
   handleChange: HandleChange;
@@ -24,10 +26,12 @@ export const PromptTextArea = <
   optimalLength?: number;
   softMaxLength?: number;
   hardMaxLength?: number;
+  placeholder?: string;
+  rows?: number;
 }) => (
   <div className={cn("flex flex-col gap-2", className)}>
     <Label htmlFor={name as string}>
-      {label}:{" "}
+      {label && `${label}:`}{label && " "}
       {optimalLength && (
         <span className="text-xs text-slate-500">
           (Optimal length per generation/line: {optimalLength} characters)
@@ -40,8 +44,8 @@ export const PromptTextArea = <
       value={params[name] as string}
       onChange={handleChange}
       className="cell"
-      placeholder="Enter text here..."
-      rows={3}
+      placeholder={placeholder || "Enter text here..."}
+      rows={rows || 3}
       // maxLength={hardMaxLength || 100000}
     />
   </div>

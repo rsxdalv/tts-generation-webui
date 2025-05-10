@@ -119,8 +119,8 @@ def main_ui(theme_choice="Base"):
     ) as blocks:
         gr.Markdown(
             """
-            # TTS Generation WebUI (Legacy - Gradio) [React UI](http://localhost:3000) [Feedback / Bug reports](https://forms.gle/2L62owhBsGFzdFBC8) [Discord Server](https://discord.gg/V8BKTVRtJ9)
-            ### _(Text To Speech, Audio & Music Generation, Conversion)_
+            # TTS Generation WebUI
+            ### (This is the Gradio UI with more tools but more basic UI) | [React UI](http://localhost:3000) | [Feedback / Bug reports](https://forms.gle/2L62owhBsGFzdFBC8) | [Discord Server](https://discord.gg/V8BKTVRtJ9)
             """
         )
         with gr.Tabs():
@@ -130,13 +130,13 @@ def main_ui(theme_choice="Base"):
 
 
 def all_tabs():
-    with gr.Tab("Text-to-Speech"), gr.Tabs():
+    with gr.Tab("💬 Text-to-Speech"), gr.Tabs():
         handle_extension_class("text-to-speech", config)
-    with gr.Tab("Audio/Music Generation"), gr.Tabs():
+    with gr.Tab("🎼 Audio/Music Generation"), gr.Tabs():
         handle_extension_class("audio-music-generation", config)
-    with gr.Tab("Audio Conversion"), gr.Tabs():
+    with gr.Tab("🎙️ Audio Conversion"), gr.Tabs():
         handle_extension_class("audio-conversion", config)
-    with gr.Tab("Outputs"), gr.Tabs():
+    with gr.Tab("📁 Outputs"), gr.Tabs():
         from tts_webui.history_tab.main import history_tab
 
         collections_directories_atom.render()
@@ -155,9 +155,9 @@ def all_tabs():
 
         handle_extension_class("outputs", config)
 
-    with gr.Tab("Tools"), gr.Tabs():
+    with gr.Tab("🔧 Tools"), gr.Tabs():
         handle_extension_class("tools", config)
-    with gr.Tab("Settings"), gr.Tabs():
+    with gr.Tab("⚙️ Settings"), gr.Tabs():
         from tts_webui.settings_tab_gradio import settings_tab_gradio
 
         settings_tab_gradio(reload_config_and_restart_ui, gradio_interface_options)

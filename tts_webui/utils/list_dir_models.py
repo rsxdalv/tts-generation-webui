@@ -9,7 +9,9 @@ from tts_webui.utils.manage_model_state import unload_model
 def list_dir_models(abs_dir: str):
     try:
         # return [x for x in os.listdir(abs_dir) if x not in [".gitkeep", "cache"]]
-        return [x for x in next(os.walk(abs_dir))[1] if x not in ["cache"]]
+        os.makedirs(abs_dir, exist_ok=True)
+        walk_result = next(os.walk(abs_dir), (None, [], []))
+        return [x for x in walk_result[1] if x not in ["cache"]]
     except FileNotFoundError as e:
         print(e)
         return []
