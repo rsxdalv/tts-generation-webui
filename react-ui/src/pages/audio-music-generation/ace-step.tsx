@@ -37,7 +37,7 @@ const AceStepPage = () => {
             filter={["sendToAceStep"]}
           />
           <HyperParameters
-            genParams={aceStepParams}
+            genParams={aceStepParams as any} // todo - make ace-step comply with 'text' input
             consumer={aceStepConsumer}
             prefix="aceStep"
           />
