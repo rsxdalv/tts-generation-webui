@@ -82,3 +82,10 @@ def list_loaded_models_as_markdown():
             lines.append(f"| {namespace} | Not Loaded |")
 
     return "\n".join(lines)
+
+
+def is_model_loaded(model_namespace):
+    return (
+        model_namespace in model_states
+        and model_states[model_namespace].get_model() is not None
+    )
