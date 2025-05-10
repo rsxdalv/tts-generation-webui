@@ -87,6 +87,9 @@ May 10:
 * Fix missing directory bug causing extensions to fail to load. Thanks Discord/Comstock for discovery of the bug.
 * Add ACE-Step to React UI.
 * Add emoji to Gradio UI categories for simplicity.
+* Add enhanced logging for every update and app startup, allowing for easier debugging once issues happen.
+* Show gr.Info when models are being loaded or unloaded.
+* Allow users to use React UI together with Gradio auth by specifying GRADIO_AUTH="username:pass" environment variable.
 
 May 7:
 * Add [Piper TTS](https://github.com/rhasspy/piper) extension

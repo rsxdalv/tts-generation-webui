@@ -42,7 +42,9 @@ export default async function handler(
   res.status(200).json(result);
 }
 
-const getClient = () => Client.connect(defaultBackend, {});
+const getClient = () => Client.connect(defaultBackend, {
+  auth: process.env.GRADIO_AUTH?.split(":") as [string, string] | undefined,
+});
 
 type GradioChoices = {
   choices: string[];

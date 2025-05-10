@@ -1,4 +1,10 @@
+import gradio as gr
 from tts_webui.utils.torch_clear_memory import torch_clear_memory
+
+
+def show(message):
+    print(message)
+    gr.Info(message)
 
 
 class ModelState:
@@ -35,14 +41,14 @@ def manage_model_state(model_namespace):
             model_state = model_states[model_namespace]
 
             if not model_state.is_model_loaded(model_name):
-                print(
+                show(
                     f"Model '{model_name}' in namespace '{model_namespace}' is not loaded or is different. Loading model..."
                 )
                 unload_model(model_namespace)
                 model = func(model_name, *args, **kwargs)
                 model_state.set_model(model, model_name)
             else:
-                print(
+                show(
                     f"Using cached model '{model_name}' in namespace '{model_namespace}'."
                 )
 
@@ -61,9 +67,9 @@ def unload_model(model_namespace):
         model_states[model_namespace].set_model(None, None)
         # del model_states[model_namespace]
         torch_clear_memory()
-        print(f"Model in namespace '{model_namespace}' has been unloaded.")
+        show(f"Model in namespace '{model_namespace}' has been unloaded.")
     else:
-        print(f"No model loaded in namespace '{model_namespace}'.")
+        show(f"No model loaded in namespace '{model_namespace}'.")
 
 
 def unload_all_models():
@@ -82,3 +88,10 @@ def list_loaded_models_as_markdown():
             lines.append(f"| {namespace} | Not Loaded |")
 
     return "\n".join(lines)
+
+
+def is_model_loaded(model_namespace):
+    return (
+        model_namespace in model_states
+        and model_states[model_namespace].get_model() is not None
+    )

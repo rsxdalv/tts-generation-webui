@@ -1,6 +1,6 @@
 const fs = require("fs");
 const { resolve } = require("path");
-const { $ } = require("./js/shell");
+const { $, $sh } = require("./js/shell");
 const { displayError, displayMessage } = require("./js/displayMessage.js");
 const { processExit } = require("./js/processExit.js");
 const { startServer } = require("./js/server.js");
@@ -11,17 +11,21 @@ const checkConda = async () => {
     updateState({ status: "checking_dependencies", currentStep: 1 });
 
     displayMessage("Checking conda installation...");
-    await $("conda --version");
+    await $sh("conda --version");
 
     updateState({ condaReady: true });
 
     displayMessage("");
     // verify conda paths
-    await $("conda info --envs");
+    $sh("conda info --envs");
+
     // expect
     // # conda environments:
     // #
     // base                 * .. ..\tts-generation-webui-main\installer_files\env
+    $sh("node --version");
+    $sh("python --version");
+    $sh("pip --version");
   } catch (error) {
     updateState({ status: "error", lastError: "Conda installation not found" });
 
@@ -33,7 +37,7 @@ const checkConda = async () => {
 };
 
 const updateConda = async () => {
-  await $("conda update -y -n base -c defaults conda");
+  await $sh("conda update -y -n base -c defaults conda");
 };
 
 const FORCE_REINSTALL = process.env.FORCE_REINSTALL ? true : false;
@@ -59,13 +63,13 @@ const syncRepo = async () => {
     displayMessage("Linking to tts-generation-webui repository");
     // this is a clone over the files from https://github.com/rsxdalv/tts-generation-webui
     try {
-      await $("git init -b main");
-      await $(
+      await $sh("git init -b main");
+      await $sh(
         "git remote add origin https://github.com/rsxdalv/tts-generation-webui"
       );
-      await $("git fetch");
-      await $("git reset --hard origin/main"); // Required when the versioned files existed in path before "git init" of this repo.
-      await $("git branch --set-upstream-to=origin/main");
+      await $sh("git fetch");
+      await $sh("git reset --hard origin/main"); // Required when the versioned files existed in path before "git init" of this repo.
+      await $sh("git branch --set-upstream-to=origin/main");
 
       const newHash = getGitCommitHash();
       updateState({ gitHash: newHash });
@@ -83,7 +87,7 @@ const syncRepo = async () => {
   } else {
     displayMessage("Pulling updates from tts-generation-webui");
     try {
-      await $("git pull");
+      await $sh("git pull");
       const newHash = getGitCommitHash();
       updateState({ gitHash: newHash });
       if (AppliedGitVersion.get() === newHash) {
@@ -123,6 +127,7 @@ async function main() {
     const isUpdated = await syncRepo();
     if (!isUpdated) {
       updateState({ status: "ready", currentStep: 5, totalSteps: 5 });
+      $sh("pip show torch torchvision torchaudio");
       return true;
     }
 

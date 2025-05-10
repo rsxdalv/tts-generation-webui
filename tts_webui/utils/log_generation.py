@@ -16,7 +16,10 @@ def StringifyParams(x):
 
 
 def middleware_log_generation(params: dict):
-    print("Generating: '''", params["text"], "'''")
+    text = params.get("text", "")
+    if text:
+        text = text[:50] + "..." if len(text) > 50 else text
+        print(f"Generating: '''{text}'''")
     print(StringifyParams(params))
 
 

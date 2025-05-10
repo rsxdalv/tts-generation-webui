@@ -249,6 +249,7 @@ def server_hypervisor():
             env={
                 **os.environ,
                 "GRADIO_BACKEND_AUTOMATIC": f"http://127.0.0.1:{gradio_interface_options['server_port']}/",
+                # "GRADIO_AUTH": gradio_interface_options["auth"].join(":"),
             },
             shell=True,
         )
