@@ -89,6 +89,7 @@ May 10:
 * Add emoji to Gradio UI categories for simplicity.
 * Add enhanced logging for every update and app startup, allowing for easier debugging once issues happen.
 * Show gr.Info when models are being loaded or unloaded.
+* Allow users to use React UI together with Gradio auth by specifying GRADIO_AUTH="username:pass" environment variable.
 
 May 7:
 * Add [Piper TTS](https://github.com/rhasspy/piper) extension
