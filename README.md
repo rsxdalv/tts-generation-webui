@@ -91,6 +91,8 @@ May 12:
 * Improve decorator extensions for future API.
 * Improve Kokoro TTS API for OpenAI compatibility, now usable with SillyTavern.
 * Add setup.py for future pip installs. Sync versions.json with setup.py and package.json.
+* Remove deprecated requirements_* files.
+* Removed Windows deepspeed until it no longer requires NVCC, thank you https://github.com/lcmiracle for extensive debugging and testing.
 
 May 10:
 * Fix missing directory bug causing extensions to fail to load. Thanks Discord/Comstock for discovery of the bug.

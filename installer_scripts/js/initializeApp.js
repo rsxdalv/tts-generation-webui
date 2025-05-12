@@ -67,7 +67,7 @@ const installDependencies = async (gpuchoice) => {
     }
 
     saveMajorVersion(majorVersion);
-    displayMessage("  Successfully installed torch");
+    displayMessage(`  Successfully installed torch==${torchVersion} with CUDA ${cudaVersion} support`);
   } catch (error) {
     displayError(`Error during installation: ${error.message}`);
     throw error;
