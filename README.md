@@ -83,6 +83,12 @@
 
 ## Changelog
 
+May 12:
+* Fix deepspeed for Windows. Thank you for the reports!
+* Improve decorator extensions for future API.
+* Improve Kokoro TTS API for OpenAI compatibility, now usable with SillyTavern.
+* Add setup.py for future pip installs. Sync versions.json with setup.py and package.json.
+
 May 10:
 * Fix missing directory bug causing extensions to fail to load. Thanks Discord/Comstock for discovery of the bug.
 * Add ACE-Step to React UI.

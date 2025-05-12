@@ -19,6 +19,14 @@ export default async function handler(
     // Construct the full URL to the Gradio backend
     let gradioUrl: string;
     
+    // handle auth
+    // const auth = process.env.GRADIO_AUTH;
+    // if (auth) {
+    //   const [username, password] = auth.split(":");
+    //   const authHeader = `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`;
+    //   req.headers.authorization = authHeader;
+    // }
+
     // Handle the special case for gradio_api/file= format
     if (originalPath.startsWith("gradio_api/file=")) {
       // For URLs like: gradio_api/file=C:/Users/rob/AppData/Local/Temp/gradio/...

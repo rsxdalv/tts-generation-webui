@@ -4,12 +4,16 @@ from importlib.metadata import version
 import time
 from types import ModuleType
 from typing import Literal
+import functools
 
 import gradio as gr
 
 from tts_webui.utils.pip_install import pip_install_wrapper, pip_uninstall_wrapper
 from tts_webui.utils.generic_error_tab_advanced import generic_error_tab_advanced
-from tts_webui.extensions_loader.extensions_data_loader import get_decorator_extensions, get_decorator_extensions_by_class
+from tts_webui.extensions_loader.extensions_data_loader import (
+    get_decorator_extensions,
+    get_decorator_extensions_by_class,
+)
 
 
 def check_if_package_installed(package_name):
@@ -149,6 +153,8 @@ def _load_decorators(class_name: Literal["outer", "inner"]):
             elapsed_time = time.time() - start_time
             print(f"  Done in {elapsed_time:.2f} seconds. ({x['name']})\n")
 
+    wrappers.reverse()
+    gen_wrappers.reverse()
     return wrappers, gen_wrappers
 
 
@@ -156,28 +162,25 @@ OUTER_WRAPPERS, OUTER_WRAPPERS_GEN = _load_decorators("outer")
 INNER_WRAPPERS, INNER_WRAPPERS_GEN = _load_decorators("inner")
 
 
-def decorator_extension_outer(fn0):
-    return _decorator_extension(OUTER_WRAPPERS, fn0)
+def _create_decorator(wrappers_list):
+    def decorator(fn0):
+        for wrapper in wrappers_list:
+            fn0 = wrapper(fn0)
+
+        @functools.wraps(fn0)
+        def wrapped(*args, **kwargs):
+            return fn0(*args, **kwargs)
+
+        return wrapped
+
+    return decorator
 
 
-def decorator_extension_inner(fn0):
-    return _decorator_extension(INNER_WRAPPERS, fn0)
-
-
-def decorator_extension_outer_generator(fn0):
-    return _decorator_extension(OUTER_WRAPPERS_GEN, fn0)
-
-
-def decorator_extension_inner_generator(fn0):
-    return _decorator_extension(INNER_WRAPPERS_GEN, fn0)
-
-
-def _decorator_extension(wrappers, fn0):
-    wrappers.reverse()
-    for wrapper in wrappers:
-        fn0 = wrapper(fn0)
-    return fn0
-
+# Define the four decorators using the helper function
+decorator_extension_outer = _create_decorator(OUTER_WRAPPERS)
+decorator_extension_inner = _create_decorator(INNER_WRAPPERS)
+decorator_extension_outer_generator = _create_decorator(OUTER_WRAPPERS_GEN)
+decorator_extension_inner_generator = _create_decorator(INNER_WRAPPERS_GEN)
 
 if __name__ == "__main__":
     pass
