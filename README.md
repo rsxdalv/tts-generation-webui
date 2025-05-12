@@ -7,6 +7,9 @@
   [Download Installer](https://github.com/rsxdalv/tts-generation-webui/archive/refs/heads/main.zip) ||
   [Installation](#installation) ||
   [Docker Setup](#docker-setup) ||
+  [Silly Tavern](#integrations) ||
+  [Extensions](#extensions) ||
+
   [Feedback / Bug reports](https://forms.gle/2L62owhBsGFzdFBC8)
 
   </h3>
@@ -82,6 +85,12 @@
 | :-----------------------------------------: | :-----------------------------------------: | :-------------------------------: |
 
 ## Changelog
+
+May 12:
+* Fix deepspeed for Windows. Thank you for the reports!
+* Improve decorator extensions for future API.
+* Improve Kokoro TTS API for OpenAI compatibility, now usable with SillyTavern.
+* Add setup.py for future pip installs. Sync versions.json with setup.py and package.json.
 
 May 10:
 * Fix missing directory bug causing extensions to fail to load. Thanks Discord/Comstock for discovery of the bug.
@@ -233,6 +242,34 @@ See the [2023 Changelog](./documentation/changelog-2023.md) for a detailed list 
 Not exactly, the dependencies clash, especially between conda and python (and dependencies are already in a critical state, moving them to conda is ways off). Therefore, while it might be possible to just replace the old installer with the new one and running the update, the problems are unpredictable and **unfixable**. Making an update to installer requires a lot of testing so it's not done lightly.
 
 </details>
+
+## Extensions
+
+Extensions are available to install from the webui itself, or using React UI. They can also be installed using the extension manager. Internally, extensions are just python packages that are installed using pip. Multiple extensions can be installed at the same time, but there might be compatibility issues between them. After installing or updating an extension, you need to restart the app to load it.
+
+Updates need to be done manually by using the mini-control panel:
+
+![mini-control-panel](./documentation/screenshots/mini-control-panel.png)
+
+
+## Integrations
+
+### Silly Tavern
+
+1. Install the Kokoro TTS API extension  
+   ![kokoro-tts-api-extension](./documentation/screenshots/kokoro-tts-api-extension.png)
+2. Start the API and test it with Python Requests
+ 
+   *(OpenAI client might not be installed thus the Test with Python OpenAI client might fail)*
+
+3. Once you can see the audio generates successfully, go to Silly Tavern, and add a new TTS API
+   Default provider endpoint: `http://localhost:7778/v1/audio/speech`
+   ![silly-tavern-tts-api](./documentation/screenshots/silly-tavern-tts-api.png)
+4. Test it out!
+
+### OpenAI Compatible APIs
+
+Using the instructions above, you can install an OpenAI compatible API, and use it with Silly Tavern or other OpenAI compatible clients.
 
 ## Installation
 * Download the [latest version](https://github.com/rsxdalv/tts-generation-webui/archive/refs/heads/main.zip) and extract it.
