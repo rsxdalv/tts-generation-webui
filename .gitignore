@@ -43,6 +43,7 @@ extensions.external.json
 /data/models/kimi-audio/
 /data/models/piper/
 /data/models/ace_step/
+/data/api/presets/
 
 # Ignore temporary files
 temp/

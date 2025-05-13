@@ -8,6 +8,7 @@ source "$SCRIPT_DIR/activate.sh"
 
 # Run the Python server
 python server.py
+# node "$SCRIPT_DIR/js/server.js"
 
 # If the app crashes, provide a shell for debugging
 echo ""

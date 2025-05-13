@@ -274,6 +274,9 @@ Updates need to be done manually by using the mini-control panel:
 Using the instructions above, you can install an OpenAI compatible API, and use it with Silly Tavern or other OpenAI compatible clients.
 
 ## Installation
+
+Current base installation size is around 10.7 GB. Each model will require 2-8 GB of space in addition.
+
 * Download the [latest version](https://github.com/rsxdalv/tts-generation-webui/archive/refs/heads/main.zip) and extract it.
 * Run start_tts_webui.bat or start_tts_webui.sh to start the server. It will ask you to select the GPU/Chip you are using. Once everything has installed, it will start the Gradio server at http://localhost:7770 and the React UI at http://localhost:3000.
 * Output log will be available in the installer_scripts/output.log file.
