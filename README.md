@@ -86,6 +86,9 @@
 
 ## Changelog
 
+May 14:
+* Prepare for Python 3.11 and 3.12 support.
+
 May 12:
 * Fix deepspeed for Windows. Thank you for the reports!
 * Improve decorator extensions for future API.

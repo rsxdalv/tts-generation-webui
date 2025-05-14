@@ -12,7 +12,7 @@ const torchVersion = "2.6.0";
 const cudaVersion = "12.4";
 const cudaVersionTag = `cu124`;
 
-const pythonVersion = `3.10.11`;
+const pythonVersion = `3.10.11`; // 3.11 and 3.12 are not yet supported
 const pythonPackage = `python=${pythonVersion}`;
 
 const ensurePythonVersion = async () => {
