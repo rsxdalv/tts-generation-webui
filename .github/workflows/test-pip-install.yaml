@@ -22,8 +22,8 @@ jobs:
             cp_tag: "310"
           - python-version: "3.11"
             cp_tag: "311"
-          - python-version: "3.12"
-            cp_tag: "312"
+          # - python-version: "3.12"
+          #   cp_tag: "312"
 
     runs-on: ${{ matrix.platform }}
 
