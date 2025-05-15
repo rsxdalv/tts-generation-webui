@@ -12,15 +12,16 @@ jobs:
       fail-fast: false
       max-parallel: 4
       matrix:
-        # platform: [ubuntu-latest, macos-14, windows-latest]
-        platform: [ubuntu-latest]
+        platform: [ubuntu-latest, macos-14, windows-latest]
+        # platform: [ubuntu-latest]
         # python-version: ["3.10", "3.11", "3.12"]
-        python-version: ["3.12"]
+        python-version: ["3.10", "3.11"]
+        # python-version: ["3.12"]
         include:
-          # - python-version: "3.10"
-          #   cp_tag: "310"
-          # - python-version: "3.11"
-          #   cp_tag: "311"
+          - python-version: "3.10"
+            cp_tag: "310"
+          - python-version: "3.11"
+            cp_tag: "311"
           - python-version: "3.12"
             cp_tag: "312"
 
