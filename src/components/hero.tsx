@@ -274,7 +274,7 @@ const Hero = () => {
       <Container>
         <div className="flex flex-col justify-center">
           <div className="text-xl text-center text-gray-700 dark:text-white">
-            Starred by <span className="text-indigo-600">150+</span> developers
+            Starred by <span className="text-indigo-600">2000+</span> developers
             on GitHub
           </div>
           {/* 
