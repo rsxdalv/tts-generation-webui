@@ -34,7 +34,7 @@ const Home = () => {
       <SectionTitle
         pretitle="Watch a video"
         title="Here's a short video demo">
-        This video shows how to use the webui to generate audio from text using MusicGen and MusicGen prompts library.
+        This video shows the different tabs available in the webui.
       </SectionTitle>
       <Video />
       {/* <SectionTitle

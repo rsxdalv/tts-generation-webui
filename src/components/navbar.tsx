@@ -65,7 +65,7 @@ const Navbar = () => {
                           {item}
                       </Link>
                     ))}
-                    <Link href="/" className="w-full px-6 py-2 mt-3 text-center text-white bg-indigo-600 rounded-md lg:ml-5">         
+                    <Link href="https://github.com/rsxdalv/tts-generation-webui/archive/refs/heads/main.zip" className="w-full px-6 py-2 mt-3 text-center text-white bg-indigo-600 rounded-md lg:ml-5">         
                         Download
                     </Link>
                   </>
