@@ -2,7 +2,7 @@
 
 <div align="center">
 
-  <h3 align="center">
+  <h4 align="center">
 
   [Download Installer](https://github.com/rsxdalv/tts-webui/archive/refs/heads/main.zip) ||
   [Installation](#installation) ||
@@ -12,7 +12,7 @@
 
   [Feedback / Bug reports](https://forms.gle/2L62owhBsGFzdFBC8)
 
-  </h3>
+  </h4>
 
   [![banner](./documentation/screenshots/banner.png)](https://github.com/rsxdalv/tts-webui)
 
