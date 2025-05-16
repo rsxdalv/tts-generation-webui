@@ -1,4 +1,4 @@
-<h1 align="center">TTS Generation WebUI / Harmonica</h1>
+<h1 align="center">TTS WebUI / Harmonica</h1>
 
 <div align="center">
 
