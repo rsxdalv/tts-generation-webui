@@ -14,7 +14,7 @@ Oct 26:
 * Improve model selection UX for Musicgen
 
 Oct 24:
-* Add initial React UI for Musicgen and Demucs (https://github.com/rsxdalv/tts-generation-webui/pull/202)
+* Add initial React UI for Musicgen and Demucs (https://github.com/rsxdalv/tts-webui/pull/202)
 * Fix Bark long generation seed drifting (thanks to https://github.com/520Pig520)
 
 ## September 2023
@@ -22,8 +22,8 @@ Oct 24:
 Sep 21:
 * Bark: Add continue as semantic history button
 * Switch to github docker image storage, new docker image:
-  * `docker pull ghcr.io/rsxdalv/tts-generation-webui:main`
-* Fix server_port option in config https://github.com/rsxdalv/tts-generation-webui/issues/168 , thanks to https://github.com/Dartvauder
+  * `docker pull ghcr.io/rsxdalv/tts-webui:main`
+* Fix server_port option in config https://github.com/rsxdalv/tts-webui/issues/168 , thanks to https://github.com/Dartvauder
 
 Sep 9:
 * Fix xdg-open command line, thanks to https://github.com/JFronny
@@ -40,13 +40,13 @@ Sep 5:
 ## August 2023
 
 Aug 27:
-* Fix MusicGen ignoring the melody https://github.com/rsxdalv/tts-generation-webui/issues/153
+* Fix MusicGen ignoring the melody https://github.com/rsxdalv/tts-webui/issues/153
 
 Aug 26:
 * Add Send to RVC, Demucs, Vocos buttons to Bark and Vocos
 
 Aug 24:
-* Add date to RVC outputs to fix https://github.com/rsxdalv/tts-generation-webui/issues/147
+* Add date to RVC outputs to fix https://github.com/rsxdalv/tts-webui/issues/147
 * Fix safetensors missing wheel
 * Add Send to demucs button to musicgen
 
@@ -87,11 +87,11 @@ Aug 6:
 * Fix audiogen + mbd error, add tortoise fix for colab
 
 Aug 4:
-* Add MultiBandDiffusion option to MusicGen https://github.com/rsxdalv/tts-generation-webui/pull/109
+* Add MultiBandDiffusion option to MusicGen https://github.com/rsxdalv/tts-webui/pull/109
 * MusicGen/AudioGen save tokens on generation as .npz files. 
 
 Aug 3:
-* Add AudioGen https://github.com/rsxdalv/tts-generation-webui/pull/105
+* Add AudioGen https://github.com/rsxdalv/tts-webui/pull/105
 
 Aug 2:
 * Fix Model locations not showing after restart
@@ -102,7 +102,7 @@ July 26:
 * Voice gallery
 * Voice cropping
 * Fix voice rename bug, rename picture as well, add a hash textbox
-* Easier downloading of voices (https://github.com/rsxdalv/tts-generation-webui/pull/98)
+* Easier downloading of voices (https://github.com/rsxdalv/tts-webui/pull/98)
 
 July 24:
 * Change bark file format to include history hash: ...continued_generation... -> ...from_3ea0d063...
@@ -112,53 +112,53 @@ July 23:
 * RVC UI naming improvements
 
 July 21:
-* Fix hubert not working with CPU only (https://github.com/rsxdalv/tts-generation-webui/pull/87)
-* Add Google Colab demo (https://github.com/rsxdalv/tts-generation-webui/pull/88)
-* New settings tab and model locations (for advanced users) (https://github.com/rsxdalv/tts-generation-webui/pull/90)
+* Fix hubert not working with CPU only (https://github.com/rsxdalv/tts-webui/pull/87)
+* Add Google Colab demo (https://github.com/rsxdalv/tts-webui/pull/88)
+* New settings tab and model locations (for advanced users) (https://github.com/rsxdalv/tts-webui/pull/90)
 
 July 19:
-* Add Tortoise Optimizations, Thank you https://github.com/manmay-nakhashi https://github.com/rsxdalv/tts-generation-webui/pull/79 (Implements https://github.com/rsxdalv/tts-generation-webui/issues/18)
+* Add Tortoise Optimizations, Thank you https://github.com/manmay-nakhashi https://github.com/rsxdalv/tts-webui/pull/79 (Implements https://github.com/rsxdalv/tts-webui/issues/18)
 
 July 16:
 * Voice Photo Demo
 * Add a directory to store RVC models/indexes in and a dropdown
-* Workaround rvc not respecting is_half for CPU https://github.com/rsxdalv/tts-generation-webui/pull/74
-* Tortoise model and voice selection improvements https://github.com/rsxdalv/tts-generation-webui/pull/73
+* Workaround rvc not respecting is_half for CPU https://github.com/rsxdalv/tts-webui/pull/74
+* Tortoise model and voice selection improvements https://github.com/rsxdalv/tts-webui/pull/73
 
 July 10:
-* Demucs Demo https://github.com/rsxdalv/tts-generation-webui/pull/67
+* Demucs Demo https://github.com/rsxdalv/tts-webui/pull/67
 
 July 9:
-* RVC Demo + Tortoise, v6 installer with update script and automatic attempts to install extra modules https://github.com/rsxdalv/tts-generation-webui/pull/66
+* RVC Demo + Tortoise, v6 installer with update script and automatic attempts to install extra modules https://github.com/rsxdalv/tts-webui/pull/66
 
 July 5:
-* Improved v5 installer - faster and more reliable https://github.com/rsxdalv/tts-generation-webui/pull/63
+* Improved v5 installer - faster and more reliable https://github.com/rsxdalv/tts-webui/pull/63
 
 July 2:
-* Upgrade bark settings https://github.com/rsxdalv/tts-generation-webui/pull/59
+* Upgrade bark settings https://github.com/rsxdalv/tts-webui/pull/59
 
 July 1:
-* Studio-tab https://github.com/rsxdalv/tts-generation-webui/pull/58
+* Studio-tab https://github.com/rsxdalv/tts-webui/pull/58
 
 ## June 2023
 
 Jun 29:
-* Tortoise new params https://github.com/rsxdalv/tts-generation-webui/pull/54
+* Tortoise new params https://github.com/rsxdalv/tts-webui/pull/54
 
 Jun 27:
-* Fix eager loading errors, refactor https://github.com/rsxdalv/tts-generation-webui/pull/50
+* Fix eager loading errors, refactor https://github.com/rsxdalv/tts-webui/pull/50
 
 Jun 20:
-* Tortoise: proper long form generation files https://github.com/rsxdalv/tts-generation-webui/pull/46
+* Tortoise: proper long form generation files https://github.com/rsxdalv/tts-webui/pull/46
 
 Jun 19:
-* Tortoise-upgrade https://github.com/rsxdalv/tts-generation-webui/pull/45
+* Tortoise-upgrade https://github.com/rsxdalv/tts-webui/pull/45
 
 June 18:
 * Update to newest audiocraft, add longer generations
 
 Jun 14:
-* add vocos wav tab https://github.com/rsxdalv/tts-generation-webui/pull/42
+* add vocos wav tab https://github.com/rsxdalv/tts-webui/pull/42
 
 June 5:
 * Fix "Save to Favorites" button on bark generation page, clean up console (v4.1.1)
@@ -189,14 +189,14 @@ May 13:
 * Enable deterministic generation and enhance generated logs. Credits to https://github.com/suno-ai/bark/pull/175.
 
 May 10:
-* Enable the possibility of reusing history prompts from older generations. Save generations as npz files. Add a convenient method of reusing any of the last 3 generations for the next prompts. Add a button for saving and collecting history prompts under /voices. https://github.com/rsxdalv/tts-generation-webui/pull/10
+* Enable the possibility of reusing history prompts from older generations. Save generations as npz files. Add a convenient method of reusing any of the last 3 generations for the next prompts. Add a button for saving and collecting history prompts under /voices. https://github.com/rsxdalv/tts-webui/pull/10
 
 May 4:
 * Long form generation (credits to https://github.com/suno-ai/bark/blob/main/notebooks/long_form_generation.ipynb and https://github.com/suno-ai/bark/issues/161)
 * Adapt to fixed env var bug
 
 May 3:
-* Improved Tortoise UI: Voice, Preset and CVVP settings as well as ability to generate 3 results (https://github.com/rsxdalv/tts-generation-webui/pull/6)
+* Improved Tortoise UI: Voice, Preset and CVVP settings as well as ability to generate 3 results (https://github.com/rsxdalv/tts-webui/pull/6)
 
 May 2:
 * Added support for history recylcing to continue longer prompts manually

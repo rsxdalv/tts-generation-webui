@@ -113,13 +113,13 @@ def main_ui(theme_choice="Base"):
 
     with gr.Blocks(
         css=full_css,
-        title="TTS Generation WebUI",
+        title="TTS WebUI",
         analytics_enabled=False,  # it broke too many times
         theme=theme,
     ) as blocks:
         gr.Markdown(
             """
-            # TTS Generation WebUI
+            # TTS WebUI
             ### (This is the Gradio UI with more tools but more basic UI) | [React UI](http://localhost:3000) | [Feedback / Bug reports](https://forms.gle/2L62owhBsGFzdFBC8) | [Discord Server](https://discord.gg/V8BKTVRtJ9)
             """
         )

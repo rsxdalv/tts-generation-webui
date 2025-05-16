@@ -67,7 +67,7 @@ Choose the appropriate PyTorch installation for your hardware:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/rsxdalv/tts-generation-webui.git
+   git clone https://github.com/rsxdalv/tts-webui.git
    ```
 
 2. Install the requirements:
@@ -91,7 +91,7 @@ Choose the appropriate PyTorch installation for your hardware:
    pip install -r requirements.txt git+https://github.com/rsxdalv/extension_audiocraft@main git+https://github.com/rsxdalv/extension_bark_voice_clone@main git+https://github.com/rsxdalv/extension_maha_tts@main git+https://github.com/rsxdalv/extension_rvc@main git+https://github.com/rsxdalv/extension_stable_audio@main git+https://github.com/rsxdalv/extension_styletts2@main git+https://github.com/rsxdalv/extension_vall_e_x@main hydra-core==1.3.2 nvidia-ml-py
    ```
 
-   > Note: This list might not be up to date. Check the [Dockerfile](https://github.com/rsxdalv/tts-generation-webui/blob/main/Dockerfile#L39-L40) for the latest requirements.
+   > Note: This list might not be up to date. Check the [Dockerfile](https://github.com/rsxdalv/tts-webui/blob/main/Dockerfile#L39-L40) for the latest requirements.
 
 #### 3. Frontend Setup
 

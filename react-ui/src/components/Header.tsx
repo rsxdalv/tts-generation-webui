@@ -266,7 +266,7 @@ export const Header = ({}) => {
           </div>
         </div>
         <a
-          href="https://github.com/rsxdalv/tts-generation-webui"
+          href="https://github.com/rsxdalv/tts-webui"
           target="_blank"
           className="text-gray-500 hover:underline"
         >

@@ -24,8 +24,8 @@ setuptools.setup(
     packages=setuptools.find_namespace_packages(),
     version="0.0.17",
     author="rsxdalv",
-    description="TTS Generation WebUI / Harmonica",
-    url="https://github.com/rsxdalv/tts-generation-webui",
+    description="TTS WebUI / Harmonica",
+    url="https://github.com/rsxdalv/tts-webui",
     project_urls={},
     scripts=[],
     # install_requires=[

@@ -73,7 +73,7 @@ def toggle_extension_state(package_name, disabled_list):
 def main():
     with gr.Blocks(
         css=full_css,
-        title="TTS Generation WebUI - Extension Manager",
+        title="TTS WebUI - Extension Manager",
         analytics_enabled=False,
         theme=gr.themes.Base(
             primary_hue="sky",
@@ -89,7 +89,7 @@ def main():
     ) as blocks:
         gr.Markdown(
             """
-            # TTS Generation WebUI - Extension Manager
+            # TTS WebUI - Extension Manager
             ### Manage your extensions without starting the full WebUI
             """
         )

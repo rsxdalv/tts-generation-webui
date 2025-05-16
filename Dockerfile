@@ -30,10 +30,10 @@ RUN pip install --no-cache-dir setuptools torch==$TORCH_VERSION torchvision torc
 WORKDIR /app
 
 # Clone the repo
-RUN git clone https://github.com/rsxdalv/tts-generation-webui.git
+RUN git clone https://github.com/rsxdalv/tts-webui.git /app/tts-webui
 
 # Set working directory to the cloned repo
-WORKDIR /app/tts-generation-webui
+WORKDIR /app/tts-webui
 
 # Install all requirements
 RUN pip3 install --no-cache-dir torch==$TORCH_VERSION -r requirements.txt

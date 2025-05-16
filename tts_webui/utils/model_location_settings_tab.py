@@ -29,7 +29,7 @@ def model_location_settings():
     - This environment variable allows you to set a custom directory for caching various applications, including the Torch Hub cache.
     - If `PATH_TO_HUB_DIR` and `TORCH_HOME` are not set, you can use this environment variable to specify the Torch Hub cache location.
 
-    Please note that the "tts-generation-webui Directory" is currently fixed and cannot be changed. This directory contains the TTS (Text-to-Speech) models used by the web UI. The models are stored inside the `data/models/` directory within the `tts-generation-webui` directory.
+    Please note that the "tts-webui Directory" is currently fixed and cannot be changed. This directory contains the TTS (Text-to-Speech) models used by the web UI. The models are stored inside the `data/models/` directory within the `tts-webui` directory.
 
     Using these environment variables allows for better management and sharing of cached assets between different installations and projects, making it easier to access and reuse models and data across different user interfaces and projects.
     """
@@ -63,11 +63,11 @@ def model_location_settings():
                 value=os.environ.get("XDG_CACHE_HOME", ""),
                 placeholder="Unset, default: ~/.cache/",
             )
-            # tts-generation-webui directory
-            gr.Markdown("### tts-generation-webui Directory (can't be changed yet)")
+            # tts-webui directory
+            gr.Markdown("### tts-webui Directory (can't be changed yet)")
             gr.Textbox(
                 label="Model Location (TTS Default)",
-                value="./tts-generation-webui/data/models/",
+                value="./tts-webui/data/models/",
                 interactive=False,
             )
 

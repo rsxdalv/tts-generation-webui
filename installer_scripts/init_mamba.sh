@@ -108,10 +108,10 @@ fail() {
     fi
     cat <<EOF
 
-Error downloading TTS Generation WebUI. Sorry about that, please try to:
+Error downloading TTS WebUI. Sorry about that, please try to:
  1. Run this installer again.
  2. If those steps don't help, please copy *all* the error messages in this window, and ask the community at https://discord.gg/V8BKTVRtJ9
- 3. If that doesn't solve the problem, please file an issue at https://github.com/rsxdalv/tts-generation-webui/issues
+ 3. If that doesn't solve the problem, please file an issue at https://github.com/rsxdalv/tts-webui/issues
 
 Thanks!
 
