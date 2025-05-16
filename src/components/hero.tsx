@@ -12,7 +12,7 @@ import heroImg from "../../public/img/hero.png";
 
 // ## Videos
 
-// |                  **The AI Artist - Stable diffusion for MUSIC ?! tts-generation-webui**                  |                       **The AI Artist - how to use BARK AI voice cloning locally**                       |
+// |                  **The AI Artist - Stable diffusion for MUSIC ?! tts-webui**                  |                       **The AI Artist - how to use BARK AI voice cloning locally**                       |
 // | :------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------: |
 // | [![Watch the video](https://img.youtube.com/vi/Jfy0WGN4hts/sddefault.jpg)](https://youtu.be/Jfy0WGN4hts) | [![Watch the video](https://img.youtube.com/vi/hrYhk9Khyho/sddefault.jpg)](https://youtu.be/hrYhk9Khyho) |
 
@@ -41,28 +41,28 @@ import heroImg from "../../public/img/hero.png";
 // * Improved v5 installer - faster and more reliable
 
 // July 2:
-// * Upgrade bark settings https://github.com/rsxdalv/tts-generation-webui/pull/59
+// * Upgrade bark settings https://github.com/rsxdalv/tts-webui/pull/59
 
 // July 1:
-// * Studio-tab https://github.com/rsxdalv/tts-generation-webui/pull/58
+// * Studio-tab https://github.com/rsxdalv/tts-webui/pull/58
 
 // Jun 29:
-// * Tortoise new params https://github.com/rsxdalv/tts-generation-webui/pull/54
+// * Tortoise new params https://github.com/rsxdalv/tts-webui/pull/54
 
 // Jun 27:
-// * Fix eager loading errors, refactor https://github.com/rsxdalv/tts-generation-webui/pull/50
+// * Fix eager loading errors, refactor https://github.com/rsxdalv/tts-webui/pull/50
 
 // Jun 20
-// * Tortoise: proper long form generation files https://github.com/rsxdalv/tts-generation-webui/pull/46
+// * Tortoise: proper long form generation files https://github.com/rsxdalv/tts-webui/pull/46
 
 // Jun 19
-// * Tortoise-upgrade https://github.com/rsxdalv/tts-generation-webui/pull/45
+// * Tortoise-upgrade https://github.com/rsxdalv/tts-webui/pull/45
 
 // June 18:
 // * Update to newest audiocraft, add longer generations
 
 // Jun 14:
-// * add vocos wav tab https://github.com/rsxdalv/tts-generation-webui/pull/42
+// * add vocos wav tab https://github.com/rsxdalv/tts-webui/pull/42
 
 // June 5:
 // * Fix "Save to Favorites" button on bark generation page, clean up console (v4.1.1)
@@ -91,14 +91,14 @@ import heroImg from "../../public/img/hero.png";
 // * Enable deterministic generation and enhance generated logs. Credits to https://github.com/suno-ai/bark/pull/175.
 
 // May 10:
-// * Enable the possibility of reusing history prompts from older generations. Save generations as npz files. Add a convenient method of reusing any of the last 3 generations for the next prompts. Add a button for saving and collecting history prompts under /voices. https://github.com/rsxdalv/tts-generation-webui/pull/10
+// * Enable the possibility of reusing history prompts from older generations. Save generations as npz files. Add a convenient method of reusing any of the last 3 generations for the next prompts. Add a button for saving and collecting history prompts under /voices. https://github.com/rsxdalv/tts-webui/pull/10
 
 // May 4:
 // * Long form generation (credits to https://github.com/suno-ai/bark/blob/main/notebooks/long_form_generation.ipynb and https://github.com/suno-ai/bark/issues/161)
 // * Adapt to fixed env var bug
 
 // May 3:
-// * Improved Tortoise UI: Voice, Preset and CVVP settings as well as ability to generate 3 results (https://github.com/rsxdalv/tts-generation-webui/pull/6)
+// * Improved Tortoise UI: Voice, Preset and CVVP settings as well as ability to generate 3 results (https://github.com/rsxdalv/tts-webui/pull/6)
 
 // May 2 Update 2:
 // * Added support for history recylcing to continue longer prompts manually
@@ -114,7 +114,7 @@ import heroImg from "../../public/img/hero.png";
 
 // ### Upgrading from v5 to v6 installer
 // * Download and run the new installer
-// * Replace the "tts-generation-webui" directory in the newly installed directory
+// * Replace the "tts-webui" directory in the newly installed directory
 // * Run update_*platform*
 
 // #### *Is there any more optimal way to do this?*
@@ -123,7 +123,7 @@ import heroImg from "../../public/img/hero.png";
 
 // ### Upgrading from v4 to v5 installer
 // * Download and run the new installer
-// * Replace the "tts-generation-webui" directory in the newly installed directory
+// * Replace the "tts-webui" directory in the newly installed directory
 // * Run update_*platform*
 
 // ## Manual installation (not recommended, check installer source for reference)
@@ -133,7 +133,7 @@ import heroImg from "../../public/img/hero.png";
 // * Install git (`conda install git`)
 // * Install ffmpeg (`conda install -y -c pytorch ffmpeg`)
 // * Set up pytorch with CUDA or CPU (https://pytorch.org/audio/stable/build.windows.html#install-pytorch)
-// * Clone the repo: `git clone https://github.com/rsxdalv/tts-generation-webui.git`
+// * Clone the repo: `git clone https://github.com/rsxdalv/tts-webui.git`
 // * install the root requirements.txt with `pip install -r requirements.txt`
 // * clone the repos in the ./models/ directory and install requirements under them
 // * run using `(venv) python server.py`
@@ -235,7 +235,7 @@ const Hero = () => {
                 One Click Installer
               </a>
               <a
-                href="https://github.com/rsxdalv/tts-generation-webui"
+                href="https://github.com/rsxdalv/tts-webui"
                 target="_blank"
                 rel="noopener"
                 className="flex items-center space-x-2 text-gray-500 dark:text-gray-400"
