@@ -204,7 +204,6 @@ google-cloud-resource-manager==1.14.2
 google-cloud-spanner==3.54.0
 google-cloud-storage==2.19.0
 google-cloud-translate==3.20.2
-google-colab @ file:///colabtools/dist/google_colab-1.0.0.tar.gz
 google-crc32c==1.7.1
 google-genai==1.15.0
 google-generativeai==0.8.5
