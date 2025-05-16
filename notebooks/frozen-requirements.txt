@@ -335,7 +335,6 @@ libraft-cu12==25.2.0
 librosa==0.10.2.post1
 libucx-cu12==1.18.1
 libucxx-cu12==0.42.0
-lightgbm @ file:///tmp/lightgbm/LightGBM/dist/lightgbm-4.5.0-py3-none-linux_x86_64.whl
 lightning-utilities==0.14.3
 linkify-it-py==2.0.3
 lion-pytorch==0.2.3
