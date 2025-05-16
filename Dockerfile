@@ -1,5 +1,5 @@
 # Python 3.10 w/ Nvidia Cuda
-FROM nvidia/cuda:11.8.0-devel-ubuntu22.04 AS env_base
+FROM nvidia/cuda:12.4.0-devel-ubuntu22.04 AS env_base
 
 # Install Pre-reqs
 RUN apt-get update && apt-get install --no-install-recommends -y \
