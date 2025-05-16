@@ -16,8 +16,8 @@ const Home = () => {
   return (
     <>
       <Head>
-        <title>TTS Generation Webui</title>
-        <meta name="description" content="TTS Generation Webui" />
+        <title>TTS WebUI / Harmonica</title>
+        <meta name="description" content="TTS WebUI / Harmonica" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 

@@ -2,7 +2,7 @@ import Image from "next/image";
 import Container from "./container";
 import heroImg from "../../public/img/hero.png";
 
-// # TTS Generation WebUI (Bark, MusicGen, Tortoise, Vocos)
+// # TTS WebUI / Harmonica (Bark, MusicGen, Tortoise, Vocos)
 
 // ## One click installers
 
@@ -221,7 +221,7 @@ const Hero = () => {
               {/* Nextly is a free landing page & marketing website
               template for startups and indie projects. Its built with
               Next.js & TailwindCSS. And its completely open-source. */}
-              TTS Generation WebUI is a free gradio based web interface for
+              TTS WebUI / Harmonica is a free gradio based web interface for
               Text-to-Speech, Audio and Music Generation.
             </p>
 

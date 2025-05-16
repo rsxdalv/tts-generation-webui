@@ -31,7 +31,7 @@ const Navbar = () => {
                         className="w-8"
                       />
                     </span> */}
-                    <span>TTS Generation Webui</span>
+                    <span>TTS WebUI / Harmonica</span>
                   </span>
                 </Link>
 

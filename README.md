@@ -1,4 +1,4 @@
-# TTS Generation WebUI (Bark, MusicGen, Tortoise, Vocos)
+# TTS WebUI / Harmonica (Bark, MusicGen, Tortoise, Vocos)
 
 ## One click installers
 
