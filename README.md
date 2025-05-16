@@ -9,7 +9,6 @@
   [Docker Setup](#docker-setup) ||
   [Silly Tavern](#integrations) ||
   [Extensions](#extensions) ||
-
   [Feedback / Bug reports](https://forms.gle/2L62owhBsGFzdFBC8)
 
   </h4>
