@@ -14,8 +14,8 @@ export function GPUMemoryUsage({
         <CardTitle>GPU Memory Usage</CardTitle>
       </CardHeader>
       <CardContent className="grid gap-4">
-        <GPUMemoryUsageBar value={used_vram} max={vram} label="TTS Generation WebUI used VRAM" />
-        <GPUMemoryUsageBar value={cached_vram} max={vram} label="TTS Generation WebUI Cached VRAM" />
+        <GPUMemoryUsageBar value={used_vram} max={vram} label="TTS WebUI used VRAM" />
+        <GPUMemoryUsageBar value={cached_vram} max={vram} label="TTS WebUI Cached VRAM" />
         <GPUMemoryUsageBar value={used_vram_total} max={vram} label="Used VRAM System" />
       </CardContent>
     </Card>

@@ -22,7 +22,7 @@ const checkConda = async () => {
     // expect
     // # conda environments:
     // #
-    // base                 * .. ..\tts-generation-webui-main\installer_files\env
+    // base                 * .. ..\tts-webui-main\installer_files\env
     $sh("node --version");
     $sh("python --version");
     $sh("pip --version");
@@ -60,12 +60,12 @@ const syncRepo = async () => {
   updateState({ status: "updating_repo", currentStep: 2 });
 
   if (!fs.existsSync(".git")) {
-    displayMessage("Linking to tts-generation-webui repository");
-    // this is a clone over the files from https://github.com/rsxdalv/tts-generation-webui
+    displayMessage("Linking to tts-webui repository");
+    // this is a clone over the files from https://github.com/rsxdalv/tts-webui
     try {
       await $sh("git init -b main");
       await $sh(
-        "git remote add origin https://github.com/rsxdalv/tts-generation-webui"
+        "git remote add origin https://github.com/rsxdalv/tts-webui"
       );
       await $sh("git fetch");
       await $sh("git reset --hard origin/main"); // Required when the versioned files existed in path before "git init" of this repo.
@@ -85,7 +85,7 @@ const syncRepo = async () => {
       throw error;
     }
   } else {
-    displayMessage("Pulling updates from tts-generation-webui");
+    displayMessage("Pulling updates from tts-webui");
     try {
       await $sh("git pull");
       const newHash = getGitCommitHash();

@@ -1,26 +1,25 @@
-<h1 align="center">TTS Generation WebUI / Harmonica</h1>
+<h1 align="center">TTS WebUI / Harmonica</h1>
 
 <div align="center">
 
-  <h3 align="center">
+  <h4 align="center">
 
-  [Download Installer](https://github.com/rsxdalv/tts-generation-webui/archive/refs/heads/main.zip) ||
+  [Download Installer](https://github.com/rsxdalv/tts-webui/archive/refs/heads/main.zip) ||
   [Installation](#installation) ||
   [Docker Setup](#docker-setup) ||
   [Silly Tavern](#integrations) ||
   [Extensions](#extensions) ||
-
   [Feedback / Bug reports](https://forms.gle/2L62owhBsGFzdFBC8)
 
-  </h3>
+  </h4>
 
-  [![banner](./documentation/screenshots/banner.png)](https://github.com/rsxdalv/tts-generation-webui)
+  [![banner](./documentation/screenshots/banner.png)](https://github.com/rsxdalv/tts-webui)
 
-  [![GitHub stars](https://img.shields.io/github/stars/rsxdalv/tts-generation-webui?style=social)](https://github.com/rsxdalv/tts-generation-webui/stargazers)
-  [![GitHub](https://img.shields.io/github/license/rsxdalv/tts-generation-webui)](https://github.com/rsxdalv/tts-generation-webui/blob/main/LICENSE)
+  [![GitHub stars](https://img.shields.io/github/stars/rsxdalv/tts-webui?style=social)](https://github.com/rsxdalv/tts-webui/stargazers)
+  [![GitHub](https://img.shields.io/github/license/rsxdalv/tts-webui)](https://github.com/rsxdalv/tts-webui/blob/main/LICENSE)
   [![Discord](https://img.shields.io/discord/1258772280071295018?label=discord&logo=discord&logoColor=white)](https://discord.gg/V8BKTVRtJ9)
-  [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rsxdalv/tts-generation-webui/blob/main/notebooks/google_colab.ipynb)
-  [![GitHub forks](https://img.shields.io/github/forks/rsxdalv/tts-generation-webui?style=social)](https://github.com/rsxdalv/tts-generation-webui/network/members)
+  [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rsxdalv/tts-webui/blob/main/notebooks/google_colab.ipynb)
+  [![GitHub forks](https://img.shields.io/github/forks/rsxdalv/tts-webui?style=social)](https://github.com/rsxdalv/tts-webui/network/members)
 
 </div>
 
@@ -85,6 +84,9 @@
 | :-----------------------------------------: | :-----------------------------------------: | :-------------------------------: |
 
 ## Changelog
+
+May 14:
+* Prepare for Python 3.11 and 3.12 support.
 
 May 12:
 * Fix deepspeed for Windows. Thank you for the reports!
@@ -228,14 +230,14 @@ See the [2023 Changelog](./documentation/changelog-2023.md) for a detailed list 
 ### Upgrading from v6 to new installer
 
 #### Recommended: Fresh install
-* Download the [new version](https://github.com/rsxdalv/tts-generation-webui/archive/refs/heads/main.zip) and run the start_tts_webui.bat (Windows) or start_tts_webui.sh (MacOS, Linux)
+* Download the [new version](https://github.com/rsxdalv/tts-webui/archive/refs/heads/main.zip) and run the start_tts_webui.bat (Windows) or start_tts_webui.sh (MacOS, Linux)
 * Once it is finished, close the server.
 * Recommended: Copy the old generations to the new directory, such as favorites/ outputs/ outputs-rvc/ models/ collections/ config.json
-* With caution: you can copy the whole new tts-generation-webui directory over the old one, but there might be some old files that are lost.
+* With caution: you can copy the whole new tts-webui directory over the old one, but there might be some old files that are lost.
 
 #### In-place upgrade, can delete some files, tweaks
 * Update the existing installation using the update_*platform* script
-* After the update run the new start_tts_webui.bat (Windows) or start_tts_webui.sh (MacOS, Linux) inside of the tts-generation-webui directory
+* After the update run the new start_tts_webui.bat (Windows) or start_tts_webui.sh (MacOS, Linux) inside of the tts-webui directory
 * Once the server starts, check if it works.
 * With caution: if the new server works, within the one-click-installers directory, delete the old installer_files.
 
@@ -277,21 +279,21 @@ Using the instructions above, you can install an OpenAI compatible API, and use 
 
 Current base installation size is around 10.7 GB. Each model will require 2-8 GB of space in addition.
 
-* Download the [latest version](https://github.com/rsxdalv/tts-generation-webui/archive/refs/heads/main.zip) and extract it.
+* Download the [latest version](https://github.com/rsxdalv/tts-webui/archive/refs/heads/main.zip) and extract it.
 * Run start_tts_webui.bat or start_tts_webui.sh to start the server. It will ask you to select the GPU/Chip you are using. Once everything has installed, it will start the Gradio server at http://localhost:7770 and the React UI at http://localhost:3000.
 * Output log will be available in the installer_scripts/output.log file.
 * Note: The start script sets up a conda environment and a python virtual environment. Thus you don't need to make a venv before that, and in fact, launching from another venv might break this script.
 
-### Manual installation (not recommended)
+### Manual installation
 
 For detailed manual installation instructions, please refer to the [Manual Installation Guide](./documentation/manual_installation.md).
 
 ### Docker Setup
 
-tts-generation-webui can also be ran inside of a Docker container. Using CUDA inside of docker requires (NVIDIA Container Toolkit)[https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html]. To get started, pull the image from GitHub Container Registry:
+tts-webui can also be ran inside of a Docker container. Using CUDA inside of docker requires (NVIDIA Container Toolkit)[https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html]. To get started, pull the image from GitHub Container Registry:
 
 ```
-docker pull ghcr.io/rsxdalv/tts-generation-webui:main
+docker pull ghcr.io/rsxdalv/tts-webui:main
 ```
 
 Once the image has been pulled it can be started with Docker Compose:
@@ -304,14 +306,14 @@ docker compose up -d
 The container will take some time to generate the first output while models are downloaded in the background. The status of this download can be verified by checking the container logs:
 
 ```
-docker logs tts-generation-webui
+docker logs tts-webui
 ```
 
 #### Building the image yourself
 If you wish to build your own docker container, you can use the included Dockerfile:
 
 ```
-docker build -t tts-generation-webui .
+docker build -t tts-webui .
 ```
 Please note that the docker-compose needs to be edited to use the image you just built.
 
@@ -346,7 +348,7 @@ It's not clear if this situation will ever be resolvable, but that is the hope.
 [README_Bark.md](./documentation/README_Bark.md)
 
 ## Info about managing models, caches and system space for AI projects
-https://github.com/rsxdalv/tts-generation-webui/discussions/186#discussioncomment-7291274
+https://github.com/rsxdalv/tts-webui/discussions/186#discussioncomment-7291274
 
 
 

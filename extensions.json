@@ -273,7 +273,7 @@
             "name": "Bark Legacy",
             "version": "0.0.1",
             "requirements": "git+https://github.com/rsxdalv/extension_bark_legacy@main",
-            "description": "This is the legacy UI of Bark from TTS-Generation-WebUI",
+            "description": "This is the legacy UI of Bark from TTS-WebUI",
             "extension_type": "interface",
             "extension_class": "text-to-speech",
             "author": "rsxdalv",

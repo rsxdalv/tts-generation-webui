@@ -4,7 +4,7 @@ This document explains how to use the external extensions feature to add custom 
 
 ## Overview
 
-The TTS Generation WebUI supports loading extensions from multiple sources:
+The TTS WebUI supports loading extensions from multiple sources:
 
 1. The main `extensions.json` file (included in the repository)
 2. An optional `extensions.external.json` file (gitignored, for your custom extensions)

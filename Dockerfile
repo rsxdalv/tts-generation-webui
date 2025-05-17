@@ -1,5 +1,5 @@
 # Python 3.10 w/ Nvidia Cuda
-FROM nvidia/cuda:11.8.0-devel-ubuntu22.04 AS env_base
+FROM nvidia/cuda:12.4.0-devel-ubuntu22.04 AS env_base
 
 # Install Pre-reqs
 RUN apt-get update && apt-get install --no-install-recommends -y \
@@ -30,10 +30,10 @@ RUN pip install --no-cache-dir setuptools torch==$TORCH_VERSION torchvision torc
 WORKDIR /app
 
 # Clone the repo
-RUN git clone https://github.com/rsxdalv/tts-generation-webui.git
+RUN git clone https://github.com/rsxdalv/tts-webui.git /app/tts-webui
 
 # Set working directory to the cloned repo
-WORKDIR /app/tts-generation-webui
+WORKDIR /app/tts-webui
 
 # Install all requirements
 RUN pip3 install --no-cache-dir torch==$TORCH_VERSION -r requirements.txt

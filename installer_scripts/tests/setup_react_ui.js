@@ -1,4 +1,4 @@
-// filepath: c:\Users\rob\Desktop\tts-generation-webui-main\installer_scripts\tests\setup_react_ui.js
+// filepath: c:\Users\rob\Desktop\tts-webui-main\installer_scripts\tests\setup_react_ui.js
 const { displayMessage, displayError } = require("../js/displayMessage.js");
 const { processExit } = require("../js/processExit.js");
 const { setupReactUI } = require("../js/initializeApp.js");

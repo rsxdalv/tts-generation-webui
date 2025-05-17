@@ -9,9 +9,23 @@ beartype>=0.16.1 # workaround for a bug
 soundfile==0.12.1; sys_platform == 'win32' # torchaudio
 # Deepspeed needs to be compiled with DS_BUILD_OPS otherwise pip only install of PyTorch without NVCC will fail.
 # deepspeed==0.16.5; sys_platform == 'win32' # Apache 2.0
+
+# https://github.com/rsxdalv/xformers/releases/download/v0.0.30/xformers-0.0.30+cbc9beb.d20250514-cp310-cp310-macosx_11_0_universal2.whl ; sys_platform == 'darwin' and python_version == '3.10' # BSD 3-Clause License
+# https://github.com/rsxdalv/xformers/releases/download/v0.0.30/xformers-0.0.30+cbc9beb.d20250514-cp311-cp311-macosx_11_0_universal2.whl ; sys_platform == 'darwin' and python_version == '3.11' # BSD 3-Clause License
+# xformers==0.0.30; sys_platform == 'darwin' # Apache 2.0
+
 fairseq @ https://github.com/rsxdalv/fairseq/releases/download/v0.12.3/fairseq-0.12.13-cp310-cp310-win_amd64.whl ; sys_platform == 'win32' and python_version == '3.10' # MIT License
 fairseq @ https://github.com/rsxdalv/fairseq/releases/download/v0.12.3/fairseq-0.12.13-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl ; sys_platform == 'linux' and python_version == '3.10' # MIT License
 fairseq @ https://github.com/rsxdalv/fairseq/releases/download/v0.12.3/fairseq-0.12.13-cp310-cp310-macosx_11_0_universal2.whl ; sys_platform == 'darwin' and python_version == '3.10' # MIT License
+
+fairseq @ https://github.com/rsxdalv/fairseq/releases/download/v0.12.3/fairseq-0.12.13-cp311-cp311-win_amd64.whl ; sys_platform == 'win32' and python_version == '3.11' # MIT License
+fairseq @ https://github.com/rsxdalv/fairseq/releases/download/v0.12.3/fairseq-0.12.13-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl ; sys_platform == 'linux' and python_version == '3.11' # MIT License
+fairseq @ https://github.com/rsxdalv/fairseq/releases/download/v0.12.3/fairseq-0.12.13-cp311-cp311-macosx_11_0_universal2.whl ; sys_platform == 'darwin' and python_version == '3.11' # MIT License
+
+fairseq @ https://github.com/rsxdalv/fairseq/releases/download/v0.12.3/fairseq-0.12.13-cp312-cp312-win_amd64.whl ; sys_platform == 'win32' and python_version == '3.12' # MIT License
+fairseq @ https://github.com/rsxdalv/fairseq/releases/download/v0.12.3/fairseq-0.12.13-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl ; sys_platform == 'linux' and python_version == '3.12' # MIT License
+fairseq @ https://github.com/rsxdalv/fairseq/releases/download/v0.12.3/fairseq-0.12.13-cp312-cp312-macosx_11_0_universal2.whl ; sys_platform == 'darwin' and python_version == '3.12' # MIT License
+
 accelerate>=0.33.0
 # optimum-quanto==0.2.6
 
@@ -28,3 +42,5 @@ extension_demucs @ git+https://github.com/rsxdalv/extension_demucs@main
 extension_mms @ git+https://github.com/rsxdalv/extension_mms@main
 extension_seamless_m4t @ git+https://github.com/rsxdalv/extension_seamless_m4t@main
 extension_vocos @ git+https://github.com/rsxdalv/extension_vocos@main
+
+matplotlib

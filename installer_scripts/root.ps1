@@ -16,7 +16,7 @@ $choices  = '&Yes', '&No'
 # check if there are spaces in the path
 if ($PSScriptRoot -match " ") {
     Write-Host "Warning: The installation directory's path contains a space character. Conda will fail to install. Please change the directory."
-    Write-Host "For example, C:\AI\TTS-Generation-WebUI\"
+    Write-Host "For example, C:\AI\tts-webui\"
     # ask user if they still want to continue
     $decision = $Host.UI.PromptForChoice($title, $question, $choices, 1)
     if ($decision -eq 1) {
