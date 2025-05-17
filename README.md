@@ -284,7 +284,7 @@ Current base installation size is around 10.7 GB. Each model will require 2-8 GB
 * Output log will be available in the installer_scripts/output.log file.
 * Note: The start script sets up a conda environment and a python virtual environment. Thus you don't need to make a venv before that, and in fact, launching from another venv might break this script.
 
-### Manual installation (not recommended)
+### Manual installation
 
 For detailed manual installation instructions, please refer to the [Manual Installation Guide](./documentation/manual_installation.md).
 
